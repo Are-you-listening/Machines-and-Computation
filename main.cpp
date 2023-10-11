@@ -5,6 +5,6 @@
 #include <iostream>
 
 int main() {
-    std::cout << "We love Tibo" << std::endl;
+    std::cout << "We do really love Tibo" << std::endl;
     return 0;
 }
