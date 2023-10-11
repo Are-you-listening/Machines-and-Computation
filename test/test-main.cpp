@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-int main() {
+int test() {
     std::cout << "We love Tibo" << std::endl;
     return 0;
 }
