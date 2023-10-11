@@ -7,4 +7,12 @@ include_directories(.)
 
 add_executable(Tog
         main.cpp
-        test/test-main.cpp)
+
+        test/test-main.cpp
+
+        lib/DesignByContract.h
+
+        lib/helper.cpp
+        lib/helper.h
+        lib/json.hpp
+)
