@@ -19,6 +19,8 @@ private:
     std::vector<std::string> T;
     std::vector<std::pair<std::string,std::vector<std::string>>> P;
     std::string S;
+    bool CNF = false;
+    bool GNF = false;
     
 public:
     CFG();
@@ -27,6 +29,7 @@ public:
     CFG(const std::vector<std::string> &v, const std::vector<std::string> &t,
         const std::vector<std::pair<std::string, std::vector<std::string>>> &p, const std::string &s);
     void toCNF();
+    void toGNF();
 
 };
 
