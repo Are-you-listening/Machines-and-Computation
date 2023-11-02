@@ -115,3 +115,20 @@ TEST(TuringMachineTest, large_runtime_test) {
 
     EXPECT_TRUE(FileCompare("output/TM_3.txt", "TestCompareFiles/TM_3.txt"));
 }
+
+TEST(TuringMachineTest, TM_4_test) {
+    ofstream output("output/TM_4.txt");
+
+    TuringMachine t{"TestFiles/TM_4.json"};
+    while (!t.isHalted()){
+
+        for (int i = 0; i < t.getTapeAmount(); i++){
+            output << t.getTapeData(i) << endl;
+        }
+        output << endl;
+
+        t.move();
+    }
+
+    EXPECT_TRUE(FileCompare("output/TM_4.txt", "TestCompareFiles/TM_4.txt"));
+}

@@ -88,7 +88,7 @@ void Tape::moveHead(int move_direction) {
         increase_size(false, optional<unsigned long>());
     }
 
-    if (tape_head_index+move_direction > tape_size){
+    if (tape_head_index+move_direction >= tape_size){
         increase_size(true, optional<unsigned long>());
     }
 
