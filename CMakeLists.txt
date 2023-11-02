@@ -23,7 +23,6 @@ set(TestCaseFiles
 )
 
 
-
 set(TuringCode
         TM/TuringMachine.cpp
         TM/TuringMachine.h
@@ -40,7 +39,6 @@ set(CodeFiles
         lib/json.hpp
         Tokenazation.cpp
         Tokenazation.h
-        CFG.cpp CFG.h
         ${TuringCode}
 )
 
@@ -60,13 +58,5 @@ gtest_discover_tests(TESTS)
 add_executable(Tog
         main.cpp
         ${CodeFiles}
-        
-        lib/DesignByContract.h
-
-        lib/helper.cpp
-        lib/helper.h
-        lib/json.hpp
-        Tokenazation.cpp 
-        Tokenazation.h
-        CFG.cpp CFG.h)
+)
 
