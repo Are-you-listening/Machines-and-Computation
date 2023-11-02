@@ -2,7 +2,9 @@
   "States": ["q", "p", "r", "s"],
   "Tapes": 2,
   "Productions": [
-    {"state": "q", "symbols": ["a", "b"], "to": {"state":  "q", "symbols": ["b", "a"], "moves": [1, 1]}}
+    {"state": "q", "symbols": ["a", "b"], "to": {"state":  "q", "symbols": ["b", "a"], "moves": [1, 1]}},
+    {"state": "q", "symbols": ["a", ""], "to": {"state":  "q", "symbols": ["", "b"], "moves": [1, 1]}}
   ],
-  "Start": "q"
+  "Start": "q",
+  "Input": "abcdefg"
 }

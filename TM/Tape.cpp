@@ -98,3 +98,12 @@ char Tape::getSymbol() const noexcept {
     return *tape_head;
 }
 
+void Tape::load(const string &input) {
+    for (int i = 0; i < input.size(); i++){
+        write(input[i]);
+        moveHead(1);
+    }
+    moveHead(-(int) input.size());
+
+}
+

@@ -20,6 +20,8 @@ public:
     [[nodiscard]] char getSymbol() const noexcept;
     void moveHead(int move_direction);
 
+    void load(const string& input);
+
 private:
     unsigned long tape_size;
     char* tape_ptr;

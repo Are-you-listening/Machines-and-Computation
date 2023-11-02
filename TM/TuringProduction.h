@@ -21,7 +21,7 @@ class TuringProduction {
 public:
     TuringProduction();
     void addRoute(queue<char>& symbols, Production&& p);
-    Production getProduction(const string_view& symbols);
+    Production getProduction(queue<char>& symbols);
 
 private:
     map<char, TuringProduction*> ptr_vector;

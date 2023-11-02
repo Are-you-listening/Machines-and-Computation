@@ -7,11 +7,26 @@
 #include "TM/Tape.h"
 #include <vector>
 #include <map>
+#include "TM/TuringProduction.h"
+#include "lib/json.hpp"
+#include <fstream>
+#include <set>
+
+using json = nlohmann::json;
+
 class TuringMachine {
 public:
-    TuringMachine(unsigned int tape_amount);
+    TuringMachine(const string &path);
+    void load(const string &path);
+    string getTapeData(unsigned int index) const;
+    void move();
 private:
     vector<Tape*> tapes;
+    map<string, TuringProduction*> production_trees;
+    set<string> states;
+    string start_state;
+    string current_state;
+
 
 
 };

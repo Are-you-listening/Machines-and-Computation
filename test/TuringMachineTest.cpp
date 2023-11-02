@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include "TM/Tape.h"
+#include "TM/TuringMachine.h"
 #include "TM/TuringProduction.h"
 class TuringMachineTest: public ::testing::Test {
 protected:
@@ -15,9 +16,6 @@ protected:
 
 };
 
-TEST(TuringMachineTest, default_constructor) {
-
-}
 
 TEST(TuringMachineTest, tape) {
     Tape* t = new Tape{3};
@@ -59,7 +57,15 @@ TEST(TuringMachineTest, tape_production) {
     }
 
     tp->addRoute(q, std::move(p));
-    Production rep = tp->getProduction("aaa");
+
+    queue<char> qc;
+    for (int i=0; i<3; i++){
+        qc.push('a');
+    }
+
+    Production rep = tp->getProduction(qc);
+    ASSERT_EQ(rep.replace_val.size(), 3);
+    ASSERT_EQ(rep.movement.size(), 3);
     for (char b: rep.replace_val){
         ASSERT_EQ(b, 'b');
     }
@@ -68,4 +74,14 @@ TEST(TuringMachineTest, tape_production) {
     }
 
     ASSERT_EQ(rep.new_state, "q");
+}
+
+TEST(TuringMachineTest, tape_TM_construction) {
+    TuringMachine t{"TestFiles/TM_1.json"};
+    ASSERT_EQ(t.getTapeData(0),"[abcdefg                                                         ]");
+    ASSERT_EQ(t.getTapeData(1),"[                                                                ]");
+    t.move();
+    ASSERT_EQ(t.getTapeData(0),"[ bcdefg                                                         ]");
+    ASSERT_EQ(t.getTapeData(1),"[b                                                               ]");
+    t.move();
 }

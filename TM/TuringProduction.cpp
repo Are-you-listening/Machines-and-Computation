@@ -29,21 +29,23 @@ void TuringProduction::addRoute(queue<char>& symbols, Production&& p) {
 
 }
 
-Production TuringProduction::getProduction(const string_view &symbols) {
+Production TuringProduction::getProduction(queue<char>& symbols) {
     if (symbols.empty()){
         return production;
     }
 
-    auto loc = ptr_vector.find(symbols[0]);
+    auto loc = ptr_vector.find(symbols.front());
     if (loc != ptr_vector.end()){
         TuringProduction* tp = loc->second;
-        return tp->getProduction(symbols.substr(1, symbols.size() - 1));
+        symbols.pop();
+        return tp->getProduction(symbols);
     }
 
     loc = ptr_vector.find('\0');
     if (loc == ptr_vector.end()){
-        throw invalid_argument("no paths");
+        return production;
     }
     TuringProduction* tp = loc->second;
-    return tp->getProduction(symbols.substr(1, symbols.size() - 1));
+    symbols.pop();
+    return tp->getProduction(symbols);
 }
