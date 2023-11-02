@@ -22,18 +22,7 @@ set(TestCaseFiles
         test/TuringMachineTest.cpp
 )
 
-add_executable(TESTS
-        ${CodeFiles}
-        ${TestCaseFiles}
-)
 
-
-target_link_libraries(
-        TESTS
-        GTest::gtest_main
-)
-gtest_discover_tests(TESTS)
-#Google Test Setup END
 
 set(TuringCode
         TM/TuringMachine.cpp
@@ -44,7 +33,6 @@ set(TuringCode
 
 set(CodeFiles
         lib/DesignByContract.h
-
         lib/helper.cpp
         lib/helper.h
         lib/json.hpp
@@ -54,6 +42,19 @@ set(CodeFiles
         CFG.cpp CFG.h
         ${TuringCode}
 )
+
+add_executable(TESTS
+        ${CodeFiles}
+        ${TestCaseFiles}
+)
+
+target_link_libraries(
+        TESTS
+        GTest::gtest_main
+)
+gtest_discover_tests(TESTS)
+#Google Test Setup END
+
 
 add_executable(Tog
         main.cpp
