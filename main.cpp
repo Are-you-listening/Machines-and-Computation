@@ -18,7 +18,7 @@ int main() {
     core_amount--;
     
     CFG cfg("lib/CFG.json");
-    cfg.toGNF();
+    cfg.toGNF(); // this still needs massive debugging. 
     
     Tokenizer.join();
     core_amount++;
