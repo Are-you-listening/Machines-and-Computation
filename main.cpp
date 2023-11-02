@@ -16,9 +16,10 @@ int main() {
     std::string Filelocation="Nested/engine.cc";
     std::thread Tokenizer(&Tokenazation::Tokenize, &tokenVector, Filelocation);
     core_amount--;
+    
     CFG cfg("lib/CFG.json");
     cfg.toGNF();
-    //construct CFG here and convert to CNF and later to GNF
+    
     Tokenizer.join();
     core_amount++;
     //create larl parser with tokenvector

@@ -38,7 +38,6 @@ set(CodeFiles
         lib/json.hpp
         Tokenazation.cpp
         Tokenazation.h
-        GNF.cpp GNF.h
         CFG.cpp CFG.h
         ${TuringCode}
 )
