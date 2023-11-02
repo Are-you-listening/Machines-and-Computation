@@ -99,3 +99,7 @@ void TuringMachine::move(){
 bool TuringMachine::isHalted() const {
     return halted;
 }
+
+unsigned int TuringMachine::getTapeAmount() const {
+    return tapes.size();
+}

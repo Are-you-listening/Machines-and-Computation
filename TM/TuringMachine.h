@@ -22,6 +22,7 @@ public:
     void move();
 
     bool isHalted() const;
+    unsigned int getTapeAmount() const;
 
 private:
     vector<Tape*> tapes;

@@ -98,3 +98,20 @@ TEST(TuringMachineTest, tape_TM_procedure) {
 
     EXPECT_TRUE(FileCompare("output/TM_2.txt", "TestCompareFiles/TM_2.txt"));
 }
+
+TEST(TuringMachineTest, large_runtime_test) {
+    ofstream output("output/TM_3.txt");
+
+    TuringMachine t{"TestFiles/TM_3.json"};
+    while (!t.isHalted()){
+
+        for (int i = 0; i < t.getTapeAmount(); i++){
+            output << t.getTapeData(i) << endl;
+        }
+        output << endl;
+
+        t.move();
+    }
+
+    EXPECT_TRUE(FileCompare("output/TM_3.txt", "TestCompareFiles/TM_3.txt"));
+}

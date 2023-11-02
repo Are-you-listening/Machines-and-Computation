@@ -1,0 +1,16 @@
+{
+  "States": ["q", "p", "r", "s"],
+  "Tapes": 5,
+  "Productions": [
+    {"state": "q", "symbols": ["a", "\u0001", "\u0001", "\u0001", "\u0001"], "to": {"state":  "q", "symbols": ["a", "", "", "", "a"], "moves": [1, 1, 1, 1, 0]}},
+    {"state": "q", "symbols": ["b", "\u0001", "\u0001", "\u0001", "\u0001"], "to": {"state":  "q", "symbols": ["b", "b", "", "", "b"], "moves": [1, 1, 1, 1, 0]}},
+    {"state": "q", "symbols": ["c", "\u0001", "\u0001", "\u0001", "\u0001"], "to": {"state":  "q", "symbols": ["c", "", "c", "", "b"], "moves": [1, 1, 1, 1, 0]}},
+    {"state": "q", "symbols": ["d", "\u0001", "\u0001", "\u0001", "\u0001"], "to": {"state":  "q", "symbols": ["d", "", "", "d", "b"], "moves": [1, 1, 1, 1, 0]}},
+    {"state": "q", "symbols": ["e", "\u0001", "\u0001", "\u0001", "\u0001"], "to": {"state":  "q", "symbols": ["d", "", "", "d", "b"], "moves": [1, 1, 1, 1, 0]}},
+    {"state": "q", "symbols": ["f", "\u0001", "\u0001", "\u0001", "\u0001"], "to": {"state":  "q", "symbols": ["d", "", "", "d", "b"], "moves": [1, 1, 1, 1, 0]}},
+    {"state": "q", "symbols": ["g", "\u0001", "\u0001", "\u0001", "\u0001"], "to": {"state":  "q", "symbols": ["d", "", "", "d", "b"], "moves": [1, 1, 1, 1, 0]}}
+
+  ],
+  "Start": "q",
+  "Input": "abcdefgabc"
+}

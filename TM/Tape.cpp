@@ -76,6 +76,9 @@ string Tape::getTapeData() const noexcept {
 }
 
 void Tape::write(char symbol) {
+    if (symbol == '\1'){
+        return;
+    }
     *tape_head = symbol;
 }
 
