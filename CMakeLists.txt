@@ -16,10 +16,18 @@ FetchContent_Declare(
 #set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 enable_testing()
-add_executable(
-        TESTS
+
+set(TestCaseFiles
         test/test-main.cpp
+        test/TuringMachineTest.cpp
 )
+
+add_executable(TESTS
+        ${CodeFiles}
+        ${TestCaseFiles}
+)
+
+
 target_link_libraries(
         TESTS
         GTest::gtest_main
@@ -27,16 +35,30 @@ target_link_libraries(
 gtest_discover_tests(TESTS)
 #Google Test Setup END
 
-add_executable(Tog
-        main.cpp
+set(TuringCode
+        TM/TuringMachine.cpp
+        TM/TuringMachine.h
+        TM/Tape.cpp
+        TM/Tape.h
+)
 
+set(CodeFiles
         lib/DesignByContract.h
 
         lib/helper.cpp
         lib/helper.h
         lib/json.hpp
-        Tokenazation.cpp 
-        Tokenazation.h 
-        GNF.cpp GNF.h 
-        CFG.cpp CFG.h)
+        Tokenazation.cpp
+        Tokenazation.h
+        GNF.cpp GNF.h
+        CFG.cpp CFG.h
+        ${TuringCode}
+)
+
+add_executable(Tog
+        main.cpp
+        ${CodeFiles}
+)
+
+
 
