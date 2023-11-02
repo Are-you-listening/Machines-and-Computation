@@ -20,6 +20,9 @@ public:
     void load(const string &path);
     string getTapeData(unsigned int index) const;
     void move();
+
+    bool isHalted() const;
+
 private:
     vector<Tape*> tapes;
     map<string, TuringProduction*> production_trees;
@@ -27,8 +30,7 @@ private:
     string start_state;
     string current_state;
 
-
-
+    bool halted;
 };
 
 

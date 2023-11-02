@@ -1,0 +1,21 @@
+{
+  "States": ["q0", "q1", "q2", "q3"],
+  "Tapes": 1,
+  "Productions": [
+    {"state": "q0", "symbols": ["#"], "to": {"state":  "q0", "symbols": ["#"], "moves": [1]}},
+    {"state": "q0", "symbols": ["0"], "to": {"state":  "q1", "symbols": ["#"], "moves": [1]}},
+    {"state": "q1", "symbols": ["#"], "to": {"state":  "q2", "symbols": ["#"], "moves": [-1]}},
+    {"state": "q1", "symbols": ["0"], "to": {"state":  "q1", "symbols": ["0"], "moves": [1]}},
+    {"state": "q1", "symbols": ["1"], "to": {"state":  "q1", "symbols": ["1"], "moves": [1]}},
+    {"state": "q1", "symbols": ["-"], "to": {"state":  "q1", "symbols": ["-"], "moves": [1]}},
+    {"state": "q2", "symbols": ["0"], "to": {"state":  "q3", "symbols": ["1"], "moves": [-1]}},
+    {"state": "q2", "symbols": ["1"], "to": {"state":  "q2", "symbols": ["0"], "moves": [-1]}},
+    {"state": "q2", "symbols": ["-"], "to": {"state":  "q3", "symbols": ["1"], "moves": [-1]}},
+    {"state": "q3", "symbols": ["#"], "to": {"state":  "q0", "symbols": ["#"], "moves": [1]}},
+    {"state": "q3", "symbols": ["0"], "to": {"state":  "q3", "symbols": ["0"], "moves": [-1]}},
+    {"state": "q3", "symbols": ["1"], "to": {"state":  "q3", "symbols": ["1"], "moves": [-1]}},
+    {"state": "q3", "symbols": ["-"], "to": {"state":  "q3", "symbols": ["-"], "moves": [-1]}}
+  ],
+  "Start": "q0",
+  "Input": "#000000----#"
+}

@@ -13,6 +13,8 @@ void TuringMachine::load(const string &path) {
     ifstream f(path);
     json data = json::parse(f);
 
+    halted = false;
+
     for (int i = 0; i<data["States"].size(); i++){
         states.insert(data["States"][i].get<std::string>());
     }
@@ -75,14 +77,14 @@ void TuringMachine::move(){
     }
     auto loc = production_trees.find(current_state);
     if (loc == production_trees.end()){
-        //cout << "halted" << endl;
+        halted = true;
         return;
     }
 
     Production p = loc->second->getProduction(symbols);
 
     if (p.new_state == ""){
-        //cout << "halted" << endl;
+        halted = true;
         return;
     }
 
@@ -92,4 +94,8 @@ void TuringMachine::move(){
         t->write(p.replace_val[i]);
         t->moveHead(p.movement[i]);
     }
+}
+
+bool TuringMachine::isHalted() const {
+    return halted;
 }

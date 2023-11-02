@@ -2,6 +2,7 @@
 #include "TM/Tape.h"
 #include "TM/TuringMachine.h"
 #include "TM/TuringProduction.h"
+#include "lib/helper.h"
 class TuringMachineTest: public ::testing::Test {
 protected:
     virtual void SetUp() {
@@ -84,4 +85,16 @@ TEST(TuringMachineTest, tape_TM_construction) {
     ASSERT_EQ(t.getTapeData(0),"[ bcdefg                                                         ]");
     ASSERT_EQ(t.getTapeData(1),"[b                                                               ]");
     t.move();
+}
+
+TEST(TuringMachineTest, tape_TM_procedure) {
+    ofstream output("output/TM_2.txt");
+
+    TuringMachine t{"TestFiles/TM_2.json"};
+    while (!t.isHalted()){
+        t.move();
+        output << t.getTapeData(0) << endl;
+    }
+
+    EXPECT_TRUE(FileCompare("output/TM_2.txt", "TestCompareFiles/TM_2.txt"));
 }
