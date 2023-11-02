@@ -29,6 +29,8 @@ set(TuringCode
         TM/TuringMachine.h
         TM/Tape.cpp
         TM/Tape.h
+        TM/TuringProduction.cpp
+        TM/TuringProduction.h
 )
 
 set(CodeFiles

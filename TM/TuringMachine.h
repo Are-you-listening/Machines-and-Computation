@@ -4,13 +4,15 @@
 
 #ifndef TOG_TURINGMACHINE_H
 #define TOG_TURINGMACHINE_H
-
-
+#include "TM/Tape.h"
+#include <vector>
+#include <map>
 class TuringMachine {
 public:
-    TuringMachine();
+    TuringMachine(unsigned int tape_amount);
 private:
-    int tapes;
+    vector<Tape*> tapes;
+
 
 };
 
