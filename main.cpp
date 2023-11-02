@@ -6,6 +6,7 @@
 #include <thread>
 #include <ctime>
 #include "Tokenazation.h"
+#include "GNF.h"
 
 static unsigned int core_amount = std::thread::hardware_concurrency(); // gets "core amount", in windows you can allocate infinite threads. in linux this isn't possible i believe. so pls care about this.
 // so whenever you thread something, pls change core_amount. Also core_amount isn't the perfect name for this

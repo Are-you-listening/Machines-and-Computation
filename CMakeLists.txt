@@ -36,5 +36,7 @@ add_executable(Tog
         lib/helper.h
         lib/json.hpp
         Tokenazation.cpp 
-        Tokenazation.h)
+        Tokenazation.h 
+        GNF.cpp GNF.h 
+        CFG.cpp CFG.h)
 

@@ -11,7 +11,7 @@
 
 class Tokenazation {
 private:
-    /* pair.first, F declares for, C declares code, { declares for/if start
+    /* pair.first, F declares for-loop, C declares code, { declares for/if start
      *  I declares if, E declares else, e declares else if
      * 
      * if you encounter other symbols those are initializations of variables or uses.
