@@ -11,15 +11,22 @@ using namespace std;
 class Tape {
 public:
     Tape();
+    Tape(unsigned long init_size);
 
     [[nodiscard]] unsigned long getTapeSize() const noexcept;
+    [[nodiscard]] string getTapeData() const noexcept;
+
+    void write(char symbol);
+    [[nodiscard]] char getSymbol() const noexcept;
+    void moveHead(int move_direction);
 
 private:
     unsigned long tape_size;
     char* tape_ptr;
     char* tape_head;
+    long tape_head_index;
 
-    void increase_size(optional<unsigned long> optional_size);
+    void increase_size(bool front, optional<unsigned long> optional_size);
 };
 
 
