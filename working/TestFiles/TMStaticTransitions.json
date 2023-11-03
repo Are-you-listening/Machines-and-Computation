@@ -1,0 +1,10 @@
+[{
+  "state": "tokenize_mark_start",
+  "to_state": "tokenize_mark_end",
+  "def_move": 1,
+  "input": ["\u0000"],
+  "input_index": [1],
+  "output": ["S"],
+  "output_index": [0],
+  "move": [1]
+}]

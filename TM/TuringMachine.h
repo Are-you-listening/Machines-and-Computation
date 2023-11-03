@@ -16,6 +16,7 @@ using json = nlohmann::json;
 
 class TuringMachine {
 public:
+    TuringMachine() = default;
     explicit TuringMachine(const string &path);
     ~TuringMachine();
 

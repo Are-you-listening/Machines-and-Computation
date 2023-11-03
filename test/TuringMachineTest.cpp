@@ -2,6 +2,7 @@
 #include "TM/Tape.h"
 #include "TM/TuringMachine.h"
 #include "TM/TuringProduction.h"
+#include "TM/TuringTokenizer.h"
 #include "lib/helper.h"
 #include <memory>
 class TuringMachineTest: public ::testing::Test {
@@ -133,4 +134,9 @@ TEST(TuringMachineTest, TM_4_test) {
     }
 
     EXPECT_TRUE(FileCompare("output/TM_4.txt", "TestCompareFiles/TM_4.txt"));
+}
+
+TEST(TuringMachineTest, TM_tokenazation) {
+    TuringTokenizer* t = new TuringTokenizer;
+    t->tokenize();
 }
