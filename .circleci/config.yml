@@ -23,10 +23,9 @@ jobs:
       - run: cd working && ./../build/testing/testing/TESTS
 
 workflows:
-  default_setup:
+  default_validation:
     jobs:
       - build
-
-  running_tests:
-    jobs:
-      - run_tests
+      - run_tests:
+          requires:
+            - build
