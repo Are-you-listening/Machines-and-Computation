@@ -30,7 +30,7 @@ jobs:
       - checkout
       - attach_workspace:
           at: build
-      - run: mkdir -p output
+      - run: cd working && mkdir -p output
       - run: ls -a
       - run: pwd
       - run: cd working && ./../build/testing/testing/TESTS
