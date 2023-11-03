@@ -21,6 +21,7 @@ jobs:
     steps:
       - run: mkdir output
       - run: ls -a
+      - run: pwd
       - run: cd working && ./../build/testing/testing/TESTS
 
 workflows:
