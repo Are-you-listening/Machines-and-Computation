@@ -1,10 +1,15 @@
 version: 2.1
 
+executors:
+  main_executor:
+    docker:
+      - image: ubuntu:22.04
+
+
 jobs:
   build:
     resource_class: small
-    docker:
-      - image: ubuntu:22.04
+    executor: main_executor
     steps:
       - checkout
       - run: apt update
@@ -16,10 +21,9 @@ jobs:
 
   run_tests:
     resource_class: large
-    docker:
-      - image: ubuntu:22.04
+    executor: main_executor
     steps:
-      - run: mkdir output
+      - run: mkdir -p output
       - run: ls -a
       - run: pwd
       - run: cd working && ./../build/testing/testing/TESTS
