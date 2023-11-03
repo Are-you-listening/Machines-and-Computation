@@ -16,13 +16,15 @@ using json = nlohmann::json;
 
 class TuringMachine {
 public:
-    TuringMachine(const string &path);
+    explicit TuringMachine(const string &path);
+    ~TuringMachine();
+
     void load(const string &path);
     string getTapeData(unsigned int index) const;
     void move();
 
-    bool isHalted() const;
-    unsigned int getTapeAmount() const;
+    [[nodiscard]] bool isHalted() const;
+    [[nodiscard]] unsigned int getTapeAmount() const;
 
 private:
     vector<Tape*> tapes;

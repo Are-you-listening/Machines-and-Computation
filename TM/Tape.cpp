@@ -110,3 +110,7 @@ void Tape::load(const string &input) {
 
 }
 
+Tape::~Tape() {
+    free(tape_ptr);
+}
+

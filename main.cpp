@@ -17,8 +17,8 @@ int main() {
     std::thread Tokenizer(&Tokenazation::Tokenize, &tokenVector, Filelocation);
     core_amount--;
     
-    CFG cfg("TestFiles/CFG.json"); //don't forget to add CFG back into cmakelist in right set
-    cfg.toGNF(); // this still needs massive debugging. 
+    //CFG cfg("TestFiles/CFG.json"); //don't forget to add CFG back into cmakelist in right set
+    //cfg.toGNF(); // this still needs massive debugging.
     
     Tokenizer.join();
     core_amount++;

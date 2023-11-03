@@ -4,9 +4,6 @@
 
 #include "TuringProduction.h"
 
-TuringProduction::TuringProduction() {
-
-}
 
 void TuringProduction::addRoute(queue<char>& symbols, Production&& p) {
     if (symbols.empty()){
@@ -48,4 +45,10 @@ Production TuringProduction::getProduction(queue<char>& symbols) {
     TuringProduction* tp = loc->second;
     symbols.pop();
     return tp->getProduction(symbols);
+}
+
+TuringProduction::~TuringProduction() {
+    for (auto [k, v]: ptr_vector){
+        delete v;
+    }
 }

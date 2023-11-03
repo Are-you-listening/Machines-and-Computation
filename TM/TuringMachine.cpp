@@ -103,3 +103,13 @@ bool TuringMachine::isHalted() const {
 unsigned int TuringMachine::getTapeAmount() const {
     return tapes.size();
 }
+
+TuringMachine::~TuringMachine() {
+    for (auto tape: tapes){
+        delete tape;
+    }
+
+    for (auto [k, tree]: production_trees){
+        delete tree;
+    }
+}

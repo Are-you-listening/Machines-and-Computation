@@ -11,6 +11,7 @@ using namespace std;
 class Tape {
 public:
     Tape();
+    ~Tape();
     Tape(unsigned long init_size);
 
     [[nodiscard]] unsigned long getTapeSize() const noexcept;

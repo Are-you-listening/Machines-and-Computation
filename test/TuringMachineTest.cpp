@@ -3,6 +3,7 @@
 #include "TM/TuringMachine.h"
 #include "TM/TuringProduction.h"
 #include "lib/helper.h"
+#include <memory>
 class TuringMachineTest: public ::testing::Test {
 protected:
     virtual void SetUp() {
@@ -19,7 +20,8 @@ protected:
 
 
 TEST(TuringMachineTest, tape) {
-    Tape* t = new Tape{3};
+
+    shared_ptr<Tape> t{new Tape{3}};
     ASSERT_EQ(t->getTapeSize(), 3);
     ASSERT_EQ(t->getTapeData(), "[   ]");
     t->write('a');
@@ -45,7 +47,7 @@ TEST(TuringMachineTest, tape) {
 }
 
 TEST(TuringMachineTest, tape_production) {
-    TuringProduction* tp = new TuringProduction{};
+    shared_ptr<TuringProduction> tp{new TuringProduction{}};
 
     Production p;
     p.replace_val = {'b','b','b'};

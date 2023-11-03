@@ -8,6 +8,7 @@
 #include <map>
 #include <iostream>
 #include <queue>
+#include <memory>
 using namespace std;
 
 struct Production{
@@ -19,7 +20,8 @@ struct Production{
 
 class TuringProduction {
 public:
-    TuringProduction();
+    TuringProduction() = default;
+    ~TuringProduction();
     void addRoute(queue<char>& symbols, Production&& p);
     Production getProduction(queue<char>& symbols);
 
