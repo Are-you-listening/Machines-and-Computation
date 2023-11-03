@@ -60,3 +60,9 @@ add_executable(Tog
         ${CodeFiles}
 )
 
+set(CMAKE_INSTALL_PREFIX testing)
+install(TARGETS TESTS
+        DESTINATION ${CMAKE_INSTALL_PREFIX}
+)
+
+
