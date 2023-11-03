@@ -18,11 +18,17 @@ jobs:
       - run: cd build && cmake ..
       - run: cd build && make
       - run: cd build && make install
+      - persist_to_workspace:
+          paths:
+            - testing/testing/TESTS
+          root: build
 
   run_tests:
     resource_class: large
     executor: main_executor
     steps:
+      - attach_workspace:
+          at: build
       - run: mkdir -p output
       - run: ls -a
       - run: pwd
