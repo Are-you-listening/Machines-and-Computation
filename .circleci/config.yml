@@ -27,6 +27,7 @@ jobs:
     resource_class: large
     executor: main_executor
     steps:
+      - checkout
       - attach_workspace:
           at: build
       - run: mkdir -p output
