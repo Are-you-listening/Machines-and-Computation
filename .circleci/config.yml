@@ -20,6 +20,7 @@ jobs:
       - image: ubuntu:22.04
     steps:
       - run: mkdir output
+      - run: ls -a
       - run: cd working && ./../build/testing/testing/TESTS
 
 workflows:
