@@ -34,9 +34,12 @@ jobs:
       - run: cd working && ./../build/testing/testing/TESTS
 
 workflows:
-  default_validation:
+  default_validation: &default_validation
     jobs:
       - build
       - run_tests:
           requires:
             - build
+
+  default_validation2:
+    *default_validation
