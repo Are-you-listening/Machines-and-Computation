@@ -13,3 +13,17 @@ jobs:
       - run: cd build && cmake ..
       - run: cd build && make
       - run: cd build && make install
+
+  run_tests:
+    resource_class: large
+    docker:
+      - image: ubuntu:22.04
+    steps:
+      - checkout
+      - run: apt update
+
+workflows:
+  default_validation:
+    jobs:
+      - build
+      - run_tests
