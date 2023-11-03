@@ -1,5 +1,6 @@
 version: 2.1
 
+
 executors:
   main_executor:
     docker:
@@ -40,6 +41,3 @@ workflows:
       - run_tests:
           requires:
             - build
-
-  default_validation2:
-    *default_validation
