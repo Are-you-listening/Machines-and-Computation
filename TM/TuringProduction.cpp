@@ -38,7 +38,7 @@ Production TuringProduction::getProduction(queue<char>& symbols) {
         return tp->getProduction(symbols);
     }
 
-    loc = ptr_vector.find('\1');
+    loc = ptr_vector.find('\u0001');
     if (loc == ptr_vector.end()){
         return production;
     }

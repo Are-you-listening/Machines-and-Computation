@@ -138,5 +138,24 @@ TEST(TuringMachineTest, TM_4_test) {
 
 TEST(TuringMachineTest, TM_tokenazation) {
     TuringTokenizer* t = new TuringTokenizer;
-    t->tokenize();
+    json data = t->tokenize();
+    ofstream o("output/TM_test.json");
+    o << data;
+    TuringMachine tm;
+    tm.load(data);
+    tm.load_input("int a = 5;", 1);
+    for (int i = 0; i<100; i++){
+        if (tm.isHalted()){
+            continue;
+        }
+        if (i == 19){
+            int j = 0;
+        }
+        tm.move();
+        for (int i = 0; i < tm.getTapeAmount(); i++){
+            cout << tm.getTapeData(i) << endl;
+        }
+    }
+
+    cout << endl;
 }

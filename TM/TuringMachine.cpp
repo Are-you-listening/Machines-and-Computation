@@ -9,10 +9,7 @@ TuringMachine::TuringMachine(const string &path) {
 
 }
 
-void TuringMachine::load(const string &path) {
-    ifstream f(path);
-    json data = json::parse(f);
-
+void TuringMachine::load(json &data) {
     halted = false;
 
     for (int i = 0; i<data["States"].size(); i++){
@@ -29,7 +26,7 @@ void TuringMachine::load(const string &path) {
     }
 
     string input = data["Input"].get<std::string>();
-    tapes[0]->load(input);
+    load_input(input, 0);
 
     for (int i = 0; i<data["Productions"].size(); i++){
         json production = data["Productions"][i];
@@ -63,6 +60,14 @@ void TuringMachine::load(const string &path) {
 
         tp->addRoute(symbols, std::move(p));
     }
+}
+
+
+void TuringMachine::load(const string &path) {
+    ifstream f(path);
+    json data = json::parse(f);
+
+    load(data);
 
 }
 
@@ -113,3 +118,8 @@ TuringMachine::~TuringMachine() {
         delete tree;
     }
 }
+
+void TuringMachine::load_input(const string &input, int index) {
+    tapes[index]->load(input);
+}
+

@@ -21,6 +21,8 @@ public:
     ~TuringMachine();
 
     void load(const string &path);
+    void load(json &data);
+    void load_input(const string& input, int index);
     string getTapeData(unsigned int index) const;
     void move();
 

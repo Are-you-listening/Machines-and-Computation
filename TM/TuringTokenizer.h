@@ -13,7 +13,8 @@ struct Transition{
 };
 
 struct IncompleteTransition{
-    IncompleteTransition(json data);
+    IncompleteTransition(json &data);
+    IncompleteTransition() = default;
     string state;
     string to_state;
     int def_move;
@@ -28,10 +29,13 @@ struct IncompleteTransition{
 class TuringTokenizer {
 public:
     TuringTokenizer();
-    void tokenize();
+    json tokenize();
 private:
+    vector<IncompleteTransition> tokenize_runner_productions();
+
     int tuple_size;
     Transition make_transition(IncompleteTransition& incomp);
+    json add_transition(Transition& transition);
     unsigned int tapes;
 
 
