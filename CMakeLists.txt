@@ -32,6 +32,8 @@ set(TuringCode
         TM/TuringProduction.h
         TM/TuringTokenizer.cpp
         TM/TuringTokenizer.h
+        TM/TuringTools.cpp
+        TM/TuringTools.h
 )
 
 set(CodeFiles

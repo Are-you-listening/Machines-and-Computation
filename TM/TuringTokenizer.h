@@ -5,25 +5,7 @@
 #ifndef TOG_TURINGTOKENIZER_H
 #define TOG_TURINGTOKENIZER_H
 #include "TuringMachine.h"
-
-struct Transition{
-    Production production;
-    string state;
-    vector<char> input;
-};
-
-struct IncompleteTransition{
-    IncompleteTransition(json &data);
-    IncompleteTransition() = default;
-    string state;
-    string to_state;
-    int def_move;
-    vector<char> input;
-    vector<int> input_index;
-    vector<char> output;
-    vector<int> output_index;
-    vector<int> move;
-};
+#include "TuringTools.h"
 
 
 class TuringTokenizer {
