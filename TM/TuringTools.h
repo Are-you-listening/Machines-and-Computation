@@ -35,7 +35,9 @@ class TuringTools {
 public:
     TuringTools();
     vector<IncompleteTransition> go_to(char symbol, int tape_index, int direction);
-    vector<IncompleteTransition> link(const string& from_state, const string& to_state);
+    static IncompleteTransition link(const string& from, const string& to);
+    static IncompleteTransition link_put(const string& from, const string& to,
+                                         const vector<char>& output, const vector<int>& output_index);
 private:
     unsigned long goto_counter;
 };

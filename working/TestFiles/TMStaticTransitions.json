@@ -1,54 +1,5 @@
 [
-  {
-    "state": "tokenize_mark_start",
-    "to_state": "tokenize_mark_end",
-    "def_move": 1,
-    "input": ["\u0001"],
-    "input_index": [1],
-    "output": ["S"],
-    "output_index": [0],
-    "move": [1]
-  },
-  {
-    "state": "tokenize_mark_end",
-    "to_state": "tokenize_go_to_start",
-    "def_move": -1,
-    "input": [";"],
-    "input_index": [1],
-    "output": ["E"],
-    "output_index": [0],
-    "move": [-1]
-  },
-  {
-    "state": "tokenize_mark_end",
-    "to_state": "tokenize_mark_end",
-    "def_move": 1,
-    "input": [],
-    "input_index": [],
-    "output": [],
-    "output_index": [],
-    "move": []
-  },
-  {
-    "state": "tokenize_go_to_start",
-    "to_state": "tokenize_go_to_start",
-    "def_move": -1,
-    "input": [],
-    "input_index": [],
-    "output": [],
-    "output_index": [],
-    "move": []
-  },
-  {
-    "state": "tokenize_go_to_start",
-    "to_state": "tokenize_0",
-    "def_move": 0,
-    "input": ["S"],
-    "input_index": [0],
-    "output": [],
-    "output_index": [],
-    "move": []
-  },
+
   {
     "state": "tokenize_extension_1",
     "to_state": "tokenize_extension_2",

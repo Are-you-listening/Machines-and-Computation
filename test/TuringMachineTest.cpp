@@ -136,6 +136,26 @@ TEST(TuringMachineTest, TM_4_test) {
     EXPECT_TRUE(FileCompare("output/TM_4.txt", "TestCompareFiles/TM_4.txt"));
 }
 
+TEST(TuringMachineTest, TM_tools){
+    TuringTools* tools = new TuringTools;
+    vector<IncompleteTransition> results1 =  tools->go_to('E', 0, 1);
+    ASSERT_EQ(results1.size(), 2);
+    ASSERT_EQ(results1[0].def_move, 1);
+    ASSERT_EQ(results1[0].input.size(), 0);
+    ASSERT_EQ(results1[0].output.size(), 0);
+    ASSERT_EQ(results1[1].def_move, 0);
+    ASSERT_EQ(results1[1].input.size(), 1);
+    ASSERT_EQ(results1[1].output.size(), 0);
+    IncompleteTransition link = TuringTools::link(results1[1].to_state, results1[0].state);
+    ASSERT_EQ(link.def_move, 0);
+    ASSERT_EQ(link.input.size(), 0);
+    ASSERT_EQ(link.output.size(), 0);
+    link = TuringTools::link_put(results1[1].to_state, results1[0].state, {'a'}, {0});
+    ASSERT_EQ(link.def_move, 0);
+    ASSERT_EQ(link.input.size(), 0);
+    ASSERT_EQ(link.output.size(), 1);
+}
+
 TEST(TuringMachineTest, TM_tokenazation) {
     TuringTokenizer* t = new TuringTokenizer;
     json data = t->tokenize();
@@ -147,9 +167,6 @@ TEST(TuringMachineTest, TM_tokenazation) {
     for (int i = 0; i<100; i++){
         if (tm.isHalted()){
             continue;
-        }
-        if (i == 19){
-            int j = 0;
         }
         tm.move();
         for (int i = 0; i < tm.getTapeAmount(); i++){

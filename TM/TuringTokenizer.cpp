@@ -29,7 +29,7 @@ TuringTokenizer::TuringTokenizer():tuple_size{4} {
 
 json TuringTokenizer::tokenize() {
     json TM_data;
-    vector<string> states = {"tokenize_spatie", "tokenize_mark_start", "tokenize_mark_end", "tokenize_go_to_start", "tokenize_extension"};
+    vector<string> states = {"still need to do"};
     for (int i = 0; i<tuple_size; i++){
         states.push_back("tokenize_"+to_string(i));
     }
@@ -39,33 +39,38 @@ json TuringTokenizer::tokenize() {
 
     TM_data["Start"] = "tokenize_mark_start";
 
-    /**
-     * productions list
-     *
-     * mark_start: ["", *, *, ...] -> ["S", *, *, ....], mark_end, R index 0
-     * mark_end: ["", ;, *, ...] -> ["E", *, *, ....], go_to_start, L index 1
-     * mark_end: ["", ',', *, ...] -> ["E", *, *, ....], go_to_start, L
-     * mark_end: ["", =, *, ...] -> ["E", *, *, ....], go_to_start, L
-     * mark_end: ["", *, *, ...] -> ["", *, *, ....], mark_end, L index 2
-     * go_to_start: index 3
-     * start sequence: index 4
-     * */
+    TuringTools* tools = new TuringTools;
 
     ifstream f("TestFiles/TMStaticTransitions.json");
     json data = json::parse(f);
+    vector<IncompleteTransition> incomp_list;
+
+    //set end marker
+    vector<IncompleteTransition> find_seperator = tools->go_to(';', 1, 1);
+    incomp_list.insert(incomp_list.end(), find_seperator.begin(), find_seperator.end());
+
+    //go to the start
+    vector<IncompleteTransition> go_to_start = tools->go_to('S', 0, -1);
+    incomp_list.insert(incomp_list.end(), go_to_start.begin(), go_to_start.end());
+
+    //link the mark end to start and mark end to go to start
+    incomp_list.push_back(TuringTools::link_put("tokenize_mark_start", find_seperator[0].state, {'S'}, {0}));
+    incomp_list.push_back(TuringTools::link(find_seperator[1].to_state, go_to_start[0].state));
+    incomp_list.push_back(TuringTools::link(go_to_start[1].to_state, "tokenize_0"));
+
+
+
     for (int i = 0; i< data.size(); i++){
         json sub = data[i];
         IncompleteTransition incomp(sub);
-        Transition t = make_transition(incomp);
-        json production = add_transition(t);
-        TM_data["Productions"].push_back(production);
+        incomp_list.push_back(incomp);
     }
 
     TM_data["Input"] = "";
 
     auto v = tokenize_runner_productions();
-
-    for (auto incomp: v){
+    incomp_list.insert(incomp_list.end(),v.begin(), v.end());
+    for (auto incomp: incomp_list){
         Transition t = make_transition(incomp);
         json production = add_transition(t);
         TM_data["Productions"].push_back(production);
