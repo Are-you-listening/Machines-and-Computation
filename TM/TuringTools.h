@@ -21,6 +21,7 @@ struct Transition{
 struct IncompleteTransition{
     IncompleteTransition(json &data);
     IncompleteTransition() = default;
+    void push(char symbol, int tape_size);
     string state;
     string to_state;
     int def_move;

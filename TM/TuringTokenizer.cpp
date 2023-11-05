@@ -3,6 +3,8 @@
 //
 
 #include "TuringTokenizer.h"
+#include "TuringTools.h"
+
 IncompleteTransition::IncompleteTransition(json &data) {
 
     state = data["state"].get<string>();
@@ -21,6 +23,11 @@ IncompleteTransition::IncompleteTransition(json &data) {
     }
 }
 
+void IncompleteTransition::push(char symbol, int tape_size) {
+    output.push_back(symbol);
+    output_index.push_back(tape_size-1);
+    move.push_back(1);
+}
 
 
 TuringTokenizer::TuringTokenizer():tuple_size{4} {
@@ -34,7 +41,7 @@ json TuringTokenizer::tokenize() {
         states.push_back("tokenize_"+to_string(i));
     }
     TM_data["States"] = states;
-    tapes = tuple_size+4;
+    tapes = tuple_size+5;
     TM_data["Tapes"] = tapes; // 2 for resulting marker and token same for original
 
     TM_data["Start"] = "tokenize_mark_start";
@@ -151,10 +158,12 @@ json TuringTokenizer::add_transition(Transition &transition) {
 
 vector<IncompleteTransition> TuringTokenizer::tokenize_runner_productions() {
     vector<IncompleteTransition> output;
-    for (int i = 0; i<tuple_size; i++){
-        for (int j =32; j<127; j++){
+    for (int j =32; j<127; j++){
+        bool is_spatie = j == 32;
+        for (int i = 0; i<tuple_size+1; i++){
             IncompleteTransition trans_prod;
             trans_prod.state = "tokenize_"+to_string(i);
+
             if (i+1 < tuple_size){
                 trans_prod.to_state = "tokenize_"+to_string(i+1);
             }else{
@@ -168,7 +177,13 @@ vector<IncompleteTransition> TuringTokenizer::tokenize_runner_productions() {
             trans_prod.output_index = {1, i+4};
             trans_prod.move = {1, 0};
             trans_prod.def_move = 0;
+
+            if (is_spatie){
+                trans_prod.push('S', tapes);
+            }
+
             output.push_back(trans_prod);
+
         }
 
     }

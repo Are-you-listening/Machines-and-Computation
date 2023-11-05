@@ -172,7 +172,8 @@ TEST(TuringMachineTest, TM_tokenazation) {
         for (int i = 0; i < tm.getTapeAmount(); i++){
             cout << tm.getTapeData(i) << endl;
         }
+        cout << endl;
     }
 
-    cout << endl;
+
 }
