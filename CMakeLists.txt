@@ -43,6 +43,8 @@ set(CodeFiles
         lib/json.hpp
         Tokenazation.cpp
         Tokenazation.h
+        ThreadFunction.cpp 
+        ThreadFunction.h
         ${TuringCode}
 )
 
@@ -62,7 +64,7 @@ gtest_discover_tests(TESTS)
 add_executable(Tog
         main.cpp
         ${CodeFiles}
-)
+        )
 
 set(CMAKE_INSTALL_PREFIX testing)
 install(TARGETS TESTS
