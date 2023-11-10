@@ -5,33 +5,11 @@
 #include "TuringTokenizer.h"
 #include "TuringTools.h"
 
-IncompleteTransition::IncompleteTransition(json &data) {
-
-    state = data["state"].get<string>();
-    to_state = data["to_state"].get<string>();
-    def_move = data["def_move"].get<int>();
-
-    for (int i = 0; i<data["input"].size(); i ++){
-        input.push_back(data["input"][i].get<string>()[0]);
-        input_index.push_back(data["input_index"][i].get<int>());
-    }
-
-    for (int i = 0; i<data["output"].size(); i ++){
-        output.push_back(data["output"][i].get<string>()[0]);
-        output_index.push_back(data["output_index"][i].get<int>());
-        move.push_back(data["move"][i].get<int>());
-    }
-}
-
-void IncompleteTransition::push(char symbol, int tape_size) {
-    output.push_back(symbol);
-    output_index.push_back(tape_size-1);
-    move.push_back(1);
-}
 
 
 TuringTokenizer::TuringTokenizer():tuple_size{4} {
-
+    tapes = tuple_size+5;
+    tools = new TuringTools(tapes-1);
 }
 
 json TuringTokenizer::tokenize() {
@@ -41,43 +19,42 @@ json TuringTokenizer::tokenize() {
         states.push_back("tokenize_"+to_string(i));
     }
     TM_data["States"] = states;
-    tapes = tuple_size+5;
+
     TM_data["Tapes"] = tapes; // 2 for resulting marker and token same for original
 
     TM_data["Start"] = "tokenize_mark_start";
 
-    TuringTools* tools = new TuringTools;
+
 
     ifstream f("TestFiles/TMStaticTransitions.json");
     json data = json::parse(f);
-    vector<IncompleteTransition> incomp_list;
 
-    //set end marker
-    vector<IncompleteTransition> find_seperator = tools->go_to(';', 1, 1);
-    incomp_list.insert(incomp_list.end(), find_seperator.begin(), find_seperator.end());
+    IncompleteSet result("tokenize_mark_start", "tokenize_mark_start");
+    tools->link_put(result, {'S'}, {0});
+    tools->go_to(result, ';', 1, 1);
+    tools->go_to(result, 'S', 0, -1);
 
-    //go to the start
-    vector<IncompleteTransition> go_to_start = tools->go_to('S', 0, -1);
-    incomp_list.insert(incomp_list.end(), go_to_start.begin(), go_to_start.end());
-
-    //link the mark end to start and mark end to go to start
-    incomp_list.push_back(TuringTools::link_put("tokenize_mark_start", find_seperator[0].state, {'S'}, {0}));
-    incomp_list.push_back(TuringTools::link(find_seperator[1].to_state, go_to_start[0].state));
-    incomp_list.push_back(TuringTools::link(go_to_start[1].to_state, "tokenize_0"));
-
-
-
+    IncompleteSet tokenization("tokenize_0","tokenize_0");
     for (int i = 0; i< data.size(); i++){
         json sub = data[i];
         IncompleteTransition incomp(sub);
-        incomp_list.push_back(incomp);
+
+        tools->add(tokenization, incomp);
     }
+    tools->link(result, tokenization);
 
     TM_data["Input"] = "";
 
     auto v = tokenize_runner_productions();
-    incomp_list.insert(incomp_list.end(),v.begin(), v.end());
-    for (auto incomp: incomp_list){
+    for (auto a: v){
+        tools->add(result, a);
+    }
+
+    result.to_state = "tokenize_2";
+    tools->stack_replace(result, {'S','S'}, {'A'});
+
+
+    for (auto incomp: result.transitions){
         Transition t = make_transition(incomp);
         json production = add_transition(t);
         TM_data["Productions"].push_back(production);
@@ -158,9 +135,11 @@ json TuringTokenizer::add_transition(Transition &transition) {
 
 vector<IncompleteTransition> TuringTokenizer::tokenize_runner_productions() {
     vector<IncompleteTransition> output;
-    for (int j =32; j<127; j++){
-        bool is_spatie = j == 32;
-        for (int i = 0; i<tuple_size+1; i++){
+    for (int i = 0; i<tuple_size+1; i++){
+
+        for (int j =32; j<127; j++){
+            bool is_spatie = j == 32;
+
             IncompleteTransition trans_prod;
             trans_prod.state = "tokenize_"+to_string(i);
 
@@ -179,7 +158,7 @@ vector<IncompleteTransition> TuringTokenizer::tokenize_runner_productions() {
             trans_prod.def_move = 0;
 
             if (is_spatie){
-                trans_prod.push('S', tapes);
+                tools->push(trans_prod, 'S');
             }
 
             output.push_back(trans_prod);

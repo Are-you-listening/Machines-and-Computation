@@ -19,6 +19,7 @@ private:
     Transition make_transition(IncompleteTransition& incomp);
     json add_transition(Transition& transition);
     unsigned int tapes;
+    TuringTools* tools;
 
 
 };

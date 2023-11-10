@@ -21,7 +21,6 @@ struct Transition{
 struct IncompleteTransition{
     IncompleteTransition(json &data);
     IncompleteTransition() = default;
-    void push(char symbol, int tape_size);
     string state;
     string to_state;
     int def_move;
@@ -32,15 +31,31 @@ struct IncompleteTransition{
     vector<int> move;
 };
 
+
+struct IncompleteSet{
+    IncompleteSet(const string& state, const string& to_state);
+    string state;
+    string to_state;
+    vector<IncompleteTransition> transitions;
+};
+
 class TuringTools {
 public:
-    TuringTools();
-    vector<IncompleteTransition> go_to(char symbol, int tape_index, int direction);
-    static IncompleteTransition link(const string& from, const string& to);
-    static IncompleteTransition link_put(const string& from, const string& to,
-                                         const vector<char>& output, const vector<int>& output_index);
+    TuringTools(unsigned int stack_tape);
+    void go_to(IncompleteSet& a, char symbol, int tape_index, int direction);
+    static void link(IncompleteSet& a, const IncompleteSet& b);
+    static void link_put(IncompleteSet& a, const IncompleteSet& b,
+                         const vector<char>& output, const vector<int>& output_index);
+
+    void link_put(IncompleteSet& a, const vector<char>& output, const vector<int>& output_index);
+    static void add(IncompleteSet& a, const IncompleteTransition& transition);
+
+    void push(IncompleteTransition& transition, char symbol);
+    void stack_replace(IncompleteSet& a, const vector<char>&input, const vector<char>& output);
 private:
     unsigned long goto_counter;
+    unsigned long counter;
+    unsigned int stack_tape;
 };
 
 
