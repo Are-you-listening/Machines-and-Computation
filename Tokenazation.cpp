@@ -15,8 +15,10 @@ void Tokenazation::Tokenize(const std::string &FileLocation) {
         while(line.substr(0,1)==" "){
             line=line.substr(1,std::string::npos);
         }
+        bool forloop=false;
         if(line.substr(0,3)=="for"){
             tokenVector.emplace_back("F",line.substr(0,line.size()-1));
+            forloop= true;
         } else if(line.substr(0,2)=="if"){
             tokenVector.emplace_back("I",line);
         } else if(line.find("else if")!=std::string::npos){
@@ -24,7 +26,7 @@ void Tokenazation::Tokenize(const std::string &FileLocation) {
         } else if(line.find("else")!=std::string::npos){
             tokenVector.emplace_back("E",line);
         }
-        int bracecount=0;
+        long int bracecount=0;
         for(char it: line){
             if(it=='{'){
                 bracecount++;
@@ -35,6 +37,9 @@ void Tokenazation::Tokenize(const std::string &FileLocation) {
         }
         switch(bracecount){
             case 1:
+                if(!forloop){
+                    tokenVector.emplace_back("C",line.substr(0,line.size()-1));
+                }
                 tokenVector.emplace_back("{","{");
                 break;
             case -1:
