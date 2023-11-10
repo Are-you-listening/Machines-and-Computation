@@ -12,6 +12,7 @@ static unsigned int core_amount = std::thread::hardware_concurrency(); // gets "
 // so whenever you thread something, pls change core_amount. Also core_amount isn't the perfect name for this
 
 int main() {
+
     Tokenazation tokenVector;
     std::string Filelocation="Nested/engine.cc";
     std::thread Tokenizer(&Tokenazation::Tokenize, &tokenVector, Filelocation);
@@ -24,5 +25,6 @@ int main() {
     core_amount++;
     //create larl parser with tokenvector
     std::cout << "We do really love Tibo" << std::endl;
+
     return 0;
 }

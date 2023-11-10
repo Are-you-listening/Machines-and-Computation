@@ -4,11 +4,43 @@
 
 #include "TuringTools.h"
 
-TuringTools::TuringTools() {
-    goto_counter = 0;
+IncompleteTransition::IncompleteTransition(json &data) {
+
+    state = data["state"].get<string>();
+    to_state = data["to_state"].get<string>();
+    def_move = data["def_move"].get<int>();
+
+    for (int i = 0; i<data["input"].size(); i ++){
+        input.push_back(data["input"][i].get<string>()[0]);
+        input_index.push_back(data["input_index"][i].get<int>());
+    }
+
+    for (int i = 0; i<data["output"].size(); i ++){
+        output.push_back(data["output"][i].get<string>()[0]);
+        output_index.push_back(data["output_index"][i].get<int>());
+        move.push_back(data["move"][i].get<int>());
+    }
 }
 
-vector<IncompleteTransition> TuringTools::go_to(char symbol, int tape_index, int direction) {
+void IncompleteTransition::push(char symbol, int tape_size) {
+    output.push_back(symbol);
+    output_index.push_back(tape_size-1);
+    move.push_back(1);
+}
+
+IncompleteSet::IncompleteSet(const string &state, const string &to_state): state{state}, to_state{to_state} {
+
+}
+
+
+
+TuringTools::TuringTools() {
+    goto_counter = 0;
+    counter = 0;
+}
+
+void TuringTools::go_to(IncompleteSet& a, char symbol, int tape_index, int direction) {
+
     vector<IncompleteTransition> outputs;
 
     IncompleteTransition moving;
@@ -30,23 +62,52 @@ vector<IncompleteTransition> TuringTools::go_to(char symbol, int tape_index, int
 
     goto_counter += 2;
 
-    return outputs;
+    IncompleteSet b(moving.state ,moving.state );
+
+    b.transitions.insert(b.transitions.end(), outputs.begin(), outputs.end());
+    b.to_state = arrived.to_state;
+
+    link(a, b);
 }
 
-IncompleteTransition TuringTools::link(const string &from, const string &to) {
+void TuringTools::link(IncompleteSet& a, const IncompleteSet& b) {
     IncompleteTransition incomp;
-    incomp.state = from;
-    incomp.to_state = to;
+    incomp.state = a.to_state;
+    incomp.to_state = b.state;
     incomp.def_move = 0;
-    return incomp;
+
+    a.to_state = b.to_state;
+    a.transitions.push_back(incomp);
+    a.transitions.insert(a.transitions.end(), b.transitions.begin(), b.transitions.end());
+
 }
 
-IncompleteTransition
-TuringTools::link_put(const string &from, const string &to, const vector<char> &output,
+void TuringTools::link_put(IncompleteSet& a, const IncompleteSet& b, const vector<char> &output,
                       const vector<int> &output_index) {
-    IncompleteTransition out = link(from, to);
-    out.output = output;
-    out.output_index = output_index;
-    out.move = {0};
-    return out;
+    IncompleteTransition incomp;
+    incomp.state = a.to_state;
+    incomp.to_state = b.state;
+    incomp.def_move = 0;
+
+    incomp.output = output;
+    incomp.output_index = output_index;
+    incomp.move = {0};
+
+    a.to_state = b.to_state;
+    a.transitions.push_back(incomp);
+    a.transitions.insert(a.transitions.end(), b.transitions.begin(), b.transitions.end());
+
 }
+
+void TuringTools::link_put(IncompleteSet &a, const vector<char> &output, const vector<int> &output_index) {
+    IncompleteSet b(to_string(counter),to_string(counter));
+    counter++;
+    link_put(a, b, output, output_index);
+}
+
+void TuringTools::add(IncompleteSet &a, const IncompleteTransition &transition) {
+
+    a.to_state = transition.to_state;
+    a.transitions.push_back(transition);
+}
+

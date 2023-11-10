@@ -138,7 +138,9 @@ TEST(TuringMachineTest, TM_4_test) {
 
 TEST(TuringMachineTest, TM_tools){
     TuringTools* tools = new TuringTools;
-    vector<IncompleteTransition> results1 =  tools->go_to('E', 0, 1);
+    IncompleteSet s("start", "start");
+    tools->go_to(s, 'E', 0, 1);
+    vector<IncompleteTransition> results1 = s.transitions;
     ASSERT_EQ(results1.size(), 2);
     ASSERT_EQ(results1[0].def_move, 1);
     ASSERT_EQ(results1[0].input.size(), 0);
@@ -146,17 +148,22 @@ TEST(TuringMachineTest, TM_tools){
     ASSERT_EQ(results1[1].def_move, 0);
     ASSERT_EQ(results1[1].input.size(), 1);
     ASSERT_EQ(results1[1].output.size(), 0);
-    IncompleteTransition link = TuringTools::link(results1[1].to_state, results1[0].state);
+    IncompleteSet s2(results1[0].state, results1[0].state);
+    TuringTools::link(s, s2);
+    auto link = s.transitions[s.transitions.size()-1];
     ASSERT_EQ(link.def_move, 0);
     ASSERT_EQ(link.input.size(), 0);
     ASSERT_EQ(link.output.size(), 0);
-    link = TuringTools::link_put(results1[1].to_state, results1[0].state, {'a'}, {0});
+    TuringTools::link_put(s, s2, {'a'}, {0});
+    link = s.transitions[s.transitions.size()-1];
     ASSERT_EQ(link.def_move, 0);
     ASSERT_EQ(link.input.size(), 0);
     ASSERT_EQ(link.output.size(), 1);
 }
 
 TEST(TuringMachineTest, TM_tokenazation) {
+    // not in real use yet
+
     TuringTokenizer* t = new TuringTokenizer;
     json data = t->tokenize();
     ofstream o("output/TM_test.json");
@@ -169,11 +176,17 @@ TEST(TuringMachineTest, TM_tokenazation) {
             continue;
         }
         tm.move();
-        for (int i = 0; i < tm.getTapeAmount(); i++){
-            cout << tm.getTapeData(i) << endl;
-        }
-        cout << endl;
+
     }
 
+    for (int i = 0; i < tm.getTapeAmount(); i++){
+        cout << tm.getTapeData(i) << endl;
+    }
+    cout << endl;
+
+
+}
+
+TEST(TuringMachineTest, TM_builder) {
 
 }
