@@ -51,6 +51,7 @@ public:
     static void add(IncompleteSet& a, const IncompleteTransition& transition);
 
     void push(IncompleteTransition& transition, char symbol);
+    void stack_replace(IncompleteSet& a, const vector<char>&input, const vector<char>& output);
 private:
     unsigned long goto_counter;
     unsigned long counter;

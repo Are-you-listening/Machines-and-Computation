@@ -113,4 +113,56 @@ void TuringTools::push(IncompleteTransition &transition, char symbol) {
     transition.move.push_back(1);
 }
 
+void TuringTools::stack_replace(IncompleteSet &a, const vector<char> &input, const vector<char> &output) {
+    IncompleteSet b(to_string(counter), to_string(counter+input.size()+output.size()+1));
+
+    IncompleteTransition to_start_check;
+    to_start_check.state = to_string(counter);
+    to_start_check.to_state = to_string(counter+1);
+    to_start_check.def_move = 0;
+    to_start_check.output = {'\u0001'};
+    to_start_check.output_index = {(int) stack_tape};
+    to_start_check.move = {-(int) input.size()};
+
+    counter++;
+
+    b.transitions.push_back(to_start_check);
+
+    for (int i=0; i< input.size(); i++){
+        char c = input[i];
+
+        IncompleteTransition check_transition;
+        check_transition.state = to_string(counter);
+        check_transition.to_state = to_string(counter+1);
+        check_transition.def_move = 0;
+        check_transition.input = {c};
+        check_transition.input_index = {(int) stack_tape};
+        check_transition.output = {'\u0001'};
+        check_transition.output_index = {(int) stack_tape};
+        check_transition.move = {1};
+
+        counter++;
+
+        b.transitions.push_back(check_transition);
+    }
+
+    for (int i=0; i< output.size(); i++){
+        char c = output[i];
+
+        IncompleteTransition write_transition;
+        write_transition.state = to_string(counter);
+        write_transition.to_state = to_string(counter+1);
+        write_transition.def_move = 0;
+        write_transition.output = {c};
+        write_transition.output_index = {(int) stack_tape};
+        write_transition.move = {1};
+
+        counter++;
+
+        b.transitions.push_back(write_transition);
+    }
+
+    link(a, b);
+}
+
 

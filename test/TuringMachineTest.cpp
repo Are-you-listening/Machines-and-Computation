@@ -177,6 +177,7 @@ TEST(TuringMachineTest, TM_tokenazation) {
         }
         tm.move();
 
+
     }
 
     for (int i = 0; i < tm.getTapeAmount(); i++){

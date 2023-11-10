@@ -50,6 +50,9 @@ json TuringTokenizer::tokenize() {
         tools->add(result, a);
     }
 
+    result.to_state = "tokenize_2";
+    tools->stack_replace(result, {'S','S'}, {'A'});
+
 
     for (auto incomp: result.transitions){
         Transition t = make_transition(incomp);
