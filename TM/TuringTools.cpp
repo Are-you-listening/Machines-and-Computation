@@ -22,22 +22,18 @@ IncompleteTransition::IncompleteTransition(json &data) {
     }
 }
 
-void IncompleteTransition::push(char symbol, int tape_size) {
-    output.push_back(symbol);
-    output_index.push_back(tape_size-1);
-    move.push_back(1);
-}
 
 IncompleteSet::IncompleteSet(const string &state, const string &to_state): state{state}, to_state{to_state} {
 
 }
 
-
-
-TuringTools::TuringTools() {
+TuringTools::TuringTools(unsigned int stack_tape) {
     goto_counter = 0;
     counter = 0;
+    this->stack_tape = stack_tape;
 }
+
+
 
 void TuringTools::go_to(IncompleteSet& a, char symbol, int tape_index, int direction) {
 
@@ -110,4 +106,11 @@ void TuringTools::add(IncompleteSet &a, const IncompleteTransition &transition) 
     a.to_state = transition.to_state;
     a.transitions.push_back(transition);
 }
+
+void TuringTools::push(IncompleteTransition &transition, char symbol) {
+    transition.output.push_back(symbol);
+    transition.output_index.push_back(stack_tape);
+    transition.move.push_back(1);
+}
+
 

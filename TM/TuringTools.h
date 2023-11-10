@@ -21,7 +21,6 @@ struct Transition{
 struct IncompleteTransition{
     IncompleteTransition(json &data);
     IncompleteTransition() = default;
-    void push(char symbol, int tape_size);
     string state;
     string to_state;
     int def_move;
@@ -42,7 +41,7 @@ struct IncompleteSet{
 
 class TuringTools {
 public:
-    TuringTools();
+    TuringTools(unsigned int stack_tape);
     void go_to(IncompleteSet& a, char symbol, int tape_index, int direction);
     static void link(IncompleteSet& a, const IncompleteSet& b);
     static void link_put(IncompleteSet& a, const IncompleteSet& b,
@@ -50,9 +49,12 @@ public:
 
     void link_put(IncompleteSet& a, const vector<char>& output, const vector<int>& output_index);
     static void add(IncompleteSet& a, const IncompleteTransition& transition);
+
+    void push(IncompleteTransition& transition, char symbol);
 private:
     unsigned long goto_counter;
     unsigned long counter;
+    unsigned int stack_tape;
 };
 
 

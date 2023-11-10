@@ -8,7 +8,8 @@
 
 
 TuringTokenizer::TuringTokenizer():tuple_size{4} {
-
+    tapes = tuple_size+5;
+    tools = new TuringTools(tapes-1);
 }
 
 json TuringTokenizer::tokenize() {
@@ -18,16 +19,16 @@ json TuringTokenizer::tokenize() {
         states.push_back("tokenize_"+to_string(i));
     }
     TM_data["States"] = states;
-    tapes = tuple_size+5;
+
     TM_data["Tapes"] = tapes; // 2 for resulting marker and token same for original
 
     TM_data["Start"] = "tokenize_mark_start";
 
-    TuringTools* tools = new TuringTools;
+
 
     ifstream f("TestFiles/TMStaticTransitions.json");
     json data = json::parse(f);
-    //vector<IncompleteTransition> incomp_list;
+
     IncompleteSet result("tokenize_mark_start", "tokenize_mark_start");
     tools->link_put(result, {'S'}, {0});
     tools->go_to(result, ';', 1, 1);
@@ -37,7 +38,7 @@ json TuringTokenizer::tokenize() {
     for (int i = 0; i< data.size(); i++){
         json sub = data[i];
         IncompleteTransition incomp(sub);
-        //incomp_list.push_back(incomp);
+
         tools->add(tokenization, incomp);
     }
     tools->link(result, tokenization);
@@ -48,6 +49,7 @@ json TuringTokenizer::tokenize() {
     for (auto a: v){
         tools->add(result, a);
     }
+
 
     for (auto incomp: result.transitions){
         Transition t = make_transition(incomp);
@@ -130,9 +132,11 @@ json TuringTokenizer::add_transition(Transition &transition) {
 
 vector<IncompleteTransition> TuringTokenizer::tokenize_runner_productions() {
     vector<IncompleteTransition> output;
-    for (int j =32; j<127; j++){
-        bool is_spatie = j == 32;
-        for (int i = 0; i<tuple_size+1; i++){
+    for (int i = 0; i<tuple_size+1; i++){
+
+        for (int j =32; j<127; j++){
+            bool is_spatie = j == 32;
+
             IncompleteTransition trans_prod;
             trans_prod.state = "tokenize_"+to_string(i);
 
@@ -151,7 +155,7 @@ vector<IncompleteTransition> TuringTokenizer::tokenize_runner_productions() {
             trans_prod.def_move = 0;
 
             if (is_spatie){
-                trans_prod.push('S', tapes);
+                tools->push(trans_prod, 'S');
             }
 
             output.push_back(trans_prod);
