@@ -172,10 +172,17 @@ TEST(TuringMachineTest, TM_tokenazation) {
     tm.load(data);
     tm.load_input("int a = 5;", 1);
     for (int i = 0; i<100; i++){
+
+
+
         if (tm.isHalted()){
             continue;
         }
         tm.move();
+
+        if (i >= 20){
+            int j = 0;
+        }
 
 
     }

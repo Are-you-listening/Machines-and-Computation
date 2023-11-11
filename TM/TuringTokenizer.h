@@ -13,7 +13,7 @@ public:
     TuringTokenizer();
     json tokenize();
 private:
-    vector<IncompleteTransition> tokenize_runner_productions();
+    IncompleteSet tokenize_runner_productions();
 
     int tuple_size;
     Transition make_transition(IncompleteTransition& incomp);
