@@ -34,10 +34,12 @@ json TuringTokenizer::tokenize() {
     tools->push(result, '*');
 
     tools->link_put(result, {'S'}, {0});
-    tools->go_to(result, '=', 1, 1);
+    tools->move(result, 0, 1);
+    tools->move(result, 1, 1);
+    tools->go_to(result, {'=', ';'}, 1, 1, {0, 1});
     IncompleteSet temp("tokenize_mark_end", "tokenize_mark_end");
     tools->link_put(result, temp, {'E'}, {0});
-    tools->go_to(result, 'S', 0, -1);
+    tools->go_to(result, {'S'}, 0, -1, {0, 1});
 
     tools->link_put(result, {'S'}, {2});
     IncompleteSet tokenization("tokenize_link","tokenize_link");
@@ -62,10 +64,28 @@ json TuringTokenizer::tokenize() {
 
     //guarantees right token on top
 
-    tools->go_to(result, 'S', 2, -1);
+    vector<int> tuple_set_indexes;
+    for (int i= 0; i<tuple_size+2; i++){
+        tuple_set_indexes.push_back(i+2);
+    }
+
+    tools->link_put(result, {'E'}, {2});
+    tools->go_to(result, {'S'}, 2, -1, tuple_set_indexes);
     tools->move(result, tapes-1, -1);
     tools->copy(result, tapes-1, 3);
     tools->move(result, tapes-1, 1);
+    tools->go_to(result, {'E'}, 2, 1, tuple_set_indexes);
+
+    for (int m: tuple_set_indexes){
+        tools->move(result, m, 1);
+    }
+
+    IncompleteTransition make_loop;
+    make_loop.state = result.to_state;
+    make_loop.to_state = result.state;
+    make_loop.def_move = 0;
+
+    result.transitions.push_back(make_loop);
 
     TM_data["Input"] = "";
 

@@ -139,7 +139,7 @@ TEST(TuringMachineTest, TM_4_test) {
 TEST(TuringMachineTest, TM_tools){
     TuringTools* tools = new TuringTools(0);
     IncompleteSet s("start", "start");
-    tools->go_to(s, 'E', 0, 1);
+    tools->go_to(s, {'E'}, 0, 1);
     vector<IncompleteTransition> results1 = s.transitions;
     ASSERT_EQ(results1.size(), 3);
     ASSERT_EQ(results1[1].def_move, 1);
@@ -173,8 +173,7 @@ TEST(TuringMachineTest, TM_tokenazation) {
     tm.load_input("int   a = 5;", 1);
 
     int halted_time = -1;
-    for (int i = 0; i<150; i++){
-
+    for (int i = 0; i<250; i++){
 
 
         if (tm.isHalted()){
@@ -186,7 +185,7 @@ TEST(TuringMachineTest, TM_tokenazation) {
         }
         tm.move();
 
-        if (i >= 700){
+        if (i >= 150){
             int j = 0;
 
             for (int i = 0; i < tm.getTapeAmount(); i++){

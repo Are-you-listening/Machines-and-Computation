@@ -42,7 +42,8 @@ struct IncompleteSet{
 class TuringTools {
 public:
     TuringTools(unsigned int stack_tape);
-    void go_to(IncompleteSet& a, char symbol, int tape_index, int direction);
+    void go_to(IncompleteSet& a, const vector<char>& symbol, int tape_index, int direction);
+    void go_to(IncompleteSet& a, const vector<char>& symbol, int tape_index, int direction, const vector<int>& affected);
     static void link(IncompleteSet& a, const IncompleteSet& b);
     static void link_put(IncompleteSet& a, const IncompleteSet& b,
                          const vector<char>& output, const vector<int>& output_index);
