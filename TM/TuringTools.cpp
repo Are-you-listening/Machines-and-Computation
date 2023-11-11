@@ -177,4 +177,12 @@ void TuringTools::stack_replace(IncompleteSet &a, const vector<char> &input, con
     link(a, b);
 }
 
+void TuringTools::push(IncompleteSet &a, char symbol) {
+
+    link_put(a, {symbol}, {(int) stack_tape});
+
+    a.transitions[a.transitions.size()-1].move = {1};
+
+}
+
 

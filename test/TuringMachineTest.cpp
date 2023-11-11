@@ -170,8 +170,8 @@ TEST(TuringMachineTest, TM_tokenazation) {
     o << data;
     TuringMachine tm;
     tm.load(data);
-    tm.load_input("int a = 5;", 1);
-    for (int i = 0; i<100; i++){
+    tm.load_input("int   a = 5;", 1);
+    for (int i = 0; i<150; i++){
 
 
 
@@ -180,8 +180,13 @@ TEST(TuringMachineTest, TM_tokenazation) {
         }
         tm.move();
 
-        if (i >= 20){
+        if (i >= 700){
             int j = 0;
+
+            for (int i = 0; i < tm.getTapeAmount(); i++){
+                cout << tm.getTapeData(i) << endl;
+            }
+            cout << endl;
         }
 
 
