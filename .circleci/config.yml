@@ -4,7 +4,7 @@ version: 2.1
 executors:
   main_executor:
     docker:
-      - image: ubuntu:22.04
+      - image: current-22.04
 
 
 jobs:
