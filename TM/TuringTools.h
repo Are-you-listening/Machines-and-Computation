@@ -53,6 +53,8 @@ public:
     void push(IncompleteTransition& transition, char symbol);
     void push(IncompleteSet& a, char symbol);
     void stack_replace(IncompleteSet& a, const vector<char>&input, const vector<char>& output);
+    void move(IncompleteSet& a, unsigned int tape, int direction);
+    void copy(IncompleteSet& a, unsigned int from_tape, unsigned int to_tape);
 private:
     unsigned long goto_counter;
     unsigned long counter;

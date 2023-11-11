@@ -144,7 +144,7 @@ TEST(TuringMachineTest, TM_tools){
     ASSERT_EQ(results1.size(), 3);
     ASSERT_EQ(results1[1].def_move, 1);
     ASSERT_EQ(results1[1].input.size(), 0);
-    ASSERT_EQ(results1[1].output.size(), 0);
+    ASSERT_EQ(results1[1].output.size(), 1);
     ASSERT_EQ(results1[2].def_move, 0);
     ASSERT_EQ(results1[2].input.size(), 1);
     ASSERT_EQ(results1[2].output.size(), 0);
@@ -171,11 +171,17 @@ TEST(TuringMachineTest, TM_tokenazation) {
     TuringMachine tm;
     tm.load(data);
     tm.load_input("int   a = 5;", 1);
+
+    int halted_time = -1;
     for (int i = 0; i<150; i++){
 
 
 
         if (tm.isHalted()){
+            if (halted_time == -1){
+                halted_time = i;
+            }
+
             continue;
         }
         tm.move();
@@ -196,7 +202,7 @@ TEST(TuringMachineTest, TM_tokenazation) {
         cout << tm.getTapeData(i) << endl;
     }
     cout << endl;
-
+    cout << "halted time " << halted_time << endl;
 
 }
 

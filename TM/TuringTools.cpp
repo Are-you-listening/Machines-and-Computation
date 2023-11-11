@@ -45,6 +45,10 @@ void TuringTools::go_to(IncompleteSet& a, char symbol, int tape_index, int direc
 
     moving.def_move = direction;
 
+    moving.output = {'\u0001'};
+    moving.output_index = {(int) stack_tape};
+    moving.move = {0};
+
     IncompleteTransition arrived;
     arrived.state = "go_to_"+ to_string(goto_counter);
     arrived.to_state = "go_to_"+ to_string(goto_counter+1);
@@ -183,6 +187,42 @@ void TuringTools::push(IncompleteSet &a, char symbol) {
 
     a.transitions[a.transitions.size()-1].move = {1};
 
+}
+
+void TuringTools::move(IncompleteSet &a, unsigned int tape, int direction) {
+    IncompleteTransition move;
+    move.state = a.to_state;
+    move.to_state = to_string(counter);
+    move.def_move = 0;
+    move.output = {'\u0001'};
+    move.output_index = {(int) tape};
+    move.move = {direction};
+
+    counter += 1;
+
+    add(a, move);
+
+}
+
+void TuringTools::copy(IncompleteSet &a, unsigned int from_tape, unsigned int to_tape) {
+    IncompleteSet copy_set(to_string(counter), to_string(counter+1));
+    for (int j =32; j<127; j++){
+        char c = (char) j;
+        IncompleteTransition copy;
+        copy.state = copy_set.state;
+        copy.to_state = copy_set.to_state;
+        copy.def_move = 0;
+        copy.input = {c};
+        copy.input_index = {(int) from_tape};
+        copy.output = {c};
+        copy.output_index = {(int) to_tape};
+        copy.move = {0};
+
+        copy_set.transitions.push_back(copy);
+    }
+    counter += 2;
+
+    link(a,copy_set);
 }
 
 
