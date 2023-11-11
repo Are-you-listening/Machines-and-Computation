@@ -34,6 +34,14 @@ json TuringTokenizer::tokenize() {
     tools->push(result, '*');
 
     tools->link_put(result, {'S'}, {0});
+
+    IncompleteSet tokenize_seperator("tokenize_seperator", "tokenize_seperator");
+    tools->move(tokenize_seperator, 0, 1);
+    tools->link_put(tokenize_seperator, {'E'}, {0});
+    tools->move(tokenize_seperator, 0, -1);
+
+    tools->link_on(result, tokenize_seperator, {'='}, {1});
+
     tools->move(result, 0, 1);
     tools->move(result, 1, 1);
     tools->go_to(result, {'=', ';'}, 1, 1, {0, 1});
@@ -64,21 +72,34 @@ json TuringTokenizer::tokenize() {
 
     //guarantees right token on top
 
+    //here we do define the define on other place token function
+    IncompleteSet set_token_else("set_token_else", "set_token_else");
     vector<int> tuple_set_indexes;
     for (int i= 0; i<tuple_size+2; i++){
         tuple_set_indexes.push_back(i+2);
     }
 
-    tools->link_put(result, {'E'}, {2});
-    tools->go_to(result, {'S'}, 2, -1, tuple_set_indexes);
-    tools->move(result, tapes-1, -1);
-    tools->copy(result, tapes-1, 3);
-    tools->move(result, tapes-1, 1);
-    tools->go_to(result, {'E'}, 2, 1, tuple_set_indexes);
+    tools->link_put(set_token_else, {'E'}, {2});
+    tools->go_to(set_token_else, {'S'}, 2, -1, tuple_set_indexes);
+    tools->move(set_token_else, tapes - 1, -1);
+    tools->copy(set_token_else, tapes - 1, 3);
+    tools->move(set_token_else, tapes - 1, 1);
+    tools->go_to(set_token_else, {'E'}, 2, 1, tuple_set_indexes);
+
+    tools->link_on(result, set_token_else, {'E'}, {3});
+    //end link on
+
+    IncompleteSet set_token("set_token", "set_token");
+    tools->move(set_token, tapes - 1, -1);
+    tools->copy(set_token, tapes - 1, 3);
+    tools->move(set_token, tapes - 1, 1);
+
+    tools->link_on(result, set_token, {'\u0000'}, {3});
 
     for (int m: tuple_set_indexes){
         tools->move(result, m, 1);
     }
+
 
     IncompleteTransition make_loop;
     make_loop.state = result.to_state;

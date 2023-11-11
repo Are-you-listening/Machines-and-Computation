@@ -268,5 +268,38 @@ void TuringTools::copy(IncompleteSet &a, unsigned int from_tape, unsigned int to
     link(a,copy_set);
 }
 
+void TuringTools::link_on(IncompleteSet &a, const IncompleteSet &b, const vector<char> &input,
+                          const vector<int> &input_index) {
+
+    string end_state = to_string(counter);
+    counter++;
+
+    IncompleteTransition condition_transition;
+    condition_transition.state = a.to_state;
+    condition_transition.to_state = b.state;
+    condition_transition.def_move = 0;
+    condition_transition.input = input;
+    condition_transition.input_index = input_index;
+
+    a.transitions.push_back(condition_transition);
+    a.transitions.insert(a.transitions.end(), b.transitions.begin(), b.transitions.end());
+
+    IncompleteTransition transition1;
+    transition1.state = a.to_state;
+    transition1.to_state = end_state;
+    transition1.def_move = 0;
+
+    IncompleteTransition transition2;
+    transition2.state = b.to_state;
+    transition2.to_state = end_state;
+    transition2.def_move = 0;
+
+    a.transitions.push_back(transition1);
+    a.transitions.push_back(transition2);
+
+    a.to_state = end_state;
+
+}
+
 
 

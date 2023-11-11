@@ -173,7 +173,7 @@ TEST(TuringMachineTest, TM_tokenazation) {
     tm.load_input("int   a = 5;", 1);
 
     int halted_time = -1;
-    for (int i = 0; i<250; i++){
+    for (int i = 0; i<300; i++){
 
 
         if (tm.isHalted()){
