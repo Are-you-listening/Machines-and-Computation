@@ -114,7 +114,8 @@ void TuringTools::push(IncompleteTransition &transition, char symbol) {
 }
 
 void TuringTools::stack_replace(IncompleteSet &a, const vector<char> &input, const vector<char> &output) {
-    IncompleteSet b(to_string(counter), to_string(counter+input.size()+output.size()+1));
+    string final_state = to_string(counter+input.size()+output.size()+1);
+    IncompleteSet b(to_string(counter), final_state);
 
     IncompleteTransition to_start_check;
     to_start_check.state = to_string(counter);
@@ -141,9 +142,18 @@ void TuringTools::stack_replace(IncompleteSet &a, const vector<char> &input, con
         check_transition.output_index = {(int) stack_tape};
         check_transition.move = {1};
 
+        IncompleteTransition fail_transition;
+        fail_transition.state = to_string(counter);
+        fail_transition.to_state = final_state;
+        fail_transition.def_move = 0;
+        fail_transition.output = {'\u0001'};
+        fail_transition.output_index = {(int) stack_tape};
+        fail_transition.move = {(int) input.size()-i};
+
         counter++;
 
         b.transitions.push_back(check_transition);
+        b.transitions.push_back(fail_transition);
     }
 
     for (int i=0; i< output.size(); i++){
@@ -159,10 +169,20 @@ void TuringTools::stack_replace(IncompleteSet &a, const vector<char> &input, con
 
         counter++;
 
+
         b.transitions.push_back(write_transition);
     }
+    counter++;
 
     link(a, b);
+}
+
+void TuringTools::push(IncompleteSet &a, char symbol) {
+
+    link_put(a, {symbol}, {(int) stack_tape});
+
+    a.transitions[a.transitions.size()-1].move = {1};
+
 }
 
 

@@ -30,28 +30,36 @@ json TuringTokenizer::tokenize() {
     json data = json::parse(f);
 
     IncompleteSet result("tokenize_mark_start", "tokenize_mark_start");
+    // int stack start symbol
+    tools->push(result, '*');
+
     tools->link_put(result, {'S'}, {0});
     tools->go_to(result, ';', 1, 1);
+    IncompleteSet temp("tokenize_mark_end", "tokenize_mark_end");
+    tools->link_put(result, temp, {'E'}, {0});
     tools->go_to(result, 'S', 0, -1);
 
-    IncompleteSet tokenization("tokenize_0","tokenize_0");
+    IncompleteSet tokenization("tokenize_link","tokenize_link");
     for (int i = 0; i< data.size(); i++){
         json sub = data[i];
         IncompleteTransition incomp(sub);
 
         tools->add(tokenization, incomp);
     }
+    tokenization.to_state = "tokenize_link";
+
+    auto v = tokenize_runner_productions();
+    tools->link(tokenization, v);
+
     tools->link(result, tokenization);
+
+    //before here, tokenize of 1 token without classier symbol
+
+    tools->stack_replace(result, {'A','S','A'}, {'D'});
 
     TM_data["Input"] = "";
 
-    auto v = tokenize_runner_productions();
-    for (auto a: v){
-        tools->add(result, a);
-    }
 
-    result.to_state = "tokenize_2";
-    tools->stack_replace(result, {'S','S'}, {'A'});
 
 
     for (auto incomp: result.transitions){
@@ -133,41 +141,63 @@ json TuringTokenizer::add_transition(Transition &transition) {
     return production;
 }
 
-vector<IncompleteTransition> TuringTokenizer::tokenize_runner_productions() {
-    vector<IncompleteTransition> output;
-    for (int i = 0; i<tuple_size+1; i++){
+IncompleteSet TuringTokenizer::tokenize_runner_productions() {
+    IncompleteSet final_tokenize_set("tokenize_pre_setup", "tokenize_pre_setup");
+    for (int i = 0; i<tuple_size; i++){
+        string from = "tokenize_"+to_string(i);
+        string to;
 
+        if (i+1 < tuple_size){
+            to = "tokenize_"+to_string(i+1)+"_replace";
+        }else{
+           to = "tokenize_extension_1_replace";
+        }
+
+        IncompleteSet tokenize_set(from,to);
         for (int j =32; j<127; j++){
             bool is_spatie = j == 32;
 
             IncompleteTransition trans_prod;
-            trans_prod.state = "tokenize_"+to_string(i);
+            trans_prod.state = from;
 
-            if (i+1 < tuple_size){
-                trans_prod.to_state = "tokenize_"+to_string(i+1);
-            }else{
-                trans_prod.to_state = "tokenize_extension_1";
-            }
+            trans_prod.to_state = to;
 
             char c = (char) j;
             trans_prod.input = {c};
             trans_prod.input_index = {1};
-            trans_prod.output = {c, c};
-            trans_prod.output_index = {1, i+4};
-            trans_prod.move = {1, 0};
+            trans_prod.output = {'\u0001', c, c};
+            trans_prod.output_index = {0, 1, i+4};
+            trans_prod.move = {1, 1, 0};
             trans_prod.def_move = 0;
 
             if (is_spatie){
+                trans_prod.to_state = to.substr(0, to.size()-8);
                 tools->push(trans_prod, 'S');
             }
-
-            output.push_back(trans_prod);
+            tokenize_set.transitions.push_back(trans_prod);
 
         }
 
+        IncompleteTransition end_marker;
+        end_marker.state = from;
+        end_marker.to_state = "tokenize_sub_finished_token";
+        end_marker.input = {'E'};
+        end_marker.input_index = {0};
+
+        tokenize_set.transitions.push_back(end_marker);
+
+        tools->stack_replace(tokenize_set, {'*'}, {'A'});
+        tools->stack_replace(tokenize_set, {'S'}, {'A'});
+
+        tools->link(final_tokenize_set, tokenize_set);
+
+
     }
 
-    return output;
-}
+    IncompleteSet end_marking("tokenize_extension_1","tokenize_extension_1");
+    tools->link(final_tokenize_set, end_marking);
 
+    final_tokenize_set.to_state = "tokenize_sub_finished_token";
+    return final_tokenize_set;
+}
 
