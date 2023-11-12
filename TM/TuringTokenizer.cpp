@@ -76,6 +76,13 @@ IncompleteSet TuringTokenizer::tokenize() {
     tools->move(set_token_else, {(int) tapes - 1}, 1);
     tools->go_to(set_token_else, {'E'}, 2, 1, tuple_set_indexes);
 
+    //in case we have an empty extension tuple
+    IncompleteSet clear_extension("clear_extension", "clear_extension");
+    tools->link_put(clear_extension, {'\u0000'}, {3});
+    tools->move(clear_extension, tuple_set_indexes, -1);
+    tools->link_on(set_token_else, clear_extension, {'\u0000'}, {4});
+    //end of case
+
     tools->link_on(result, set_token_else, {'E'}, {3});
     //end link on
 
