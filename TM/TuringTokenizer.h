@@ -20,6 +20,8 @@ private:
     json add_transition(Transition& transition);
     unsigned int tapes;
     TuringTools* tools;
+    vector<char> seperators;
+    vector<char> special_sep;
 
 
 };

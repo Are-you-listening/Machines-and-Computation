@@ -301,5 +301,42 @@ void TuringTools::link_on(IncompleteSet &a, const IncompleteSet &b, const vector
 
 }
 
+void TuringTools::clear_stack(IncompleteSet &a) {
+    IncompleteSet b("clear_stack_"+ to_string(goto_counter) ,"clear_stack_"+ to_string(goto_counter+1));
+    vector<IncompleteTransition> outputs;
+
+    IncompleteTransition moving;
+    moving.state = "clear_stack_"+ to_string(goto_counter);
+    moving.to_state = "clear_stack_"+ to_string(goto_counter);
+
+    moving.def_move = 0;
+
+    moving.output_index = {(int) stack_tape};
+    moving.output = {'\u0000'};
+    moving.move = {-1};
+
+    outputs.push_back(moving);
+
+    IncompleteTransition arrived;
+    arrived.state = "clear_stack_"+ to_string(goto_counter);
+    arrived.to_state = "clear_stack_"+ to_string(goto_counter+1);
+
+    arrived.input = {'*'};
+    arrived.input_index = {(int) stack_tape};
+    arrived.def_move = 0;
+
+
+    outputs.push_back(arrived);
+
+    goto_counter += 2;
+
+
+
+    b.transitions.insert(b.transitions.end(), outputs.begin(), outputs.end());
+    move(b, stack_tape, 1);
+    link(a, b);
+
+}
+
 
 

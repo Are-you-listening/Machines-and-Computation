@@ -170,10 +170,10 @@ TEST(TuringMachineTest, TM_tokenazation) {
     o << data;
     TuringMachine tm;
     tm.load(data);
-    tm.load_input("int   a = 5;", 1);
+    tm.load_input("main(){int a =5; if(a==0){a = 3;}}", 1);
 
     int halted_time = -1;
-    for (int i = 0; i<300; i++){
+    for (int i = 0; i<1500; i++){
 
 
         if (tm.isHalted()){
@@ -185,7 +185,7 @@ TEST(TuringMachineTest, TM_tokenazation) {
         }
         tm.move();
 
-        if (i >= 150){
+        if (i >= 8500){
             int j = 0;
 
             for (int i = 0; i < tm.getTapeAmount(); i++){

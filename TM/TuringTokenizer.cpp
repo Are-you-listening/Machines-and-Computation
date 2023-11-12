@@ -10,6 +10,8 @@
 TuringTokenizer::TuringTokenizer():tuple_size{4} {
     tapes = tuple_size+5;
     tools = new TuringTools(tapes-1);
+    seperators = {'=', ';', '{', '}', '\u0000'};
+    special_sep = {'{', '}'};
 }
 
 json TuringTokenizer::tokenize() {
@@ -22,29 +24,36 @@ json TuringTokenizer::tokenize() {
 
     TM_data["Tapes"] = tapes; // 2 for resulting marker and token same for original
 
-    TM_data["Start"] = "tokenize_mark_start";
+    TM_data["Start"] = "program_start";
 
 
 
     ifstream f("TestFiles/TMStaticTransitions.json");
     json data = json::parse(f);
 
+    IncompleteSet program("program_start", "program_start");
+    tools->push(program, '*');
+
     IncompleteSet result("tokenize_mark_start", "tokenize_mark_start");
     // int stack start symbol
-    tools->push(result, '*');
+
 
     tools->link_put(result, {'S'}, {0});
+
+
 
     IncompleteSet tokenize_seperator("tokenize_seperator", "tokenize_seperator");
     tools->move(tokenize_seperator, 0, 1);
     tools->link_put(tokenize_seperator, {'E'}, {0});
     tools->move(tokenize_seperator, 0, -1);
 
-    tools->link_on(result, tokenize_seperator, {'='}, {1});
+    for (char s: seperators){
+        tools->link_on(result, tokenize_seperator, {s}, {1});
+    }
 
     tools->move(result, 0, 1);
     tools->move(result, 1, 1);
-    tools->go_to(result, {'=', ';'}, 1, 1, {0, 1});
+    tools->go_to(result, seperators, 1, 1, {0, 1});
     IncompleteSet temp("tokenize_mark_end", "tokenize_mark_end");
     tools->link_put(result, temp, {'E'}, {0});
     tools->go_to(result, {'S'}, 0, -1, {0, 1});
@@ -66,9 +75,9 @@ json TuringTokenizer::tokenize() {
 
     //before here, tokenize of 1 token without classier symbol
 
-    tools->stack_replace(result, {'A','S','A'}, {'D'});
-    tools->stack_replace(result, {'A','S','A', 'S'}, {'D'});
-    tools->stack_replace(result, {'S'}, {'A'});
+    tools->stack_replace(result, {'A','P','A'}, {'D'});
+    tools->stack_replace(result, {'A','P','A', 'P'}, {'D'});
+    tools->stack_replace(result, {'P'}, {'A'});
 
     //guarantees right token on top
 
@@ -100,6 +109,8 @@ json TuringTokenizer::tokenize() {
         tools->move(result, m, 1);
     }
 
+    tools->clear_stack(result);
+
 
     IncompleteTransition make_loop;
     make_loop.state = result.to_state;
@@ -108,12 +119,14 @@ json TuringTokenizer::tokenize() {
 
     result.transitions.push_back(make_loop);
 
+    tools->link(program, result);
+
     TM_data["Input"] = "";
 
 
 
 
-    for (auto incomp: result.transitions){
+    for (auto incomp: program.transitions){
         Transition t = make_transition(incomp);
         json production = add_transition(t);
         TM_data["Productions"].push_back(production);
@@ -207,6 +220,7 @@ IncompleteSet TuringTokenizer::tokenize_runner_productions() {
         IncompleteSet tokenize_set(from,to);
         for (int j =32; j<127; j++){
             bool is_spatie = j == 32;
+            bool is_seperator = (find(seperators.begin(), seperators.end(), (char) j) != seperators.end());
 
             IncompleteTransition trans_prod;
             trans_prod.state = from;
@@ -225,8 +239,8 @@ IncompleteSet TuringTokenizer::tokenize_runner_productions() {
                 IncompleteSet spatie_pusher("tokenize_spatie"+ to_string(i), "tokenize_spatie"+ to_string(i));
 
                 //sets S on stack if no other S is before
-                tools->stack_replace(spatie_pusher, {'*'}, {'S'});
-                tools->stack_replace(spatie_pusher, {'A'}, {'S'});
+                tools->stack_replace(spatie_pusher, {'*'}, {'P'});
+                tools->stack_replace(spatie_pusher, {'A'}, {'P'});
 
                 trans_prod.to_state = spatie_pusher.state;
 
@@ -237,6 +251,17 @@ IncompleteSet TuringTokenizer::tokenize_runner_productions() {
                 tokenize_set.transitions.push_back(go_back);
                 tokenize_set.transitions.insert(tokenize_set.transitions.end(), spatie_pusher.transitions.begin(), spatie_pusher.transitions.end());
             }
+
+            if (is_seperator){
+                bool is_special = (find(special_sep.begin(), special_sep.end(), (char) j) != special_sep.end());
+                if (is_special){
+                    tools->push(trans_prod, (char) j);
+                }else{
+                    tools->push(trans_prod, 'S');
+                }
+
+            }
+
             tokenize_set.transitions.push_back(trans_prod);
 
         }
@@ -250,7 +275,7 @@ IncompleteSet TuringTokenizer::tokenize_runner_productions() {
         tokenize_set.transitions.push_back(end_marker);
         //sets A to say here is a token
         tools->stack_replace(tokenize_set, {'*'}, {'A'});
-        tools->stack_replace(tokenize_set, {'S'}, {'A'});
+        tools->stack_replace(tokenize_set, {'P'}, {'A'});
 
         tools->link(final_tokenize_set, tokenize_set);
 
