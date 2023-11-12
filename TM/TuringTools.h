@@ -61,6 +61,8 @@ public:
     void clear_stack(IncompleteSet& a);
     void make_loop(IncompleteSet& a);
     string branch_on(IncompleteSet& a, const vector<char>&input, const vector<int>& input_index);
+    void write_on(IncompleteSet& a, const vector<char>&input, const vector<int>& input_index,
+                  const vector<char>&output, const vector<int>& output_index);
 private:
 
     TuringTools(unsigned int stack_tape);

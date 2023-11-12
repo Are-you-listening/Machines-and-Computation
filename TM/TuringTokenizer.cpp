@@ -32,14 +32,8 @@ IncompleteSet TuringTokenizer::tokenize() {
 
     //tools->link_put(result, {'S'}, {0});
 
-    IncompleteSet write_s("write_s", "write_s");
-    tools->link_put(write_s, {'S'}, {0});
-
-    IncompleteSet write_s2("write_s2", "write_s2");
-    tools->link_put(write_s2, {'S'}, {0});
-
-    tools->link_on(result, write_s, {'\u0000'}, {0});
-    tools->link_on(result, write_s2, {'E'}, {0});
+    tools->write_on(result, {'\u0000'}, {0}, {'S'}, {0});
+    tools->write_on(result, {'E'}, {0}, {'S'}, {0});
 
     string end_tokenization_state = tools->branch_on(result, {'\u0000'}, {1});
 
@@ -61,15 +55,8 @@ IncompleteSet TuringTokenizer::tokenize() {
 
 
 
-    IncompleteSet write_s3("write_s3", "write_s3");
-    tools->link_put(write_s3, {'S'}, {2});
-
-    tools->link_on(result, write_s3, {'\u0000'}, {2});
-
-    IncompleteSet write_s4("write_s4", "write_s4");
-    tools->link_put(write_s4, {'S'}, {2});
-
-    tools->link_on(result, write_s4, {'E'}, {2});
+    tools->write_on(result, {'\u0000'}, {2}, {'S'}, {2});
+    tools->write_on(result, {'E'}, {2}, {'S'}, {2});
 
     IncompleteSet tokenization = tokenize_runner_productions();
 

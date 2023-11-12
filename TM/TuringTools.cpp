@@ -380,6 +380,32 @@ string TuringTools::branch_on(IncompleteSet &a, const vector<char> &input, const
     return resulting;
 }
 
+void TuringTools::write_on(IncompleteSet &a, const vector<char> &input, const vector<int> &input_index,
+                           const vector<char> &output, const vector<int> &output_index) {
+    string resulting = to_string(counter);
+    counter++;
+    IncompleteTransition do_on;
+    do_on.state = a.to_state;
+    do_on.to_state = resulting;
+    do_on.def_move = 0;
+    do_on.input = input;
+    do_on.input_index = input_index;
+    do_on.output = output;
+    do_on.output_index = output_index;
+    for (int i = 0; i< output_index.size(); i++){
+        do_on.move.push_back(0);
+    }
+
+    IncompleteTransition do_not;
+    do_not.state = a.to_state;
+    do_not.to_state = resulting;
+    do_not.def_move = 0;
+
+    a.to_state = resulting;
+    a.transitions.push_back(do_on);
+    a.transitions.push_back(do_not);
+}
+
 
 
 
