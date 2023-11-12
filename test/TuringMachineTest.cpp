@@ -171,10 +171,10 @@ TEST(TuringMachineTest, TM_tokenazation) {
     o << data;
     TuringMachine tm;
     tm.load(data);
-    tm.load_input("main(){int a =5; if(a==0){a = 3;}}", 1);
+    tm.load_input("int main(){int a =5; if(a==0){a = 3;}}", 1);
 
     int halted_time = -1;
-    for (int i = 0; i<1500; i++){
+    for (int i = 0; i<2000; i++){
 
 
         if (tm.isHalted()){

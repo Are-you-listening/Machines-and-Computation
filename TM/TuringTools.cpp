@@ -24,7 +24,7 @@ IncompleteTransition::IncompleteTransition(json &data) {
 }
 
 
-IncompleteSet::IncompleteSet(const string &state, const string &to_state): state{state}, to_state{to_state} {
+IncompleteSet::IncompleteSet(const string& state, const string& to_state): state{state}, to_state{to_state} {
 
 }
 

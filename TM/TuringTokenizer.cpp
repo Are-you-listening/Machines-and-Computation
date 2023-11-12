@@ -55,6 +55,11 @@ IncompleteSet TuringTokenizer::tokenize() {
 
     IncompleteSet tokenization = tokenize_runner_productions();
 
+    IncompleteSet check_if ("check_if","check_if");
+    tools->push(check_if, '(');
+
+    tools->link_on(tokenization, check_if, {'('}, {1});
+
     tools->link(result, tokenization);
 
     //before here, tokenize of 1 token without classier symbol
@@ -62,6 +67,10 @@ IncompleteSet TuringTokenizer::tokenize() {
     tools->stack_replace(result, {'A','P','A'}, {'D'});
     tools->stack_replace(result, {'A','P','A', 'P'}, {'D'});
     tools->stack_replace(result, {'P'}, {'A'});
+    tools->stack_replace(result, {'A','P','A', '('}, {'U'});
+    tools->stack_replace(result, {'A','P','A', 'P', '('}, {'U'});
+    tools->stack_replace(result, {'A', '('}, {'F'});
+    tools->stack_replace(result, {'('}, {'A'});
 
     //guarantees right token on top
 
