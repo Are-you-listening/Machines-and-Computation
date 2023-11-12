@@ -144,7 +144,10 @@ void TuringTools::link_put(IncompleteSet& a, const IncompleteSet& b, const vecto
 
     incomp.output = output;
     incomp.output_index = output_index;
-    incomp.move = {0};
+    for (int i=0; i<output_index.size(); i++){
+        incomp.move.push_back(0);
+    }
+
 
     a.to_state = b.to_state;
     a.transitions.push_back(incomp);

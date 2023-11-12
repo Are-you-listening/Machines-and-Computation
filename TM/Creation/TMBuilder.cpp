@@ -22,6 +22,7 @@ json TMBuilder::generateTM() {
 
     IncompleteSet program("program_start", "program_start");
     tools->push(program, '*');
+    tools->link_put(program, {'A', 'A'}, {0, 2});
 
     TuringTokenizer tokenizer{};
     IncompleteSet tokenize_program = tokenizer.tokenize();

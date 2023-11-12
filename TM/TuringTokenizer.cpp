@@ -30,8 +30,16 @@ IncompleteSet TuringTokenizer::tokenize() {
     IncompleteSet result("tokenize_mark_start", "tokenize_mark_start");
     // int stack start symbol
 
+    //tools->link_put(result, {'S'}, {0});
 
-    tools->link_put(result, {'S'}, {0});
+    IncompleteSet write_s("write_s", "write_s");
+    tools->link_put(write_s, {'S'}, {0});
+
+    IncompleteSet write_s2("write_s2", "write_s2");
+    tools->link_put(write_s2, {'S'}, {0});
+
+    tools->link_on(result, write_s, {'\u0000'}, {0});
+    tools->link_on(result, write_s2, {'E'}, {0});
 
     string end_tokenization_state = tools->branch_on(result, {'\u0000'}, {1});
 
@@ -49,9 +57,19 @@ IncompleteSet TuringTokenizer::tokenize() {
     tools->go_to(result, seperators, 1, 1, {0, 1});
     IncompleteSet temp("tokenize_mark_end", "tokenize_mark_end");
     tools->link_put(result, temp, {'E'}, {0});
-    tools->go_to(result, {'S'}, 0, -1, {0, 1});
+    tools->go_to(result, {'S', 'A'}, 0, -1, {0, 1});
 
-    tools->link_put(result, {'S'}, {2});
+
+
+    IncompleteSet write_s3("write_s3", "write_s3");
+    tools->link_put(write_s3, {'S'}, {2});
+
+    tools->link_on(result, write_s3, {'\u0000'}, {2});
+
+    IncompleteSet write_s4("write_s4", "write_s4");
+    tools->link_put(write_s4, {'S'}, {2});
+
+    tools->link_on(result, write_s4, {'E'}, {2});
 
     IncompleteSet tokenization = tokenize_runner_productions();
 
@@ -79,7 +97,7 @@ IncompleteSet TuringTokenizer::tokenize() {
     vector<int> tuple_set_indexes = get_tuple_index();
 
     tools->link_put(set_token_else, {'E'}, {2});
-    tools->go_to(set_token_else, {'S'}, 2, -1, tuple_set_indexes);
+    tools->go_to(set_token_else, {'S', 'A'}, 2, -1, tuple_set_indexes);
     tools->move(set_token_else, {(int) tapes - 1}, -1);
     tools->copy(set_token_else, tapes - 1, 3);
     tools->move(set_token_else, {(int) tapes - 1}, 1);
