@@ -111,13 +111,8 @@ json TuringTokenizer::tokenize() {
 
     tools->clear_stack(result);
 
+    tools->make_loop(result);
 
-    IncompleteTransition make_loop;
-    make_loop.state = result.to_state;
-    make_loop.to_state = result.state;
-    make_loop.def_move = 0;
-
-    result.transitions.push_back(make_loop);
 
     tools->link(program, result);
 

@@ -338,5 +338,15 @@ void TuringTools::clear_stack(IncompleteSet &a) {
 
 }
 
+void TuringTools::make_loop(IncompleteSet &a) {
+    IncompleteTransition make_loop;
+    make_loop.state = a.to_state;
+    make_loop.to_state = a.state;
+    make_loop.def_move = 0;
+
+    a.transitions.push_back(make_loop);
+
+}
+
 
 
