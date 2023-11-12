@@ -4,8 +4,8 @@
 
 #include "TMBuilder.h"
 
-TMBuilder::TMBuilder(unsigned int tape_size): tape_size{tape_size+5} {
-
+TMBuilder::TMBuilder(unsigned int tuple_size): tapes{tuple_size+5} {
+    tools = TuringTools::getInstance(tapes-1);
 }
 
 json TMBuilder::generateTM() {
@@ -13,14 +13,20 @@ json TMBuilder::generateTM() {
     vector<string> states = {"still need to do"};
     TM_data["States"] = states;
 
-    TM_data["Tapes"] = tape_size; // 2 for resulting marker and token same for original
+    TM_data["Tapes"] = tapes; // 2 for resulting marker and token same for original
 
     TM_data["Start"] = "program_start";
 
     TM_data["Input"] = "";
 
+
+    IncompleteSet program("program_start", "program_start");
+    tools->push(program, '*');
+
     TuringTokenizer tokenizer{};
-    IncompleteSet program = tokenizer.tokenize();
+    IncompleteSet tokenize_program = tokenizer.tokenize();
+
+    tools->link(program, tokenize_program);
 
     for (auto incomp: program.transitions){
         Transition t = make_transition(incomp);
@@ -43,7 +49,7 @@ Transition TMBuilder::make_transition(IncompleteTransition &incomp) {
     bool input_empty = incomp.input_index.empty();
     bool output_empty = incomp.output_index.empty();
 
-    for (int i = 0; i< tape_size; i++){
+    for (int i = 0; i< tapes; i++){
         if (!input_empty && incomp.input_index.front() == i){
             inputs.push_back(incomp.input.front());
             incomp.input.erase(incomp.input.begin());

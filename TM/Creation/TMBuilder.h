@@ -12,7 +12,9 @@ public:
     TMBuilder(unsigned int tuple_size);
     json generateTM();
 private:
-    unsigned int tape_size;
+    unsigned int tapes;
+    TuringTools* tools;
+
     Transition make_transition(IncompleteTransition& incomp);
     json add_transition(Transition& transition);
 

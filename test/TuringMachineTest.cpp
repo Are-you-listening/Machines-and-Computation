@@ -138,7 +138,7 @@ TEST(TuringMachineTest, TM_4_test) {
 }
 
 TEST(TuringMachineTest, TM_tools){
-    TuringTools* tools = new TuringTools(0);
+    TuringTools* tools = TuringTools::getInstance(0);
     IncompleteSet s("start", "start");
     tools->go_to(s, {'E'}, 0, 1);
     vector<IncompleteTransition> results1 = s.transitions;

@@ -4,6 +4,7 @@
 
 #include "TuringTools.h"
 
+
 IncompleteTransition::IncompleteTransition(json &data) {
 
     state = data["state"].get<string>();
@@ -32,6 +33,15 @@ TuringTools::TuringTools(unsigned int stack_tape) {
     counter = 0;
     this->stack_tape = stack_tape;
 }
+
+TuringTools* TuringTools::getInstance(unsigned int stack_tape) {
+    if (!_instance_flag){
+        _instance_flag = true;
+        _instance = unique_ptr<TuringTools>(new TuringTools(stack_tape));
+    }
+    return _instance.get();
+}
+
 
 
 
@@ -366,6 +376,7 @@ string TuringTools::branch_on(IncompleteSet &a, const vector<char> &input, const
 
     return resulting;
 }
+
 
 
 

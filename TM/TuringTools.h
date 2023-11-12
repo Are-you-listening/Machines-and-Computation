@@ -41,7 +41,8 @@ struct IncompleteSet{
 
 class TuringTools {
 public:
-    TuringTools(unsigned int stack_tape);
+    static TuringTools* getInstance(unsigned int stack_tape);
+
     void go_to(IncompleteSet& a, const vector<char>& symbol, int tape_index, int direction);
     void go_to(IncompleteSet& a, const vector<char>& symbol, int tape_index, int direction, const vector<int>& affected);
     static void link(IncompleteSet& a, const IncompleteSet& b);
@@ -61,11 +62,18 @@ public:
     void make_loop(IncompleteSet& a);
     string branch_on(IncompleteSet& a, const vector<char>&input, const vector<int>& input_index);
 private:
+
+    TuringTools(unsigned int stack_tape);
+    inline static unique_ptr<TuringTools> _instance;
+    inline static bool _instance_flag;
+
+
     unsigned long goto_counter;
     unsigned long counter;
     unsigned int stack_tape;
     unsigned int branch_counter;
 };
+
 
 
 #endif //TOG_TURINGTOOLS_H

@@ -9,8 +9,8 @@
 
 TuringTokenizer::TuringTokenizer():tuple_size{4} {
     tapes = tuple_size+5;
-    tools = new TuringTools(tapes-1);
-    seperators = {'=', ';', '{', '}', '\u0000'};
+    tools = TuringTools::getInstance(tapes-1);
+    seperators = {'=', ';', '{', '}', ')', '(', '\u0000'};
     special_sep = {'{', '}'};
 }
 
@@ -25,8 +25,7 @@ vector<int> TuringTokenizer::get_tuple_index() {
 
 IncompleteSet TuringTokenizer::tokenize() {
 
-    IncompleteSet program("program_start", "program_start");
-    tools->push(program, '*');
+
 
     IncompleteSet result("tokenize_mark_start", "tokenize_mark_start");
     // int stack start symbol
@@ -94,9 +93,9 @@ IncompleteSet TuringTokenizer::tokenize() {
     tools->make_loop(result);
     result.to_state = end_tokenization_state;
 
-    tools->link(program, result);
+    //tools->link(program, result);
 
-    return program;
+    return result;
 }
 
 
