@@ -232,14 +232,17 @@ void TuringTools::push(IncompleteSet &a, char symbol) {
 
 }
 
-void TuringTools::move(IncompleteSet &a, unsigned int tape, int direction) {
+void TuringTools::move(IncompleteSet &a, const vector<int>& tape, int direction) {
     IncompleteTransition move;
     move.state = a.to_state;
     move.to_state = to_string(counter);
     move.def_move = 0;
-    move.output = {'\u0001'};
-    move.output_index = {(int) tape};
-    move.move = {direction};
+    for (int i =0; i<tape.size(); i++){
+        move.output.push_back('\u0001');
+        move.move.push_back(direction);
+    }
+
+    move.output_index = tape;
 
     counter += 1;
 
@@ -333,7 +336,7 @@ void TuringTools::clear_stack(IncompleteSet &a) {
 
 
     b.transitions.insert(b.transitions.end(), outputs.begin(), outputs.end());
-    move(b, stack_tape, 1);
+    move(b, {(int) stack_tape}, 1);
     link(a, b);
 
 }
@@ -346,6 +349,22 @@ void TuringTools::make_loop(IncompleteSet &a) {
 
     a.transitions.push_back(make_loop);
 
+}
+
+string TuringTools::branch_on(IncompleteSet &a, const vector<char> &input, const vector<int> &input_index) {
+    string resulting = "branch_on_"+to_string(branch_counter);
+    branch_counter++;
+
+    IncompleteTransition leave_condition;
+    leave_condition.state = a.to_state;
+    leave_condition.to_state = resulting;
+    leave_condition.def_move = 0;
+    leave_condition.input_index = input_index;
+    leave_condition.input = input;
+
+    a.transitions.push_back(leave_condition);
+
+    return resulting;
 }
 
 

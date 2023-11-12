@@ -1,24 +1,5 @@
 [
 
-  {
-    "state": "tokenize_extension_1",
-    "to_state": "tokenize_extension_2",
-    "def_move": 1,
-    "input": [],
-    "input_index": [],
-    "output": ["\u0001", "\u0001", "\u0001"],
-    "output_index": [0, 1, 8],
-    "move": [0, 0, 0]
-  },
-  {
-    "state": "tokenize_extension_2",
-    "to_state": "tokenize_0",
-    "def_move": 0,
-    "input": [],
-    "input_index": [],
-    "output": ["E"],
-    "output_index": [3],
-    "move": [0]
-  }
+
 
 ]

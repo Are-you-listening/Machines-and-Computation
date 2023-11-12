@@ -4,6 +4,7 @@
 #include "TM/TuringProduction.h"
 #include "TM/TuringTokenizer.h"
 #include "lib/helper.h"
+#include "TM/Creation/TMBuilder.h"
 #include <memory>
 class TuringMachineTest: public ::testing::Test {
 protected:
@@ -164,8 +165,8 @@ TEST(TuringMachineTest, TM_tools){
 TEST(TuringMachineTest, TM_tokenazation) {
     // not in real use yet
 
-    TuringTokenizer* t = new TuringTokenizer;
-    json data = t->tokenize();
+    TMBuilder* t = new TMBuilder(4);
+    json data = t->generateTM();
     ofstream o("output/TM_test.json");
     o << data;
     TuringMachine tm;

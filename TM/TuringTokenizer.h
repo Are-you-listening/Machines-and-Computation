@@ -11,17 +11,18 @@
 class TuringTokenizer {
 public:
     TuringTokenizer();
-    json tokenize();
+    IncompleteSet tokenize();
 private:
     IncompleteSet tokenize_runner_productions();
 
     int tuple_size;
-    Transition make_transition(IncompleteTransition& incomp);
-    json add_transition(Transition& transition);
+
     unsigned int tapes;
     TuringTools* tools;
     vector<char> seperators;
     vector<char> special_sep;
+
+    vector<int> get_tuple_index();
 
 
 };

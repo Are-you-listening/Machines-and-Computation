@@ -36,8 +36,6 @@ set(TuringCode
         TM/TuringTools.h
         TM/Creation/TMBuilder.cpp
         TM/Creation/TMBuilder.h
-        TM/Creation/TMTransitionBuilder.cpp
-        TM/Creation/TMTransitionBuilder.h
 )
 
 set(CodeFiles

@@ -4,13 +4,17 @@
 
 #ifndef TOG_TMBUILDER_H
 #define TOG_TMBUILDER_H
-
+#include "TM/TuringTokenizer.h"
+#include "TM/TuringTools.h"
 
 class TMBuilder {
 public:
-    TMBuilder(unsigned int tape_size);
+    TMBuilder(unsigned int tuple_size);
+    json generateTM();
 private:
     unsigned int tape_size;
+    Transition make_transition(IncompleteTransition& incomp);
+    json add_transition(Transition& transition);
 
 };
 

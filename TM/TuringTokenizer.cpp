@@ -14,22 +14,16 @@ TuringTokenizer::TuringTokenizer():tuple_size{4} {
     special_sep = {'{', '}'};
 }
 
-json TuringTokenizer::tokenize() {
-    json TM_data;
-    vector<string> states = {"still need to do"};
-    for (int i = 0; i<tuple_size; i++){
-        states.push_back("tokenize_"+to_string(i));
+vector<int> TuringTokenizer::get_tuple_index() {
+    vector<int> tuple_set_indexes;
+    for (int i= 0; i<tuple_size+2; i++){
+        tuple_set_indexes.push_back(i+2);
     }
-    TM_data["States"] = states;
-
-    TM_data["Tapes"] = tapes; // 2 for resulting marker and token same for original
-
-    TM_data["Start"] = "program_start";
+    return tuple_set_indexes;
+}
 
 
-
-    ifstream f("TestFiles/TMStaticTransitions.json");
-    json data = json::parse(f);
+IncompleteSet TuringTokenizer::tokenize() {
 
     IncompleteSet program("program_start", "program_start");
     tools->push(program, '*');
@@ -40,36 +34,27 @@ json TuringTokenizer::tokenize() {
 
     tools->link_put(result, {'S'}, {0});
 
-
+    string end_tokenization_state = tools->branch_on(result, {'\u0000'}, {1});
 
     IncompleteSet tokenize_seperator("tokenize_seperator", "tokenize_seperator");
-    tools->move(tokenize_seperator, 0, 1);
+    tools->move(tokenize_seperator, {0}, 1);
     tools->link_put(tokenize_seperator, {'E'}, {0});
-    tools->move(tokenize_seperator, 0, -1);
+    tools->move(tokenize_seperator, {0}, -1);
 
     for (char s: seperators){
         tools->link_on(result, tokenize_seperator, {s}, {1});
     }
 
-    tools->move(result, 0, 1);
-    tools->move(result, 1, 1);
+    tools->move(result, {0}, 1);
+    tools->move(result, {1}, 1);
     tools->go_to(result, seperators, 1, 1, {0, 1});
     IncompleteSet temp("tokenize_mark_end", "tokenize_mark_end");
     tools->link_put(result, temp, {'E'}, {0});
     tools->go_to(result, {'S'}, 0, -1, {0, 1});
 
     tools->link_put(result, {'S'}, {2});
-    IncompleteSet tokenization("tokenize_link","tokenize_link");
-    for (int i = 0; i< data.size(); i++){
-        json sub = data[i];
-        IncompleteTransition incomp(sub);
 
-        tools->add(tokenization, incomp);
-    }
-    tokenization.to_state = "tokenize_link";
-
-    auto v = tokenize_runner_productions();
-    tools->link(tokenization, v);
+    IncompleteSet tokenization = tokenize_runner_productions();
 
     tools->link(result, tokenization);
 
@@ -83,122 +68,38 @@ json TuringTokenizer::tokenize() {
 
     //here we do define the define on other place token function
     IncompleteSet set_token_else("set_token_else", "set_token_else");
-    vector<int> tuple_set_indexes;
-    for (int i= 0; i<tuple_size+2; i++){
-        tuple_set_indexes.push_back(i+2);
-    }
+    vector<int> tuple_set_indexes = get_tuple_index();
 
     tools->link_put(set_token_else, {'E'}, {2});
     tools->go_to(set_token_else, {'S'}, 2, -1, tuple_set_indexes);
-    tools->move(set_token_else, tapes - 1, -1);
+    tools->move(set_token_else, {(int) tapes - 1}, -1);
     tools->copy(set_token_else, tapes - 1, 3);
-    tools->move(set_token_else, tapes - 1, 1);
+    tools->move(set_token_else, {(int) tapes - 1}, 1);
     tools->go_to(set_token_else, {'E'}, 2, 1, tuple_set_indexes);
 
     tools->link_on(result, set_token_else, {'E'}, {3});
     //end link on
 
     IncompleteSet set_token("set_token", "set_token");
-    tools->move(set_token, tapes - 1, -1);
+    tools->move(set_token, {(int) tapes - 1}, -1);
     tools->copy(set_token, tapes - 1, 3);
-    tools->move(set_token, tapes - 1, 1);
+    tools->move(set_token, {(int) tapes - 1}, 1);
 
     tools->link_on(result, set_token, {'\u0000'}, {3});
 
-    for (int m: tuple_set_indexes){
-        tools->move(result, m, 1);
-    }
+    tools->move(result, tuple_set_indexes, 1);
 
     tools->clear_stack(result);
 
     tools->make_loop(result);
-
+    result.to_state = end_tokenization_state;
 
     tools->link(program, result);
 
-    TM_data["Input"] = "";
-
-
-
-
-    for (auto incomp: program.transitions){
-        Transition t = make_transition(incomp);
-        json production = add_transition(t);
-        TM_data["Productions"].push_back(production);
-    }
-
-    return TM_data;
+    return program;
 }
 
-Transition TuringTokenizer::make_transition(IncompleteTransition &incomp) {
-    Transition transition;
-    transition.state = incomp.state;
-    vector<char> inputs;
-    vector<char> outputs;
-    vector<int> moves;
 
-    int def_move = incomp.def_move;
-
-    bool input_empty = incomp.input_index.empty();
-    bool output_empty = incomp.output_index.empty();
-
-    for (int i = 0; i< tapes; i++){
-        if (!input_empty && incomp.input_index.front() == i){
-            inputs.push_back(incomp.input.front());
-            incomp.input.erase(incomp.input.begin());
-            incomp.input_index.erase(incomp.input_index.begin());
-        }else{
-            inputs.push_back('\u0001');
-        }
-
-        if (!output_empty && incomp.output_index.front() == i){
-            outputs.push_back(incomp.output.front());
-            moves.push_back(incomp.move.front());
-            incomp.output.erase(incomp.output.begin());
-            incomp.move.erase(incomp.move.begin());
-            incomp.output_index.erase(incomp.output_index.begin());
-        }else{
-            outputs.push_back('\u0001');
-            moves.push_back(def_move);
-        }
-    }
-
-
-
-    transition.input = inputs;
-    Production p;
-    p.new_state = incomp.to_state;
-    p.replace_val = outputs;
-    p.movement = moves;
-    transition.production = p;
-    return transition;
-}
-
-json TuringTokenizer::add_transition(Transition &transition) {
-    json production;
-    json to;
-    production["state"] = transition.state;
-    vector<string> input;
-    for (char c: transition.input){
-        string temp;
-        temp += c;
-        input.push_back(temp);
-    }
-    production["symbols"] = input;
-
-    to["state"] = transition.production.new_state;
-
-    vector<string> output;
-    for (char c: transition.production.replace_val){
-        string temp;
-        temp += c;
-        output.push_back(temp);
-    }
-    to["symbols"] = output;
-    to["moves"] = transition.production.movement;
-    production["to"] = to;
-    return production;
-}
 
 IncompleteSet TuringTokenizer::tokenize_runner_productions() {
     IncompleteSet final_tokenize_set("tokenize_pre_setup", "tokenize_pre_setup");
@@ -279,8 +180,12 @@ IncompleteSet TuringTokenizer::tokenize_runner_productions() {
 
     IncompleteSet end_marking("tokenize_extension_1","tokenize_extension_1");
     tools->link(final_tokenize_set, end_marking);
+    tools->move(final_tokenize_set, get_tuple_index(), 1);
+    tools->link_put(final_tokenize_set, {'E'}, {3});
+    tools->make_loop(final_tokenize_set);
 
     final_tokenize_set.to_state = "tokenize_sub_finished_token";
     return final_tokenize_set;
 }
+
 
