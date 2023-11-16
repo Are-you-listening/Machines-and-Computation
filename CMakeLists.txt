@@ -30,12 +30,16 @@ set(TuringCode
         TM/Tape.h
         TM/TuringProduction.cpp
         TM/TuringProduction.h
-        TM/TuringTokenizer.cpp
-        TM/TuringTokenizer.h
+        TM/TransitieGenerators/TuringTokenizer.cpp
+        TM/TransitieGenerators/TuringTokenizer.h
         TM/TuringTools.cpp
         TM/TuringTools.h
         TM/Creation/TMBuilder.cpp
         TM/Creation/TMBuilder.h
+        TM/TransitieGenerators/TuringVarDictionary.cpp
+        TM/TransitieGenerators/TuringVarDictionary.h
+        TM/TransitieGenerators/TuringGenerator.cpp
+        TM/TransitieGenerators/TuringGenerator.h
 )
 
 set(CodeFiles

@@ -81,6 +81,11 @@ void TuringTools::go_to(IncompleteSet& a, const vector<char>& symbol, int tape_i
 }
 
 void TuringTools::go_to(IncompleteSet &a, const vector<char>& symbol, int tape_index, int direction, const vector<int> &affected) {
+    go_to_clear(a, symbol, tape_index, direction, affected, {});
+}
+
+void TuringTools::go_to_clear(IncompleteSet &a, const vector<char> &symbol, int tape_index, int direction,
+                              const vector<int> &affected, const vector<int> &cleared) {
     IncompleteSet b("go_to_"+ to_string(goto_counter) ,"go_to_"+ to_string(goto_counter+1));
     vector<IncompleteTransition> outputs;
 
@@ -93,7 +98,12 @@ void TuringTools::go_to(IncompleteSet &a, const vector<char>& symbol, int tape_i
     moving.output_index = affected;
 
     for (int i =0; i<moving.output_index.size(); i++){
-        moving.output.push_back('\u0001');
+        char c = '\u0001';
+        if (find(cleared.begin(), cleared.end(), moving.output_index[i]) != cleared.end()){
+            c = '\u0000';
+        }
+
+        moving.output.push_back(c);
         moving.move.push_back(direction);
 
     }
@@ -120,7 +130,9 @@ void TuringTools::go_to(IncompleteSet &a, const vector<char>& symbol, int tape_i
     b.transitions.insert(b.transitions.end(), outputs.begin(), outputs.end());
 
     link(a, b);
+
 }
+
 
 
 void TuringTools::link(IncompleteSet& a, const IncompleteSet& b) {
@@ -317,6 +329,44 @@ void TuringTools::link_on(IncompleteSet &a, const IncompleteSet &b, const vector
 
 }
 
+void TuringTools::link_on_multiple(IncompleteSet &a, const IncompleteSet &b, const vector<vector<char>> &input,
+                                   const vector<int> &input_index) {
+    string end_state = to_string(counter);
+    counter++;
+
+    for (int i=0; i<input.size(); i++){
+        vector<char> sub_input = input[i];
+
+        IncompleteTransition condition_transition;
+        condition_transition.state = a.to_state;
+        condition_transition.to_state = b.state;
+        condition_transition.def_move = 0;
+        condition_transition.input = sub_input;
+        condition_transition.input_index = input_index;
+
+        a.transitions.push_back(condition_transition);
+    }
+
+    a.transitions.insert(a.transitions.end(), b.transitions.begin(), b.transitions.end());
+
+    IncompleteTransition transition1;
+    transition1.state = a.to_state;
+    transition1.to_state = end_state;
+    transition1.def_move = 0;
+
+    IncompleteTransition transition2;
+    transition2.state = b.to_state;
+    transition2.to_state = end_state;
+    transition2.def_move = 0;
+
+    a.transitions.push_back(transition1);
+    a.transitions.push_back(transition2);
+
+    a.to_state = end_state;
+
+}
+
+
 void TuringTools::clear_stack(IncompleteSet &a) {
     IncompleteSet b("clear_stack_"+ to_string(goto_counter) ,"clear_stack_"+ to_string(goto_counter+1));
     vector<IncompleteTransition> outputs;
@@ -405,6 +455,50 @@ void TuringTools::write_on(IncompleteSet &a, const vector<char> &input, const ve
     a.transitions.push_back(do_on);
     a.transitions.push_back(do_not);
 }
+
+void TuringTools::heap_push_function(IncompleteSet &a, const vector<int> &tuple_indexes) {
+    IncompleteSet push_heap_action{"push_heap_"+ to_string(counter), "push_heap_"+ to_string(counter)};
+    counter++;
+
+    go_to(push_heap_action, {'*'}, stack_tape, -1, {(int) stack_tape});
+
+    go_to(push_heap_action, {'\u0000'}, stack_tape, -1, {(int) stack_tape});
+
+    IncompleteSet push_heap_action_do{"push_heap_do_"+ to_string(counter), "push_heap_do_"+ to_string(counter)};
+    counter++;
+
+    IncompleteSet push_sub_action{"push_heap_sub_"+ to_string(counter), "push_heap_sub_"+ to_string(counter)};
+    counter++;
+
+
+    for (int i = 0; i< tuple_indexes.size(); i++){
+        if (i < 2){
+            continue;
+        }
+
+        copy(push_sub_action, tuple_indexes[i], stack_tape);
+        move(push_sub_action, {(int) stack_tape}, -1);
+
+    }
+
+    move(push_sub_action, tuple_indexes, 1);
+
+    link_on_multiple(push_heap_action_do, push_sub_action, {{'U'}, {'E'}}, {tuple_indexes[1]});
+    //link_on(push_heap_action, push_sub_action, {'E'}, {tuple_indexes[1]});
+    string end_loop = branch_on(push_heap_action_do, {'S'}, {tuple_indexes[1]});
+    make_loop(push_heap_action_do);
+    push_heap_action_do.to_state = end_loop;
+    link(push_heap_action, push_heap_action_do);
+    link(a, push_heap_action);
+}
+
+void TuringTools::reset() {
+    _instance_flag = false;
+    _instance = nullptr;
+
+}
+
+
 
 
 

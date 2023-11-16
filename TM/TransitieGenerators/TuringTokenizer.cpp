@@ -3,24 +3,13 @@
 //
 
 #include "TuringTokenizer.h"
-#include "TuringTools.h"
+#include "TM/TuringTools.h"
 
 
 
-TuringTokenizer::TuringTokenizer():tuple_size{4} {
-    tapes = tuple_size+5;
-    tools = TuringTools::getInstance(tapes-1);
-    seperators = {'=', ';', '{', '}', ')', '(', '\u0000'};
-    special_sep = {'{', '}'};
+TuringTokenizer::TuringTokenizer(): TuringGenerator(4) {
 }
 
-vector<int> TuringTokenizer::get_tuple_index() {
-    vector<int> tuple_set_indexes;
-    for (int i= 0; i<tuple_size+2; i++){
-        tuple_set_indexes.push_back(i+2);
-    }
-    return tuple_set_indexes;
-}
 
 
 IncompleteSet TuringTokenizer::tokenize() {
@@ -114,7 +103,10 @@ IncompleteSet TuringTokenizer::tokenize() {
     tools->make_loop(result);
     result.to_state = end_tokenization_state;
 
-    //tools->link(program, result);
+    //do cleanup
+    tools->go_to_clear(result, {'A'}, 0, -1, {0, 1}, {0,1});
+    tools->link_put(result, {'\u0000'}, {1});
+    tools->go_to_clear(result, {'A'}, 2, -1, get_tuple_index(), {2});
 
     return result;
 }
@@ -206,6 +198,10 @@ IncompleteSet TuringTokenizer::tokenize_runner_productions() {
 
     final_tokenize_set.to_state = "tokenize_sub_finished_token";
     return final_tokenize_set;
+}
+
+IncompleteSet TuringTokenizer::getTransitions() {
+    return tokenize();
 }
 
 

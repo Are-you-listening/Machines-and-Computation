@@ -45,6 +45,8 @@ public:
 
     void go_to(IncompleteSet& a, const vector<char>& symbol, int tape_index, int direction);
     void go_to(IncompleteSet& a, const vector<char>& symbol, int tape_index, int direction, const vector<int>& affected);
+    void go_to_clear(IncompleteSet& a, const vector<char>& symbol, int tape_index, int direction, const vector<int>& affected,
+                     const vector<int>& cleared);
     static void link(IncompleteSet& a, const IncompleteSet& b);
     static void link_put(IncompleteSet& a, const IncompleteSet& b,
                          const vector<char>& output, const vector<int>& output_index);
@@ -58,11 +60,15 @@ public:
     void move(IncompleteSet& a, const vector<int>& tape, int direction);
     void copy(IncompleteSet& a, unsigned int from_tape, unsigned int to_tape);
     void link_on(IncompleteSet& a, const IncompleteSet& b, const vector<char>&input, const vector<int>& input_index);
+    void link_on_multiple(IncompleteSet& a, const IncompleteSet& b, const vector<vector<char>>&input, const vector<int>& input_index);
     void clear_stack(IncompleteSet& a);
     void make_loop(IncompleteSet& a);
     string branch_on(IncompleteSet& a, const vector<char>&input, const vector<int>& input_index);
     void write_on(IncompleteSet& a, const vector<char>&input, const vector<int>& input_index,
                   const vector<char>&output, const vector<int>& output_index);
+
+    void heap_push_function(IncompleteSet& a, const vector<int>&tuple_indexes);
+    static void reset();
 private:
 
     TuringTools(unsigned int stack_tape);

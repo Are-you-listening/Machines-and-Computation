@@ -2,7 +2,7 @@
 #include "TM/Tape.h"
 #include "TM/TuringMachine.h"
 #include "TM/TuringProduction.h"
-#include "TM/TuringTokenizer.h"
+#include "TM/TransitieGenerators/TuringTokenizer.h"
 #include "lib/helper.h"
 #include "TM/Creation/TMBuilder.h"
 #include <memory>
@@ -164,7 +164,7 @@ TEST(TuringMachineTest, TM_tools){
 
 TEST(TuringMachineTest, TM_tokenazation) {
     // not in real use yet
-
+    TuringTools::reset();
     TMBuilder* t = new TMBuilder(4);
     json data = t->generateTM();
     ofstream o("output/TM_test.json");
@@ -186,7 +186,7 @@ TEST(TuringMachineTest, TM_tokenazation) {
         }
         tm.move();
 
-        if (i >= 8500){
+        if (i >= 18100){
             int j = 0;
 
             for (int i = 0; i < tm.getTapeAmount(); i++){
