@@ -25,6 +25,8 @@ jobs:
           root: build
 
   run_tests:
+    requires:
+      - build
     resource_class: large
     executor: main_executor
     steps:
@@ -39,9 +41,3 @@ workflows:
     jobs:
       - build
       - run_tests: &runtests
-          requires:
-            - build
-      - *runtests
-      - *runtests
-      - *runtests
-      - *runtests
