@@ -7,7 +7,6 @@
 static unsigned long int ThreadNameFunction=0xA0000000;
 
 void ThreadFunction::ThreadFunctionCall(const std::string& FileLocation, const std::string& Function){
-    std::cout << ThreadNameFunction << std::endl;
     ChangedVariables.clear();
     unsigned long int left=0;
     unsigned long int right=0;
@@ -114,7 +113,7 @@ void ThreadFunction::ThreadFunctionCall(const std::string& FileLocation, const s
             ThreadNameFunction++;
             count++;
             for(unsigned long int i=0; i<copy.size(); i++){
-                FunctionCall+=VusedVariables[count][i]+", "; 
+                FunctionCall+=VusedVariables[count][i]+", ";
             }
             FunctionCall[FunctionCall.size()-2]=')';
             FunctionCall[FunctionCall.size()-1]=';';
@@ -143,7 +142,7 @@ void ThreadFunction::ThreadFunctionCall(const std::string& FileLocation, const s
     }
     std::ifstream File3(FileLocation+"thread");
     std::ofstream File4(FileLocation);
-    
+
     std::string line;
     File.clear();
     File.seekg(0);
