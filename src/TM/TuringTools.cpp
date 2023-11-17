@@ -498,6 +498,67 @@ void TuringTools::reset() {
 
 }
 
+void TuringTools::link_on_sequence(IncompleteSet &a, const IncompleteSet &b, const vector<char> &input_sequence,
+                                   int input_index) {
+    string final_state = to_string(counter+input_sequence.size()+2);
+    IncompleteSet d(to_string(counter), final_state);
+
+    IncompleteTransition to_start_check;
+    to_start_check.state = to_string(counter);
+    to_start_check.to_state = to_string(counter+1);
+    to_start_check.def_move = 0;
+    to_start_check.output = {'\u0001'};
+    to_start_check.output_index = {input_index};
+    to_start_check.move = {-(int) input_sequence.size()};
+
+    counter++;
+
+    d.transitions.push_back(to_start_check);
+
+    for (int i=0; i< input_sequence.size(); i++){
+        char c = input_sequence[i];
+
+        IncompleteTransition check_transition;
+        check_transition.state = to_string(counter);
+        check_transition.to_state = to_string(counter+1);
+        check_transition.def_move = 0;
+        check_transition.input = {c};
+        check_transition.input_index = {input_index};;
+        check_transition.output = {'\u0001'};
+        check_transition.output_index = {input_index};;
+        check_transition.move = {1};
+
+        IncompleteTransition fail_transition;
+        fail_transition.state = to_string(counter);
+        fail_transition.to_state = final_state;
+        fail_transition.def_move = 0;
+        fail_transition.output = {'\u0001'};
+        fail_transition.output_index = {input_index};;
+        fail_transition.move = {(int) input_sequence.size()-i};
+
+        counter++;
+
+        d.transitions.push_back(check_transition);
+        d.transitions.push_back(fail_transition);
+    }
+
+    d.to_state = to_string(counter);
+    link(d, b);
+
+    IncompleteTransition link_back;
+    link_back.state = d.to_state;
+    link_back.to_state = final_state;
+    link_back.def_move = 0;
+
+    d.transitions.push_back(link_back);
+    d.to_state = final_state;
+
+    counter++;
+
+    link(a, d);
+
+}
+
 
 
 

@@ -28,11 +28,18 @@ json TMBuilder::generateTM() {
     TuringTokenizer tokenizer{};
     IncompleteSet tokenize_program = tokenizer.getTransitions();
 
+
     tools->link(program, tokenize_program);
 
-    TuringVarDictionary vardict{};
+    //TuringVarDictionary vardict{};
 
-    tools->link(program, vardict.getTransitions());
+    //tools->link(program, vardict.getTransitions());
+
+
+    //IncompleteSet test("test1", "test1");
+    //tools->push(test, 'B');
+    //tools->link_on_sequence(program,test, {'#','*'}, tapes-1);
+
 
     for (auto incomp: program.transitions){
         Transition t = make_transition(incomp);

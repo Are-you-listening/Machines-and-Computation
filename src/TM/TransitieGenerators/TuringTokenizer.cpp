@@ -54,6 +54,16 @@ IncompleteSet TuringTokenizer::tokenize() {
 
     tools->link_on(tokenization, check_if, {'('}, {1});
 
+    IncompleteSet check_if2 ("check_if2","check_if2");
+    IncompleteSet check_if3 ("check_if3","check_if3");
+    tools->push(check_if2, ':');
+    tools->push(check_if3, ':');
+    tools->move(check_if2, {1}, 1);
+    tools->link_on(check_if2, check_if3, {':'}, {1});
+    tools->move(check_if2, {1}, -1);
+
+    tools->link_on(tokenization, check_if2, {':'}, {1});
+
     tools->link(result, tokenization);
 
     //before here, tokenize of 1 token without classier symbol
@@ -65,6 +75,9 @@ IncompleteSet TuringTokenizer::tokenize() {
     tools->stack_replace(result, {'A','P','A', 'P', '('}, {'U'});
     tools->stack_replace(result, {'A', '('}, {'F'});
     tools->stack_replace(result, {'('}, {'A'});
+    tools->stack_replace(result, {'A', ':'}, {'I'});
+    tools->stack_replace(result, {':', ':'}, {'O'});
+    tools->stack_replace(result, {':'}, {'S'});
 
     //guarantees right token on top
 
@@ -145,6 +158,10 @@ IncompleteSet TuringTokenizer::tokenize_runner_productions() {
 
             if (is_spatie){
                 IncompleteSet spatie_pusher("tokenize_spatie"+ to_string(i), "tokenize_spatie"+ to_string(i));
+
+                IncompleteSet class_checker("tokenize_class_checker", "tokenize_class_checker");
+                tools->push(class_checker, 'C');
+                tools->link_on_sequence(spatie_pusher, class_checker, {'c','l','a','s','s', ' '}, 1);
 
                 //sets S on stack if no other S is before
                 tools->stack_replace(spatie_pusher, {'*'}, {'P'});
