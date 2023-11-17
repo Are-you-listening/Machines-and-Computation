@@ -53,6 +53,8 @@ set(CodeFiles
         src/Tokenazation.h
         src/ThreadFunction.cpp
         src/ThreadFunction.h
+        src/CFG.cpp
+        src/CFG.h
         ${TuringCode}
 )
 
