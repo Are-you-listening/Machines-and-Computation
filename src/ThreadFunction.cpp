@@ -4,10 +4,11 @@
 
 #include "ThreadFunction.h"
 #include <iostream>
+#include <mutex>
 static unsigned long int ThreadNameFunction=0xA0000000;
-
+static std::mutex thread_name_lock;
 void ThreadFunction::ThreadFunctionCall(const std::string& FileLocation, const std::string& Function){
-    ChangedVariables.clear();
+    std::vector<std::string> ChangedVariables;
     unsigned long int left=0;
     unsigned long int right=0;
     for(unsigned long int i=0; i<Function.size(); i++){
@@ -68,10 +69,12 @@ void ThreadFunction::ThreadFunctionCall(const std::string& FileLocation, const s
     }
     std::vector<std::string> joins;
     std::stringstream Tempname;
+    thread_name_lock.lock();
     Tempname<<std::hex<<ThreadNameFunction;
     std::string FunctionCall="std::thread "+ Tempname.str()+"("+Functionname+", ";
     joins.push_back(Tempname.str());
     ThreadNameFunction++;
+    thread_name_lock.unlock();
     std::vector<std::string> copy=VusedVariables[0];
     for(unsigned long int i=0; i<copy.size(); i++){
         for(unsigned long int j=0; j<copy[i].size(); j++){
@@ -107,10 +110,12 @@ void ThreadFunction::ThreadFunctionCall(const std::string& FileLocation, const s
             FunctionCalls.push_back(FunctionCall);
             FunctionCall.clear();
             Tempname.str("");
+            thread_name_lock.lock();
             Tempname<<std::hex<<ThreadNameFunction;
             FunctionCall="std::thread "+ Tempname.str()+"("+Functionname+", ";
             joins.push_back(Tempname.str());
             ThreadNameFunction++;
+            thread_name_lock.unlock();
             count++;
             for(unsigned long int i=0; i<copy.size(); i++){
                 FunctionCall+=VusedVariables[count][i]+", ";
