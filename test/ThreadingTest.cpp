@@ -1,7 +1,4 @@
-//
-// Created by watson on 10/11/23.
-//
-
+#include <gtest/gtest.h>
 #include <iostream>
 #include <thread>
 
@@ -10,23 +7,33 @@
 #include "CFG.h"
 #include "ThreadFunction.h"
 #include "filesystem"
+static unsigned int core_amount = std::thread::hardware_concurrency();
 
-static unsigned int core_amount = std::thread::hardware_concurrency(); // gets "core amount", in windows you can allocate infinite threads. in linux this isn't possible i believe. so pls care about this.
-// so whenever you thread something, pls change core_amount. Also core_amount isn't the perfect name for this
+class ThreadingTest: public ::testing::Test {
+protected:
+    virtual void SetUp() {
 
-int main() { // Function names we create to replace nesting should have F or I in their names so we know if they were for-loops or If-loops
+
+
+    }
+    virtual void TearDown() {
+    }
+
+};
+
+TEST(ThreadingTest, old_main) {
     Tokenazation tokenVector;
     std::string Filelocation="Nested/engine.cc";
     std::thread Tokenizer(&Tokenazation::Tokenize, &tokenVector, Filelocation);
     core_amount--;
-    
+
     //CFG cfg("TestFiles/CFG.json"); //don't forget to add CFG back into cmakelist in right set
     //cfg.toGNF(); // this still needs massive debugging.
-    
+
     Tokenizer.join();
     core_amount++;
     //create larl parser with tokenvector
-    
+
     //threading every function for now, will later be changed
     // i also assume that every function we create to replace nesting is only called upon once
     // result don't work for now, will be changed
@@ -99,7 +106,7 @@ int main() { // Function names we create to replace nesting should have F or I i
     }
     File2.close();
     File1.close();
-    
+
     std::ofstream File5(ResultFileLocation+"result.cc");
     std::ifstream File6(ResultFileLocation+"tempresult.cc0");
     for(unsigned long int i=0; i<count; i++){
@@ -138,7 +145,7 @@ int main() { // Function names we create to replace nesting should have F or I i
     File6.close();
     File7.close();
     File8.close();
-    
+
     for(unsigned long int i=0; i<count; i++){
         std::string c=ResultFileLocation + std::to_string(i);
         std::remove(c.c_str());
@@ -146,5 +153,5 @@ int main() { // Function names we create to replace nesting should have F or I i
     std::string c=ResultFileLocation +"tempresult.cc0";
     std::remove(c.c_str());
     std::cout << "We do really love Tibo" << std::endl;
-    return 0;
+
 }

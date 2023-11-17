@@ -3,6 +3,7 @@ project(Tog)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 
 include_directories(.)
 #Google Test Setup
@@ -20,6 +21,7 @@ enable_testing()
 set(TestCaseFiles
         test/test-main.cpp
         test/TuringMachineTest.cpp
+        test/ThreadingTest.cpp
 )
 
 
