@@ -1,0 +1,16 @@
+{
+  "_comment": "Config File",
+
+  "max_nesting": {
+    "_comment": "0 is the main loop's {}, gives the value of max nesting that might occur in the generated program",
+    "value": 0
+  },
+  "split_nesting": {
+    "_comment": "0 is an exact copy paste, gives the amount of transferred nesting",
+    "value": 0
+  },
+  "threading": {
+    "value": false,
+    "_comment": ""
+  }
+}
