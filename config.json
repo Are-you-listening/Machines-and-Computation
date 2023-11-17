@@ -1,6 +1,5 @@
 {
   "_comment": "Config File",
-
   "max_nesting": {
     "_comment": "0 is the main loop's {}, gives the value of max nesting that might occur in the generated program",
     "value": 0
