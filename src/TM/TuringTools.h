@@ -13,6 +13,7 @@ using namespace std;
 using json = nlohmann::json;
 
 struct Transition{
+public:
     Production production;
     string state;
     vector<char> input;
