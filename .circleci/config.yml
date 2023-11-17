@@ -22,6 +22,7 @@ jobs:
       - persist_to_workspace:
           paths:
             - testing/testing/TESTS
+            - testing/testing/Tog
           root: build
 
   run_tests:
