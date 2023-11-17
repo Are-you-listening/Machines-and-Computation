@@ -4,8 +4,8 @@
 
 #ifndef TOG_TURINGTOKENIZER_H
 #define TOG_TURINGTOKENIZER_H
-#include "TM/TuringMachine.h"
-#include "TM/TransitieGenerators/TuringGenerator.h"
+#include "src/TM/TuringMachine.h"
+#include "TuringGenerator.h"
 
 
 class TuringTokenizer: public TuringGenerator{

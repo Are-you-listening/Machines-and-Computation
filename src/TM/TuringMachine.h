@@ -4,10 +4,10 @@
 
 #ifndef TOG_TURINGMACHINE_H
 #define TOG_TURINGMACHINE_H
-#include "TM/Tape.h"
+#include "Tape.h"
 #include <vector>
 #include <map>
-#include "TM/TuringProduction.h"
+#include "TuringProduction.h"
 #include "lib/json.hpp"
 #include <fstream>
 #include <set>

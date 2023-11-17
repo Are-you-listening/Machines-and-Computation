@@ -5,9 +5,9 @@
 #include <iostream>
 #include <thread>
 #include <ctime>
-#include "Tokenazation.h"
-#include "CFG.h"
-#include "ThreadFunction.h"
+#include "src/Tokenazation.h"
+#include "src/CFG.h"
+#include "src/ThreadFunction.h"
 #include "filesystem"
 
 static unsigned int core_amount = std::thread::hardware_concurrency(); // gets "core amount", in windows you can allocate infinite threads. in linux this isn't possible i believe. so pls care about this.

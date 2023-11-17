@@ -24,22 +24,22 @@ set(TestCaseFiles
 
 
 set(TuringCode
-        TM/TuringMachine.cpp
-        TM/TuringMachine.h
-        TM/Tape.cpp
-        TM/Tape.h
-        TM/TuringProduction.cpp
-        TM/TuringProduction.h
-        TM/TransitieGenerators/TuringTokenizer.cpp
-        TM/TransitieGenerators/TuringTokenizer.h
-        TM/TuringTools.cpp
-        TM/TuringTools.h
-        TM/Creation/TMBuilder.cpp
-        TM/Creation/TMBuilder.h
-        TM/TransitieGenerators/TuringVarDictionary.cpp
-        TM/TransitieGenerators/TuringVarDictionary.h
-        TM/TransitieGenerators/TuringGenerator.cpp
-        TM/TransitieGenerators/TuringGenerator.h
+        src/TM/TuringMachine.cpp
+        src/TM/TuringMachine.h
+        src/TM/Tape.cpp
+        src/TM/Tape.h
+        src/TM/TuringProduction.cpp
+        src/TM/TuringProduction.h
+        src/TM/TransitieGenerators/TuringTokenizer.cpp
+        src/TM/TransitieGenerators/TuringTokenizer.h
+        src/TM/TuringTools.cpp
+        src/TM/TuringTools.h
+        src/TM/Creation/TMBuilder.cpp
+        src/TM/Creation/TMBuilder.h
+        src/TM/TransitieGenerators/TuringVarDictionary.cpp
+        src/TM/TransitieGenerators/TuringVarDictionary.h
+        src/TM/TransitieGenerators/TuringGenerator.cpp
+        src/TM/TransitieGenerators/TuringGenerator.h
 )
 
 set(CodeFiles
@@ -47,10 +47,10 @@ set(CodeFiles
         lib/helper.cpp
         lib/helper.h
         lib/json.hpp
-        Tokenazation.cpp
-        Tokenazation.h
-        ThreadFunction.cpp 
-        ThreadFunction.h
+        src/Tokenazation.cpp
+        src/Tokenazation.h
+        src/ThreadFunction.cpp
+        src/ThreadFunction.h
         ${TuringCode}
 )
 
