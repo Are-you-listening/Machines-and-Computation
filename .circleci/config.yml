@@ -38,7 +38,12 @@ workflows:
   default_validation: &default_validation
     jobs:
       - build
-      - run_tests: &runtests
+      - run_tests:
           requires:
             - build
-      - run_tests2: *runtests
+      - run_tests:
+          requires:
+            - build
+      - run_tests:
+          requires:
+            - build
