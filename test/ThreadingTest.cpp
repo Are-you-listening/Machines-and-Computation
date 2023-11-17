@@ -3,9 +3,9 @@
 #include <thread>
 
 #include <ctime>
-#include "Tokenazation.h"
-#include "CFG.h"
-#include "ThreadFunction.h"
+#include "src/Tokenazation.h"
+#include "src/CFG.h"
+#include "src/ThreadFunction.h"
 #include "filesystem"
 static unsigned int core_amount = std::thread::hardware_concurrency();
 
