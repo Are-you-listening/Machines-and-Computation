@@ -1,10 +1,10 @@
 #include <gtest/gtest.h>
-#include "TM/Tape.h"
-#include "TM/TuringMachine.h"
-#include "TM/TuringProduction.h"
-#include "TM/TransitieGenerators/TuringTokenizer.h"
+#include "src/TM/Tape.h"
+#include "src/TM/TuringMachine.h"
+#include "src/TM/TuringProduction.h"
+#include "src/TM/TransitieGenerators/TuringTokenizer.h"
 #include "lib/helper.h"
-#include "TM/Creation/TMBuilder.h"
+#include "src/TM/Creation/TMBuilder.h"
 #include <memory>
 class TuringMachineTest: public ::testing::Test {
 protected:
@@ -82,7 +82,7 @@ TEST(TuringMachineTest, tape_production) {
 }
 
 TEST(TuringMachineTest, tape_TM_construction) {
-    TuringMachine t{"TestFiles/TM_1.json"};
+    TuringMachine t{"../test/testFiles/TM_1.json"};
     ASSERT_EQ(t.getTapeData(0),"[abcdefg                                                         ]");
     ASSERT_EQ(t.getTapeData(1),"[                                                                ]");
     t.move();
@@ -94,19 +94,19 @@ TEST(TuringMachineTest, tape_TM_construction) {
 TEST(TuringMachineTest, tape_TM_procedure) {
     ofstream output("output/TM_2.txt");
 
-    TuringMachine t{"TestFiles/TM_2.json"};
+    TuringMachine t{"../test/testFiles/TM_2.json"};
     while (!t.isHalted()){
         t.move();
         output << t.getTapeData(0) << endl;
     }
 
-    EXPECT_TRUE(FileCompare("output/TM_2.txt", "TestCompareFiles/TM_2.txt"));
+    EXPECT_TRUE(FileCompare("output/TM_2.txt", "../test/compareFiles/TM_2.txt"));
 }
 
 TEST(TuringMachineTest, large_runtime_test) {
     ofstream output("output/TM_3.txt");
 
-    TuringMachine t{"TestFiles/TM_3.json"};
+    TuringMachine t{"../test/testFiles/TM_3.json"};
     while (!t.isHalted()){
 
         for (int i = 0; i < t.getTapeAmount(); i++){
@@ -117,13 +117,13 @@ TEST(TuringMachineTest, large_runtime_test) {
         t.move();
     }
 
-    EXPECT_TRUE(FileCompare("output/TM_3.txt", "TestCompareFiles/TM_3.txt"));
+    EXPECT_TRUE(FileCompare("output/TM_3.txt", "../test/compareFiles/TM_3.txt"));
 }
 
 TEST(TuringMachineTest, TM_4_test) {
     ofstream output("output/TM_4.txt");
 
-    TuringMachine t{"TestFiles/TM_4.json"};
+    TuringMachine t{"../test/testFiles/TM_4.json"};
     while (!t.isHalted()){
 
         for (int i = 0; i < t.getTapeAmount(); i++){
@@ -134,7 +134,7 @@ TEST(TuringMachineTest, TM_4_test) {
         t.move();
     }
 
-    EXPECT_TRUE(FileCompare("output/TM_4.txt", "TestCompareFiles/TM_4.txt"));
+    EXPECT_TRUE(FileCompare("output/TM_4.txt", "../test/compareFiles/TM_4.txt"));
 }
 
 TEST(TuringMachineTest, TM_tools){

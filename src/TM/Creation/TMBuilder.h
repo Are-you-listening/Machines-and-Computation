@@ -4,9 +4,9 @@
 
 #ifndef TOG_TMBUILDER_H
 #define TOG_TMBUILDER_H
-#include "TM/TransitieGenerators/TuringTokenizer.h"
-#include "TM/TuringTools.h"
-#include "TM/TransitieGenerators/TuringVarDictionary.h"
+#include "src/TM/TransitieGenerators/TuringTokenizer.h"
+#include "src/TM/TuringTools.h"
+#include "src/TM/TransitieGenerators/TuringVarDictionary.h"
 class TMBuilder {
 public:
     TMBuilder(unsigned int tuple_size);
