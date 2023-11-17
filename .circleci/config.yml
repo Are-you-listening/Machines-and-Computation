@@ -33,6 +33,9 @@ jobs:
           at: build
       - run: cd working && mkdir -p output
       - run: cd working && ./../build/testing/testing/TESTS
+      - run: cd working && ./../build/testing/testing/TESTS
+      - run: cd working && ./../build/testing/testing/TESTS
+      - run: cd working && ./../build/testing/testing/TESTS
 
 workflows:
   default_validation: &default_validation
@@ -42,3 +45,7 @@ workflows:
           requires:
             - build
   default_validation2: *default_validation
+  default_validation3: *default_validation
+  default_validation4: *default_validation
+  default_validation5: *default_validation
+  default_validation6: *default_validation
