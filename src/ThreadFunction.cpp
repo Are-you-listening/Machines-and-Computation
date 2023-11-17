@@ -3,10 +3,11 @@
 //
 
 #include "ThreadFunction.h"
-
+#include <iostream>
 static unsigned long int ThreadNameFunction=0xA0000000;
 
 void ThreadFunction::ThreadFunctionCall(const std::string& FileLocation, const std::string& Function){
+    std::cout << ThreadNameFunction << std::endl;
     ChangedVariables.clear();
     unsigned long int left=0;
     unsigned long int right=0;

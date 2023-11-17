@@ -33,8 +33,6 @@ jobs:
           at: build
       - run: cd working && mkdir -p output
       - run: cd working && ./../build/testing/testing/TESTS
-      - run: cd working && ./../build/testing/testing/TESTS
-      - run: cd working && ./../build/testing/testing/TESTS
 
 workflows:
   default_validation: &default_validation
