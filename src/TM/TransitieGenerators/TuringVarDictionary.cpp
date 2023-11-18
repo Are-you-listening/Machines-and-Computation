@@ -25,6 +25,7 @@ IncompleteSet TuringVarDictionary::storeVar() {
 
 void TuringVarDictionary::check_defined(IncompleteSet &a) {
     //precondition dont start on seperator
+    //goes marking an part of code that we can store on heap
     IncompleteSet added("vardict_check_defined", "vardict_check_defined");
     vector<int> tuple_index = get_tuple_index();
     tools->write_on(added, {'\u0000'}, {tuple_index[0]}, {'S'}, {tuple_index[0]});
