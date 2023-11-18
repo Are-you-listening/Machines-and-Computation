@@ -492,7 +492,7 @@ void TuringTools::write_on(IncompleteSet &a, const vector<char> &input, const ve
 }
 
 void TuringTools::heap_push_definer(IncompleteSet& a, const vector<int>&tuple_indexes) {
-
+    //requires that string that is marked is seperated by at least 1 space
     IncompleteSet push_heap_action{"push_heap_"+ to_string(counter), "push_heap_"+ to_string(counter)};
     counter++;
 
@@ -552,6 +552,15 @@ void TuringTools::heap_push_definer(IncompleteSet& a, const vector<int>&tuple_in
     move(push_heap_action, {(int) stack_tape}, -1);
     link_put(push_heap_action, {'{'}, {(int) stack_tape});
     move(push_heap_action, {(int) stack_tape}, -1);
+
+    //go back to stack mode
+    move(push_heap_action, {(int) stack_tape}, 1);
+    go_to(push_heap_action, {'\u0000'}, (int) stack_tape, 1, {(int) stack_tape});
+
+    //clear working tapes
+    go_to(push_heap_action, {'E'}, 0, 1, {0,1});
+    go_to_clear(push_heap_action, {'A'}, 0, -1, {0,1}, {0,1});
+    link_put(push_heap_action, {'\u0000'}, {1});
 
 
     link_on(a, push_heap_action, {'A', 'S'}, {tuple_indexes[0]});

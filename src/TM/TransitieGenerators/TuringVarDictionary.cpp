@@ -17,6 +17,9 @@ IncompleteSet TuringVarDictionary::storeVar() {
     //tools->heap_push_function(result, get_tuple_index());
     check_defined(result);
     tools->heap_push_definer(result, get_tuple_index());
+    string branch = tools->branch_on(result, {'\u0000'}, {get_tuple_index()[1]});
+    //tools->make_loop(result);
+    result.to_state = branch;
     return result;
 }
 
