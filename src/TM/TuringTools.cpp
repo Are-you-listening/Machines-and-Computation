@@ -512,13 +512,13 @@ void TuringTools::heap_push_definer(IncompleteSet& a, const vector<int>&tuple_in
             continue;
         }
 
-        IncompleteSet copy_to_heap("copy_to_heap_"+to_string(counter), "copy_to_heap_"+to_string(counter));
+        IncompleteSet copy_to_working("copy_to_working_" + to_string(counter), "copy_to_working_" + to_string(counter));
         counter++;
+        //copy to start_tapes
+        copy(copy_to_working, tuple_indexes[i], 1);
+        move(copy_to_working, {0, 1}, 1);
 
-        copy(copy_to_heap, tuple_indexes[i], stack_tape);
-        move(copy_to_heap, {(int) stack_tape}, -1);
-
-        link_on_not(push_sub_action, copy_to_heap, {'\u0000'}, {tuple_indexes[i]});
+        link_on_not(push_sub_action, copy_to_working, {'\u0000'}, {tuple_indexes[i]});
 
     }
 
@@ -529,6 +529,31 @@ void TuringTools::heap_push_definer(IncompleteSet& a, const vector<int>&tuple_in
     make_loop(push_heap_action_do);
     push_heap_action_do.to_state = end_loop;
     link(push_heap_action, push_heap_action_do);
+
+    //from here on we will copy data from working tape and put it on the heap
+    link_put(push_heap_action, {'E'}, {0});
+    go_to(push_heap_action, {' '}, 1, -1, {0,1});
+    link_put(push_heap_action, {'P'}, {0});
+    move(push_heap_action, {0,1}, 1);
+
+    IncompleteSet copy_to_heap_key("copy_to_heap_key_" + to_string(counter), "copy_to_heap_key_" + to_string(counter));
+    counter++;
+
+    copy(copy_to_heap_key, 1, stack_tape);
+    move(copy_to_heap_key, {0, 1}, 1);
+    move(copy_to_heap_key, {(int) stack_tape}, -1);
+    make_loop_on(copy_to_heap_key, '\u0000', 0);
+
+    //put right syntax in place
+    link(push_heap_action, copy_to_heap_key);
+    link_put(push_heap_action, {'#'}, {(int) stack_tape});
+    move(push_heap_action, {(int) stack_tape}, -1);
+    link_put(push_heap_action, {'}'}, {(int) stack_tape});
+    move(push_heap_action, {(int) stack_tape}, -1);
+    link_put(push_heap_action, {'{'}, {(int) stack_tape});
+    move(push_heap_action, {(int) stack_tape}, -1);
+
+
     link_on(a, push_heap_action, {'A', 'S'}, {tuple_indexes[0]});
 }
 
