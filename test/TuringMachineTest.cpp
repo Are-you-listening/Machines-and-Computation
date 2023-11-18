@@ -173,6 +173,8 @@ TEST(TuringMachineTest, TM_tokenazation) {
         test_string  += line;
     }
 
+    test_string = "class base{} class derived{}";
+
     // not in real use yet
     TuringTools::reset();
     TMBuilder* t = new TMBuilder(4);
@@ -184,7 +186,7 @@ TEST(TuringMachineTest, TM_tokenazation) {
     tm.load_input(test_string, 1);
 
     int halted_time = -1;
-    for (int i = 0; i<6000; i++){
+    for (int i = 0; i<8000; i++){
 
 
         if (tm.isHalted()){
@@ -200,7 +202,7 @@ TEST(TuringMachineTest, TM_tokenazation) {
             int j=0;
         }
 
-        if (i >= 5460){
+        if (i >= 6296){
             int j = 0;
 
             for (int i = 0; i < tm.getTapeAmount(); i++){
