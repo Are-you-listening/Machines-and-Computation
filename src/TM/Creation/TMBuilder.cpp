@@ -38,7 +38,10 @@ json TMBuilder::generateTM() {
 
     //IncompleteSet test("test1", "test1");
     //tools->push(test, 'B');
-    //tools->link_on_sequence(program,test, {'#','*'}, tapes-1);
+    //tools->make_loop_on_sequence(test, {'#','*'}, (int) tapes-1);
+    //tools->push(test, 'C');
+
+    //tools->link(program, test);
 
 
     for (auto incomp: program.transitions){

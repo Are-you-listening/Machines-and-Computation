@@ -173,6 +173,7 @@ TEST(TuringMachineTest, TM_tokenazation) {
         test_string  += line;
     }
 
+
     // not in real use yet
     TuringTools::reset();
     TMBuilder* t = new TMBuilder(4);
@@ -195,6 +196,7 @@ TEST(TuringMachineTest, TM_tokenazation) {
             continue;
         }
         tm.move();
+
 
 
         if (i == 80){

@@ -65,6 +65,8 @@ public:
     void link_on_multiple(IncompleteSet& a, const IncompleteSet& b, const vector<vector<char>>&input, const vector<int>& input_index);
     void clear_stack(IncompleteSet& a);
     void make_loop(IncompleteSet& a);
+    void make_loop_on(IncompleteSet& a, char input, int input_index);
+    void make_loop_on_sequence(IncompleteSet& a, const vector<char>& input_sequence, int input_index);
     string branch_on(IncompleteSet& a, const vector<char>&input, const vector<int>& input_index);
     void write_on(IncompleteSet& a, const vector<char>&input, const vector<int>& input_index,
                   const vector<char>&output, const vector<int>& output_index);

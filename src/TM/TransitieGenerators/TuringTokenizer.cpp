@@ -35,9 +35,18 @@ IncompleteSet TuringTokenizer::tokenize() {
         tools->link_on(result, tokenize_seperator, {s}, {1});
     }
 
-    //need to loop this, and repeat if ::
     tools->move(result, {0, 1}, 1);
-    tools->go_to(result, seperators, 1, 1, {0, 1});
+
+    IncompleteSet find_seperator("tokenize_find_seperator", "tokenize_find_seperator");
+    //need to loop this, and repeat if ::
+    tools->go_to(find_seperator, seperators, 1, 1, {0, 1});
+    tools->move(find_seperator, {0,1}, 2);
+    tools->make_loop_on_sequence(find_seperator, {':', ':'}, 1);
+    tools->move(find_seperator, {0,1}, -2);
+
+
+
+    tools->link(result, find_seperator);
 
     tools->link_put(result, {'E'}, {0});
 

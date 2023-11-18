@@ -559,6 +559,88 @@ void TuringTools::link_on_sequence(IncompleteSet &a, const IncompleteSet &b, con
 
 }
 
+void TuringTools::make_loop_on(IncompleteSet &a, char input, int input_index) {
+    IncompleteTransition loop_transition;
+    loop_transition.to_state = a.state;
+    loop_transition.state = a.to_state;
+    loop_transition.def_move = 0;
+    loop_transition.input = {input};
+    loop_transition.input_index = {input_index};
+
+    a.transitions.push_back(loop_transition);
+
+    IncompleteTransition end_loop;
+    end_loop.state = a.to_state;
+    end_loop.to_state = to_string(counter);
+    counter++;
+    end_loop.def_move = 0;
+    add(a, end_loop);
+
+}
+
+void TuringTools::make_loop_on_sequence(IncompleteSet &a, const vector<char> &input_sequence, int input_index) {
+    IncompleteSet go_to_start{to_string(counter), to_string(counter)};
+    counter++;
+
+    string final_state = to_string(counter+input_sequence.size()+2);
+    IncompleteSet d(to_string(counter), final_state);
+
+    IncompleteTransition to_start_check;
+    to_start_check.state = to_string(counter);
+    to_start_check.to_state = to_string(counter+1);
+    to_start_check.def_move = 0;
+    to_start_check.output = {'\u0001'};
+    to_start_check.output_index = {input_index};
+    to_start_check.move = {-(int) input_sequence.size()};
+
+    counter++;
+
+    d.transitions.push_back(to_start_check);
+
+    for (int i=0; i< input_sequence.size(); i++){
+        char c = input_sequence[i];
+
+        IncompleteTransition check_transition;
+        check_transition.state = to_string(counter);
+        check_transition.to_state = to_string(counter+1);
+        check_transition.def_move = 0;
+        check_transition.input = {c};
+        check_transition.input_index = {input_index};;
+        check_transition.output = {'\u0001'};
+        check_transition.output_index = {input_index};;
+        check_transition.move = {1};
+
+        IncompleteTransition fail_transition;
+        fail_transition.state = to_string(counter);
+        fail_transition.to_state = final_state;
+        fail_transition.def_move = 0;
+        fail_transition.output = {'\u0001'};
+        fail_transition.output_index = {input_index};;
+        fail_transition.move = {(int) input_sequence.size()-i};
+
+        counter++;
+
+        d.transitions.push_back(check_transition);
+        d.transitions.push_back(fail_transition);
+    }
+
+    d.to_state = to_string(counter);
+    counter++;
+
+    IncompleteTransition to_start;
+    to_start.state = d.to_state;
+    to_start.to_state = a.state;
+    to_start.def_move = 0;
+
+    d.transitions.push_back(to_start);
+
+    d.to_state = final_state;
+    counter++;
+
+    link(a, d);
+
+}
+
 
 
 
