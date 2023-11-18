@@ -489,7 +489,7 @@ void TuringTools::heap_push_function(IncompleteSet &a, const vector<int> &tuple_
     make_loop(push_heap_action_do);
     push_heap_action_do.to_state = end_loop;
     link(push_heap_action, push_heap_action_do);
-    link(a, push_heap_action);
+    link_on(a, push_heap_action, {'U'}, {tuple_indexes[1]});
 }
 
 void TuringTools::reset() {

@@ -8,6 +8,7 @@ TMBuilder::TMBuilder(unsigned int tuple_size): tapes{tuple_size+5} {
     tools = TuringTools::getInstance(tapes-1);
 }
 
+
 json TMBuilder::generateTM() {
     json TM_data;
     vector<string> states = {"still need to do"};
@@ -31,9 +32,9 @@ json TMBuilder::generateTM() {
 
     tools->link(program, tokenize_program);
 
-    //TuringVarDictionary vardict{};
+    TuringVarDictionary vardict{};
 
-    //tools->link(program, vardict.getTransitions());
+    tools->link(program, vardict.getTransitions());
 
 
     //IncompleteSet test("test1", "test1");

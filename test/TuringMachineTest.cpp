@@ -173,7 +173,6 @@ TEST(TuringMachineTest, TM_tokenazation) {
         test_string  += line;
     }
 
-
     // not in real use yet
     TuringTools::reset();
     TMBuilder* t = new TMBuilder(4);
@@ -203,7 +202,7 @@ TEST(TuringMachineTest, TM_tokenazation) {
             int j=0;
         }
 
-        if (i >= 181000){
+        if (i >= 5259){
             int j = 0;
 
             for (int i = 0; i < tm.getTapeAmount(); i++){
