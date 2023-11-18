@@ -171,7 +171,7 @@ IncompleteSet TuringTokenizer::tokenize_runner_productions() {
             if (is_spatie){
                 IncompleteSet spatie_pusher("tokenize_spatie"+ to_string(i), "tokenize_spatie"+ to_string(i));
 
-                IncompleteSet class_checker("tokenize_class_checker", "tokenize_class_checker");
+                IncompleteSet class_checker("tokenize_class_checker"+ to_string(i), "tokenize_class_checker"+ to_string(i));
                 tools->push(class_checker, 'C');
                 tools->link_on_sequence(spatie_pusher, class_checker, {'c','l','a','s','s', ' '}, 1);
 

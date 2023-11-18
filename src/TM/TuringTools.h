@@ -61,6 +61,7 @@ public:
     void move(IncompleteSet& a, const vector<int>& tape, int direction);
     void copy(IncompleteSet& a, unsigned int from_tape, unsigned int to_tape);
     void link_on(IncompleteSet& a, const IncompleteSet& b, const vector<char>&input, const vector<int>& input_index);
+    void link_on_not(IncompleteSet& a, const IncompleteSet& b, const vector<char>&input, const vector<int>& input_index);
     void link_on_sequence(IncompleteSet& a, const IncompleteSet& b, const vector<char>&input_sequence, int input_index);
     void link_on_multiple(IncompleteSet& a, const IncompleteSet& b, const vector<vector<char>>&input, const vector<int>& input_index);
     void clear_stack(IncompleteSet& a);
@@ -71,7 +72,7 @@ public:
     void write_on(IncompleteSet& a, const vector<char>&input, const vector<int>& input_index,
                   const vector<char>&output, const vector<int>& output_index);
 
-    void heap_push_function(IncompleteSet& a, const vector<int>&tuple_indexes);
+    void heap_push_definer(IncompleteSet& a, const vector<int>&tuple_indexes);
     static void reset();
 private:
 

@@ -196,13 +196,11 @@ TEST(TuringMachineTest, TM_tokenazation) {
         }
         tm.move();
 
-
-
         if (i == 80){
             int j=0;
         }
 
-        if (i >= 5259){
+        if (i >= 5460){
             int j = 0;
 
             for (int i = 0; i < tm.getTapeAmount(); i++){
