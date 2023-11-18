@@ -75,9 +75,7 @@ IncompleteSet TuringTokenizer::tokenize() {
 
     tools->stack_replace(result, {'A','P','A'}, {'D'});
     tools->stack_replace(result, {'A','P','A', 'P'}, {'D'});
-    tools->stack_replace(result, {'P'}, {'A'});
-
-
+    tools->stack_replace(result, {'A', 'P'}, {'A'});
 
     tools->stack_replace(result, {'A','P','A', '('}, {'U'});
     tools->stack_replace(result, {'A','P','A', 'P', '('}, {'U'});
@@ -87,8 +85,9 @@ IncompleteSet TuringTokenizer::tokenize() {
     tools->stack_replace(result, {'A', ':'}, {'I'});
 
     //make sure we still have usefull tokens
-    tools->stack_replace(result, {'('}, {'A'});
+    //tools->stack_replace(result, {'('}, {'A'});
     tools->stack_replace(result, {':'}, {'S'});
+
 
 
     //guarantees right token on top
@@ -188,10 +187,6 @@ IncompleteSet TuringTokenizer::tokenize_runner_productions() {
                 go_back.def_move = 0;
                 tokenize_set.transitions.push_back(go_back);
                 tokenize_set.transitions.insert(tokenize_set.transitions.end(), spatie_pusher.transitions.begin(), spatie_pusher.transitions.end());
-            }
-
-            if (is_double_dot){
-                tools->push(trans_prod, ':');
             }
 
             if (is_seperator){

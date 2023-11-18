@@ -16,6 +16,6 @@ TuringGenerator::TuringGenerator(int tuple_size): tuple_size{tuple_size} {
     tapes = tuple_size+5;
     tools = TuringTools::getInstance(tapes-1);
     seperators = {'=', ';', '{', '}', ')', '(', '\u0000', ':'};
-    special_sep = {'{', '}', ':'};
+    special_sep = {'{', '}', ':', '(', ')'};
 
 }
