@@ -4,7 +4,6 @@
 
 #include <iostream>
 #include <thread>
-
 #include <ctime>
 #include "src/Tokenazation.h"
 #include "src/CFG.h"
@@ -16,7 +15,7 @@ static unsigned int core_amount = std::thread::hardware_concurrency(); // gets "
 
 int main() { // Function names we create to replace nesting should have F or I in their names so we know if they were for-loops or If-loops
     Tokenazation tokenVector;
-    std::string Filelocation="Nested/engine.cc";
+    std::string Filelocation="input/nestedExamples/engine.cc";
     std::thread Tokenizer(&Tokenazation::Tokenize, &tokenVector, Filelocation);
     core_amount--;
     
@@ -31,7 +30,7 @@ int main() { // Function names we create to replace nesting should have F or I i
     // i also assume that every function we create to replace nesting is only called upon once
     // result don't work for now, will be changed
     // Functioncalls in Functioncalls don't work for now, another function that split those calls up is needed
-    std::string ResultFileLocation="Nested/copyengine.cc";
+    std::string ResultFileLocation="nestedExamples/copyengine.cc";
     std::string line;
     std::string line2;
     std::ifstream File(ResultFileLocation);

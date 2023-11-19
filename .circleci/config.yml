@@ -22,6 +22,7 @@ jobs:
       - persist_to_workspace:
           paths:
             - testing/testing/TESTS
+            - testing/testing/Tog
           root: build
 
   run_tests:
@@ -33,9 +34,16 @@ jobs:
           at: build
       - run: cd working && mkdir -p output
       - run: cd working && ./../build/testing/testing/TESTS
-      - run: cd working && ./../build/testing/testing/TESTS
-      - run: cd working && ./../build/testing/testing/TESTS
-      - run: cd working && ./../build/testing/testing/TESTS
+
+  run_main:
+    resource_class: large
+    executor: main_executor
+    steps:
+      - checkout
+      - attach_workspace:
+          at: build
+      - run: cd working && mkdir -p output
+      - run: cd working && ./../build/testing/testing/Tog
 
 workflows:
   default_validation: &default_validation
@@ -44,8 +52,6 @@ workflows:
       - run_tests:
           requires:
             - build
-  default_validation2: *default_validation
-  default_validation3: *default_validation
-  default_validation4: *default_validation
-  default_validation5: *default_validation
-  default_validation6: *default_validation
+      - run_main:
+          requires:
+            - build

@@ -13,6 +13,7 @@ using namespace std;
 using json = nlohmann::json;
 
 struct Transition{
+public:
     Production production;
     string state;
     vector<char> input;
@@ -47,6 +48,9 @@ public:
     void go_to(IncompleteSet& a, const vector<char>& symbol, int tape_index, int direction, const vector<int>& affected);
     void go_to_clear(IncompleteSet& a, const vector<char>& symbol, int tape_index, int direction, const vector<int>& affected,
                      const vector<int>& cleared);
+    void go_to_copy(IncompleteSet& a, const vector<char>& symbol, int tape_index, int direction, const vector<int>& affected,
+                     int copy_to_tape, int copy_to_direction);
+
     static void link(IncompleteSet& a, const IncompleteSet& b);
     static void link_put(IncompleteSet& a, const IncompleteSet& b,
                          const vector<char>& output, const vector<int>& output_index);
@@ -60,14 +64,21 @@ public:
     void move(IncompleteSet& a, const vector<int>& tape, int direction);
     void copy(IncompleteSet& a, unsigned int from_tape, unsigned int to_tape);
     void link_on(IncompleteSet& a, const IncompleteSet& b, const vector<char>&input, const vector<int>& input_index);
+    void link_on_not(IncompleteSet& a, const IncompleteSet& b, const vector<char>&input, const vector<int>& input_index);
+    void link_on_sequence(IncompleteSet& a, const IncompleteSet& b, const vector<char>&input_sequence, int input_index);
     void link_on_multiple(IncompleteSet& a, const IncompleteSet& b, const vector<vector<char>>&input, const vector<int>& input_index);
     void clear_stack(IncompleteSet& a);
     void make_loop(IncompleteSet& a);
+    void make_loop_on(IncompleteSet& a, char input, int input_index);
+    void make_loop_on_sequence(IncompleteSet& a, const vector<char>& input_sequence, int input_index);
     string branch_on(IncompleteSet& a, const vector<char>&input, const vector<int>& input_index);
     void write_on(IncompleteSet& a, const vector<char>&input, const vector<int>& input_index,
                   const vector<char>&output, const vector<int>& output_index);
 
-    void heap_push_function(IncompleteSet& a, const vector<int>&tuple_indexes);
+    void heap_push_definer(IncompleteSet& a, const vector<int>&tuple_indexes);
+
+    void copy_to_working(IncompleteSet& a, const vector<int>&tuple_indexes);
+
     static void reset();
 private:
 

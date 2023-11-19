@@ -13,6 +13,7 @@ public:
 
 private:
     IncompleteSet storeVar();
+    void check_defined(IncompleteSet &a);
 };
 
 

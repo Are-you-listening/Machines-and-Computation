@@ -163,6 +163,18 @@ TEST(TuringMachineTest, TM_tools){
 }
 
 TEST(TuringMachineTest, TM_tokenazation) {
+
+    ifstream test_file("../test/testFiles/TM_test_1.cpp");
+    string test_string;
+    cout << test_file.is_open() << endl;
+    while (!test_file.eof()){
+        string line;
+        getline(test_file, line);
+        test_string  += line;
+    }
+
+    //test_string = "class base{}; class derived{}";
+
     // not in real use yet
     TuringTools::reset();
     TMBuilder* t = new TMBuilder(4);
@@ -171,10 +183,10 @@ TEST(TuringMachineTest, TM_tokenazation) {
     o << data;
     TuringMachine tm;
     tm.load(data);
-    tm.load_input("int main(){int a =5; if(a==0){a = 3;}}", 1);
+    tm.load_input(test_string, 1);
 
     int halted_time = -1;
-    for (int i = 0; i<2000; i++){
+    for (int i = 0; i<8000; i++){
 
 
         if (tm.isHalted()){
@@ -186,7 +198,12 @@ TEST(TuringMachineTest, TM_tokenazation) {
         }
         tm.move();
 
-        if (i >= 18100){
+
+        if (i == 80){
+            int j=0;
+        }
+
+        if (i >= 52980){
             int j = 0;
 
             for (int i = 0; i < tm.getTapeAmount(); i++){

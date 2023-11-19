@@ -3,7 +3,7 @@ project(Tog)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -fsanitize=thread")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 
 include_directories(.)
 #Google Test Setup
@@ -53,6 +53,8 @@ set(CodeFiles
         src/Tokenazation.h
         src/ThreadFunction.cpp
         src/ThreadFunction.h
+        src/CFG.cpp
+        src/CFG.h
         ${TuringCode}
 )
 
@@ -76,6 +78,10 @@ add_executable(Tog
 
 set(CMAKE_INSTALL_PREFIX testing)
 install(TARGETS TESTS
+        DESTINATION ${CMAKE_INSTALL_PREFIX}
+)
+
+install(TARGETS Tog
         DESTINATION ${CMAKE_INSTALL_PREFIX}
 )
 
