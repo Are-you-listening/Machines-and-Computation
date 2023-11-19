@@ -14,7 +14,7 @@
 
 //!!!!!!!!!!!!!!!!!!! Default Config Location is already SET in Orchestrator.cpp
 
-static unsigned int core_amount = std::thread::hardware_concurrency(); // gets "core amount", in windows you can allocate infinite threads. in linux this isn't possible i believe. so pls care about this.
+static unsigned int core_amount = std::thread::hardware_concurrency(); // gets "core amount", in windows you can allocate infinite threads. in linux this isn't possible I believe. so pls care about this.
 // so whenever you thread something, pls change core_amount. Also core_amount isn't the perfect name for this
 
 int main() { // Function names we create to replace nesting should have F or I in their names, so we know if they were for-loops or If-loops
@@ -28,26 +28,26 @@ int main() { // Function names we create to replace nesting should have F or I i
     
     Tokenizer.join();
     core_amount++;
-    //create larl parser with tokenvector
+    //create LARL parser with tokenvector
     
     //threading every function for now, will later be changed
-    // i also assume that every function we create to replace nesting is only called upon once
+    // I also assume that every function we create to replace nesting is only called upon once
     // result don't work for now, will be changed
-    // Functioncalls in Functioncalls don't work for now, another function that split those calls up is needed
+    // Function calls in Function calls don't work for now, another function that split those calls up is needed
     std::string ResultFileLocation="nestedExamples/copyengine.cc";
     std::string line;
     std::string line2;
     std::ifstream File(ResultFileLocation);
-    std::vector<std::string> Functioncalls;
+    std::vector<std::string> FunctionCalls;
     while(getline(File,line)){
-        if(line[0]!='#'&&line[0]!=' '&&line.substr(0,6)!="static"&&line.substr(0,6)!="struct"&&!line.empty()&&line!="}"&&line!="{"){ // i assume the code we check people don't write variables or classes above a function, also needs debugging
-            Functioncalls.push_back(line);
+        if(line[0]!='#'&&line[0]!=' '&&line.substr(0,6)!="static"&&line.substr(0,6)!="struct"&&!line.empty()&&line!="}"&&line!="{"){ // I assume the code we check people don't write variables or classes above a function, also needs debugging
+            FunctionCalls.push_back(line);
         }
     }
     std::vector<std::thread> Threads; // still doesn't work, don't forgot void functions and their returns etc.
     ThreadFunction threading; // maybe create function that turns every function into a void one.
     unsigned long int count=0; // I also assume calling join() on a thread that's already joined is not harmful.
-    for(const auto & i : Functioncalls){
+    for(const auto & i : FunctionCalls){
         if(core_amount!=0){
             std::filesystem::copy(ResultFileLocation,ResultFileLocation + std::to_string(count));
             std::thread temp(&ThreadFunction::ThreadFunctionCall, &threading, ResultFileLocation + std::to_string(count), i);
