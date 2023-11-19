@@ -2,23 +2,16 @@
 #include <iostream>
 #include <thread>
 
-#include <ctime>
 #include "src/Tokenazation.h"
-#include "src/CFG.h"
 #include "src/ThreadFunction.h"
 #include "filesystem"
+
 static unsigned int core_amount = std::thread::hardware_concurrency();
 
 class ThreadingTest: public ::testing::Test {
 protected:
-    virtual void SetUp() {
-
-
-
-    }
-    virtual void TearDown() {
-    }
-
+    virtual void SetUp() {}
+    virtual void TearDown() {}
 };
 
 TEST(ThreadingTest, old_main) {
@@ -35,7 +28,7 @@ TEST(ThreadingTest, old_main) {
     //create larl parser with tokenvector
 
     //threading every function for now, will later be changed
-    // i also assume that every function we create to replace nesting is only called upon once
+    // I also assume that every function we create to replace nesting is only called upon once
     // result don't work for now, will be changed
     // Functioncalls in Functioncalls don't work for now, another function that split those calls up is needed
     std::string ResultFileLocation="Nested/copyengine.cc";
@@ -43,14 +36,17 @@ TEST(ThreadingTest, old_main) {
     std::string line2;
     std::ifstream File(ResultFileLocation);
     std::vector<std::string> Functioncalls;
+
     while(getline(File,line)){
-        if(line[0]!='#'&&line[0]!=' '&&line.substr(0,6)!="static"&&line.substr(0,6)!="struct"&&!line.empty()&&line!="}"&&line!="{"){ // i assume the code we check people don't write variables or classes above a function, also needs debugging
+        if(line[0]!='#'&&line[0]!=' '&&line.substr(0,6)!="static"&&line.substr(0,6)!="struct"&&!line.empty()&&line!="}"&&line!="{"){ // I assume the code we check people don't write variables or classes above a function, also needs debugging
             Functioncalls.push_back(line);
         }
     }
-    std::vector<std::thread> Threads; // still doens't work, don't forgot void functions and their returns etc.
+
+    std::vector<std::thread> Threads; // still doesn't work, don't forgot void functions and their returns etc.
     ThreadFunction threading; // maybe create function that turns every function into a void one.
-    unsigned long int count=0; // i also assume calling join() on a thread that's already joined is not harmfull.
+    unsigned long int count=0; // I also assume calling join() on a thread that's already joined is not harmful.
+
     for(const auto & i : Functioncalls){
         if(core_amount!=0){
             std::filesystem::copy(ResultFileLocation,ResultFileLocation + std::to_string(count));
@@ -71,6 +67,7 @@ TEST(ThreadingTest, old_main) {
             core_amount--;
         }
     }
+
     for(std::vector<std::thread>::iterator it=Threads.begin(); it!=Threads.end(); it++){
         it->join();
         core_amount++;
@@ -153,5 +150,4 @@ TEST(ThreadingTest, old_main) {
     std::string c=ResultFileLocation +"tempresult.cc0";
     std::remove(c.c_str());
     std::cout << "We do really love Tibo" << std::endl;
-
 }
