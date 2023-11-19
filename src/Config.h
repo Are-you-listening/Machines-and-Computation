@@ -5,12 +5,15 @@
 #ifndef TOG_CONFIG_H
 #define TOG_CONFIG_H
 
-#include <memory>
+
+#include <string>
 
 #include "lib/DesignByContract.h"
 #include "lib/helper.h"
 #include "lib/json.hpp"
+#include "Orchestrator.h"
 
+using json = nlohmann::json;
 using namespace std;
 
 /**
@@ -18,23 +21,38 @@ using namespace std;
  */
 class Config {
 private:
-    const int max_nesting; //0 is the main loop's {}, gives the value of max nesting that might occur in the generated program
-    const int split_nesting; //0 is an exact copy and paste, gives the amount of transferred nesting
-    const int ifElse_nesting; //Specifies if if-else statements needs to be taken care off. 0 includes no changes
+    int max_nesting; //0 is the main loop's {}, gives the value of max nesting that might occur in the generated program
+    int split_nesting; //0 is an exact copy and paste, gives the amount of transferred nesting
+    int ifElse_nesting; //Specifies if if-else statements needs to be taken care off. 0 includes no changes
 
-    const bool threading; //Specifies if threading should be used to optimise the code
-    const bool staticMemory; //Specifies if variables may be manipulated and set into static memory of the processed code
+    bool threading; //Specifies if threading should be used to optimise the code
+    bool staticMemory; //Specifies if variables may be manipulated and set into static memory of the processed code
 
-    static unique_ptr<Config> init; //Hold a ptr to ittself
-    static bool initFlag; //Define initialised state
+    static Config * init; //Hold a ptr to itself
 
-    Config() = default; //Private Constructor
+    explicit Config();//Private Constructor
 
 public:
+    /**
+     * Singletons should not be cloneable.
+     */
+    Config(Config &other) = delete;
 
-    static Config* createInstance(const string &filename); //Used as constructor
+    /**
+     * Singletons should not be assignable.
+     */
+    void operator=(const Config &) = delete;
 
+    /**
+     * Simple Destructor
+     */
+    virtual ~Config();
 
+    /**
+     * //Used as constructor
+     * @return
+     */
+    static Config *getConfig();
 };
 
 

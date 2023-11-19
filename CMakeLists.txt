@@ -58,6 +58,10 @@ set(CodeFiles
 
         src/Config.h
         src/Config.cpp
+
+        src/Orchestrator.cpp
+        src/Orchestrator.h
+
         ${TuringCode}
 )
 
