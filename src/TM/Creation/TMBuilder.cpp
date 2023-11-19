@@ -37,6 +37,7 @@ json TMBuilder::generateTM() {
     tools->link(program, vardict.getTransitions());
 
 
+
     //IncompleteSet test("test1", "test1");
     //tools->push(test, 'B');
     //tools->make_loop_on_sequence(test, {'#','*'}, (int) tapes-1);

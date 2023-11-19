@@ -198,6 +198,7 @@ TEST(TuringMachineTest, TM_tokenazation) {
         }
         tm.move();
 
+
         if (i == 80){
             int j=0;
         }

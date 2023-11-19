@@ -48,6 +48,9 @@ public:
     void go_to(IncompleteSet& a, const vector<char>& symbol, int tape_index, int direction, const vector<int>& affected);
     void go_to_clear(IncompleteSet& a, const vector<char>& symbol, int tape_index, int direction, const vector<int>& affected,
                      const vector<int>& cleared);
+    void go_to_copy(IncompleteSet& a, const vector<char>& symbol, int tape_index, int direction, const vector<int>& affected,
+                     int copy_to_tape, int copy_to_direction);
+
     static void link(IncompleteSet& a, const IncompleteSet& b);
     static void link_put(IncompleteSet& a, const IncompleteSet& b,
                          const vector<char>& output, const vector<int>& output_index);

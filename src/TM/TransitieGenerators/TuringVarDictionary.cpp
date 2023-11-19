@@ -52,9 +52,9 @@ void TuringVarDictionary::check_defined(IncompleteSet &a) {
     tools->heap_push_definer(store_on_heap, get_tuple_index());
 
     //store call func/class on working tape
-    tools->copy_to_working(store_on_heap, get_tuple_index());
-    tools->move(store_on_heap, {0,1}, 1);
-    tools->link_put(store_on_heap, {'S'}, {0});
+    //tools->copy_to_working(store_on_heap, get_tuple_index());
+    //tools->move(store_on_heap, {0,1}, 1);
+    //tools->link_put(store_on_heap, {'S'}, {0});
 
     tools->go_to(store_on_heap, {'E'}, tuple_index[0], 1, tuple_index);
 
