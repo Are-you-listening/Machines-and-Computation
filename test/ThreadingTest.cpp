@@ -2,7 +2,7 @@
 #include <iostream>
 #include <thread>
 
-#include "src/Tokenazation.h"
+#include "src/Tokenisation.h"
 #include "src/ThreadFunction.h"
 #include "filesystem"
 
@@ -15,9 +15,9 @@ protected:
 };
 
 TEST(ThreadingTest, old_main) {
-    Tokenazation tokenVector;
+    Tokenisation tokenVector;
     std::string Filelocation="Nested/engine.cc";
-    std::thread Tokenizer(&Tokenazation::Tokenize, &tokenVector, Filelocation);
+    std::thread Tokenizer(&Tokenisation::Tokenize, &tokenVector, Filelocation);
     core_amount--;
 
     //CFG cfg("TestFiles/CFG.json"); //don't forget to add CFG back into cmakelist in right set
