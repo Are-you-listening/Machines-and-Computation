@@ -1,9 +1,4 @@
 //
-// Created by anass on 2-11-2023.
-//
-
-#include "src/CFG.h"
-//
 // Created by anass on 14-10-2023.
 //
 
@@ -70,7 +65,7 @@ CFG::CFG(const std::string& c) {
         json data2=*it;
         std::string HEAD= data2["head"];
         std::vector<std::string> BODY =data2["body"];
-        P.push_back(std::make_pair(HEAD,BODY));
+        P.emplace_back(HEAD,BODY);
     }
     S=data["Start"];
 
@@ -110,14 +105,14 @@ void sort(std::vector<std::pair<std::string,std::vector<std::string>>>& P){
 }
 
 void CFG::toCNF(){
-    for(auto it=P.begin(); it!=P.end(); it++){
-        it->second.emplace_back("`");
+    for(auto &it: P){
+        it.second.emplace_back("`");
     }
     std::sort(V.begin(), V.end());
     std::sort(T.begin(), T.end());
     std::sort(P.begin(), P.end());
-    for(auto it=P.begin(); it!=P.end(); it++){
-        it->second.erase(it->second.end());
+    for(auto &it: P){
+        it.second.erase(it.second.end());
     }
     sort(P);
 
@@ -129,19 +124,19 @@ void CFG::toCNF(){
     std::cout << std::endl;
     std::cout << " >> Eliminating epsilon productions" << std::endl;
 
-    unsigned int orignalSize=P.size();
+    unsigned int originalSize=P.size();
     std::set<std::string> Nullables;
-    for(auto it=P.begin(); it!=P.end(); it++){
-        if(it->second.empty()){
-            Nullables.emplace(it->first);
+    for(auto &it: P){
+        if(it.second.empty()){
+            Nullables.emplace(it.first);
         }
     }
-    for(auto it2=P.begin(); it2!=P.end(); it2++){ // can maybe be optimized
-        if(it2->second.size()==1){
-            for(auto it3=it2->second.begin(); it3!=it2->second.end(); it3++){
+    for(auto &it2: P){ // can maybe be optimized
+        if(it2.second.size()==1){
+            for(auto it3=it2.second.begin(); it3!=it2.second.end(); it3++){
                 for(auto it=Nullables.begin(); it!=Nullables.end(); it++){
                     if(*it==*it3){
-                        Nullables.emplace(it2->first);
+                        Nullables.emplace(it2.first);
                         break;
                     }
                 }
@@ -150,8 +145,8 @@ void CFG::toCNF(){
     }
 
     std::string c="{";
-    for(auto it=Nullables.begin(); it!=Nullables.end(); it++){
-        c+=*it+", ";
+    for(auto &it: Nullables){
+        c+=it+", ";
     }
     if(c.size()==1){
         c+="}";
@@ -169,12 +164,12 @@ void CFG::toCNF(){
         }
     }
     auto copy=P;
-    for(auto it2=copy.begin(); it2!=copy.end(); it2++){
-        if(it2->second.size()>1){
+    for(auto &it2: copy){
+        if(it2.second.size()>1){
             std::vector<int> Combination;
             int countOnes=0;
-            for(auto it3=it2->second.begin(); it3!=it2->second.end(); it3++){
-                if(Nullables.find(*it3)!=Nullables.end()){
+            for(auto &it3: it2.second){
+                if(Nullables.find(it3)!=Nullables.end()){
                     Combination.push_back(1);
                     countOnes++;
                 } else{
@@ -183,21 +178,21 @@ void CFG::toCNF(){
             }
             unsigned long int count=0;
             std::pair<std::string,std::vector<std::string>> temp2;
-            temp2.first=it2->first;
+            temp2.first=it2.first;
             bool b= false;
             if(countOnes>1){
                 b= true;
             }
             for(auto it4=Combination.begin(); it4!=Combination.end(); it4++, count++){
                 std::pair<std::string,std::vector<std::string>> temp;
-                temp.first=it2->first;
+                temp.first=it2.first;
                 if(*it4==1){
-                    std::vector<std::string> Vtemp=it2->second;
-                    Vtemp.erase(Vtemp.begin()+count);
+                    std::vector<std::string> Vtemp=it2.second;
+                    Vtemp.erase(Vtemp.begin()+(int) count);
                     temp.second=Vtemp;
                     P.push_back(temp);
                 }else{
-                    temp2.second.push_back(it2->second[count]);
+                    temp2.second.push_back(it2.second[count]);
                 }
             }
             if(b){
@@ -206,19 +201,19 @@ void CFG::toCNF(){
         }
     }
 
-    for(auto it=P.begin(); it!=P.end(); it++){
-        it->second.emplace_back("`");
+    for(auto &it: P){
+        it.second.emplace_back("`");
     }
     std::sort(V.begin(), V.end());
     std::sort(T.begin(), T.end());
     std::sort(P.begin(), P.end());
-    for(auto it=P.begin(); it!=P.end(); it++){
-        it->second.erase(it->second.end());
+    for(auto &it: P){
+        it.second.erase(it.second.end());
     }
     sort(P);
 
 
-    std::cout << "  Created "<<P.size()<<" productions, original had "<<orignalSize<<std::endl;
+    std::cout << "  Created " << P.size() << " productions, original had " << originalSize << std::endl;
     std::cout<<std::endl;
     CFG::print();
     std::cout<<std::endl;
@@ -227,21 +222,21 @@ void CFG::toCNF(){
     std::set<std::pair<std::string, std::string>> unitPairs;
     std::set<std::pair<std::string, std::string>> unitProductions;
     std::set<std::string> Vtemp;
-    for(auto it=V.begin(); it!=V.end(); it++){
-        Vtemp.emplace(*it);
-        unitPairs.emplace(*it,*it);
+    for(auto &it: V){
+        Vtemp.emplace(it);
+        unitPairs.emplace(it,it);
     }
-    for(auto it=P.begin(); it!=P.end(); it++){
-        if(it->second.size()==1&&Vtemp.find(it->second[0])!=Vtemp.end()){
-            unitPairs.emplace(it->first,it->second[0]);
-            std::string unit=it->second[0];
-            unitProductions.emplace(it->first,it->second[0]);
+    for(auto &it: P){
+        if(it.second.size()==1&&Vtemp.find(it.second[0])!=Vtemp.end()){
+            unitPairs.emplace(it.first,it.second[0]);
+            std::string unit=it.second[0];
+            unitProductions.emplace(it.first,it.second[0]);
             label:
-            for(auto it2=P.begin(); it2!=P.end(); it2++){
-                if(it2->first==unit){
-                    if(it2->second.size()==1&&Vtemp.find(it2->second[0])!=Vtemp.end()&&!(it2->second[0]==it->first)){
-                        unitPairs.emplace(it->first,it2->second[0]);
-                        unit=it2->second[0];
+            for(auto &it2: P){
+                if(it2.first==unit){
+                    if(it2.second.size()==1&&Vtemp.find(it2.second[0])!=Vtemp.end()&&!(it2.second[0]==it.first)){
+                        unitPairs.emplace(it.first,it2.second[0]);
+                        unit=it2.second[0];
                         goto label;
                     }
                 }
@@ -249,8 +244,8 @@ void CFG::toCNF(){
         }
     }
     std::string c1= "  Unit pairs: {";
-    for(auto it=unitPairs.begin(); it!=unitPairs.end(); it++){
-        c1+="("+it->first+", "+it->second+")"+", ";
+    for(auto &it: unitPairs){
+        c1+="("+it.first+", "+it.second+")"+", ";
     }
     if(c1.size()==1){
         c1+="}";
@@ -262,7 +257,7 @@ void CFG::toCNF(){
     std::cout << "  Found " << unitProductions.size() <<" unit productions" <<std::endl;
     std::cout << c1 << std::endl;
 
-    orignalSize=P.size();
+    originalSize=P.size();
     for(unsigned int i=0; i<P.size(); i++){
         if(P[i].second.size()==1&&Vtemp.find(P[i].second[0])!=Vtemp.end()){
             std::pair<std::string,std::vector<std::string>> temp2;
@@ -292,19 +287,19 @@ void CFG::toCNF(){
         }
     }
 
-    for(auto it=P.begin(); it!=P.end(); it++){
-        it->second.emplace_back("`");
+    for(auto &it: P){
+        it.second.emplace_back("`");
     }
     std::sort(V.begin(), V.end());
     std::sort(T.begin(), T.end());
     std::sort(P.begin(), P.end());
     sort(P);
-    for(auto it=P.begin(); it!=P.end(); it++){
-        it->second.erase(it->second.end());
+    for(auto &it: P){
+        it.second.erase(it.second.end());
     }
     sort(P);
 
-    std::cout << "  Created "<<P.size()<<" new productions, original had "<<orignalSize<<std::endl;
+    std::cout << "  Created " << P.size() << " new productions, original had " << originalSize << std::endl;
     std::cout << std::endl;
     CFG::print();
     std::cout<<std::endl;
@@ -312,12 +307,12 @@ void CFG::toCNF(){
     std::set<std::string> Generating;
     std::set<std::string> Reachable;
     unsigned long int ProductionsORGsize=P.size();
-    for(auto it=P.begin(); it!=P.end(); it++) {
+    for(auto & it : P) {
         bool a1= true;
-        for (auto it2 = it->second.begin(); it2 != it->second.end(); it2++) {
+        for (auto & it2 : it.second) {
             bool a=false;
-            for (auto it3 = P.begin(); it3 != P.end(); it3++) {
-                if (*it2 == it3->first||std::find(T.begin(),T.end(),*it2)!=T.end()) {
+            for (auto & it3 : P) {
+                if (it2 == it3.first||std::find(T.begin(),T.end(),it2)!=T.end()) {
                     a= true;
                 }
             }
@@ -326,12 +321,12 @@ void CFG::toCNF(){
             }
         }
         if(a1){
-            Generating.emplace(it->first);
+            Generating.emplace(it.first);
         }
     }
-    for(auto it=P.begin(); it!=P.end(); it++) {
-        for(auto it2=it->second.begin(); it2!=it->second.end(); it2++){
-            if(Generating.find(it->first)!=Generating.end()&&std::find(T.begin(),T.end(),*it2)!=T.end()){
+    for(auto & it : P) {
+        for(auto it2=it.second.begin(); it2!=it.second.end(); it2++){
+            if(Generating.find(it.first)!=Generating.end()&&std::find(T.begin(),T.end(),*it2)!=T.end()){
                 Generating.emplace(*it2);
             }
         }
@@ -350,10 +345,10 @@ void CFG::toCNF(){
     std::vector<std::string> symbols={S};
     while(!symbols.empty()){
         auto symbol = symbols[0];
-        for(auto it=P.begin(); it!=P.end(); it++){
-            if(it->first==symbol){
-                for(auto it2=it->second.begin(); it2!=it->second.end(); it2++){
-                    if(std::find(V.begin(), V.end(), *it2)!=V.end()&&it->first!=*it2&&Reachable.find(*it2)==Reachable.end()){
+        for(auto & it : P){
+            if(it.first==symbol){
+                for(auto it2=it.second.begin(); it2!=it.second.end(); it2++){
+                    if(std::find(V.begin(), V.end(), *it2)!=V.end()&&it.first!=*it2&&Reachable.find(*it2)==Reachable.end()){
                         symbols.push_back(*it2);
                     }
                     Reachable.emplace(*it2);
@@ -383,21 +378,21 @@ void CFG::toCNF(){
         }
     }
 
-    for(auto it=P.begin(); it!=P.end(); it++){
-        it->second.emplace_back("`");
+    for(auto & it : P){
+        it.second.emplace_back("`");
     }
     std::sort(V.begin(), V.end());
     std::sort(T.begin(), T.end());
     std::sort(P.begin(), P.end());
-    for(auto it=P.begin(); it!=P.end(); it++){
-        it->second.erase(it->second.end());
+    for(auto & it : P){
+        it.second.erase(it.second.end());
     }
     sort(P);
 
 
     std::string c2= "  Generating symbols: {";
-    for(auto it=Generating.begin(); it!=Generating.end(); it++){
-        c2+=*it+", ";
+    for(const auto & it : Generating){
+        c2+=it+", ";
     }
     if(c2.size()==1){
         c2+="}";
@@ -409,9 +404,9 @@ void CFG::toCNF(){
 
     std::string c3= "  Reachable symbols: {";
     std::string c4= "  Useful symbols: {";
-    for(auto it=Reachable.begin(); it!=Reachable.end(); it++){
-        c3+=*it+", ";
-        c4+=*it+", ";
+    for(const auto & it : Reachable){
+        c3+=it+", ";
+        c4+=it+", ";
     }
     if(c3.size()==1){
         c3+="}";
@@ -437,17 +432,17 @@ void CFG::toCNF(){
             for(auto it = P[i].second.begin(); it != P[i].second.end(); it++){
                 if(std::find(T.begin(),T.end(),*it)!=T.end()){
                     bool a= true;
-                    for(auto it2=P.begin(); it2!=P.end(); it2++){
-                        if(it2->second.size()==1&&std::find(it2->second.begin(), it2->second.end(), *it)!=it2->second.end()){
-                            *it=it2->first;
+                    for(auto & it2 : P){
+                        if(it2.second.size()==1&&std::find(it2.second.begin(), it2.second.end(), *it)!=it2.second.end()){
+                            *it=it2.first;
                             a=false;
                         }
                     }
                     if(a){
                         bool b=true;
-                        for(auto it3=P.begin(); it3!=P.end(); it3++){
-                            if(it3->second.size()==1&&*it==it3->second[0]){
-                                *it=it3->first;
+                        for(auto & it3 : P){
+                            if(it3.second.size()==1&&*it==it3.second[0]){
+                                *it=it3.first;
                                 b=false;
                             }
                         }
@@ -468,20 +463,20 @@ void CFG::toCNF(){
         }
     }
 
-    for(auto it=P.begin(); it!=P.end(); it++){// technically only needed for the couts, last sort is needed
-        it->second.emplace_back("`");
+    for(auto & it : P){// technically only needed for the couts, last sort is needed
+        it.second.emplace_back("`");
     }
     std::sort(V.begin(), V.end());
     std::sort(T.begin(), T.end());
     std::sort(P.begin(), P.end());
-    for(auto it=P.begin(); it!=P.end(); it++){
-        it->second.erase(it->second.end());
+    for(auto & it : P){
+        it.second.erase(it.second.end());
     }
     sort(P);
 
     std::string c5= "{";
-    for(auto it=newVariables.begin(); it!=newVariables.end(); it++){
-        c5+=*it+",";
+    for(auto & newVariable : newVariables){
+        c5+=newVariable+",";
     }
     if(c5.size()==1){
         c5+="}";
@@ -492,14 +487,14 @@ void CFG::toCNF(){
     std::cout << "  Added "<< VariableCount<<" new variables: " << c5 << std::endl;
     std::cout << "  Created "<< P.size() <<" new productions, original had "<<Poriginal <<std::endl;
 
-    for(auto it=P.begin(); it!=P.end(); it++){
-        it->second.emplace_back("`");
+    for(auto & it : P){
+        it.second.emplace_back("`");
     }
     std::sort(V.begin(), V.end());
     std::sort(T.begin(), T.end());
     std::sort(P.begin(), P.end());
-    for(auto it=P.begin(); it!=P.end(); it++){
-        it->second.erase(it->second.end());
+    for(auto & it : P){
+        it.second.erase(it.second.end());
     }
     sort(P);
 
@@ -507,7 +502,7 @@ void CFG::toCNF(){
     CFG::print();
     std::cout<<std::endl;
 
-    unsigned long int BrokesBodies=0;
+    unsigned long int BrokeBodies=0;
     unsigned long int newerVariables=0;
 
     label2:
@@ -525,7 +520,7 @@ void CFG::toCNF(){
             }
             V.push_back(tempChar);
             newerVariables++;
-            BrokesBodies++;
+            BrokeBodies++;
             temp2.second.push_back(tempChar);
 
             std::pair<std::string,std::vector<std::string>> temp3;
@@ -540,18 +535,18 @@ void CFG::toCNF(){
         }
     }
 
-    for(auto it=P.begin(); it!=P.end(); it++){
-        it->second.emplace_back("`");
+    for(auto & it : P){
+        it.second.emplace_back("`");
     }
     std::sort(V.begin(), V.end());
     std::sort(T.begin(), T.end());
     std::sort(P.begin(), P.end());
-    for(auto it=P.begin(); it!=P.end(); it++){
-        it->second.erase(it->second.end());
+    for(auto & it : P){
+        it.second.erase(it.second.end());
     }
     sort(P);
 
-    std::cout << " >> Broke "<<BrokesBodies <<" bodies, added "<<newerVariables <<" new variables" << std::endl;
+    std::cout << " >> Broke " << BrokeBodies << " bodies, added " << newerVariables << " new variables" << std::endl;
     std::cout << ">>> Result CFG:" << std::endl;
     std::cout << std::endl;
     CFG::print();
@@ -575,14 +570,14 @@ void CFG::toGNF() { // I used the algorithm described by https://www.geeksforgee
             i.first="A"+ std::to_string(n);
             n++;
         }
-        for(auto it=i.second.begin(); it!=i.second.end(); it++){
-            auto Variable= std::find(V.cbegin(),V.cend(),*it);
-            if(Variable!=V.cend()&&originals.find(*it)==originals.cend()){
-                originals[*it]="A"+ std::to_string(n);
-                *it="A"+ std::to_string(n);
+        for(auto & it : i.second){
+            auto Variable= std::find(V.cbegin(),V.cend(),it);
+            if(Variable!=V.cend()&&originals.find(it)==originals.cend()){
+                originals[it]="A"+ std::to_string(n);
+                it="A"+ std::to_string(n);
                 n++;
             } else if(Variable!=V.cend()) {
-                *it=originals[*it];
+                it=originals[it];
             }
         }
     }
@@ -692,5 +687,5 @@ CFGKars CFG::convert() const {
         P2[tup.first].push_back(tup.second);
     }
 
-    return CFGKars(V,T,P2,S); //Construct CFG
+    return CFGKars{V,T,P2,S}; //Construct CFG
 }
