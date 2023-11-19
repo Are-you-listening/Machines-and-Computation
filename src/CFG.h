@@ -25,6 +25,8 @@ private:
     std::string S;
     bool CNF = false;
     bool GNF = false;
+
+    CFGKars convert() const;
     
 public:
     CFG();
