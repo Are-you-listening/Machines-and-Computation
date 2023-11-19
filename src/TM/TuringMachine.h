@@ -29,6 +29,8 @@ public:
     [[nodiscard]] bool isHalted() const;
     [[nodiscard]] unsigned int getTapeAmount() const;
 
+    const string &getCurrentState() const;
+
 private:
     vector<Tape*> tapes;
     map<string, TuringProduction*> production_trees;

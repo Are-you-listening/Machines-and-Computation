@@ -123,3 +123,7 @@ void TuringMachine::load_input(const string &input, int index) {
     tapes[index]->load(input);
 }
 
+const string &TuringMachine::getCurrentState() const {
+    return current_state;
+}
+

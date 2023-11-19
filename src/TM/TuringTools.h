@@ -49,7 +49,7 @@ public:
     void go_to_clear(IncompleteSet& a, const vector<char>& symbol, int tape_index, int direction, const vector<int>& affected,
                      const vector<int>& cleared);
     void go_to_copy(IncompleteSet& a, const vector<char>& symbol, int tape_index, int direction, const vector<int>& affected,
-                     int copy_to_tape, int copy_to_direction);
+                     int copy_to_tape, int copy_to_direction, const vector<int>& copy_affected);
 
     static void link(IncompleteSet& a, const IncompleteSet& b);
     static void link_put(IncompleteSet& a, const IncompleteSet& b,
@@ -91,6 +91,10 @@ private:
     unsigned long counter;
     unsigned int stack_tape;
     unsigned int branch_counter;
+
+    bool heap_mode = false;
+
+    void find_match(IncompleteSet& a, int start_market, int end_marker, int marker_tape, int data_tape);
 };
 
 
