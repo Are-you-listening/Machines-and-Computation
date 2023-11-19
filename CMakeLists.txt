@@ -55,6 +55,9 @@ set(CodeFiles
         src/ThreadFunction.h
         src/CFG.cpp
         src/CFG.h
+
+        src/Config.h
+        src/Config.cpp
         ${TuringCode}
 )
 
