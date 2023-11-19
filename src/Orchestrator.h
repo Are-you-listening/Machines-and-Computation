@@ -10,7 +10,7 @@
 using namespace std;
 
 /**
- * Facade Class
+ * Facade Class to handle interface
  */
 class Orchestrator {
     friend class Config;

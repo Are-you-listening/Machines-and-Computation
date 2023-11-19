@@ -4,4 +4,4 @@
 
 #include "Orchestrator.h"
 
-string Orchestrator::file = "input/config/config.json";
+string Orchestrator::file = "input/config/config.json"; //Static variables should be initialised outside the class

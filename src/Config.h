@@ -5,7 +5,6 @@
 #ifndef TOG_CONFIG_H
 #define TOG_CONFIG_H
 
-
 #include <string>
 
 #include "lib/DesignByContract.h"

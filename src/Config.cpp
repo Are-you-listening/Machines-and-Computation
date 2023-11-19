@@ -4,7 +4,6 @@
 
 #include "Config.h"
 
-
 Config* Config::init{nullptr}; //Static Members should be initialised outside the Class
 
 Config::Config(){
