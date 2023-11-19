@@ -8,7 +8,7 @@
 //
 
 #include "CFG.h"
-using json = nlohmann::json;
+
 CFG::CFG() {
     std::sort(V.begin(), V.end());
     std::sort(T.begin(), T.end());

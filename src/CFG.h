@@ -13,6 +13,8 @@
 #include <iostream>
 #include <set>
 
+using json = nlohmann::json;
+
 class CFG {
 private:
     std::vector<std::string> V;
