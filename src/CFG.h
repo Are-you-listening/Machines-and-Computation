@@ -35,10 +35,18 @@ public:
     CFG(const std::vector<std::string> &v, const std::vector<std::string> &t,
         const std::vector<std::pair<std::string, std::vector<std::string>>> &p, const std::string &s);
     void toCNF();
+
+    /**
+     *
+     */
     void toGNF();
 
+    /**
+     * Check for a given string if it's in the language of the grammar
+     * @param w
+     * @return
+     */
     [[nodiscard]] bool accepts(const std::string &w) const;
-
 };
 
 

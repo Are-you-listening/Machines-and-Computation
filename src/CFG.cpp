@@ -683,13 +683,14 @@ void CFG::toGNF() { // I used the algorithm described by https://www.geeksforgee
 }
 
 bool CFG::accepts(const string &w) const {
-    return convert().accepts(w);
+    return convert().accepts(w); //Construct CFG & Check Membership
 }
 
 CFGKars CFG::convert() const {
-    map<string,vector<vector<string>>> P2;
+    map<string,vector<vector<string>>> P2; //Convert P to Kars' P=P2
+    for(auto &tup: P){
+        P2[tup.first].push_back(tup.second);
+    }
 
-
-
-    return CFGKars(V,T,P2,S);
+    return CFGKars(V,T,P2,S); //Construct CFG
 }
