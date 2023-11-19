@@ -491,19 +491,15 @@ void TuringTools::write_on(IncompleteSet &a, const vector<char> &input, const ve
     a.transitions.push_back(do_not);
 }
 
-void TuringTools::heap_push_definer(IncompleteSet& a, const vector<int>&tuple_indexes) {
-    //requires that string that is marked is seperated by at least 1 space
-    IncompleteSet push_heap_action{"push_heap_"+ to_string(counter), "push_heap_"+ to_string(counter)};
+void TuringTools::copy_to_working(IncompleteSet &a, const vector<int> &tuple_indexes) {
+    //copy from marker 'A' or 'S' till marker 'E'
+    IncompleteSet copier{"copy_to_working_main_"+ to_string(counter), "copy_to_working_main_"+ to_string(counter)};
     counter++;
 
-    go_to(push_heap_action, {'*'}, stack_tape, -1, {(int) stack_tape});
-
-    go_to(push_heap_action, {'\u0000'}, stack_tape, -1, {(int) stack_tape});
-
-    IncompleteSet push_heap_action_do{"push_heap_do_"+ to_string(counter), "push_heap_do_"+ to_string(counter)};
+    IncompleteSet copier_do{"copier_do_"+ to_string(counter), "copier_do_"+ to_string(counter)};
     counter++;
 
-    IncompleteSet push_sub_action{"push_heap_sub_"+ to_string(counter), "push_heap_sub_"+ to_string(counter)};
+    IncompleteSet copier_do_sub{"copier_do_sub_"+ to_string(counter), "copier_do_sub_"+ to_string(counter)};
     counter++;
 
 
@@ -518,20 +514,37 @@ void TuringTools::heap_push_definer(IncompleteSet& a, const vector<int>&tuple_in
         copy(copy_to_working, tuple_indexes[i], 1);
         move(copy_to_working, {0, 1}, 1);
 
-        link_on_not(push_sub_action, copy_to_working, {'\u0000'}, {tuple_indexes[i]});
+        link_on_not(copier_do_sub, copy_to_working, {'\u0000'}, {tuple_indexes[i]});
 
     }
 
-    move(push_sub_action, tuple_indexes, 1);
+    move(copier_do_sub, tuple_indexes, 1);
 
-    link_on_multiple(push_heap_action_do, push_sub_action, {{'A'}, {'S'}, {'\u0000'}}, {tuple_indexes[0]});
-    string end_loop = branch_on(push_heap_action_do, {'E'}, {tuple_indexes[0]});
-    make_loop(push_heap_action_do);
-    push_heap_action_do.to_state = end_loop;
-    link(push_heap_action, push_heap_action_do);
+    link_on_multiple(copier_do, copier_do_sub, {{'A'}, {'S'}, {'\u0000'}}, {tuple_indexes[0]});
+    string end_loop = branch_on(copier_do, {'E'}, {tuple_indexes[0]});
+    make_loop(copier_do);
+    copier_do.to_state = end_loop;
+    link(copier, copier_do);
+    go_to(copier, {'S', 'A'}, tuple_indexes[0], -1, tuple_indexes);
+    link_put(copier, {'E'}, {0});
+    link(a,copier);
+
+}
+
+
+void TuringTools::heap_push_definer(IncompleteSet& a, const vector<int>&tuple_indexes) {
+    //requires that string that is marked is seperated by at least 1 space
+    IncompleteSet push_heap_action{"push_heap_"+ to_string(counter), "push_heap_"+ to_string(counter)};
+    counter++;
+
+    go_to(push_heap_action, {'*'}, stack_tape, -1, {(int) stack_tape});
+
+    go_to(push_heap_action, {'\u0000'}, stack_tape, -1, {(int) stack_tape});
+
+    copy_to_working(push_heap_action, tuple_indexes);
 
     //from here on we will copy data from working tape and put it on the heap
-    link_put(push_heap_action, {'E'}, {0});
+
     go_to(push_heap_action, {' '}, 1, -1, {0,1});
     link_put(push_heap_action, {'P'}, {0});
     move(push_heap_action, {0,1}, 1);
@@ -577,7 +590,7 @@ void TuringTools::heap_push_definer(IncompleteSet& a, const vector<int>&tuple_in
 
     //clear working tapes
     go_to(push_heap_action, {'E'}, 0, 1, {0,1});
-    go_to_clear(push_heap_action, {'A'}, 0, -1, {0,1}, {0,1});
+    go_to_clear(push_heap_action, {'A', 'S'}, 0, -1, {0,1}, {0,1});
     link_put(push_heap_action, {'\u0000'}, {1});
 
 
@@ -732,6 +745,7 @@ void TuringTools::make_loop_on_sequence(IncompleteSet &a, const vector<char> &in
     link(a, d);
 
 }
+
 
 
 
