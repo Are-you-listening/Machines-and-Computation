@@ -91,6 +91,10 @@ private:
     unsigned long counter;
     unsigned int stack_tape;
     unsigned int branch_counter;
+
+    bool heap_mode = false;
+
+    void find_match(IncompleteSet& a, int start_market, int end_marker, int marker_tape, int data_tape);
 };
 
 

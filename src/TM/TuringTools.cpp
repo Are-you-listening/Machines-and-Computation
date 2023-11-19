@@ -609,7 +609,9 @@ void TuringTools::heap_push_definer(IncompleteSet& a, const vector<int>&tuple_in
     IncompleteSet push_heap_action{"push_heap_"+ to_string(counter), "push_heap_"+ to_string(counter)};
     counter++;
 
+    //go to heap mode
     go_to(push_heap_action, {'*'}, stack_tape, -1, {(int) stack_tape});
+    heap_mode = true;
 
     go_to(push_heap_action, {'\u0000'}, stack_tape, -1, {(int) stack_tape});
 
@@ -667,12 +669,20 @@ void TuringTools::heap_push_definer(IncompleteSet& a, const vector<int>&tuple_in
         move(push_heap_action, {(int) stack_tape}, 1);
     }
     move(push_heap_action, {(int) stack_tape}, -2);
+
+    //remove 'S' markers
+    write_on(push_heap_action, {'S'}, {0}, {'\u0000'}, {0});
+
+    //make nesting on working tape
     go_to_copy(push_heap_action, {':'}, stack_tape, -1, {(int) stack_tape}, 1, 1, {0, 1});
+    link_put(push_heap_action, {'{'}, {1});
+    move(push_heap_action, {0,1}, 1);
     link_put(push_heap_action, {'S'}, {0});
 
     //go back to stack mode
     //move(push_heap_action, {(int) stack_tape}, 1);
     go_to(push_heap_action, {'\u0000'}, (int) stack_tape, 1, {(int) stack_tape});
+    heap_mode = false;
 
 
     link_on_multiple(a, push_heap_action, {{'A'}, {'S'}}, {tuple_indexes[0]});
@@ -827,11 +837,16 @@ void TuringTools::make_loop_on_sequence(IncompleteSet &a, const vector<char> &in
 
 }
 
+void TuringTools::find_match(IncompleteSet &a, int start_market, int end_marker, int marker_tape, int data_tape) {
+    //precondition: in heap mode
+    if (!heap_mode){
+        throw "not in heap mode";
+    }
+    IncompleteSet searcher{"heap_search"+ to_string(counter), "heap_search"+ to_string(counter)};
+    counter++;
 
+    go_to(searcher, {'#'}, stack_tape, -1, {(int) stack_tape});
+    move(searcher, {(int) stack_tape}, -1);
 
-
-
-
-
-
+}
 
