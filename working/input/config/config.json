@@ -1,23 +1,7 @@
 {
-  "_comment": "Config File",
-  "max_nesting": {
-    "_comment": "0 is the main loop's {}, gives the value of max nesting that might occur in the generated program",
-    "value": 0
-  },
-  "split_nesting": {
-    "_comment": "0 is an exact copy paste, gives the amount of transferred nesting",
-    "value": 0
-  },
-  "ifElse_nesting": {
-    "_comment": "Specifies if if-else statements needs to be taken care off. 0 includes no changes",
-    "value": 0
-  },
-  "threading": {
-    "_comment": "Specifies if threading should be used to optimise the code",
-    "value": false
-  },
-  "staticMemory": {
-    "_comment": "Specifies if variables may be manipulated and set into static memory of the processed code",
-    "value": false
-  }
+  "max_nesting" : 0,
+  "split_nesting": 0,
+  "ifElse_nesting": 0,
+  "threading": false,
+  "staticMemory": false
 }
