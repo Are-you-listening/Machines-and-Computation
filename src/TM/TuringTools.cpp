@@ -170,9 +170,73 @@ void TuringTools::go_to_copy(IncompleteSet &a, const vector<char> &symbol, int t
 
     }
 
-    //copy_go_back.output_index = {copy_to_tape};
-    //copy_go_back.output = {'\u0001'};
-    //copy_go_back.move = {copy_to_direction};
+    outputs.push_back(copy_go_back);
+
+    IncompleteTransition moving;
+    moving.state = "go_to_"+ to_string(goto_counter);
+    moving.to_state = "go_to_copy_"+ to_string(goto_counter);
+
+    moving.def_move = 0;
+
+    outputs.push_back(moving);
+
+    for (char sym: symbol){
+        IncompleteTransition arrived;
+        arrived.state = "go_to_"+ to_string(goto_counter);
+        arrived.to_state = "go_to_"+ to_string(goto_counter+1);
+
+        arrived.input = {sym};
+        arrived.input_index = {tape_index};
+        arrived.def_move = 0;
+
+
+        outputs.push_back(arrived);
+    }
+
+    goto_counter += 2;
+
+    b.transitions.insert(b.transitions.end(), outputs.begin(), outputs.end());
+
+    link(a, b);
+
+}
+
+void TuringTools::go_to_move(IncompleteSet &a, const vector<char> &symbol, int tape_index, int direction,
+                             const vector<int> &affected, int copy_to_tape, int copy_to_direction,
+                             const vector<int> &copy_affected) {
+    vector<int> affected_using = affected;
+    affected_using.insert(affected_using.end(), copy_affected.begin(), copy_affected.end());
+    sort(affected_using.begin(), affected_using.end());
+
+    IncompleteSet b("go_to_"+ to_string(goto_counter) ,"go_to_"+ to_string(goto_counter+1));
+    vector<IncompleteTransition> outputs;
+
+    IncompleteSet copy_linker{"go_to_copy_"+ to_string(goto_counter),"go_to_copy_"+ to_string(goto_counter)};
+    copy(copy_linker, tape_index, copy_to_tape);
+
+    outputs = copy_linker.transitions;
+
+    IncompleteTransition copy_go_back;
+    copy_go_back.state = copy_linker.to_state;
+    copy_go_back.to_state = "go_to_"+ to_string(goto_counter);
+
+    copy_go_back.def_move = 0;
+
+    copy_go_back.output_index = affected_using;
+
+    for (int i =0; i<copy_go_back.output_index.size(); i++){
+        char c = '\u0000';
+        int move_direction = direction;
+
+        if (find(copy_affected.begin(), copy_affected.end(), copy_go_back.output_index[i]) != copy_affected.end()){
+            c = '\u0001';
+            move_direction = copy_to_direction;
+        }
+
+        copy_go_back.output.push_back(c);
+        copy_go_back.move.push_back(move_direction);
+
+    }
 
     outputs.push_back(copy_go_back);
 
@@ -202,6 +266,7 @@ void TuringTools::go_to_copy(IncompleteSet &a, const vector<char> &symbol, int t
     b.transitions.insert(b.transitions.end(), outputs.begin(), outputs.end());
 
     link(a, b);
+
 
 }
 
@@ -620,7 +685,30 @@ void TuringTools::heap_push_definer(IncompleteSet& a, const vector<int>&tuple_in
 
     go_to(push_heap_action, {' '}, 1, -1, {0,1});
     link_put(push_heap_action, {'P'}, {0});
+
+    //check if this starts with A or S
+    go_to(push_heap_action, {'S', 'A'}, 0, -1, {0,1});
+
+    //store part on heap after insert on working tape after new data
+    IncompleteSet move_heap{"move_heap_"+ to_string(counter), "move_heap_"+ to_string(counter)};
+    counter++;
+
+    go_to(move_heap, {'A'}, 0, -1, {0,1});
+    find_match_heap(move_heap, 'A', 'S', 0, 1);
+    go_to(move_heap, {'E'}, 0, 1, {0,1});
+    move(move_heap, {(int) stack_tape}, -1);
+    go_to_move(move_heap, {'\u0000'}, stack_tape, -1, {(int) stack_tape}, 1, 1, {0,1});
+    link_put(move_heap, {'H'}, {0});
+    go_to(move_heap, {'}'}, stack_tape, 1, {(int) stack_tape});
+    //this to make sure we dont continue
+    go_to(move_heap, {'E'}, 0, -1, {0,1});
+    string heap_find = branch_on(move_heap, {'E'}, {0});
+
+    link_on(push_heap_action, move_heap, {'S'}, {0});
+
+    go_to(push_heap_action, {'P'}, 0, 1, {0,1});
     move(push_heap_action, {0,1}, 1);
+
 
     go_to(push_heap_action, {'\u0000'}, stack_tape, -1, {(int) stack_tape});
 
@@ -880,6 +968,7 @@ void TuringTools::find_match_heap(IncompleteSet &a, char start_marker, char end_
     counter+=2;
 
     link(searcher, check_match);
+    move(searcher, {marker_tape, data_tape}, 1);
     string branch = branch_on(searcher, {end_marker}, {marker_tape});
     go_to(searcher, {start_marker}, marker_tape, -1, {marker_tape, data_tape});
 
@@ -896,4 +985,6 @@ void TuringTools::find_match_heap(IncompleteSet &a, char start_marker, char end_
     link(a, searcher);
 
 }
+
+
 
