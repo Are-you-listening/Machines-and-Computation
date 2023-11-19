@@ -563,7 +563,7 @@ void TuringTools::heap_push_definer(IncompleteSet& a, const vector<int>&tuple_in
     link_put(push_heap_action, {'\u0000'}, {1});
 
 
-    link_on(a, push_heap_action, {'A', 'S'}, {tuple_indexes[0]});
+    link_on_multiple(a, push_heap_action, {{'A'}, {'S'}}, {tuple_indexes[0]});
 }
 
 void TuringTools::reset() {

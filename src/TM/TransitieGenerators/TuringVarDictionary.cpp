@@ -15,13 +15,15 @@ IncompleteSet TuringVarDictionary::getTransitions() {
 IncompleteSet TuringVarDictionary::storeVar() {
     IncompleteSet result("store_var_start", "store_var_start");
     //tools->heap_push_function(result, get_tuple_index());
-    tools->go_to(result, {'C', 'U', 'O'}, get_tuple_index()[1], 1, {get_tuple_index()});
-    check_defined(result);
-    //tools->heap_push_definer(result, get_tuple_index());
+    tools->go_to(result, {'C', 'U', 'O', '\u0000'}, get_tuple_index()[1], 1, {get_tuple_index()});
     string branch = tools->branch_on(result, {'\u0000'}, {get_tuple_index()[1]});
 
+    check_defined(result);
+    //tools->heap_push_definer(result, get_tuple_index());
 
-    //tools->make_loop(result);
+
+
+    tools->make_loop(result);
     //result.to_state = branch;
     return result;
 }
