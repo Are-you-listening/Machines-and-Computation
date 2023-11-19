@@ -679,3 +679,10 @@ void CFG::toGNF() { // I used the algorithm described by https://www.geeksforgee
     }
     GNF= true;
 }
+
+bool CFG::accepts(const string &w) const {
+
+
+    cout << "this doesn't do anything yet!" << endl;
+    return false;
+}

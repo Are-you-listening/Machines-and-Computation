@@ -13,6 +13,8 @@
 #include <iostream>
 #include <set>
 
+#include "lib/kars/CFGKars.h"
+
 using json = nlohmann::json;
 
 class CFG {
@@ -32,6 +34,8 @@ public:
         const std::vector<std::pair<std::string, std::vector<std::string>>> &p, const std::string &s);
     void toCNF();
     void toGNF();
+
+    [[nodiscard]] bool accepts(const std::string &w) const;
 
 };
 

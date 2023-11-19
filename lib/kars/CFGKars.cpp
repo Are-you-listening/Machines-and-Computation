@@ -2,9 +2,9 @@
 // Created by watson on 10/6/23.
 //
 
-#include "CFG.h"
+#include "CFGKars.h"
 
-CFG::CFG() {
+CFGKars::CFGKars() {
     V = {"BINDIGIT", "S"};
     S = "S";
     T = {"0", "1", "a", "b"};
@@ -12,7 +12,7 @@ CFG::CFG() {
     P.insert( { "S",  {  {""}, {"a","S","b","BINDIGIT"} }  });
 }
 
-void CFG::print() const {
+void CFGKars::print() const {
     printVector("V", V);
     printVector("T", T);
 
@@ -33,7 +33,7 @@ void CFG::print() const {
     cout << "S = " << S << endl;
 }
 
-CFG::CFG(const string &file) {
+CFGKars::CFGKars(const string &file) {
     REQUIRE(FileExists(file), "No file found to load");
     //Read File
     ifstream input(file);
@@ -68,10 +68,10 @@ CFG::CFG(const string &file) {
     S = j["Start"];
 }
 
-CFG::CFG(const vector<string> &v, const vector<string> &t, const map<string, vector<vector<string>>> &p,
+CFGKars::CFGKars(const vector<string> &v, const vector<string> &t, const map<string, vector<vector<string>>> &p,
          const string &s) : V(v), T(t), P(p), S(s) {}
 
-bool CFG::accepts(const string &w) const {
+bool CFGKars::accepts(const string &w) const {
     vector<vector<set<string>>> table;
 
     //Set up first row
@@ -93,12 +93,10 @@ bool CFG::accepts(const string &w) const {
             //Collect all options
             //
             set<vector<string>> options;
-            //cout << i << " " << j << endl;
             while(d.first>-1 && d.second<=w.length() && c.first<i){
                 auto temp2 = Cartesian(table[c.first][c.second], table[d.first][d.second]);
                 Merge(options, temp2);
 
-                //cout << c.first << " " << c.second << " AND " << d.first << " " << d.second <<endl;
 
                 ++d.second;
                 --d.first;
@@ -113,7 +111,6 @@ bool CFG::accepts(const string &w) const {
 
             //Place Result in row
             row.push_back(cel);
-            //cout << "======"<< endl;
         }
         table.push_back(row); //Place row in table
         ++i;
@@ -130,7 +127,7 @@ bool CFG::accepts(const string &w) const {
     return false;
 }
 
-set<string> CFG::ReverseFindP(const string &c) const {
+set<string> CFGKars::ReverseFindP(const string &c) const {
     const vector<string> temp = {c};
     set<string> possible;
 
@@ -144,7 +141,7 @@ set<string> CFG::ReverseFindP(const string &c) const {
     return possible;
 }
 
-set<string> CFG::ReverseFindP(const vector<string> &tocheck) const {
+set<string> CFGKars::ReverseFindP(const vector<string> &tocheck) const {
     set<string> possible;
 
     for(auto &tup: P){

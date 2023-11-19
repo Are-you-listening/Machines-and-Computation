@@ -2,8 +2,8 @@
 // Created by watson on 10/6/23.
 //
 
-#ifndef TOI_CFG_H
-#define TOI_CFG_H
+#ifndef TOI_CFGKars_H
+#define TOI_CFGKars_H
 
 #include <vector>
 #include <string>
@@ -13,14 +13,14 @@
 #include <iomanip>
 #include <set>
 
-#include "DesignByContract.h"
-#include "json.hpp"
-#include "helper.h"
+#include "../DesignByContract.h"
+#include "../json.hpp"
+#include "../helper.h"
 
 using namespace std;
 using json = nlohmann::json;
 
-class CFG {
+class CFGKars {
 private:
     vector<string> V; //Variables
     vector<string> T; //Terminals
@@ -42,11 +42,11 @@ private:
     [[nodiscard]] set<string> ReverseFindP(const vector<string> &c) const;
 
 public:
-    CFG();
+    CFGKars();
 
-    CFG(const string &file);
+    CFGKars(const string &file);
 
-    CFG(const vector<string> &v, const vector<string> &t, const map<string, vector<vector<string>>> &p,
+    CFGKars(const vector<string> &v, const vector<string> &t, const map<string, vector<vector<string>>> &p,
         const string &s);
 
     [[nodiscard]] bool accepts(const string &w) const;
@@ -55,4 +55,4 @@ public:
 };
 
 
-#endif //TOI_CFG_H
+#endif //TOI_CFGKars_H

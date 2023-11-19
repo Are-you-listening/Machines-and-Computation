@@ -49,6 +49,11 @@ set(CodeFiles
         lib/helper.cpp
         lib/helper.h
         lib/json.hpp
+        lib/kars/CFGKars.h
+        lib/kars/CFGKars.cpp
+
+
+
         src/Tokenazation.cpp
         src/Tokenazation.h
         src/ThreadFunction.cpp
