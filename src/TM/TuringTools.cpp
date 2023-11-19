@@ -538,19 +538,37 @@ void TuringTools::heap_push_definer(IncompleteSet& a, const vector<int>&tuple_in
 
     IncompleteSet copy_to_heap_key("copy_to_heap_key_" + to_string(counter), "copy_to_heap_key_" + to_string(counter));
     counter++;
-
+    //copies classname/function name
     copy(copy_to_heap_key, 1, stack_tape);
     move(copy_to_heap_key, {0, 1}, 1);
     move(copy_to_heap_key, {(int) stack_tape}, -1);
     make_loop_on(copy_to_heap_key, '\u0000', 0);
 
-    //put right syntax in place
     link(push_heap_action, copy_to_heap_key);
+
+    link_put(push_heap_action, {':'}, {(int) stack_tape});
+    move(push_heap_action, {(int) stack_tape}, -1);
+
+    go_to(push_heap_action, {'S', 'A'}, 0, -1, {0,1});
+
+    IncompleteSet copy_to_heap_type("copy_to_heap_type_" + to_string(counter), "copy_to_heap_type_" + to_string(counter));
+    counter++;
+    //copies classname/function name
+    copy(copy_to_heap_type, 1, stack_tape);
+    move(copy_to_heap_type, {0, 1}, 1);
+    move(copy_to_heap_type, {(int) stack_tape}, -1);
+    make_loop_on(copy_to_heap_type, '\u0000', 0);
+
+    link(push_heap_action, copy_to_heap_type);
+
+    //put right syntax in place
     link_put(push_heap_action, {'#'}, {(int) stack_tape});
     move(push_heap_action, {(int) stack_tape}, -1);
     link_put(push_heap_action, {'}'}, {(int) stack_tape});
     move(push_heap_action, {(int) stack_tape}, -1);
     link_put(push_heap_action, {'{'}, {(int) stack_tape});
+    move(push_heap_action, {(int) stack_tape}, -1);
+    link_put(push_heap_action, {'#'}, {(int) stack_tape});
     move(push_heap_action, {(int) stack_tape}, -1);
 
     //go back to stack mode

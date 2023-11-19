@@ -14,7 +14,6 @@ public:
 private:
     IncompleteSet storeVar();
     void check_defined(IncompleteSet &a);
-    void check_defined_old(IncompleteSet &a);
 };
 
 
