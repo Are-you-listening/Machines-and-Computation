@@ -56,6 +56,8 @@ void CFG::print() {
 
 
 CFG::CFG(const std::string& c) {
+    REQUIRE(FileExists(c),"Can't find file!");
+
     std::ifstream f(c);
     json data = json::parse(f);
 
