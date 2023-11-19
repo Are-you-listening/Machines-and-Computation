@@ -14,7 +14,7 @@
 
 //!!!!!!!!!!!!!!!!!!! Default Config Location is already SET in Orchestrator.cpp
 
-static unsigned int core_amount = std::thread::hardware_concurrency(); // gets "core amount", in windows you can allocate infinite threads. in linux this isn't possible I believe. so pls care about this.
+static unsigned int core_amount = std::thread::hardware_concurrency(); // gets "core amount", in windows you can allocate infinite threads. In linux this isn't possible, I believe. so pls care about this.
 // so whenever you thread something, pls change core_amount. Also core_amount isn't the perfect name for this
 
 int main() { // Function names we create to replace nesting should have F or I in their names, so we know if they were for-loops or If-loops
@@ -44,8 +44,8 @@ int main() { // Function names we create to replace nesting should have F or I i
             FunctionCalls.push_back(line);
         }
     }
-    std::vector<std::thread> Threads; // still doesn't work, don't forgot void functions and their returns etc.
-    ThreadFunction threading; // maybe create function that turns every function into a void one.
+    std::vector<std::thread> Threads; // still doesn't work, remember void functions and their returns, etc.
+    ThreadFunction threading; // maybe create a function that turns every function into a void one.
     unsigned long int count=0; // I also assume calling join() on a thread that's already joined is not harmful.
     for(const auto & i : FunctionCalls){
         if(core_amount!=0){
