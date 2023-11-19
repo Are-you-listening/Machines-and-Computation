@@ -681,8 +681,13 @@ void CFG::toGNF() { // I used the algorithm described by https://www.geeksforgee
 }
 
 bool CFG::accepts(const string &w) const {
+    return convert().accepts(w);
+}
+
+CFGKars CFG::convert() const {
+    map<string,vector<vector<string>>> P2;
 
 
-    cout << "this doesn't do anything yet!" << endl;
-    return false;
+
+    return CFGKars(V,T,P2,S);
 }
