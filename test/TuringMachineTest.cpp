@@ -1,28 +1,21 @@
 #include <gtest/gtest.h>
+#include <memory>
+
 #include "src/TM/Tape.h"
 #include "src/TM/TuringMachine.h"
-#include "src/TM/TuringProduction.h"
 #include "src/TM/TransitieGenerators/TuringTokenizer.h"
 #include "lib/helper.h"
 #include "src/TM/Creation/TMBuilder.h"
-#include <memory>
+
 class TuringMachineTest: public ::testing::Test {
 protected:
-    virtual void SetUp() {
+    virtual void SetUp() {}
 
-
-
-    }
-    virtual void TearDown() {
-    }
-
-
-
+    virtual void TearDown() {}
 };
 
 
 TEST(TuringMachineTest, tape) {
-
     shared_ptr<Tape> t{new Tape{3}};
     ASSERT_EQ(t->getTapeSize(), 3);
     ASSERT_EQ(t->getTapeData(), "[   ]");
@@ -177,7 +170,7 @@ TEST(TuringMachineTest, TM_tokenazation) {
 
     // not in real use yet
     TuringTools::reset();
-    TMBuilder* t = new TMBuilder(4);
+    auto t = new TMBuilder(4);
     json data = t->generateTM();
     ofstream o("output/TM_test.json");
     o << data;
@@ -211,16 +204,14 @@ TEST(TuringMachineTest, TM_tokenazation) {
             }
             cout << endl;
         }
-
-
     }
 
     for (int i = 0; i < tm.getTapeAmount(); i++){
         cout << tm.getTapeData(i) << endl;
     }
+
     cout << endl;
     cout << "halted time " << halted_time << endl;
-
 }
 
 TEST(TuringMachineTest, TM_builder) {
