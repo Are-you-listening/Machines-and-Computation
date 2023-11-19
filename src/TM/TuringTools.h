@@ -50,6 +50,8 @@ public:
                      const vector<int>& cleared);
     void go_to_copy(IncompleteSet& a, const vector<char>& symbol, int tape_index, int direction, const vector<int>& affected,
                      int copy_to_tape, int copy_to_direction, const vector<int>& copy_affected);
+    void go_to_move(IncompleteSet& a, const vector<char>& symbol, int tape_index, int direction, const vector<int>& affected,
+                    int copy_to_tape, int copy_to_direction, const vector<int>& copy_affected);
 
     static void link(IncompleteSet& a, const IncompleteSet& b);
     static void link_put(IncompleteSet& a, const IncompleteSet& b,
@@ -80,6 +82,9 @@ public:
     void copy_to_working(IncompleteSet& a, const vector<int>&tuple_indexes);
 
     static void reset();
+
+    //this needs to become private in future
+    void find_match_heap(IncompleteSet& a, char start_marker, char end_marker, int marker_tape, int data_tape);
 private:
 
     TuringTools(unsigned int stack_tape);
@@ -94,7 +99,7 @@ private:
 
     bool heap_mode = false;
 
-    void find_match(IncompleteSet& a, int start_market, int end_marker, int marker_tape, int data_tape);
+
 };
 
 
