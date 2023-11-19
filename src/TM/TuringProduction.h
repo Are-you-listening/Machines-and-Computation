@@ -4,11 +4,13 @@
 
 #ifndef TOG_TURINGPRODUCTION_H
 #define TOG_TURINGPRODUCTION_H
+
 #include <vector>
 #include <map>
 #include <iostream>
 #include <queue>
 #include <memory>
+
 using namespace std;
 
 struct Production{
@@ -16,7 +18,6 @@ struct Production{
     vector<int> movement;
     string new_state;
 };
-
 
 class TuringProduction {
 public:
@@ -29,6 +30,5 @@ private:
     map<char, TuringProduction*> ptr_vector;
     Production production;
 };
-
 
 #endif //TOG_TURINGPRODUCTION_H

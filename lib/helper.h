@@ -67,7 +67,7 @@ void printVVS(const vector<vector<string>>& vvs);
 void printVVSS(const vector<vector<set<string>>> &vvvs);
 
  /**
-  * Makes combinations of given strings for a specified lenght
+  * Makes combinations of given strings for a specified length
   * @param input
   * @param length
   * @param current

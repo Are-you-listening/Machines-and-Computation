@@ -73,13 +73,13 @@ bool FileCompare(const std::string &leftFileName, const std::string &rightFileNa
 string getCurrTime(){
     //Code from https://stackoverflow.com/questions/16357999/current-date-and-time-as-string
     time_t rawtime;
-    struct tm * timeinfo;
+    struct tm * timeInfo;
     char buffer[80];
 
     time (&rawtime);
-    timeinfo = localtime(&rawtime);
+    timeInfo = localtime(&rawtime);
 
-    strftime(buffer,sizeof(buffer),"%d-%m-%Y %H:%M:%S",timeinfo);
+    strftime(buffer, sizeof(buffer), "%d-%m-%Y %H:%M:%S", timeInfo);
     std::string str(buffer);
     return "["+str+"]";
 }
@@ -138,7 +138,6 @@ pair< vector<vector<string>> , vector<vector<string> >  > GenerateStateNames(con
             it2++;
             it++;
             rules.second.push_back(temp);
-            //cout << temp << endl;
         }
     }
     return rules;
@@ -189,7 +188,7 @@ void Merge(set<vector<string>> &result, vector<vector<string>> &extra){
 }
 
 void Merge(vector<string> &result, vector<string> &extra){
-    cout << "this merge doenst yet? anything!!" << endl;
+    cout << "this merge doesn't yet? anything!!" << endl;
 }
 
 bool SubsetCheck(const vector<string> &uset, const vector<string> &subset){

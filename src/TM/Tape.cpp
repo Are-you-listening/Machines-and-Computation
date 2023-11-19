@@ -2,18 +2,15 @@
 // Created by tibov on 02/11/23.
 //
 
-#include <cstdlib>
 #include "Tape.h"
 
-Tape::Tape(): Tape{20} {
-}
+Tape::Tape(): Tape{20} {}
 
 Tape::Tape(unsigned long init_size): tape_size{init_size} {
     tape_ptr = (char*) calloc(tape_size, 1);
     tape_head_index = 0;
     tape_head = tape_ptr;
 }
-
 
 void Tape::increase_size(bool front, optional<unsigned long> optional_size) {
     unsigned long new_size = tape_size*2;
@@ -30,12 +27,10 @@ void Tape::increase_size(bool front, optional<unsigned long> optional_size) {
     char* old_head = tape_ptr;
     char* move_head = new_tape_ptr;
 
-    if (!front){
-        /**
-         * guarantees that we will not fill up the start
-         * */
-        tape_head_index += (long) (new_size-tape_size);
-        move_head+=(long) (new_size-tape_size);
+    if (!front) {
+        //guarantees that we will not fill up the start
+        tape_head_index += (long) (new_size - tape_size);
+        move_head += (long) (new_size - tape_size);
     }
 
     for (int i=0; i<tape_size; i++){
@@ -44,8 +39,7 @@ void Tape::increase_size(bool front, optional<unsigned long> optional_size) {
 
         old_head++;
         move_head++;
-    };
-
+    }
 
     free(tape_ptr);
 
@@ -53,7 +47,6 @@ void Tape::increase_size(bool front, optional<unsigned long> optional_size) {
     tape_head = new_head;
     tape_ptr = new_tape_ptr;
     tape_size = new_size;
-
 }
 
 unsigned long Tape::getTapeSize() const noexcept{
@@ -83,7 +76,6 @@ void Tape::write(char symbol) {
 }
 
 void Tape::moveHead(int move_direction) {
-
     if (tape_head_index+move_direction < 0){
         increase_size(false, optional<unsigned long>());
     }
@@ -94,7 +86,6 @@ void Tape::moveHead(int move_direction) {
 
     tape_head_index += move_direction;
     tape_head += move_direction;
-
 }
 
 char Tape::getSymbol() const noexcept {
@@ -102,15 +93,13 @@ char Tape::getSymbol() const noexcept {
 }
 
 void Tape::load(const string &input) {
-    for (int i = 0; i < input.size(); i++){
-        write(input[i]);
+    for (char i : input){
+        write(i);
         moveHead(1);
     }
     moveHead(-(int) input.size());
-
 }
 
 Tape::~Tape() {
     free(tape_ptr);
 }
-

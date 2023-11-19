@@ -4,9 +4,9 @@
 
 #ifndef TOG_TURINGTOKENIZER_H
 #define TOG_TURINGTOKENIZER_H
+
 #include "src/TM/TuringMachine.h"
 #include "TuringGenerator.h"
-
 
 class TuringTokenizer: public TuringGenerator{
 public:
@@ -16,11 +16,6 @@ public:
 private:
     IncompleteSet tokenize_runner_productions();
     IncompleteSet tokenize();
-
-
-
-
 };
-
 
 #endif //TOG_TURINGTOKENIZER_H

@@ -4,7 +4,6 @@
 
 #include "TuringProduction.h"
 
-
 void TuringProduction::addRoute(queue<char>& symbols, Production&& p) {
     if (symbols.empty()){
         production = p;
@@ -23,7 +22,6 @@ void TuringProduction::addRoute(queue<char>& symbols, Production&& p) {
 
     symbols.pop();
     next_node->addRoute(symbols, std::move(p));
-
 }
 
 Production TuringProduction::getProduction(queue<char>& symbols) {

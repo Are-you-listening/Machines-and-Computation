@@ -4,15 +4,20 @@
 
 #ifndef TOG_TAPE_H
 #define TOG_TAPE_H
+
 #include <optional>
 #include <iostream>
+#include <cstdlib>
+
 #include "lib/DesignByContract.h"
+
 using namespace std;
+
 class Tape {
 public:
     Tape();
     ~Tape();
-    Tape(unsigned long init_size);
+    explicit Tape(unsigned long init_size);
 
     [[nodiscard]] unsigned long getTapeSize() const noexcept;
     [[nodiscard]] string getTapeData() const noexcept;
@@ -31,6 +36,5 @@ private:
 
     void increase_size(bool front, optional<unsigned long> optional_size);
 };
-
 
 #endif //TOG_TAPE_H

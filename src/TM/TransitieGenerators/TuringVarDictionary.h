@@ -4,6 +4,7 @@
 
 #ifndef TOG_TURINGVARDICTIONARY_H
 #define TOG_TURINGVARDICTIONARY_H
+
 #include "TuringGenerator.h"
 
 class TuringVarDictionary: public TuringGenerator{
@@ -15,6 +16,5 @@ private:
     IncompleteSet storeVar();
     void check_defined(IncompleteSet &a);
 };
-
 
 #endif //TOG_TURINGVARDICTIONARY_H

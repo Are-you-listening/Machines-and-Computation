@@ -3,19 +3,10 @@
 //
 
 #include "TuringTokenizer.h"
-#include "src/TM/TuringTools.h"
 
-
-
-TuringTokenizer::TuringTokenizer(): TuringGenerator(4) {
-}
-
-
+TuringTokenizer::TuringTokenizer(): TuringGenerator(4) {}
 
 IncompleteSet TuringTokenizer::tokenize() {
-
-
-
     IncompleteSet result("tokenize_mark_start", "tokenize_mark_start");
     // int stack start symbol
 
@@ -84,11 +75,9 @@ IncompleteSet TuringTokenizer::tokenize() {
     tools->stack_replace(result, {':', ':', '('}, {'O'});
     tools->stack_replace(result, {'A', ':'}, {'I'});
 
-    //make sure we still have usefull tokens
+    //make sure we still have useful tokens
     //tools->stack_replace(result, {'('}, {'A'});
     tools->stack_replace(result, {':'}, {'S'});
-
-
 
     //guarantees right token on top
 
@@ -135,8 +124,6 @@ IncompleteSet TuringTokenizer::tokenize() {
     return result;
 }
 
-
-
 IncompleteSet TuringTokenizer::tokenize_runner_productions() {
     IncompleteSet final_tokenize_set("tokenize_pre_setup", "tokenize_pre_setup");
     for (int i = 0; i<tuple_size; i++){
@@ -152,7 +139,7 @@ IncompleteSet TuringTokenizer::tokenize_runner_productions() {
         IncompleteSet tokenize_set(from,to);
         for (int j =32; j<127; j++){
             bool is_spatie = j == 32;
-            bool is_double_dot = j == 58;
+            //bool is_double_dot = j == 58
             bool is_seperator = (find(seperators.begin(), seperators.end(), (char) j) != seperators.end());
 
             IncompleteTransition trans_prod;
@@ -196,11 +183,8 @@ IncompleteSet TuringTokenizer::tokenize_runner_productions() {
                 }else{
                     tools->push(trans_prod, 'S');
                 }
-
             }
-
             tokenize_set.transitions.push_back(trans_prod);
-
         }
 
         IncompleteTransition end_marker;
@@ -215,8 +199,6 @@ IncompleteSet TuringTokenizer::tokenize_runner_productions() {
         tools->stack_replace(tokenize_set, {'P'}, {'A'});
 
         tools->link(final_tokenize_set, tokenize_set);
-
-
     }
 
     IncompleteSet end_marking("tokenize_extension_1","tokenize_extension_1");
@@ -232,5 +214,3 @@ IncompleteSet TuringTokenizer::tokenize_runner_productions() {
 IncompleteSet TuringTokenizer::getTransitions() {
     return tokenize();
 }
-
-

@@ -4,9 +4,7 @@
 
 #include "TuringVarDictionary.h"
 
-TuringVarDictionary::TuringVarDictionary(): TuringGenerator(4) {
-
-}
+TuringVarDictionary::TuringVarDictionary(): TuringGenerator(4) {}
 
 IncompleteSet TuringVarDictionary::getTransitions() {
     return storeVar();
@@ -28,13 +26,10 @@ IncompleteSet TuringVarDictionary::storeVar() {
 
     tools->link_on_multiple(result, temp, {{'O'}}, {get_tuple_index()[1]});
 
-
     tools->make_loop(result);
     result.to_state = branch;
     return result;
 }
-
-
 
 void TuringVarDictionary::check_defined(IncompleteSet &a) {
     IncompleteSet added("vardict_check_defined", "vardict_check_defined");

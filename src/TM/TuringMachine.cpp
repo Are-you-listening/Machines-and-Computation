@@ -6,46 +6,43 @@
 
 TuringMachine::TuringMachine(const string &path) {
     load(path);
-
 }
 
 void TuringMachine::load(json &data) {
     halted = false;
-
-    for (int i = 0; i<data["States"].size(); i++){
-        states.insert(data["States"][i].get<std::string>());
+    for (const auto & i : data["States"]){
+        states.insert(i.get<std::string>());
     }
 
     start_state = data["Start"].get<std::string>();
     current_state = start_state;
-
 
     unsigned int tape_amount = data["Tapes"].get<int>();
     for (int i=0; i<tape_amount; i++){
         tapes.push_back(new Tape{64});
     }
 
-    string input = data["Input"].get<std::string>();
+    auto input = data["Input"].get<std::string>();
     load_input(input, 0);
 
     for (int i = 0; i<data["Productions"].size(); i++){
         json production = data["Productions"][i];
         string state = production["state"];
         queue<char> symbols;
-        for (int j = 0; j<production["symbols"].size(); j++){
-            symbols.push(production["symbols"][j].get<string>()[0]);
+        for (const auto & j : production["symbols"]){
+            symbols.push(j.get<string>()[0]);
         }
 
         json to = production["to"];
         Production p;
         p.new_state = to["state"];
 
-        for (int j = 0; j<to["symbols"].size(); j++){
-            p.replace_val.push_back(to["symbols"][j].get<string>()[0]);
+        for (const auto & j : to["symbols"]){
+            p.replace_val.push_back(j.get<string>()[0]);
         }
 
-        for (int j = 0; j<to["moves"].size(); j++){
-            p.movement.push_back(to["moves"][j].get<int>());
+        for (const auto & j : to["moves"]){
+            p.movement.push_back(j.get<int>());
         }
 
         auto loc = production_trees.find(state);
@@ -68,7 +65,6 @@ void TuringMachine::load(const string &path) {
     json data = json::parse(f);
 
     load(data);
-
 }
 
 string TuringMachine::getTapeData(unsigned int index) const {
@@ -88,7 +84,7 @@ void TuringMachine::move(){
 
     Production p = loc->second->getProduction(symbols);
 
-    if (p.new_state == ""){
+    if (p.new_state.empty()){
         halted = true;
         return;
     }
@@ -126,4 +122,3 @@ void TuringMachine::load_input(const string &input, int index) {
 const string &TuringMachine::getCurrentState() const {
     return current_state;
 }
-
