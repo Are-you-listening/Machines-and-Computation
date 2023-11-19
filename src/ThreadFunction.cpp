@@ -3,10 +3,10 @@
 //
 
 #include "ThreadFunction.h"
-#include <iostream>
-#include <mutex>
+
 static unsigned long int ThreadNameFunction=0xA0000000;
 static std::mutex thread_name_lock;
+
 void ThreadFunction::ThreadFunctionCall(const std::string& FileLocation, const std::string& Function){
     std::vector<std::string> ChangedVariables;
     unsigned long int left=0;
@@ -18,7 +18,7 @@ void ThreadFunction::ThreadFunctionCall(const std::string& FileLocation, const s
             right=i;
         }
     }
-    std::string Functionname=Function.substr(left,right-left);
+    std::string FunctionName=Function.substr(left, right - left);
     bool appending= false;
     std::string temp;
     for(const auto& i: Function){
@@ -38,7 +38,7 @@ void ThreadFunction::ThreadFunctionCall(const std::string& FileLocation, const s
     std::string line3;
     std::vector<std::vector<std::string>> VusedVariables;
     while(getline(File5,line3)){
-        if(line3.find(Functionname+"(")!=std::string::npos){
+        if(line3.find(FunctionName + "(") != std::string::npos){
             std::vector<std::string> usedVariables;
             std::string temp2;
             bool appending2=false;
@@ -68,11 +68,11 @@ void ThreadFunction::ThreadFunctionCall(const std::string& FileLocation, const s
         }
     }
     std::vector<std::string> joins;
-    std::stringstream Tempname;
+    std::stringstream tempName;
     thread_name_lock.lock();
-    Tempname<<std::hex<<ThreadNameFunction;
-    std::string FunctionCall="std::thread "+ Tempname.str()+"("+Functionname+", ";
-    joins.push_back(Tempname.str());
+    tempName << std::hex << ThreadNameFunction;
+    std::string FunctionCall= "std::thread " + tempName.str() + "(" + FunctionName + ", ";
+    joins.push_back(tempName.str());
     ThreadNameFunction++;
     thread_name_lock.unlock();
     std::vector<std::string> copy=VusedVariables[0];
@@ -93,11 +93,11 @@ void ThreadFunction::ThreadFunctionCall(const std::string& FileLocation, const s
     std::fstream File(FileLocation);
     std::ofstream File2(FileLocation+"thread");
     std::string line2;
-    std::string uselessline;
+    std::string uselessLine;
     std::vector<std::string> FunctionCalls;
     unsigned long int count=0;
     while(getline(File,line2)){
-        if(line2!=Function&&line2.find(Functionname+"(")!=std::string::npos){
+        if(line2!=Function&& line2.find(FunctionName + "(") != std::string::npos){
             std::string temp2;
             for(auto S: line2){
                 if(S==' '){
@@ -109,11 +109,11 @@ void ThreadFunction::ThreadFunctionCall(const std::string& FileLocation, const s
             File2 << temp2<<FunctionCall<<std::endl;
             FunctionCalls.push_back(FunctionCall);
             FunctionCall.clear();
-            Tempname.str("");
+            tempName.str("");
             thread_name_lock.lock();
-            Tempname<<std::hex<<ThreadNameFunction;
-            FunctionCall="std::thread "+ Tempname.str()+"("+Functionname+", ";
-            joins.push_back(Tempname.str());
+            tempName << std::hex << ThreadNameFunction;
+            FunctionCall= "std::thread " + tempName.str() + "(" + FunctionName + ", ";
+            joins.push_back(tempName.str());
             ThreadNameFunction++;
             thread_name_lock.unlock();
             count++;
@@ -129,10 +129,10 @@ void ThreadFunction::ThreadFunctionCall(const std::string& FileLocation, const s
     File2.close();
     for(unsigned long int i=0; i<ChangedVariables.size(); i++){
         if(ChangedVariables[i].find("const")!=std::string::npos){
-            ChangedVariables.erase(ChangedVariables.cbegin()+i);
+            ChangedVariables.erase(ChangedVariables.cbegin()+ (int) i);
             i--;
         } else if(ChangedVariables[i].find('&')==std::string::npos){
-            ChangedVariables.erase(ChangedVariables.cbegin()+i);
+            ChangedVariables.erase(ChangedVariables.cbegin()+ (int) i);
             i--;
         }
     }
@@ -152,6 +152,7 @@ void ThreadFunction::ThreadFunctionCall(const std::string& FileLocation, const s
     File.clear();
     File.seekg(0);
     std::vector<unsigned long int> reachedFunctions;
+
     while(getline(File3,line)){
         for(unsigned long int i=0; i<FunctionCalls.size(); i++){
             if(line.find(FunctionCalls[i])!=std::string::npos){
@@ -169,14 +170,14 @@ void ThreadFunction::ThreadFunctionCall(const std::string& FileLocation, const s
         for(unsigned long int i=0; i<reachedFunctions.size(); i++){
             if(VusedVariables[reachedFunctions[i]].empty()&&line!=temp3+FunctionCalls[reachedFunctions[i]]){
                 File4<<temp3<<joins[reachedFunctions[i]]<<".join()"<<std::endl;
-                reachedFunctions.erase(reachedFunctions.cbegin()+i);
+                reachedFunctions.erase(reachedFunctions.cbegin()+ (int) i);
                 i=-1;
                 continue;
             }
             for(unsigned long int j=0; j<VusedVariables[reachedFunctions[i]].size();j++){
                 if((line.find(VusedVariables[reachedFunctions[i]][j])!=std::string::npos||line.find("return")!=std::string::npos||line.find('}')!=std::string::npos)&&line!=temp3+FunctionCalls[reachedFunctions[i]]){
                     File4<<temp3<<joins[reachedFunctions[i]]<<".join()"<<std::endl;
-                    reachedFunctions.erase(reachedFunctions.cbegin()+i);
+                    reachedFunctions.erase(reachedFunctions.cbegin()+ (int) i);
                     i--;
                     break;
                 }
