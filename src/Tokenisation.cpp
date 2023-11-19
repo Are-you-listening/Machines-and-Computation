@@ -2,9 +2,9 @@
 // Created by anass on 1-11-2023.
 //
 
-#include "Tokenazation.h"
+#include "Tokenisation.h"
 
-void Tokenazation::Tokenize(const std::string &FileLocation) {
+void Tokenisation::Tokenize(const std::string &FileLocation) {
     std::ifstream File(FileLocation);
     std::string line;
     while(getline(File,line)){
@@ -51,7 +51,7 @@ void Tokenazation::Tokenize(const std::string &FileLocation) {
                 tokenVector.emplace_back("D1",line.substr(line.find(' ')+1,line.size()-1));
             }
         } else if((line.find('+')!=std::string::npos||line.find('-')!=std::string::npos||line.find('*')!=std::string::npos // this just gives on when a variable is used, not which or even which scope the variable is from
-        ||line.find('/')!=std::string::npos||line.find('%')!=std::string::npos||line.find("++")!=std::string::npos // so use in combination of (D,line) to dether the scopes.
+        ||line.find('/')!=std::string::npos||line.find('%')!=std::string::npos||line.find("++")!=std::string::npos // so use in combination of (D,line) to dither the scopes.
         ||line.find("--")!=std::string::npos||line.find("++")!=std::string::npos||line.find('=')!=std::string::npos
         ||line.find("+=")!=std::string::npos||line.find("-=")!=std::string::npos||line.find("*=")!=std::string::npos
         ||line.find("/=")!=std::string::npos||line.find("%=")!=std::string::npos||line.find("==")!=std::string::npos

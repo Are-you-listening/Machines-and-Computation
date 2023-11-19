@@ -6,7 +6,7 @@
 #include <thread>
 #include <ctime>
 
-#include "src/Tokenazation.h"
+#include "src/Tokenisation.h"
 #include "src/CFG.h"
 #include "src/ThreadFunction.h"
 #include "filesystem"
@@ -18,9 +18,9 @@ static unsigned int core_amount = std::thread::hardware_concurrency(); // gets "
 // so whenever you thread something, pls change core_amount. Also core_amount isn't the perfect name for this
 
 int main() { // Function names we create to replace nesting should have F or I in their names, so we know if they were for-loops or If-loops
-    Tokenazation tokenVector;
+    Tokenisation tokenVector;
     std::string Filelocation="input/nestedExamples/engine.cc";
-    std::thread Tokenizer(&Tokenazation::Tokenize, &tokenVector, Filelocation);
+    std::thread Tokenizer(&Tokenisation::Tokenize, &tokenVector, Filelocation);
     core_amount--;
     
     //CFG cfg("testFiles/CFG.json"); //don't forget to add CFG back into cmakelist in right set

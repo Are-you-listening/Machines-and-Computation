@@ -2,14 +2,14 @@
 // Created by anass on 1-11-2023.
 //
 
-#ifndef TOG_TOKENAZATION_H
-#define TOG_TOKENAZATION_H
+#ifndef TOG_TOKENISATION_H
+#define TOG_TOKENISATION_H
 
 #include <vector>
 #include <string>
 #include <fstream>
 
-class Tokenazation {
+class Tokenisation {
 private:
     /* pair.first, F declares for-loop, C declares code, { declares for/if start
      *  I declares if, E declares else, e declares else if
@@ -19,10 +19,9 @@ private:
     std::vector<std::pair<std::string, std::string>> tokenVector;
     
 public:
-    Tokenazation()=default;
-    void Tokenize(const std::string& FileLocation);
+    Tokenisation()=default;
 
+    void Tokenize(const std::string& FileLocation);
 };
 
-
-#endif //TOG_TOKENAZATION_H
+#endif //TOG_TOKENISATION_H

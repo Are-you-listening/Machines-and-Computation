@@ -53,9 +53,8 @@ set(CodeFiles
         lib/kars/CFGKars.cpp
 
 
-
-        src/Tokenazation.cpp
-        src/Tokenazation.h
+        src/Tokenisation.cpp
+        src/Tokenisation.h
         src/ThreadFunction.cpp
         src/ThreadFunction.h
         src/CFG.cpp
