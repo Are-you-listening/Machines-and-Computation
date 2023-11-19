@@ -134,10 +134,11 @@ void TuringTools::go_to_clear(IncompleteSet &a, const vector<char> &symbol, int 
 }
 
 void TuringTools::go_to_copy(IncompleteSet &a, const vector<char> &symbol, int tape_index, int direction,
-                             const vector<int> &affected, int copy_to_tape, int copy_to_direction) {
+                             const vector<int> &affected, int copy_to_tape, int copy_to_direction, const vector<int>& copy_affected) {
 
     vector<int> affected_using = affected;
-    affected_using.push_back(copy_to_tape);
+    affected_using.insert(affected_using.end(), copy_affected.begin(), copy_affected.end());
+    sort(affected_using.begin(), affected_using.end());
 
     IncompleteSet b("go_to_"+ to_string(goto_counter) ,"go_to_"+ to_string(goto_counter+1));
     vector<IncompleteTransition> outputs;
@@ -159,7 +160,7 @@ void TuringTools::go_to_copy(IncompleteSet &a, const vector<char> &symbol, int t
         char c = '\u0001';
         int move_direction = direction;
 
-        if (copy_go_back.output_index[i] == copy_to_tape){
+        if (find(copy_affected.begin(), copy_affected.end(), copy_go_back.output_index[i]) != copy_affected.end()){
             move_direction = copy_to_direction;
         }
 
@@ -665,8 +666,9 @@ void TuringTools::heap_push_definer(IncompleteSet& a, const vector<int>&tuple_in
         go_to(push_heap_action, {'#'}, (int) stack_tape, 1, {(int) stack_tape});
         move(push_heap_action, {(int) stack_tape}, 1);
     }
-    move(push_heap_action, {(int) stack_tape}, -1);
-    link_put(push_heap_action, {'a'}, {(int) stack_tape});
+    move(push_heap_action, {(int) stack_tape}, -2);
+    go_to_copy(push_heap_action, {':'}, stack_tape, -1, {(int) stack_tape}, 1, 1, {0, 1});
+    link_put(push_heap_action, {'S'}, {0});
 
     //go back to stack mode
     //move(push_heap_action, {(int) stack_tape}, 1);

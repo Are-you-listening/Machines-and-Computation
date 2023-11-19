@@ -199,11 +199,11 @@ TEST(TuringMachineTest, TM_tokenazation) {
         tm.move();
 
 
-        if (i == 80){
+        if (tm.getCurrentState() == "264"){
             int j=0;
         }
 
-        if (i >= 52980){
+        if (i >= 63950){
             int j = 0;
 
             for (int i = 0; i < tm.getTapeAmount(); i++){
