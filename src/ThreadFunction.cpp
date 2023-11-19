@@ -7,7 +7,7 @@
 static unsigned long int ThreadNameFunction=0xA0000000;
 
 void ThreadFunction::ThreadFunctionCall(const std::string& FileLocation, const std::string& Function){
-    ChangedVariables.clear();
+    std::vector<std::string> ChangedVariables;
     unsigned long int left=0;
     unsigned long int right=0;
     for(unsigned long int i=0; i<Function.size(); i++){

@@ -10,8 +10,6 @@
 #include <sstream>
 
 class ThreadFunction {
-private:
-    std::vector<std::string> ChangedVariables;
 public:
     void ThreadFunctionCall(const std::string& FileLocation, const std::string& Function);
 };
