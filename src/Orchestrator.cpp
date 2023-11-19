@@ -4,4 +4,4 @@
 
 #include "Orchestrator.h"
 
-
+string Orchestrator::file = "input/config/config.json";
