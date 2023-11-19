@@ -80,6 +80,9 @@ public:
     void copy_to_working(IncompleteSet& a, const vector<int>&tuple_indexes);
 
     static void reset();
+
+    //this needs to become private in future
+    void find_match_heap(IncompleteSet& a, char start_marker, char end_marker, int marker_tape, int data_tape);
 private:
 
     TuringTools(unsigned int stack_tape);
@@ -94,7 +97,7 @@ private:
 
     bool heap_mode = false;
 
-    void find_match(IncompleteSet& a, int start_market, int end_marker, int marker_tape, int data_tape);
+
 };
 
 

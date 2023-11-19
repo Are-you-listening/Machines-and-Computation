@@ -36,6 +36,14 @@ json TMBuilder::generateTM() {
 
     tools->link(program, vardict.getTransitions());
 
+    tools->go_to(program, {'A'}, 0, -1, {0,1});
+
+    tools->move(program, {0,1}, 4);
+    tools->link_put(program, {'S'}, {0});
+    tools->move(program, {0,1}, -4);
+
+    tools->go_to(program, {'#'}, tapes-1, -1, {(int) tapes-1});
+    tools->find_match_heap(program, 'A', 'S', 0, 1);
 
 
     //IncompleteSet test("test1", "test1");

@@ -31,6 +31,7 @@ IncompleteSet::IncompleteSet(const string& state, const string& to_state): state
 TuringTools::TuringTools(unsigned int stack_tape) {
     goto_counter = 0;
     counter = 0;
+    branch_counter = 0;
     this->stack_tape = stack_tape;
 }
 
@@ -613,8 +614,6 @@ void TuringTools::heap_push_definer(IncompleteSet& a, const vector<int>&tuple_in
     go_to(push_heap_action, {'*'}, stack_tape, -1, {(int) stack_tape});
     heap_mode = true;
 
-    go_to(push_heap_action, {'\u0000'}, stack_tape, -1, {(int) stack_tape});
-
     copy_to_working(push_heap_action, tuple_indexes);
 
     //from here on we will copy data from working tape and put it on the heap
@@ -622,6 +621,8 @@ void TuringTools::heap_push_definer(IncompleteSet& a, const vector<int>&tuple_in
     go_to(push_heap_action, {' '}, 1, -1, {0,1});
     link_put(push_heap_action, {'P'}, {0});
     move(push_heap_action, {0,1}, 1);
+
+    go_to(push_heap_action, {'\u0000'}, stack_tape, -1, {(int) stack_tape});
 
     IncompleteSet copy_to_heap_key("copy_to_heap_key_" + to_string(counter), "copy_to_heap_key_" + to_string(counter));
     counter++;
@@ -837,16 +838,62 @@ void TuringTools::make_loop_on_sequence(IncompleteSet &a, const vector<char> &in
 
 }
 
-void TuringTools::find_match(IncompleteSet &a, int start_market, int end_marker, int marker_tape, int data_tape) {
+void TuringTools::find_match_heap(IncompleteSet &a, char start_marker, char end_marker, int marker_tape, int data_tape) {
     //precondition: in heap mode
     if (!heap_mode){
-        throw "not in heap mode";
+        //throw "not in heap mode";
     }
-    IncompleteSet searcher{"heap_search"+ to_string(counter), "heap_search"+ to_string(counter)};
+    IncompleteSet searcher{"heap_search_find"+ to_string(counter), "heap_search_find"+ to_string(counter)};
     counter++;
 
     go_to(searcher, {'#'}, stack_tape, -1, {(int) stack_tape});
     move(searcher, {(int) stack_tape}, -1);
+
+    IncompleteSet check_match{"check_match_"+ to_string(counter), "check_match_"+ to_string(counter+1)};
+
+
+    for (int j =32; j<127; j++){
+        IncompleteTransition check_equal;
+        check_equal.state = "check_match_"+ to_string(counter);
+        check_equal.to_state = "check_match_"+ to_string(counter);
+        check_equal.def_move = 0;
+
+        check_equal.input = {(char) j, (char) j};
+        check_equal.input_index = {data_tape, (int) stack_tape};
+        check_equal.output = {'\u0001', '\u0001', '\u0001'};
+        check_equal.output_index = {marker_tape, data_tape, (int) stack_tape};
+        check_equal.move = {1, 1, -1};
+
+        check_match.transitions.push_back(check_equal);
+
+        IncompleteTransition end_check;
+        end_check.state = "check_match_"+ to_string(counter);
+        end_check.to_state = "check_match_"+ to_string(counter+1);
+        end_check.def_move = 0;
+
+        end_check.input = {(char) j, '\u0001'};
+        end_check.input_index = {data_tape, (int) stack_tape};
+
+        check_match.transitions.push_back(end_check);
+    }
+
+    counter+=2;
+
+    link(searcher, check_match);
+    string branch = branch_on(searcher, {end_marker}, {marker_tape});
+    go_to(searcher, {start_marker}, marker_tape, -1, {marker_tape, data_tape});
+
+    //still needs counter
+    go_to(searcher, {'}'}, stack_tape, -1, {(int) stack_tape});
+    go_to(searcher, {'{'}, stack_tape, -1, {(int) stack_tape});
+
+    //loop somewhere here
+
+    //after loop on found
+    searcher.to_state = branch;
+    go_to(searcher, {'}'}, stack_tape, -1, {(int) stack_tape});
+
+    link(a, searcher);
 
 }
 

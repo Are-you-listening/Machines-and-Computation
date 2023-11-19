@@ -30,7 +30,7 @@ IncompleteSet TuringVarDictionary::storeVar() {
 
 
     tools->make_loop(result);
-    //result.to_state = branch;
+    result.to_state = branch;
     return result;
 }
 
