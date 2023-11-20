@@ -15,7 +15,7 @@
 using namespace std;
 
 /**
- * //All used Terminals from Tokenisation
+ * All used Terminals from Tokenisation
  * @param {
  * @param }
  * @param F, Function call
@@ -28,7 +28,10 @@ using namespace std;
  */
 static vector<string> T{"{","}","F","C","I","E","e","D","V"};
 
+/**
+ * Create a CFG, accepting the Language made by Tokenisation, from the Config Data
+ * @return
+ */
 CFG* createCFG();
-
 
 #endif //TOG_CFGCONSTRUCTOR_H

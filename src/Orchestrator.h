@@ -17,6 +17,9 @@ using namespace std;
 class Orchestrator {
     friend class Config;
 private:
+    /**
+     * Location of the Config.json file
+     */
     static string file;
 
 public:
