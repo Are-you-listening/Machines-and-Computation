@@ -4,7 +4,9 @@
 
 #include "TuringTools.h"
 
+
 IncompleteTransition::IncompleteTransition(json &data) {
+
     state = data["state"].get<string>();
     to_state = data["to_state"].get<string>();
     def_move = data["def_move"].get<int>();
@@ -21,7 +23,10 @@ IncompleteTransition::IncompleteTransition(json &data) {
     }
 }
 
-IncompleteSet::IncompleteSet(const string& state, const string& to_state): state{state}, to_state{to_state} {}
+
+IncompleteSet::IncompleteSet(const string& state, const string& to_state): state{state}, to_state{to_state} {
+
+}
 
 TuringTools::TuringTools(unsigned int stack_tape) {
     goto_counter = 0;
@@ -37,6 +42,9 @@ TuringTools* TuringTools::getInstance(unsigned int stack_tape) {
     }
     return _instance.get();
 }
+
+
+
 
 void TuringTools::go_to(IncompleteSet& a, const vector<char>& symbol, int tape_index, int direction) {
 
@@ -118,9 +126,12 @@ void TuringTools::go_to_clear(IncompleteSet &a, const vector<char> &symbol, int 
 
     goto_counter += 2;
 
+
+
     b.transitions.insert(b.transitions.end(), outputs.begin(), outputs.end());
 
     link(a, b);
+
 }
 
 void TuringTools::go_to_copy(IncompleteSet &a, const vector<char> &symbol, int tape_index, int direction,
@@ -156,6 +167,7 @@ void TuringTools::go_to_copy(IncompleteSet &a, const vector<char> &symbol, int t
 
         copy_go_back.output.push_back(c);
         copy_go_back.move.push_back(move_direction);
+
     }
 
     outputs.push_back(copy_go_back);
@@ -177,6 +189,7 @@ void TuringTools::go_to_copy(IncompleteSet &a, const vector<char> &symbol, int t
         arrived.input_index = {tape_index};
         arrived.def_move = 0;
 
+
         outputs.push_back(arrived);
     }
 
@@ -185,6 +198,7 @@ void TuringTools::go_to_copy(IncompleteSet &a, const vector<char> &symbol, int t
     b.transitions.insert(b.transitions.end(), outputs.begin(), outputs.end());
 
     link(a, b);
+
 }
 
 void TuringTools::go_to_move(IncompleteSet &a, const vector<char> &symbol, int tape_index, int direction,
@@ -221,6 +235,7 @@ void TuringTools::go_to_move(IncompleteSet &a, const vector<char> &symbol, int t
 
         copy_go_back.output.push_back(c);
         copy_go_back.move.push_back(move_direction);
+
     }
 
     outputs.push_back(copy_go_back);
@@ -242,6 +257,7 @@ void TuringTools::go_to_move(IncompleteSet &a, const vector<char> &symbol, int t
         arrived.input_index = {tape_index};
         arrived.def_move = 0;
 
+
         outputs.push_back(arrived);
     }
 
@@ -250,35 +266,43 @@ void TuringTools::go_to_move(IncompleteSet &a, const vector<char> &symbol, int t
     b.transitions.insert(b.transitions.end(), outputs.begin(), outputs.end());
 
     link(a, b);
+
+
 }
 
+
+
+
 void TuringTools::link(IncompleteSet& a, const IncompleteSet& b) {
-    IncompleteTransition inComp;
-    inComp.state = a.to_state;
-    inComp.to_state = b.state;
-    inComp.def_move = 0;
+    IncompleteTransition incomp;
+    incomp.state = a.to_state;
+    incomp.to_state = b.state;
+    incomp.def_move = 0;
 
     a.to_state = b.to_state;
-    a.transitions.push_back(inComp);
+    a.transitions.push_back(incomp);
     a.transitions.insert(a.transitions.end(), b.transitions.begin(), b.transitions.end());
+
 }
 
 void TuringTools::link_put(IncompleteSet& a, const IncompleteSet& b, const vector<char> &output,
-                      const vector<int> &output_index) {
-    IncompleteTransition inComp;
-    inComp.state = a.to_state;
-    inComp.to_state = b.state;
-    inComp.def_move = 0;
+                           const vector<int> &output_index) {
+    IncompleteTransition incomp;
+    incomp.state = a.to_state;
+    incomp.to_state = b.state;
+    incomp.def_move = 0;
 
-    inComp.output = output;
-    inComp.output_index = output_index;
+    incomp.output = output;
+    incomp.output_index = output_index;
     for (int i=0; i<output_index.size(); i++){
-        inComp.move.push_back(0);
+        incomp.move.push_back(0);
     }
 
+
     a.to_state = b.to_state;
-    a.transitions.push_back(inComp);
+    a.transitions.push_back(incomp);
     a.transitions.insert(a.transitions.end(), b.transitions.begin(), b.transitions.end());
+
 }
 
 void TuringTools::link_put(IncompleteSet &a, const vector<char> &output, const vector<int> &output_index) {
@@ -288,13 +312,14 @@ void TuringTools::link_put(IncompleteSet &a, const vector<char> &output, const v
 }
 
 void TuringTools::add(IncompleteSet &a, const IncompleteTransition &transition) {
+
     a.to_state = transition.to_state;
     a.transitions.push_back(transition);
 }
 
-void TuringTools::push(IncompleteTransition &transition, char symbol) const {
+void TuringTools::push(IncompleteTransition &transition, char symbol) {
     transition.output.push_back(symbol);
-    transition.output_index.push_back( (int) stack_tape);
+    transition.output_index.push_back(stack_tape);
     transition.move.push_back(1);
 }
 
@@ -341,7 +366,9 @@ void TuringTools::stack_replace(IncompleteSet &a, const vector<char> &input, con
         b.transitions.push_back(fail_transition);
     }
 
-    for (char c : output){
+    for (int i=0; i< output.size(); i++){
+        char c = output[i];
+
         IncompleteTransition write_transition;
         write_transition.state = to_string(counter);
         write_transition.to_state = to_string(counter+1);
@@ -352,6 +379,7 @@ void TuringTools::stack_replace(IncompleteSet &a, const vector<char> &input, con
 
         counter++;
 
+
         b.transitions.push_back(write_transition);
     }
     counter++;
@@ -360,9 +388,11 @@ void TuringTools::stack_replace(IncompleteSet &a, const vector<char> &input, con
 }
 
 void TuringTools::push(IncompleteSet &a, char symbol) {
+
     link_put(a, {symbol}, {(int) stack_tape});
 
     a.transitions[a.transitions.size()-1].move = {1};
+
 }
 
 void TuringTools::move(IncompleteSet &a, const vector<int>& tape, int direction) {
@@ -380,6 +410,7 @@ void TuringTools::move(IncompleteSet &a, const vector<int>& tape, int direction)
     counter += 1;
 
     add(a, move);
+
 }
 
 void TuringTools::copy(IncompleteSet &a, unsigned int from_tape, unsigned int to_tape) {
@@ -433,6 +464,7 @@ void TuringTools::link_on(IncompleteSet &a, const IncompleteSet &b, const vector
     a.transitions.push_back(transition2);
 
     a.to_state = end_state;
+
 }
 
 void TuringTools::link_on_not(IncompleteSet &a, const IncompleteSet &b, const vector<char> &input,
@@ -444,6 +476,7 @@ void TuringTools::link_on_not(IncompleteSet &a, const IncompleteSet &b, const ve
     condition_transition.state = a.to_state;
     condition_transition.to_state = b.state;
     condition_transition.def_move = 0;
+
 
     a.transitions.push_back(condition_transition);
     a.transitions.insert(a.transitions.end(), b.transitions.begin(), b.transitions.end());
@@ -465,14 +498,18 @@ void TuringTools::link_on_not(IncompleteSet &a, const IncompleteSet &b, const ve
     a.transitions.push_back(transition2);
 
     a.to_state = end_state;
+
 }
+
 
 void TuringTools::link_on_multiple(IncompleteSet &a, const IncompleteSet &b, const vector<vector<char>> &input,
                                    const vector<int> &input_index) {
     string end_state = to_string(counter);
     counter++;
 
-    for (const auto & sub_input : input){
+    for (int i=0; i<input.size(); i++){
+        vector<char> sub_input = input[i];
+
         IncompleteTransition condition_transition;
         condition_transition.state = a.to_state;
         condition_transition.to_state = b.state;
@@ -499,7 +536,9 @@ void TuringTools::link_on_multiple(IncompleteSet &a, const IncompleteSet &b, con
     a.transitions.push_back(transition2);
 
     a.to_state = end_state;
+
 }
+
 
 void TuringTools::clear_stack(IncompleteSet &a) {
     IncompleteSet b("clear_stack_"+ to_string(goto_counter) ,"clear_stack_"+ to_string(goto_counter+1));
@@ -525,13 +564,17 @@ void TuringTools::clear_stack(IncompleteSet &a) {
     arrived.input_index = {(int) stack_tape};
     arrived.def_move = 0;
 
+
     outputs.push_back(arrived);
 
     goto_counter += 2;
 
+
+
     b.transitions.insert(b.transitions.end(), outputs.begin(), outputs.end());
     move(b, {(int) stack_tape}, 1);
     link(a, b);
+
 }
 
 void TuringTools::make_loop(IncompleteSet &a) {
@@ -541,6 +584,7 @@ void TuringTools::make_loop(IncompleteSet &a) {
     make_loop.def_move = 0;
 
     a.transitions.push_back(make_loop);
+
 }
 
 string TuringTools::branch_on(IncompleteSet &a, const vector<char> &input, const vector<int> &input_index) {
@@ -596,6 +640,7 @@ void TuringTools::copy_to_working(IncompleteSet &a, const vector<int> &tuple_ind
     IncompleteSet copier_do_sub{"copier_do_sub_"+ to_string(counter), "copier_do_sub_"+ to_string(counter)};
     counter++;
 
+
     for (int i = 0; i< tuple_indexes.size(); i++){
         if (i < 2){
             continue;
@@ -608,6 +653,7 @@ void TuringTools::copy_to_working(IncompleteSet &a, const vector<int> &tuple_ind
         move(copy_to_working, {0, 1}, 1);
 
         link_on_not(copier_do_sub, copy_to_working, {'\u0000'}, {tuple_indexes[i]});
+
     }
 
     move(copier_do_sub, tuple_indexes, 1);
@@ -620,7 +666,9 @@ void TuringTools::copy_to_working(IncompleteSet &a, const vector<int> &tuple_ind
     go_to(copier, {'S', 'A'}, tuple_indexes[0], -1, tuple_indexes);
     link_put(copier, {'E'}, {0});
     link(a,copier);
+
 }
+
 
 void TuringTools::heap_push_definer(IncompleteSet& a, const vector<int>&tuple_indexes) {
     //requires that string that is marked is seperated by at least 1 space
@@ -628,12 +676,13 @@ void TuringTools::heap_push_definer(IncompleteSet& a, const vector<int>&tuple_in
     counter++;
 
     //go to heap mode
-    go_to(push_heap_action, {'*'}, (int) stack_tape, -1, {(int) stack_tape});
+    go_to(push_heap_action, {'*'}, stack_tape, -1, {(int) stack_tape});
     heap_mode = true;
 
     copy_to_working(push_heap_action, tuple_indexes);
 
     //from here on we will copy data from working tape and put it on the heap
+
     go_to(push_heap_action, {' '}, 1, -1, {0,1});
     link_put(push_heap_action, {'P'}, {0});
 
@@ -648,10 +697,10 @@ void TuringTools::heap_push_definer(IncompleteSet& a, const vector<int>&tuple_in
     find_match_heap(move_heap, 'A', 'S', 0, 1);
     go_to(move_heap, {'E'}, 0, 1, {0,1});
     move(move_heap, {(int) stack_tape}, -1);
-    go_to_move(move_heap, {'\u0000'}, (int) stack_tape, -1, {(int) stack_tape}, 1, 1, {0,1});
+    go_to_move(move_heap, {'\u0000'}, stack_tape, -1, {(int) stack_tape}, 1, 1, {0,1});
     link_put(move_heap, {'H'}, {0});
-    go_to(move_heap, {'}'}, (int) stack_tape, 1, {(int) stack_tape});
-    //this to make sure we don't continue
+    go_to(move_heap, {'}'}, stack_tape, 1, {(int) stack_tape});
+    //this to make sure we dont continue
     go_to(move_heap, {'E'}, 0, -1, {0,1});
     string heap_find = branch_on(move_heap, {'E'}, {0});
 
@@ -660,7 +709,8 @@ void TuringTools::heap_push_definer(IncompleteSet& a, const vector<int>&tuple_in
     go_to(push_heap_action, {'P'}, 0, 1, {0,1});
     move(push_heap_action, {0,1}, 1);
 
-    go_to(push_heap_action, {'\u0000'}, (int) stack_tape, -1, {(int) stack_tape});
+
+    go_to(push_heap_action, {'\u0000'}, stack_tape, -1, {(int) stack_tape});
 
     IncompleteSet copy_to_heap_key("copy_to_heap_key_" + to_string(counter), "copy_to_heap_key_" + to_string(counter));
     counter++;
@@ -713,7 +763,7 @@ void TuringTools::heap_push_definer(IncompleteSet& a, const vector<int>&tuple_in
     write_on(push_heap_action, {'S'}, {0}, {'\u0000'}, {0});
 
     //make nesting on working tape
-    go_to_copy(push_heap_action, {':'}, (int) stack_tape, -1, {(int) stack_tape}, 1, 1, {0, 1});
+    go_to_copy(push_heap_action, {':'}, stack_tape, -1, {(int) stack_tape}, 1, 1, {0, 1});
     link_put(push_heap_action, {'{'}, {1});
     move(push_heap_action, {0,1}, 1);
     link_put(push_heap_action, {'S'}, {0});
@@ -723,12 +773,14 @@ void TuringTools::heap_push_definer(IncompleteSet& a, const vector<int>&tuple_in
     go_to(push_heap_action, {'\u0000'}, (int) stack_tape, 1, {(int) stack_tape});
     heap_mode = false;
 
+
     link_on_multiple(a, push_heap_action, {{'A'}, {'S'}}, {tuple_indexes[0]});
 }
 
 void TuringTools::reset() {
     _instance_flag = false;
     _instance = nullptr;
+
 }
 
 void TuringTools::link_on_sequence(IncompleteSet &a, const IncompleteSet &b, const vector<char> &input_sequence,
@@ -756,9 +808,9 @@ void TuringTools::link_on_sequence(IncompleteSet &a, const IncompleteSet &b, con
         check_transition.to_state = to_string(counter+1);
         check_transition.def_move = 0;
         check_transition.input = {c};
-        check_transition.input_index = {input_index};
+        check_transition.input_index = {input_index};;
         check_transition.output = {'\u0001'};
-        check_transition.output_index = {input_index};
+        check_transition.output_index = {input_index};;
         check_transition.move = {1};
 
         IncompleteTransition fail_transition;
@@ -766,7 +818,7 @@ void TuringTools::link_on_sequence(IncompleteSet &a, const IncompleteSet &b, con
         fail_transition.to_state = final_state;
         fail_transition.def_move = 0;
         fail_transition.output = {'\u0001'};
-        fail_transition.output_index = {input_index};
+        fail_transition.output_index = {input_index};;
         fail_transition.move = {(int) input_sequence.size()-i};
 
         counter++;
@@ -789,6 +841,7 @@ void TuringTools::link_on_sequence(IncompleteSet &a, const IncompleteSet &b, con
     counter++;
 
     link(a, d);
+
 }
 
 void TuringTools::make_loop_on(IncompleteSet &a, char input, int input_index) {
@@ -807,6 +860,7 @@ void TuringTools::make_loop_on(IncompleteSet &a, char input, int input_index) {
     counter++;
     end_loop.def_move = 0;
     add(a, end_loop);
+
 }
 
 void TuringTools::make_loop_on_sequence(IncompleteSet &a, const vector<char> &input_sequence, int input_index) {
@@ -836,9 +890,9 @@ void TuringTools::make_loop_on_sequence(IncompleteSet &a, const vector<char> &in
         check_transition.to_state = to_string(counter+1);
         check_transition.def_move = 0;
         check_transition.input = {c};
-        check_transition.input_index = {input_index};
+        check_transition.input_index = {input_index};;
         check_transition.output = {'\u0001'};
-        check_transition.output_index = {input_index};
+        check_transition.output_index = {input_index};;
         check_transition.move = {1};
 
         IncompleteTransition fail_transition;
@@ -846,7 +900,7 @@ void TuringTools::make_loop_on_sequence(IncompleteSet &a, const vector<char> &in
         fail_transition.to_state = final_state;
         fail_transition.def_move = 0;
         fail_transition.output = {'\u0001'};
-        fail_transition.output_index = {input_index};
+        fail_transition.output_index = {input_index};;
         fail_transition.move = {(int) input_sequence.size()-i};
 
         counter++;
@@ -869,6 +923,7 @@ void TuringTools::make_loop_on_sequence(IncompleteSet &a, const vector<char> &in
     counter++;
 
     link(a, d);
+
 }
 
 void TuringTools::find_match_heap(IncompleteSet &a, char start_marker, char end_marker, int marker_tape, int data_tape) {
@@ -879,10 +934,11 @@ void TuringTools::find_match_heap(IncompleteSet &a, char start_marker, char end_
     IncompleteSet searcher{"heap_search_find"+ to_string(counter), "heap_search_find"+ to_string(counter)};
     counter++;
 
-    go_to(searcher, {'#'}, (int) stack_tape, -1, {(int) stack_tape});
+    go_to(searcher, {'#'}, stack_tape, -1, {(int) stack_tape});
     move(searcher, {(int) stack_tape}, -1);
 
     IncompleteSet check_match{"check_match_"+ to_string(counter), "check_match_"+ to_string(counter+1)};
+
 
     for (int j =32; j<127; j++){
         IncompleteTransition check_equal;
@@ -917,14 +973,15 @@ void TuringTools::find_match_heap(IncompleteSet &a, char start_marker, char end_
     go_to(searcher, {start_marker}, marker_tape, -1, {marker_tape, data_tape});
 
     //still needs counter
-    go_to(searcher, {'}'}, (int) stack_tape, -1, {(int) stack_tape});
-    go_to(searcher, {'{'}, (int) stack_tape, -1, {(int) stack_tape});
+    go_to(searcher, {'}'}, stack_tape, -1, {(int) stack_tape});
+    go_to(searcher, {'{'}, stack_tape, -1, {(int) stack_tape});
 
     //loop somewhere here
 
     //after loop on found
     searcher.to_state = branch;
-    go_to(searcher, {'}'}, (int) stack_tape, -1, {(int) stack_tape});
+    go_to(searcher, {'}'}, stack_tape, -1, {(int) stack_tape});
 
     link(a, searcher);
+
 }

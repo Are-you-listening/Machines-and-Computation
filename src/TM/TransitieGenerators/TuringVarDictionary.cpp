@@ -4,7 +4,9 @@
 
 #include "TuringVarDictionary.h"
 
-TuringVarDictionary::TuringVarDictionary(): TuringGenerator(4) {}
+TuringVarDictionary::TuringVarDictionary(): TuringGenerator(4) {
+
+}
 
 IncompleteSet TuringVarDictionary::getTransitions() {
     return storeVar();
@@ -25,6 +27,7 @@ IncompleteSet TuringVarDictionary::storeVar() {
     tools->move(temp, get_tuple_index(), 1);
 
     tools->link_on_multiple(result, temp, {{'O'}}, {get_tuple_index()[1]});
+
 
     tools->make_loop(result);
     result.to_state = branch;

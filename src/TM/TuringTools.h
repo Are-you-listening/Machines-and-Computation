@@ -7,10 +7,8 @@
 
 #include <iostream>
 #include <vector>
-
 #include "lib/json.hpp"
 #include "TuringProduction.h"
-
 using namespace std;
 using json = nlohmann::json;
 
@@ -22,7 +20,7 @@ public:
 };
 
 struct IncompleteTransition{
-    explicit IncompleteTransition(json &data);
+    IncompleteTransition(json &data);
     IncompleteTransition() = default;
     string state;
     string to_state;
@@ -33,6 +31,7 @@ struct IncompleteTransition{
     vector<int> output_index;
     vector<int> move;
 };
+
 
 struct IncompleteSet{
     IncompleteSet(const string& state, const string& to_state);
@@ -50,7 +49,7 @@ public:
     void go_to_clear(IncompleteSet& a, const vector<char>& symbol, int tape_index, int direction, const vector<int>& affected,
                      const vector<int>& cleared);
     void go_to_copy(IncompleteSet& a, const vector<char>& symbol, int tape_index, int direction, const vector<int>& affected,
-                     int copy_to_tape, int copy_to_direction, const vector<int>& copy_affected);
+                    int copy_to_tape, int copy_to_direction, const vector<int>& copy_affected);
     void go_to_move(IncompleteSet& a, const vector<char>& symbol, int tape_index, int direction, const vector<int>& affected,
                     int copy_to_tape, int copy_to_direction, const vector<int>& copy_affected);
 
@@ -61,7 +60,7 @@ public:
     void link_put(IncompleteSet& a, const vector<char>& output, const vector<int>& output_index);
     static void add(IncompleteSet& a, const IncompleteTransition& transition);
 
-    void push(IncompleteTransition& transition, char symbol) const;
+    void push(IncompleteTransition& transition, char symbol);
     void push(IncompleteSet& a, char symbol);
     void stack_replace(IncompleteSet& a, const vector<char>&input, const vector<char>& output);
     void move(IncompleteSet& a, const vector<int>& tape, int direction);
@@ -71,7 +70,7 @@ public:
     void link_on_sequence(IncompleteSet& a, const IncompleteSet& b, const vector<char>&input_sequence, int input_index);
     void link_on_multiple(IncompleteSet& a, const IncompleteSet& b, const vector<vector<char>>&input, const vector<int>& input_index);
     void clear_stack(IncompleteSet& a);
-    static void make_loop(IncompleteSet& a);
+    void make_loop(IncompleteSet& a);
     void make_loop_on(IncompleteSet& a, char input, int input_index);
     void make_loop_on_sequence(IncompleteSet& a, const vector<char>& input_sequence, int input_index);
     string branch_on(IncompleteSet& a, const vector<char>&input, const vector<int>& input_index);
@@ -86,11 +85,12 @@ public:
 
     //this needs to become private in future
     void find_match_heap(IncompleteSet& a, char start_marker, char end_marker, int marker_tape, int data_tape);
-
 private:
-    explicit TuringTools(unsigned int stack_tape);
+
+    TuringTools(unsigned int stack_tape);
     inline static unique_ptr<TuringTools> _instance;
     inline static bool _instance_flag;
+
 
     unsigned long goto_counter;
     unsigned long counter;
@@ -98,6 +98,10 @@ private:
     unsigned int branch_counter;
 
     bool heap_mode = false;
+
+
 };
+
+
 
 #endif //TOG_TURINGTOOLS_H
