@@ -53,22 +53,22 @@ IncompleteSet TuringVarDictionary::storeVar() {
 void TuringVarDictionary::check_defined(IncompleteSet &a) {
     IncompleteSet added("vardict_check_defined", "vardict_check_defined");
     vector<int> tuple_index = get_tuple_index();
+
+    //but S at the start of tuple tapes
     tools->write_on(added, {'\u0000'}, {tuple_index[0]}, {'S'}, {tuple_index[0]});
     tools->write_on(added, {'E'}, {tuple_index[0]}, {'S'}, {tuple_index[0]});
 
+    //go to seperator or '{'
     tools->move(added, tuple_index, 1);
     tools->go_to(added, {'S', '{', '\u0000'}, tuple_index[1], 1, tuple_index);
 
+    //set end marker
     tools->write_on(added, {'{'}, {tuple_index[1]}, {'E'}, {tuple_index[0]});
 
     IncompleteSet store_on_heap("vardict_store_on_heap", "vardict_store_on_heap");
     tools->go_to(store_on_heap, {'S', 'A'}, tuple_index[0], -1, tuple_index);
     tools->heap_push_definer(store_on_heap, get_tuple_index());
 
-    //store call func/class on working tape
-    //tools->copy_to_working(store_on_heap, get_tuple_index());
-    //tools->move(store_on_heap, {0,1}, 1);
-    //tools->link_put(store_on_heap, {'S'}, {0});
 
     tools->go_to(store_on_heap, {'E'}, tuple_index[0], 1, tuple_index);
 
@@ -80,8 +80,6 @@ void TuringVarDictionary::check_defined(IncompleteSet &a) {
 void TuringVarDictionary::remove_nesting(IncompleteSet &a) {
     tools->go_to_clear(a, {'{'}, 1, -1, {0,1}, {0,1});
     tools->link_put(a, {'\u0000'}, {1});
-
-    //tools->move(a, {0,1}, -1);
 
     tools->go_to_multiple(a, {{'A'}, {'{'}}, {0,1}, -1, {0,1});
 

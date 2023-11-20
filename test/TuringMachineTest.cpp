@@ -157,7 +157,7 @@ TEST(TuringMachineTest, TM_tools){
 
 TEST(TuringMachineTest, TM_tokenazation) {
 
-    ifstream test_file("../test/testFiles/TM_test_1.cpp");
+    ifstream test_file("../test/testFiles/TM_test_3.cpp");
     string test_string;
     cout << test_file.is_open() << endl;
     while (!test_file.eof()){
@@ -167,7 +167,7 @@ TEST(TuringMachineTest, TM_tokenazation) {
     }
 
     //test_string = "class base{}; class derived{}";
-    test_string = "class base{}; class derived{int test(){};int taco(){};}";
+    //test_string = "class base{}; class derived{int test(){};int taco(){};}";
     // not in real use yet
     TuringTools::reset();
     auto t = new TMBuilder(4);

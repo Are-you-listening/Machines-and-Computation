@@ -741,6 +741,41 @@ void TuringTools::heap_push_definer(IncompleteSet& a, const vector<int>&tuple_in
     //check if this starts with A or S
     go_to(push_heap_action, {'S', 'A'}, 0, -1, {0,1});
 
+    //do entire copy to heap
+    heap_push_working(push_heap_action, tuple_indexes);
+
+    //clear working tapes
+    go_to(push_heap_action, {'E'}, 0, 1, {0,1});
+    go_to_clear(push_heap_action, {'A', 'S'}, 0, -1, {0,1}, {0,1});
+    link_put(push_heap_action, {'\u0000'}, {1});
+
+    //store definer again on working tape
+    go_to(push_heap_action, {'!'}, (int) stack_tape, 1, {(int) stack_tape});
+    go_to(push_heap_action, {'#'}, (int) stack_tape, 1, {(int) stack_tape});
+    move(push_heap_action, {(int) stack_tape}, -1);
+    //remove 'S' markers
+    write_on(push_heap_action, {'S'}, {0}, {'\u0000'}, {0});
+
+    //make nesting on working tape
+    go_to_copy(push_heap_action, {':'}, stack_tape, -1, {(int) stack_tape}, 1, 1, {0, 1});
+    //link_put(push_heap_action, {'{'}, {1});
+    //move(push_heap_action, {0,1}, 1);
+    link_put(push_heap_action, {'S'}, {0});
+
+    //change '!' to '#'
+    go_to(push_heap_action, {'!'}, (int) stack_tape, -1, {(int) stack_tape});
+    link_put(push_heap_action, {'#'}, {(int) stack_tape});
+
+    //go back to stack mode
+    //move(push_heap_action, {(int) stack_tape}, 1);
+    go_to(push_heap_action, {'\u0000'}, (int) stack_tape, 1, {(int) stack_tape});
+    heap_mode = false;
+
+
+    link_on_multiple(a, push_heap_action, {{'A'}, {'S'}}, {tuple_indexes[0]});
+}
+
+void TuringTools::heap_push_working(IncompleteSet &push_heap_action, const vector<int> &tuple_indexes) {
     //store part on heap after insert on working tape after new data
     IncompleteSet move_heap{"move_heap_"+ to_string(counter), "move_heap_"+ to_string(counter)};
     counter++;
@@ -822,38 +857,8 @@ void TuringTools::heap_push_definer(IncompleteSet& a, const vector<int>&tuple_in
 
     //string branch_break = branch_on(fix_heap, {'E'}, {0});
     link_on_not(push_heap_action, fix_heap, {'\u0000'}, {1});
-
-    //clear working tapes
-    go_to(push_heap_action, {'E'}, 0, 1, {0,1});
-    go_to_clear(push_heap_action, {'A', 'S'}, 0, -1, {0,1}, {0,1});
-    link_put(push_heap_action, {'\u0000'}, {1});
-
-    //store definer again on working tape
-    go_to(push_heap_action, {'!'}, (int) stack_tape, 1, {(int) stack_tape});
-    go_to(push_heap_action, {'#'}, (int) stack_tape, 1, {(int) stack_tape});
-    move(push_heap_action, {(int) stack_tape}, -1);
-
-    //remove 'S' markers
-    write_on(push_heap_action, {'S'}, {0}, {'\u0000'}, {0});
-
-    //make nesting on working tape
-    go_to_copy(push_heap_action, {':'}, stack_tape, -1, {(int) stack_tape}, 1, 1, {0, 1});
-    //link_put(push_heap_action, {'{'}, {1});
-    //move(push_heap_action, {0,1}, 1);
-    link_put(push_heap_action, {'S'}, {0});
-
-    //change '!' to '#'
-    go_to(push_heap_action, {'!'}, (int) stack_tape, -1, {(int) stack_tape});
-    link_put(push_heap_action, {'#'}, {(int) stack_tape});
-
-    //go back to stack mode
-    //move(push_heap_action, {(int) stack_tape}, 1);
-    go_to(push_heap_action, {'\u0000'}, (int) stack_tape, 1, {(int) stack_tape});
-    heap_mode = false;
-
-
-    link_on_multiple(a, push_heap_action, {{'A'}, {'S'}}, {tuple_indexes[0]});
 }
+
 
 void TuringTools::reset() {
     _instance_flag = false;
@@ -1142,6 +1147,7 @@ stack_direction, int skip_tape, int skip_direction) {
     move(result, {new_stack_tape}, -1*stack_direction);
     link(a, result);
 }
+
 
 
 
