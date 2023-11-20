@@ -45,6 +45,7 @@ public:
     static TuringTools* getInstance(unsigned int stack_tape);
 
     void go_to(IncompleteSet& a, const vector<char>& symbol, int tape_index, int direction);
+    void go_to_multiple(IncompleteSet& a, const vector<vector<char>>& symbol, const vector<int>& tape_index, int direction, const vector<int>& affected);
     void go_to(IncompleteSet& a, const vector<char>& symbol, int tape_index, int direction, const vector<int>& affected);
     void go_to_clear(IncompleteSet& a, const vector<char>& symbol, int tape_index, int direction, const vector<int>& affected,
                      const vector<int>& cleared);

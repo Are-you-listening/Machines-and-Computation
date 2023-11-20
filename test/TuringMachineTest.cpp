@@ -157,7 +157,7 @@ TEST(TuringMachineTest, TM_tools){
 
 TEST(TuringMachineTest, TM_tokenazation) {
 
-    ifstream test_file("../test/testFiles/TM_test_1.cpp");
+    ifstream test_file("../test/testFiles/TM_test_2.cpp");
     string test_string;
     cout << test_file.is_open() << endl;
     while (!test_file.eof()){
@@ -196,7 +196,7 @@ TEST(TuringMachineTest, TM_tokenazation) {
             int j=0;
         }
 
-        if (i >= 7155){
+        if (i >= 64130){
             int j = 0;
 
             for (int i = 0; i < tm.getTapeAmount(); i++){

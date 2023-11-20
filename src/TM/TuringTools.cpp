@@ -81,6 +81,54 @@ void TuringTools::go_to(IncompleteSet& a, const vector<char>& symbol, int tape_i
     link(a, b);
 }
 
+void TuringTools::go_to_multiple(IncompleteSet &a, const vector<vector<char>> &symbol, const vector<int> &tape_index,
+                                 int direction, const vector<int>& affected) {
+    IncompleteSet b("go_to_"+ to_string(goto_counter) ,"go_to_"+ to_string(goto_counter+1));
+    vector<IncompleteTransition> outputs;
+
+    IncompleteTransition moving;
+    moving.state = "go_to_"+ to_string(goto_counter);
+    moving.to_state = "go_to_"+ to_string(goto_counter);
+
+    moving.def_move = 0;
+
+    moving.output_index = affected;
+
+    for (int i =0; i<moving.output_index.size(); i++){
+        char c = '\u0001';
+
+        moving.output.push_back(c);
+        moving.move.push_back(direction);
+
+    }
+
+    outputs.push_back(moving);
+    for (int i=0; i<tape_index.size(); i++){
+        for (char sym: symbol[i]){
+            IncompleteTransition arrived;
+            arrived.state = "go_to_"+ to_string(goto_counter);
+            arrived.to_state = "go_to_"+ to_string(goto_counter+1);
+
+            arrived.input = {sym};
+            arrived.input_index = {tape_index[i]};
+            arrived.def_move = 0;
+
+
+            outputs.push_back(arrived);
+        }
+    }
+
+
+    goto_counter += 2;
+
+
+
+    b.transitions.insert(b.transitions.end(), outputs.begin(), outputs.end());
+
+    link(a, b);
+
+}
+
 void TuringTools::go_to(IncompleteSet &a, const vector<char>& symbol, int tape_index, int direction, const vector<int> &affected) {
     go_to_clear(a, symbol, tape_index, direction, affected, {});
 }
@@ -1031,3 +1079,5 @@ void TuringTools::find_match_heap(IncompleteSet &a, char start_marker, char end_
     link(a, searcher);
 
 }
+
+
