@@ -86,6 +86,9 @@ public:
 
     //this needs to become private in future
     void find_match_heap(IncompleteSet& a, char start_marker, char end_marker, int marker_tape, int data_tape);
+
+    //still needs to become private in future
+    void skip_nesting(IncompleteSet& a, int new_stack_tape, int stack_direction, int skip_tape, int skip_direction);
 private:
 
     TuringTools(unsigned int stack_tape);

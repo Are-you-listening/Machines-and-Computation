@@ -834,8 +834,8 @@ void TuringTools::heap_push_definer(IncompleteSet& a, const vector<int>&tuple_in
 
     //make nesting on working tape
     go_to_copy(push_heap_action, {':'}, stack_tape, -1, {(int) stack_tape}, 1, 1, {0, 1});
-    link_put(push_heap_action, {'{'}, {1});
-    move(push_heap_action, {0,1}, 1);
+    //link_put(push_heap_action, {'{'}, {1});
+    //move(push_heap_action, {0,1}, 1);
     link_put(push_heap_action, {'S'}, {0});
 
     //change '!' to '#'
@@ -1079,5 +1079,32 @@ void TuringTools::find_match_heap(IncompleteSet &a, char start_marker, char end_
     link(a, searcher);
 
 }
+
+void TuringTools::skip_nesting(IncompleteSet &a, int new_stack_tape, int
+stack_direction, int skip_tape, int skip_direction) {
+    /*
+     * case 1: found '{' has '0' on stack -> pop 0
+     * case 2: found '{' has not '0' on stack -> push 1
+     * case 3: found '}' has '1' on stack -> pop 1
+     * case 4: found '}' has not '1' on stack -> push 0
+     * */
+
+
+    IncompleteSet result{"skip_nesting_"+ to_string(counter), "skip_nesting_"+ to_string(counter)};
+    counter++;
+
+    go_to(result, {'{', '}'}, skip_tape, skip_direction, {skip_tape});
+
+    IncompleteSet case_1{"skip_nesting_"+ to_string(counter), "skip_nesting_"+ to_string(counter)};
+    IncompleteSet case_2{"skip_nesting_"+ to_string(counter+1), "skip_nesting_"+ to_string(counter+1)};
+    IncompleteSet case_3{"skip_nesting_"+ to_string(counter+2), "skip_nesting_"+ to_string(counter+2)};
+    IncompleteSet case_4{"skip_nesting_"+ to_string(counter+3), "skip_nesting_"+ to_string(counter+3)};
+
+    IncompleteSet case_handler_1{"skip_nesting_"+ to_string(counter+4), "skip_nesting_"+ to_string(counter+4)};
+    IncompleteSet case_handler_2{"skip_nesting_"+ to_string(counter+4), "skip_nesting_"+ to_string(counter+4)};
+    counter+=6;
+
+}
+
 
 

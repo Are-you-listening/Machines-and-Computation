@@ -15,7 +15,7 @@ IncompleteSet TuringVarDictionary::getTransitions() {
 IncompleteSet TuringVarDictionary::storeVar() {
     IncompleteSet result("store_var_start", "store_var_start");
     //tools->heap_push_function(result, get_tuple_index());
-    tools->go_to(result, {'C', 'U', 'O', '\u0000', '}'}, get_tuple_index()[1], 1, {get_tuple_index()});
+    tools->go_to(result, {'C', 'U', 'O', '\u0000', '}', '{'}, get_tuple_index()[1], 1, {get_tuple_index()});
     string branch = tools->branch_on(result, {'\u0000'}, {get_tuple_index()[1]});
 
     IncompleteSet store_call{"vardict_store_call",  "vardict_store_call"};
@@ -32,6 +32,15 @@ IncompleteSet TuringVarDictionary::storeVar() {
     remove_nesting(remove_nest);
     tools->move(remove_nest, get_tuple_index(), 1);
     tools->link_on(result, remove_nest, {'}'}, {get_tuple_index()[1]});
+
+    IncompleteSet add_nest{"vardict_add_nesting", "vardict_add_nesting"};
+    tools->link_put(add_nest, {'{'}, {1});
+    tools->write_on(add_nest, {'S'}, {0}, {'\u0000'}, {0});
+    tools->move(add_nest, {0,1}, 1);
+    tools->link_put(add_nest, {'S'}, {0});
+
+    tools->move(add_nest, get_tuple_index(), 1);
+    tools->link_on(result, add_nest, {'{'}, {get_tuple_index()[1]});
 
     tools->make_loop(result);
     result.to_state = branch;
@@ -71,7 +80,9 @@ void TuringVarDictionary::check_defined(IncompleteSet &a) {
 void TuringVarDictionary::remove_nesting(IncompleteSet &a) {
     tools->go_to_clear(a, {'{'}, 1, -1, {0,1}, {0,1});
     tools->link_put(a, {'\u0000'}, {1});
-    tools->move(a, {0,1}, -1);
+
+    //tools->move(a, {0,1}, -1);
+
     tools->go_to_multiple(a, {{'A'}, {'{'}}, {0,1}, -1, {0,1});
 
     tools->move(a, {0,1}, 1);
