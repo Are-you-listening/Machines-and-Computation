@@ -67,6 +67,7 @@ set(CodeFiles
         src/Orchestrator.h
 
         ${TuringCode}
+        src/CFGConstructor.cpp
         src/CFGConstructor.h
 )
 
