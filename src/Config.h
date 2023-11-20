@@ -52,6 +52,36 @@ public:
      * @return
      */
     static Config *getConfig();
+
+    /**
+     * Simple getter
+     * @return
+     */
+    [[nodiscard]] int getMaxNesting() const;
+
+    /**
+     * Simple getter
+     * @return
+     */
+    [[nodiscard]] int getSplitNesting() const;
+
+    /**
+     * Simple getter
+     * @return
+     */
+    [[nodiscard]] int getIfElseNesting() const;
+
+    /**
+     * Simple getter
+     * @return
+     */
+    [[nodiscard]] bool isThreading() const;
+
+    /**
+     * Simple getter
+     * @return
+     */
+    [[nodiscard]] bool isStaticMemory() const;
 };
 
 

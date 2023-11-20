@@ -30,3 +30,23 @@ Config * Config::getConfig() {
     }
     return init;
 }
+
+int Config::getMaxNesting() const {
+    return max_nesting;
+}
+
+int Config::getSplitNesting() const {
+    return split_nesting;
+}
+
+int Config::getIfElseNesting() const {
+    return ifElse_nesting;
+}
+
+bool Config::isThreading() const {
+    return threading;
+}
+
+bool Config::isStaticMemory() const {
+    return staticMemory;
+}
