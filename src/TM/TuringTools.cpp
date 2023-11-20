@@ -751,6 +751,8 @@ void TuringTools::heap_push_definer(IncompleteSet& a, const vector<int>&tuple_in
     move(push_heap_action, {(int) stack_tape}, -1);
     link_put(push_heap_action, {'}'}, {(int) stack_tape});
     move(push_heap_action, {(int) stack_tape}, -1);
+    link_put(push_heap_action, {'#'}, {(int) stack_tape});
+    move(push_heap_action, {(int) stack_tape}, -1);
     link_put(push_heap_action, {'{'}, {(int) stack_tape});
     move(push_heap_action, {(int) stack_tape}, -1);
     link_put(push_heap_action, {'#'}, {(int) stack_tape});
@@ -989,16 +991,34 @@ void TuringTools::find_match_heap(IncompleteSet &a, char start_marker, char end_
         check_match.transitions.push_back(end_check);
     }
 
+
     counter+=2;
 
     link(searcher, check_match);
     move(searcher, {marker_tape, data_tape}, 1);
+
+
     string branch = branch_on(searcher, {end_marker}, {marker_tape});
-    go_to(searcher, {start_marker}, marker_tape, -1, {marker_tape, data_tape});
+    //go_to(searcher, {start_marker}, marker_tape, -1, {marker_tape, data_tape});
+
+    //recreate search loop
+    move(searcher, {marker_tape, data_tape}, -1);
+
+    IncompleteSet change_stack_pos{"change_stack_pos_"+ to_string(counter), "change_stack_pos_"+ to_string(counter)};
+    counter++;
+    go_to(change_stack_pos, {'#'}, stack_tape, -1, {(int) stack_tape});
+    go_to(change_stack_pos, {'}'}, stack_tape, -1, {(int) stack_tape});
+    move(change_stack_pos, {marker_tape, data_tape}, 1);
+    //make_loop(change_stack_pos);
+
+    link_on(searcher, change_stack_pos, {'{'}, {data_tape});
+
+    make_loop_on(searcher, '}', stack_tape);
 
     //still needs counter
     go_to(searcher, {'}'}, stack_tape, -1, {(int) stack_tape});
     go_to(searcher, {'{'}, stack_tape, -1, {(int) stack_tape});
+    move(searcher, {(int) stack_tape}, -1);
 
     //loop somewhere here
 
