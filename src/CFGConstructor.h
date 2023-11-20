@@ -1,14 +1,34 @@
 //
-// Created by watson on 11/19/23.
+// Created by watson on 11/20/23.
 //
 
 #ifndef TOG_CFGCONSTRUCTOR_H
 #define TOG_CFGCONSTRUCTOR_H
 
-//Symbols: {,},F,I,E,e, C, V, D, V1, D1, ... Vn, Dn
-class CFGConstructor {
+#include <string>
+#include <vector>
+#include <map>
 
-};
+#include "Config.h"
+#include "CFG.h"
+
+using namespace std;
+
+/**
+ * //All used Terminals from Tokenisation
+ * @param {
+ * @param }
+ * @param F, Function call
+ * @param C, general Code
+ * @param I, If Statement
+ * @param E, Else Statement
+ * @param e, else if Statement
+ * @param D, Declaration
+ * @param V, Variable
+ */
+static vector<string> T{"{","}","F","C","I","E","e","D","V"};
+
+CFG* createCFG();
 
 
 #endif //TOG_CFGCONSTRUCTOR_H
