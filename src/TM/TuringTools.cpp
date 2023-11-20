@@ -749,8 +749,12 @@ void TuringTools::heap_push_definer(IncompleteSet& a, const vector<int>&tuple_in
     find_match_heap(move_heap, 'A', 'S', 0, 1);
 
     //go to end of nesting
-    //TODO: still need to count nestings
-    go_to(move_heap, {'{'}, stack_tape, -1, {(int) stack_tape});
+    //this will end on '{' at the end of the nesting
+    go_to(move_heap, {'E'}, 0, 1, {0,1});
+    move(move_heap, {0,1}, 1);
+    skip_nesting(move_heap, 1, 1, stack_tape, -1);
+    go_to(move_heap, {'A'}, 0, -1, {0,1});
+
     move(move_heap, {(int) stack_tape}, 1);
 
     go_to(move_heap, {'E'}, 0, 1, {0,1});
@@ -1054,9 +1058,11 @@ void TuringTools::find_match_heap(IncompleteSet &a, char start_marker, char end_
 
     IncompleteSet change_stack_pos{"change_stack_pos_"+ to_string(counter), "change_stack_pos_"+ to_string(counter)};
     counter++;
+
+    //point to first character withing the nesting
     go_to(change_stack_pos, {'#'}, stack_tape, -1, {(int) stack_tape});
-    //TODO: find '}' will need to be removed in future, so we can make defined, function multi-compatible
-    go_to(change_stack_pos, {'}'}, stack_tape, -1, {(int) stack_tape});
+    move(change_stack_pos, {(int) stack_tape}, -1);
+
     move(change_stack_pos, {marker_tape, data_tape}, 1);
 
     link_on(searcher, change_stack_pos, {'{'}, {data_tape});

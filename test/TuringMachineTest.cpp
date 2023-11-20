@@ -167,7 +167,7 @@ TEST(TuringMachineTest, TM_tokenazation) {
     }
 
     //test_string = "class base{}; class derived{}";
-    test_string = "class base{}; class derived{int test(){};}";
+    test_string = "class base{}; class derived{int test(){};int taco(){};}";
     // not in real use yet
     TuringTools::reset();
     auto t = new TMBuilder(4);
