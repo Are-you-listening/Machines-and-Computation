@@ -167,7 +167,7 @@ TEST(TuringMachineTest, TM_tokenazation) {
     }
 
     //test_string = "class base{}; class derived{}";
-
+    test_string = "class base{}; class derived{int test(){};}";
     // not in real use yet
     TuringTools::reset();
     auto t = new TMBuilder(4);
@@ -196,7 +196,7 @@ TEST(TuringMachineTest, TM_tokenazation) {
             int j=0;
         }
 
-        if (i >= 7600){
+        if (i >= 24640){
             int j = 0;
 
             for (int i = 0; i < tm.getTapeAmount(); i++){

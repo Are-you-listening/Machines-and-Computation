@@ -1064,14 +1064,15 @@ void TuringTools::find_match_heap(IncompleteSet &a, char start_marker, char end_
     make_loop_on(searcher, '}', stack_tape);
 
 
-    //TODO: still need to count nestings
-    go_to(searcher, {'}'}, stack_tape, -1, {(int) stack_tape});
-    go_to(searcher, {'{'}, stack_tape, -1, {(int) stack_tape});
-    move(searcher, {(int) stack_tape}, -1);
 
+    go_to(searcher, {'\u0000'}, 1, 1, {0,1});
+    move(searcher, {0,1}, 1);
+    //skip nesting that we don't care about
+    skip_nesting(searcher, 1, 1, stack_tape,-1);
+
+    go_to(searcher, {start_marker}, 0, -1, {0,1});
     //loop somewhere here
-    //TODO: make loop to search again
-
+    make_loop(searcher);
     //after loop on found
     searcher.to_state = branch;
     go_to(searcher, {'}'}, stack_tape, -1, {(int) stack_tape});
@@ -1088,7 +1089,8 @@ stack_direction, int skip_tape, int skip_direction) {
      * case 3: found '}' has '1' on stack -> pop 1
      * case 4: found '}' has not '1' on stack -> push 0
      * */
-
+    move(a, {new_stack_tape}, stack_direction);
+    link_put(a, {'#'}, {new_stack_tape});
 
     IncompleteSet result{"skip_nesting_"+ to_string(counter), "skip_nesting_"+ to_string(counter)};
     counter++;
@@ -1101,9 +1103,38 @@ stack_direction, int skip_tape, int skip_direction) {
     IncompleteSet case_4{"skip_nesting_"+ to_string(counter+3), "skip_nesting_"+ to_string(counter+3)};
 
     IncompleteSet case_handler_1{"skip_nesting_"+ to_string(counter+4), "skip_nesting_"+ to_string(counter+4)};
-    IncompleteSet case_handler_2{"skip_nesting_"+ to_string(counter+4), "skip_nesting_"+ to_string(counter+4)};
+    IncompleteSet case_handler_2{"skip_nesting_"+ to_string(counter+5), "skip_nesting_"+ to_string(counter+5)};
     counter+=6;
 
+    link_put(case_1, {'\u0000'}, {new_stack_tape});
+    move(case_1, {new_stack_tape}, -1*stack_direction);
+    write_on(case_1, {'#'}, {new_stack_tape}, {'\u0000'}, {new_stack_tape});
+
+    move(case_2, {new_stack_tape}, stack_direction);
+    link_put(case_2, {'1'}, {new_stack_tape});
+
+    link_put(case_3, {'\u0000'}, {new_stack_tape});
+    move(case_3, {new_stack_tape}, -1*stack_direction);
+    write_on(case_3, {'#'}, {new_stack_tape}, {'\u0000'}, {new_stack_tape});
+
+    move(case_4, {new_stack_tape}, stack_direction);
+    link_put(case_4, {'0'}, {new_stack_tape});
+
+    link_on(case_handler_1, case_1, {'0'}, {new_stack_tape});
+    link_on_multiple(case_handler_1, case_2, {{'1'}, {'#'}}, {new_stack_tape});
+
+    link_on(case_handler_2, case_3, {'1'}, {new_stack_tape});
+    link_on_multiple(case_handler_2, case_4, {{'0'}, {'#'}}, {new_stack_tape});
+
+    link_on(result, case_handler_1, {'{'}, {skip_tape});
+    link_on(result, case_handler_2, {'}'}, {skip_tape});
+
+    string loop_end = branch_on(result, {'\u0000'}, {new_stack_tape});
+    move(result, {skip_tape}, skip_direction);
+    make_loop(result);
+    result.to_state = loop_end;
+    move(result, {new_stack_tape}, -1*stack_direction);
+    link(a, result);
 }
 
 
