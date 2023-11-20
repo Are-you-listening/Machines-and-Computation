@@ -4,7 +4,6 @@
 
 #ifndef TOG_TURINGVARDICTIONARY_H
 #define TOG_TURINGVARDICTIONARY_H
-
 #include "TuringGenerator.h"
 
 class TuringVarDictionary: public TuringGenerator{
