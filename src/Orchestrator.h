@@ -7,6 +7,8 @@
 
 #include <string>
 
+#include "CFGConstructor.h"
+
 using namespace std;
 
 /**
@@ -18,7 +20,7 @@ private:
     static string file;
 
 public:
-
+    Orchestrator();
 };
 
 #endif //TOG_ORCHESTRATOR_H
