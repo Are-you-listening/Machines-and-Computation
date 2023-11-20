@@ -701,7 +701,7 @@ void TuringTools::heap_push_definer(IncompleteSet& a, const vector<int>&tuple_in
     find_match_heap(move_heap, 'A', 'S', 0, 1);
 
     //go to end of nesting
-    //still need to count nestings
+    //TODO: still need to count nestings
     go_to(move_heap, {'{'}, stack_tape, -1, {(int) stack_tape});
     move(move_heap, {(int) stack_tape}, 1);
 
@@ -1007,20 +1007,22 @@ void TuringTools::find_match_heap(IncompleteSet &a, char start_marker, char end_
     IncompleteSet change_stack_pos{"change_stack_pos_"+ to_string(counter), "change_stack_pos_"+ to_string(counter)};
     counter++;
     go_to(change_stack_pos, {'#'}, stack_tape, -1, {(int) stack_tape});
+    //TODO: find '}' will need to be removed in future, so we can make defined, function multi-compatible
     go_to(change_stack_pos, {'}'}, stack_tape, -1, {(int) stack_tape});
     move(change_stack_pos, {marker_tape, data_tape}, 1);
-    //make_loop(change_stack_pos);
 
     link_on(searcher, change_stack_pos, {'{'}, {data_tape});
 
     make_loop_on(searcher, '}', stack_tape);
 
-    //still needs counter
+
+    //TODO: still need to count nestings
     go_to(searcher, {'}'}, stack_tape, -1, {(int) stack_tape});
     go_to(searcher, {'{'}, stack_tape, -1, {(int) stack_tape});
     move(searcher, {(int) stack_tape}, -1);
 
     //loop somewhere here
+    //TODO: make loop to search again
 
     //after loop on found
     searcher.to_state = branch;
