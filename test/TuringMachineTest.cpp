@@ -179,7 +179,7 @@ TEST(TuringMachineTest, TM_tokenazation) {
     tm.load_input(test_string, 1);
 
     int halted_time = -1;
-    for (int i = 0; i<11000; i++){
+    for (int i = 0; i<13000; i++){
 
 
         if (tm.isHalted()){
@@ -192,11 +192,11 @@ TEST(TuringMachineTest, TM_tokenazation) {
         tm.move();
 
 
-        if (tm.getCurrentState() == "264"){
+        if (tm.getCurrentState() == "37"){
             int j=0;
         }
 
-        if (i >= 71800){
+        if (i >= 61700){
             int j = 0;
 
             for (int i = 0; i < tm.getTapeAmount(); i++){

@@ -875,11 +875,13 @@ void TuringTools::heap_push_definer(IncompleteSet& a, const vector<int>&tuple_in
     go_to(push_heap_action, {'!'}, (int) stack_tape, 1, {(int) stack_tape});
     go_to(push_heap_action, {'#'}, (int) stack_tape, 1, {(int) stack_tape});
     move(push_heap_action, {(int) stack_tape}, -1);
-    //remove 'S' markers
-    write_on(push_heap_action, {'S'}, {0}, {'\u0000'}, {0});
+
+
 
     //make nesting on working tape
     if (function){
+        //remove 'S' markers
+        write_on(push_heap_action, {'S'}, {0}, {'\u0000'}, {0});
         go_to_copy(push_heap_action, {':'}, stack_tape, -1, {(int) stack_tape}, 1, 1, {0, 1});
         link_put(push_heap_action, {'S'}, {0});
     }

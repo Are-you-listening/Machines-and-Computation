@@ -174,6 +174,10 @@ IncompleteSet TuringTokenizer::tokenize_runner_productions() {
                 tools->push(class_checker, 'C');
                 tools->link_on_sequence(spatie_pusher, class_checker, {'c','l','a','s','s', ' '}, 1);
 
+                //IncompleteSet new_checker("tokenize_new_checker"+ to_string(i), "tokenize_new_checker"+ to_string(i));
+                //tools->push(new_checker, 'B');
+                //tools->link_on_sequence(spatie_pusher, new_checker, {'n','e','w', ' '}, 1);
+
                 //sets S on stack if no other S is before
                 tools->stack_replace(spatie_pusher, {'*'}, {'P'});
                 tools->stack_replace(spatie_pusher, {'A'}, {'P'});

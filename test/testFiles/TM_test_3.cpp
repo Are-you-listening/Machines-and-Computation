@@ -2,15 +2,16 @@
 class Base{
 public:
     int kikker();
-    int test(){int b = 0;}
+    int test(){int b= 0;}
 private:
-    unsigned int a = 0;
+    unsigned int a= 0;
 };
 
 int Base::kikker(){
-    a = 5;
+    a= 5;
 }
 
 int main(){
-    Base* b = nullptr;
+    Base* b= nullptr;
+    int c;
 }
