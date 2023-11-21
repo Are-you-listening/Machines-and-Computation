@@ -1057,7 +1057,7 @@ void TuringTools::link_on_sequence(IncompleteSet &a, const IncompleteSet &b, con
     d.transitions.push_back(link_back);
     d.to_state = final_state;
 
-    counter++;
+    counter+=2;
 
     link(a, d);
 
@@ -1282,6 +1282,15 @@ stack_direction, int skip_tape, int skip_direction) {
     result.to_state = loop_end;
     move(result, {new_stack_tape}, -1*stack_direction);
     link(a, result);
+}
+
+void TuringTools::push_on_sequence(IncompleteSet &a, const vector<char> &input_sequence,
+                                   int input_index, char push_char) {
+    IncompleteSet pusher("push_on_sequence"+ to_string(counter), "push_on_sequence"+ to_string(counter));
+    counter++;
+    push(pusher, push_char);
+    link_on_sequence(a, pusher, input_sequence, input_index);
+
 }
 
 

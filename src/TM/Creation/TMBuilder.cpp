@@ -3,7 +3,7 @@
 //
 
 #include "TMBuilder.h"
-
+#include "chrono"
 TMBuilder::TMBuilder(unsigned int tuple_size): tapes{tuple_size+5} {
     tools = TuringTools::getInstance(tapes-1);
 }
@@ -35,7 +35,6 @@ json TMBuilder::generateTM() {
     TuringVarDictionary vardict{};
 
     tools->link(program, vardict.getTransitions());
-
 
     //IncompleteSet test("test1", "test1");
     //tools->push(test, 'B');

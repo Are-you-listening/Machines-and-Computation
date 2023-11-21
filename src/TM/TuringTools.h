@@ -92,6 +92,8 @@ public:
 
     //still needs to become private in future
     void skip_nesting(IncompleteSet& a, int new_stack_tape, int stack_direction, int skip_tape, int skip_direction);
+
+    void push_on_sequence(IncompleteSet& a, const vector<char>&input_sequence, int input_index, char push_char);
 private:
 
     TuringTools(unsigned int stack_tape);
