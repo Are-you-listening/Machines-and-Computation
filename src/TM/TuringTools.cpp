@@ -727,8 +727,6 @@ void TuringTools::heap_push_definer(IncompleteSet& a, const vector<int>&tuple_in
     IncompleteSet push_heap_action{"push_heap_"+ to_string(counter), "push_heap_"+ to_string(counter)};
     counter++;
 
-
-
     copy_to_working(push_heap_action, tuple_indexes);
 
     //from here on we will copy data from working tape and put it on the heap
