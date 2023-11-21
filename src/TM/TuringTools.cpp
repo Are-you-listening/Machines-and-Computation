@@ -727,16 +727,60 @@ void TuringTools::heap_push_definer(IncompleteSet& a, const vector<int>&tuple_in
     IncompleteSet push_heap_action{"push_heap_"+ to_string(counter), "push_heap_"+ to_string(counter)};
     counter++;
 
-    //go to heap mode
-    go_to(push_heap_action, {'*'}, stack_tape, -1, {(int) stack_tape});
-    heap_mode = true;
+
 
     copy_to_working(push_heap_action, tuple_indexes);
 
     //from here on we will copy data from working tape and put it on the heap
-
     go_to(push_heap_action, {' '}, 1, -1, {0,1});
     link_put(push_heap_action, {'P'}, {0});
+
+    //manipulate hierarchy in case of object type
+    //make sure class::func equals class{func}
+    IncompleteSet object_hierarchy{"object_hierarchy_"+ to_string(counter), "object_hierarchy_"+ to_string(counter)};
+    counter++;
+    //copy class object to stack
+    move(object_hierarchy, {0,1}, 1);
+    go_to_copy(object_hierarchy, {':'}, 1, 1, {0, 1}, stack_tape, 1, {(int) stack_tape});
+    push(object_hierarchy, '{');
+
+    //copy return type on stack
+    go_to(object_hierarchy, {'A', 'S'}, 0, -1, {0,1});
+    go_to_copy(object_hierarchy, {' '}, 1, 1, {0, 1}, stack_tape, 1, {(int) stack_tape});
+    push(object_hierarchy, ' ');
+    go_to(object_hierarchy, {'E'}, 0, 1, {0,1});
+    go_to(object_hierarchy, {':'}, 1, -1, {0,1});
+    move(object_hierarchy, {0,1}, 1);
+    go_to_copy(object_hierarchy, {'\u0000'}, 1, 1, {0, 1}, stack_tape, 1, {(int) stack_tape});
+    clear_working(object_hierarchy);
+
+    //read data from bottom till top of stack (used as fifo)
+    //use '#' in case return type is a ptr
+    go_to(object_hierarchy, {'#'}, stack_tape, -1, {(int) stack_tape});
+    move(object_hierarchy, {(int) stack_tape}, 2);
+    go_to_move(object_hierarchy, {'\u0000'}, stack_tape, 1, {(int) stack_tape}, 1, 1, {0, 1});
+    link_put(object_hierarchy, {'E'}, {0});
+
+    go_to(object_hierarchy, {'*'}, stack_tape, -1, {(int) stack_tape});
+    move(object_hierarchy, {(int) stack_tape}, 1);
+
+    //but old markings
+    go_to(object_hierarchy, {' '}, 1, -1, {0,1});
+    link_put(object_hierarchy, {'P'}, {0});
+    go_to(object_hierarchy, {'{'}, 1, -1, {0,1});
+    move(object_hierarchy, {0,1}, 1);
+    link_put(object_hierarchy, {'S'}, {0});
+
+    //push on stack the fact that this is an object, and on bracket close we need to double remove nesting
+    push(object_hierarchy, 'O');
+
+    //string object_break = branch_on(object_hierarchy, {'O'}, {tuple_indexes[1]});
+    link_on(push_heap_action, object_hierarchy, {'O'}, {tuple_indexes[1]});
+
+
+    //go to heap mode
+    go_to(push_heap_action, {'*'}, stack_tape, -1, {(int) stack_tape});
+    heap_mode = true;
 
     //check if this starts with A or S
     go_to(push_heap_action, {'S', 'A'}, 0, -1, {0,1});
@@ -744,10 +788,7 @@ void TuringTools::heap_push_definer(IncompleteSet& a, const vector<int>&tuple_in
     //do entire copy to heap
     heap_push_working(push_heap_action, tuple_indexes);
 
-    //clear working tapes
-    go_to(push_heap_action, {'E'}, 0, 1, {0,1});
-    go_to_clear(push_heap_action, {'A', 'S'}, 0, -1, {0,1}, {0,1});
-    link_put(push_heap_action, {'\u0000'}, {1});
+    clear_working(push_heap_action);
 
     //store definer again on working tape
     go_to(push_heap_action, {'!'}, (int) stack_tape, 1, {(int) stack_tape});
@@ -774,6 +815,14 @@ void TuringTools::heap_push_definer(IncompleteSet& a, const vector<int>&tuple_in
 
     link_on_multiple(a, push_heap_action, {{'A'}, {'S'}}, {tuple_indexes[0]});
 }
+
+void TuringTools::clear_working(IncompleteSet &a) {
+    //clear working tapes
+    go_to(a, {'E'}, 0, 1, {0,1});
+    go_to_clear(a, {'A', 'S'}, 0, -1, {0,1}, {0,1});
+    link_put(a, {'\u0000'}, {1});
+}
+
 
 void TuringTools::heap_push_working(IncompleteSet &push_heap_action, const vector<int> &tuple_indexes) {
     //store part on heap after insert on working tape after new data
@@ -1147,6 +1196,7 @@ stack_direction, int skip_tape, int skip_direction) {
     move(result, {new_stack_tape}, -1*stack_direction);
     link(a, result);
 }
+
 
 
 

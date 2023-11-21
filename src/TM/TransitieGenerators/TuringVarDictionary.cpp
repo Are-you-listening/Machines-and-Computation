@@ -15,12 +15,12 @@ IncompleteSet TuringVarDictionary::getTransitions() {
 IncompleteSet TuringVarDictionary::storeVar() {
     IncompleteSet result("store_var_start", "store_var_start");
     //tools->heap_push_function(result, get_tuple_index());
-    tools->go_to(result, {'C', 'U', 'O', '\u0000', '}', '{'}, get_tuple_index()[1], 1, {get_tuple_index()});
+    tools->go_to(result, {'C', 'U', 'O', '\u0000', '}', '{', 'O'}, get_tuple_index()[1], 1, {get_tuple_index()});
     string branch = tools->branch_on(result, {'\u0000'}, {get_tuple_index()[1]});
 
     IncompleteSet store_call{"vardict_store_call",  "vardict_store_call"};
     check_defined(store_call);
-    tools->link_on_multiple(result, store_call, {{'C'}, {'U'}}, {get_tuple_index()[1]});
+    tools->link_on_multiple(result, store_call, {{'C'}, {'U'}, {'O'}}, {get_tuple_index()[1]});
 
     //temp just prevents inf loop if token is 'O' (as a placeholder)
     IncompleteSet temp{"vardict_temp",  "vardict_temp"};
@@ -74,13 +74,27 @@ void TuringVarDictionary::check_defined(IncompleteSet &a) {
 
     tools->link_on(added, store_on_heap, {'E'}, {tuple_index[0]});
 
-    tools->link_on_multiple(a, added, {{'U'}, {'C'}}, {tuple_index[1]});
+    tools->link_on_multiple(a, added, {{'U'}, {'C'}, {'O'}}, {tuple_index[1]});
 }
 
 void TuringVarDictionary::remove_nesting(IncompleteSet &a) {
+    //clear nesting bracket itself, and all within
     tools->go_to_clear(a, {'{'}, 1, -1, {0,1}, {0,1});
     tools->link_put(a, {'\u0000'}, {1});
 
+    //check if stack has 'O' charcter saying we need to pop
+    tools->move(a, {(int) tapes-1}, -1);
+
+    IncompleteSet clear_again{"vardict_clear_again", "vardict_clear_again"};
+    tools->move(clear_again, {0,1}, -1);
+    tools->go_to_clear(clear_again, {'{'}, 1, -1, {0,1}, {0,1});
+    tools->link_put(clear_again, {'\u0000'}, {1});
+    tools->link_put(clear_again, {'\u0000'}, {(int) tapes-1});
+
+    tools->link_on(a, clear_again, {'O'}, {(int) tapes-1});
+    tools->move(a, {(int) tapes-1}, 1);
+
+    //clears what is before cleared bracket
     tools->go_to_multiple(a, {{'A'}, {'{'}}, {0,1}, -1, {0,1});
 
     tools->move(a, {0,1}, 1);

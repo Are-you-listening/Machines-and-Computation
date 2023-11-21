@@ -7,7 +7,7 @@ private:
     unsigned int a = 0;
 };
 
-int Base::kikker() {
+int Base::kikker(){
     a = 5;
 }
 

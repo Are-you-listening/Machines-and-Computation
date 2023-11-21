@@ -82,6 +82,7 @@ public:
     void heap_push_working(IncompleteSet& a, const vector<int>&tuple_indexes);
 
     void copy_to_working(IncompleteSet& a, const vector<int>&tuple_indexes);
+    void clear_working(IncompleteSet& a);
 
     static void reset();
 
