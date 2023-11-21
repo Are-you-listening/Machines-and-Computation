@@ -65,7 +65,7 @@ void TuringVarDictionary::check_defined(IncompleteSet &a) {
 
     IncompleteSet store_on_heap("vardict_store_on_heap", "vardict_store_on_heap");
     tools->go_to(store_on_heap, {'S', 'A'}, tuple_index[0], -1, tuple_index);
-    tools->heap_push_definer(store_on_heap, get_tuple_index());
+    tools->heap_push_definer(store_on_heap, get_tuple_index(), true);
 
 
     tools->go_to(store_on_heap, {'E'}, tuple_index[0], 1, tuple_index);
@@ -89,7 +89,7 @@ void TuringVarDictionary::store_defined(IncompleteSet &a) {
 
     IncompleteSet store_on_heap("vardict_store_data_on_heap", "vardict_store_data_on_heap");
     tools->go_to(store_on_heap, {'S', 'A'}, tuple_index[0], -1, tuple_index);
-    tools->heap_push_definer(store_on_heap, get_tuple_index());
+    tools->heap_push_definer(store_on_heap, get_tuple_index(), false);
 
 
     tools->go_to(store_on_heap, {'E'}, tuple_index[0], 1, tuple_index);

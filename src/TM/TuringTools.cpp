@@ -682,9 +682,16 @@ void TuringTools::write_on(IncompleteSet &a, const vector<char> &input, const ve
 }
 
 void TuringTools::copy_to_working(IncompleteSet &a, const vector<int> &tuple_indexes) {
+    if (heap_mode){
+        throw "heap mode is not allowed";
+    }
+
     //copy from marker 'A' or 'S' till marker 'E'
     IncompleteSet copier{"copy_to_working_main_"+ to_string(counter), "copy_to_working_main_"+ to_string(counter)};
     counter++;
+
+    //make sure we don't copy spaces at the start
+    push(copier, 'P');
 
     IncompleteSet copier_do{"copier_do_"+ to_string(counter), "copier_do_"+ to_string(counter)};
     counter++;
@@ -698,13 +705,29 @@ void TuringTools::copy_to_working(IncompleteSet &a, const vector<int> &tuple_ind
             continue;
         }
 
+        //copy_to_working_check has as task to not copy the prefix spaces to working
+        IncompleteSet copy_to_working_check{"copy_to_working_check_" + to_string(counter), "copy_to_working_check_" + to_string(counter)};
+        counter++;
+
         IncompleteSet copy_to_working("copy_to_working_" + to_string(counter), "copy_to_working_" + to_string(counter));
         counter++;
+
         //copy to start_tapes
         copy(copy_to_working, tuple_indexes[i], 1);
         move(copy_to_working, {0, 1}, 1);
 
-        link_on_not(copier_do_sub, copy_to_working, {'\u0000'}, {tuple_indexes[i]});
+        move(copy_to_working_check, {(int) stack_tape}, -1);
+        IncompleteSet pop_p{"copy_op_"+ to_string(counter), "copy_op_"+ to_string(counter)};
+        counter++;
+
+        write_on(pop_p, {'P'}, {(int) stack_tape}, {'\u0000'}, {(int) stack_tape});
+
+        link_on_not(copy_to_working_check, pop_p, {' '}, {tuple_indexes[i]});
+
+        link_on_not(copy_to_working_check, copy_to_working, {'P'}, {(int) stack_tape});
+        go_to(copy_to_working_check, {'\u0000'},(int) stack_tape, 1, {(int) stack_tape});
+
+        link_on_not(copier_do_sub, copy_to_working_check, {'\u0000'}, {tuple_indexes[i]});
 
     }
 
@@ -717,12 +740,16 @@ void TuringTools::copy_to_working(IncompleteSet &a, const vector<int> &tuple_ind
     link(copier, copier_do);
     go_to(copier, {'S', 'A'}, tuple_indexes[0], -1, tuple_indexes);
     link_put(copier, {'E'}, {0});
+
+    //clear spaces check stack
+    clear_stack(copier);
+
     link(a,copier);
 
 }
 
 
-void TuringTools::heap_push_definer(IncompleteSet& a, const vector<int>&tuple_indexes) {
+void TuringTools::heap_push_definer(IncompleteSet& a, const vector<int>&tuple_indexes, bool function) {
     //requires that string that is marked is seperated by at least 1 space
     IncompleteSet push_heap_action{"push_heap_"+ to_string(counter), "push_heap_"+ to_string(counter)};
     counter++;
@@ -784,7 +811,7 @@ void TuringTools::heap_push_definer(IncompleteSet& a, const vector<int>&tuple_in
     go_to(push_heap_action, {'S', 'A'}, 0, -1, {0,1});
 
     //do entire copy to heap
-    heap_push_working(push_heap_action, tuple_indexes);
+    heap_push_working(push_heap_action, tuple_indexes, function);
 
     clear_working(push_heap_action);
 
@@ -796,10 +823,10 @@ void TuringTools::heap_push_definer(IncompleteSet& a, const vector<int>&tuple_in
     write_on(push_heap_action, {'S'}, {0}, {'\u0000'}, {0});
 
     //make nesting on working tape
-    go_to_copy(push_heap_action, {':'}, stack_tape, -1, {(int) stack_tape}, 1, 1, {0, 1});
-    //link_put(push_heap_action, {'{'}, {1});
-    //move(push_heap_action, {0,1}, 1);
-    link_put(push_heap_action, {'S'}, {0});
+    if (function){
+        go_to_copy(push_heap_action, {':'}, stack_tape, -1, {(int) stack_tape}, 1, 1, {0, 1});
+        link_put(push_heap_action, {'S'}, {0});
+    }
 
     //change '!' to '#'
     go_to(push_heap_action, {'!'}, (int) stack_tape, -1, {(int) stack_tape});
@@ -822,7 +849,7 @@ void TuringTools::clear_working(IncompleteSet &a) {
 }
 
 
-void TuringTools::heap_push_working(IncompleteSet &push_heap_action, const vector<int> &tuple_indexes) {
+void TuringTools::heap_push_working(IncompleteSet &push_heap_action, const vector<int> &tuple_indexes, bool function) {
     //store part on heap after insert on working tape after new data
     IncompleteSet move_heap{"move_heap_"+ to_string(counter), "move_heap_"+ to_string(counter)};
     counter++;
@@ -883,14 +910,18 @@ void TuringTools::heap_push_working(IncompleteSet &push_heap_action, const vecto
     //put right syntax in place
     link_put(push_heap_action, {'!'}, {(int) stack_tape});
     move(push_heap_action, {(int) stack_tape}, -1);
-    link_put(push_heap_action, {'}'}, {(int) stack_tape});
-    move(push_heap_action, {(int) stack_tape}, -1);
-    link_put(push_heap_action, {'#'}, {(int) stack_tape});
-    move(push_heap_action, {(int) stack_tape}, -1);
-    link_put(push_heap_action, {'{'}, {(int) stack_tape});
-    move(push_heap_action, {(int) stack_tape}, -1);
-    link_put(push_heap_action, {'#'}, {(int) stack_tape});
-    move(push_heap_action, {(int) stack_tape}, -1);
+    if (function){
+        link_put(push_heap_action, {'}'}, {(int) stack_tape});
+        move(push_heap_action, {(int) stack_tape}, -1);
+        link_put(push_heap_action, {'#'}, {(int) stack_tape});
+        move(push_heap_action, {(int) stack_tape}, -1);
+        link_put(push_heap_action, {'{'}, {(int) stack_tape});
+        move(push_heap_action, {(int) stack_tape}, -1);
+        link_put(push_heap_action, {'#'}, {(int) stack_tape});
+        move(push_heap_action, {(int) stack_tape}, -1);
+    }
+
+
 
     //check if part heap is still on working tape
     go_to(push_heap_action, {'E'}, 0, 1, {0,1});
@@ -1059,7 +1090,7 @@ void TuringTools::make_loop_on_sequence(IncompleteSet &a, const vector<char> &in
 void TuringTools::find_match_heap(IncompleteSet &a, char start_marker, char end_marker, int marker_tape, int data_tape) {
     //precondition: in heap mode
     if (!heap_mode){
-        //throw "not in heap mode";
+        throw "not in heap mode";
     }
     IncompleteSet searcher{"heap_search_find"+ to_string(counter), "heap_search_find"+ to_string(counter)};
     counter++;

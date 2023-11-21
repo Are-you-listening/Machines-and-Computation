@@ -78,8 +78,8 @@ public:
     void write_on(IncompleteSet& a, const vector<char>&input, const vector<int>& input_index,
                   const vector<char>&output, const vector<int>& output_index);
 
-    void heap_push_definer(IncompleteSet& a, const vector<int>&tuple_indexes);
-    void heap_push_working(IncompleteSet& a, const vector<int>&tuple_indexes);
+    void heap_push_definer(IncompleteSet& a, const vector<int>&tuple_indexes, bool function);
+    void heap_push_working(IncompleteSet& a, const vector<int>&tuple_indexes, bool function);
 
     void copy_to_working(IncompleteSet& a, const vector<int>&tuple_indexes);
     void clear_working(IncompleteSet& a);

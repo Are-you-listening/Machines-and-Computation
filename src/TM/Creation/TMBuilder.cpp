@@ -28,7 +28,7 @@ json TMBuilder::generateTM() {
 
     TuringTokenizer tokenizer{};
     IncompleteSet tokenize_program = tokenizer.getTransitions();
-
+    //TODO: tokenize not completly correct for constructor/destructor/ new/delete/return
 
     tools->link(program, tokenize_program);
 
