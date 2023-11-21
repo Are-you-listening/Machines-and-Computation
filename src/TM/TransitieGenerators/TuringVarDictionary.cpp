@@ -32,6 +32,34 @@ IncompleteSet TuringVarDictionary::storeVar() {
     tools->link_on(result, remove_nest, {'}'}, {get_tuple_index()[1]});
 
     IncompleteSet add_nest{"vardict_add_nesting", "vardict_add_nesting"};
+
+    //make sure 2 following if statements have their own key
+    IncompleteSet create_key{"vardict_create_key", "vardict_create_key"};
+    tools->move(create_key, {0,1}, 1);
+
+    tools->push(create_key, 'N');
+
+    tools->go_to(create_key, {'*'}, tapes-1, -1, {(int) tapes-1});
+    tools->move(create_key, {(int) tapes-1}, 1);
+    tools->go_to_copy(create_key, {'\u0000'}, tapes-1, 1, {(int) tapes-1}, 1, 1, {0, 1});
+    tools->link_put(create_key, {'P'}, {0});
+    tools->move(create_key, {0,1}, 1);
+
+    tools->go_to(create_key, {'*'}, tapes-1, -1, {(int) tapes-1});
+    tools->move(create_key, {(int) tapes-1}, 1);
+    tools->go_to_copy(create_key, {'\u0000'}, tapes-1, 1, {(int) tapes-1}, 1, 1, {0, 1});
+
+    tools->link_put(create_key, {'E'}, {0});
+    tools->go_to(create_key, {'A', 'S'}, 0, -1, {0,1});
+    tools->set_heap_mode(create_key, true);
+    tools->heap_push_working(create_key, true);
+    string breaker = tools->branch_on(create_key, {'\u0000'}, {(int) tapes-1});
+
+    //check if already curly bracket present
+    tools->move(add_nest, {0,1}, -1);
+    tools->link_on(add_nest, create_key, {'{'}, {1});
+    tools->move(add_nest, {0,1}, 1);
+
     tools->link_put(add_nest, {'{'}, {1});
     tools->write_on(add_nest, {'S'}, {0}, {'\u0000'}, {0});
     tools->move(add_nest, {0,1}, 1);

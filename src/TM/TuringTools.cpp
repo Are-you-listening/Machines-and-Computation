@@ -860,14 +860,13 @@ void TuringTools::heap_push_definer(IncompleteSet& a, const vector<int>&tuple_in
 
 
     //go to heap mode
-    go_to(push_heap_action, {'*'}, stack_tape, -1, {(int) stack_tape});
-    heap_mode = true;
+    set_heap_mode(push_heap_action, true);
 
     //check if this starts with A or S
     go_to(push_heap_action, {'S', 'A'}, 0, -1, {0,1});
 
     //do entire copy to heap
-    heap_push_working(push_heap_action, tuple_indexes, function);
+    heap_push_working(push_heap_action, function);
 
     clear_working(push_heap_action);
 
@@ -892,9 +891,7 @@ void TuringTools::heap_push_definer(IncompleteSet& a, const vector<int>&tuple_in
 
     //go back to stack mode
     //move(push_heap_action, {(int) stack_tape}, 1);
-    go_to(push_heap_action, {'\u0000'}, (int) stack_tape, 1, {(int) stack_tape});
-    heap_mode = false;
-
+    set_heap_mode(push_heap_action, false);
 
     link_on_multiple(a, push_heap_action, {{'A'}, {'S'}}, {tuple_indexes[0]});
 }
@@ -907,7 +904,7 @@ void TuringTools::clear_working(IncompleteSet &a) {
 }
 
 
-void TuringTools::heap_push_working(IncompleteSet &push_heap_action, const vector<int> &tuple_indexes, bool function) {
+void TuringTools::heap_push_working(IncompleteSet &push_heap_action, bool function) {
     //store part on heap after insert on working tape after new data
     IncompleteSet move_heap{"move_heap_"+ to_string(counter), "move_heap_"+ to_string(counter)};
     counter++;
@@ -1290,6 +1287,30 @@ void TuringTools::push_on_sequence(IncompleteSet &a, const vector<char> &input_s
     counter++;
     push(pusher, push_char);
     link_on_sequence(a, pusher, input_sequence, input_index);
+
+}
+
+void TuringTools::set_heap_mode(IncompleteSet &a, bool to_heap) {
+    if (to_heap){
+        if (heap_mode){
+            throw "already heap";
+        }
+        IncompleteSet to_heap_mode{"to_heap_mode_"+ to_string(counter), "to_heap_mode_"+ to_string(counter)};
+        counter++;
+        go_to(to_heap_mode, {'*'}, stack_tape, -1, {(int) stack_tape});
+        heap_mode = true;
+        link(a, to_heap_mode);
+    }else{
+        if (!heap_mode){
+            throw "already stack";
+        }
+        IncompleteSet from_heap_mode{"from_heap_mode_"+ to_string(counter), "from_heap_mode_"+ to_string(counter)};
+        counter++;
+        go_to(from_heap_mode, {'\u0000'}, stack_tape, 1, {(int) stack_tape});
+        heap_mode = false;
+        link(a, from_heap_mode);
+    }
+
 
 }
 
