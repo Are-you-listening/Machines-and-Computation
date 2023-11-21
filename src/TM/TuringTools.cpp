@@ -182,6 +182,53 @@ void TuringTools::go_to_clear(IncompleteSet &a, const vector<char> &symbol, int 
 
 }
 
+void TuringTools::go_to_not(IncompleteSet &a, const vector<char> &symbol, int tape_index, int direction,
+                            const vector<int> &affected) {
+    IncompleteSet b("go_to_"+ to_string(goto_counter) ,"go_to_"+ to_string(goto_counter+1));
+    vector<IncompleteTransition> outputs;
+
+    for (char sym: symbol){
+        IncompleteTransition moving;
+        moving.state = "go_to_"+ to_string(goto_counter);
+        moving.to_state = "go_to_"+ to_string(goto_counter);
+
+        moving.def_move = 0;
+
+        moving.output_index = affected;
+
+        for (int i =0; i<moving.output_index.size(); i++){
+            char c = '\u0001';
+
+            moving.output.push_back(c);
+            moving.move.push_back(direction);
+
+        }
+
+        moving.input = {sym};
+        moving.input_index = {tape_index};
+
+        outputs.push_back(moving);
+    }
+
+    IncompleteTransition arrived;
+    arrived.state = "go_to_"+ to_string(goto_counter);
+    arrived.to_state = "go_to_"+ to_string(goto_counter+1);
+
+
+    arrived.def_move = 0;
+
+
+    outputs.push_back(arrived);
+
+
+    goto_counter += 2;
+
+    b.transitions.insert(b.transitions.end(), outputs.begin(), outputs.end());
+
+    link(a, b);
+
+}
+
 void TuringTools::go_to_copy(IncompleteSet &a, const vector<char> &symbol, int tape_index, int direction,
                              const vector<int> &affected, int copy_to_tape, int copy_to_direction, const vector<int>& copy_affected) {
 
@@ -739,6 +786,15 @@ void TuringTools::copy_to_working(IncompleteSet &a, const vector<int> &tuple_ind
     copier_do.to_state = end_loop;
     link(copier, copier_do);
     go_to(copier, {'S', 'A'}, tuple_indexes[0], -1, tuple_indexes);
+
+    //writes end marker
+    //guaranteeing that spaces on the end will not be taken into account
+    move(copier, {0,1}, -1);
+    go_to_not(copier, {' '}, 1, -1, {0,1});
+    move(copier, {0,1}, 1);
+    go_to_clear(copier, {'\u0000'}, 1, 1, {0,1}, {0,1});
+    go_to_not(copier, {'\u0000'}, 1, -1, {0,1});
+    move(copier, {0,1}, 1);
     link_put(copier, {'E'}, {0});
 
     //clear spaces check stack
@@ -1225,6 +1281,8 @@ stack_direction, int skip_tape, int skip_direction) {
     move(result, {new_stack_tape}, -1*stack_direction);
     link(a, result);
 }
+
+
 
 
 
