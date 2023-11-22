@@ -42,7 +42,7 @@ IncompleteSet TuringVarDictionary::storeVar() {
     tools->go_to(create_key, {'*'}, tapes-1, -1, {(int) tapes-1});
     tools->move(create_key, {(int) tapes-1}, 1);
     tools->go_to_copy(create_key, {'\u0000'}, tapes-1, 1, {(int) tapes-1}, 1, 1, {0, 1});
-    tools->link_put(create_key, {'P'}, {0});
+    tools->link_put(create_key, {'P', ' '}, {0, 1});
     tools->move(create_key, {0,1}, 1);
 
     tools->go_to(create_key, {'*'}, tapes-1, -1, {(int) tapes-1});

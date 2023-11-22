@@ -798,7 +798,11 @@ void TuringTools::copy_to_working(IncompleteSet &a, const vector<int> &tuple_ind
     link_put(copier, {'E'}, {0});
 
     //clear spaces check stack
-    clear_stack(copier);
+    //don't use clear to keep 'N' stored on stack
+    move(copier, {(int) stack_tape}, -1);
+    write_on(copier, {'P'}, {(int) stack_tape}, {'\u0000'}, {(int) stack_tape});
+    go_to(copier, {'\u0000'}, stack_tape, 1, {(int) stack_tape});
+    //clear_stack(copier);
 
     link(a,copier);
 
