@@ -42,6 +42,8 @@ set(TuringCode
         src/TM/TransitieGenerators/TuringVarDictionary.h
         src/TM/TransitieGenerators/TuringGenerator.cpp
         src/TM/TransitieGenerators/TuringGenerator.h
+        src/TM/TransitieGenerators/TuringDenestify.cpp
+        src/TM/TransitieGenerators/TuringDenestify.h
 )
 
 set(CodeFiles

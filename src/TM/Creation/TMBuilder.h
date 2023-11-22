@@ -7,6 +7,7 @@
 #include "src/TM/TransitieGenerators/TuringTokenizer.h"
 #include "src/TM/TuringTools.h"
 #include "src/TM/TransitieGenerators/TuringVarDictionary.h"
+#include "src/TM/TransitieGenerators/TuringDenestify.h"
 class TMBuilder {
 public:
     TMBuilder(unsigned int tuple_size);

@@ -157,7 +157,7 @@ TEST(TuringMachineTest, TM_tools){
 
 TEST(TuringMachineTest, TM_tokenazation) {
 
-    ifstream test_file("../test/testFiles/TM_test_6.cpp");
+    ifstream test_file("../test/testFiles/TM_test_7.cpp");
     string test_string;
     cout << test_file.is_open() << endl;
     while (!test_file.eof()){
@@ -179,7 +179,7 @@ TEST(TuringMachineTest, TM_tokenazation) {
     tm.load_input(test_string, 1);
 
     int halted_time = -1;
-    for (int i = 0; i<15000; i++){
+    for (int i = 0; i<18000; i++){
 
 
         if (tm.isHalted()){

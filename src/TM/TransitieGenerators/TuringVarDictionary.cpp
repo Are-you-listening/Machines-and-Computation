@@ -78,7 +78,9 @@ IncompleteSet TuringVarDictionary::storeVar() {
     tools->make_loop(result);
     result.to_state = branch;
 
-    //remove_nesting(result);
+    //cleanup
+    tools->go_to_clear(result, {'A'}, get_tuple_index()[0], -1, get_tuple_index(), {get_tuple_index()[0]});
+    tools->clear_stack(result);
 
     return result;
 }

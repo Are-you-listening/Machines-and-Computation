@@ -36,12 +36,9 @@ json TMBuilder::generateTM() {
 
     tools->link(program, vardict.getTransitions());
 
-    //IncompleteSet test("test1", "test1");
-    //tools->push(test, 'B');
-    //tools->make_loop_on_sequence(test, {'#','*'}, (int) tapes-1);
-    //tools->push(test, 'C');
+    TuringDenestify denest{2, 4};
 
-    //tools->link(program, test);
+    tools->link(program, denest.getTransitions());
 
 
     for (auto incomp: program.transitions){
