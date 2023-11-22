@@ -1236,6 +1236,10 @@ void TuringTools::find_match_heap(IncompleteSet &a, char start_marker, char end_
     searcher.to_state = branch;
     go_to(searcher, {'}'}, stack_tape, -1, {(int) stack_tape});
 
+    //clear 'C' characters on marker tape
+    move(searcher, {marker_tape, data_tape}, -1);
+    go_to_clear(searcher, {start_marker}, marker_tape, -1, {marker_tape, data_tape}, {marker_tape});
+    go_to(searcher, {end_marker}, marker_tape, 1, {marker_tape, data_tape});
     link(a, searcher);
 
 }

@@ -38,18 +38,24 @@ IncompleteSet TuringVarDictionary::storeVar() {
     tools->move(create_key, {0,1}, 1);
 
     tools->push(create_key, 'N');
+    tools->push(create_key, '{');
 
-    tools->go_to(create_key, {'*'}, tapes-1, -1, {(int) tapes-1});
+
+    tools->move(create_key, {(int) tapes-1}, -2);
+    tools->go_to(create_key, {'*', '{'}, tapes-1, -1, {(int) tapes-1});
     tools->move(create_key, {(int) tapes-1}, 1);
-    tools->go_to_copy(create_key, {'\u0000'}, tapes-1, 1, {(int) tapes-1}, 1, 1, {0, 1});
+    tools->go_to_copy(create_key, {'{'}, tapes-1, 1, {(int) tapes-1}, 1, 1, {0, 1});
     tools->link_put(create_key, {'P', ' '}, {0, 1});
     tools->move(create_key, {0,1}, 1);
 
-    tools->go_to(create_key, {'*'}, tapes-1, -1, {(int) tapes-1});
+    tools->move(create_key, {(int) tapes-1}, -2);
+    tools->go_to(create_key, {'*', '{'}, tapes-1, -1, {(int) tapes-1});
     tools->move(create_key, {(int) tapes-1}, 1);
-    tools->go_to_copy(create_key, {'\u0000'}, tapes-1, 1, {(int) tapes-1}, 1, 1, {0, 1});
+    tools->go_to_copy(create_key, {'{'}, tapes-1, 1, {(int) tapes-1}, 1, 1, {0, 1});
 
     tools->link_put(create_key, {'E'}, {0});
+
+
     tools->go_to(create_key, {'A', 'S'}, 0, -1, {0,1});
     tools->set_heap_mode(create_key, true);
     tools->heap_push_working(create_key, true);
@@ -137,9 +143,19 @@ void TuringVarDictionary::remove_nesting(IncompleteSet &a) {
     tools->go_to_clear(a, {'{'}, 1, -1, {0,1}, {0,1});
     tools->link_put(a, {'\u0000'}, {1});
 
-    //check if stack has 'O' charcter saying we need to pop
+
+    //check current stack symbol
     tools->move(a, {(int) tapes-1}, -1);
 
+    //if top is '{' of stack -> POP
+    IncompleteSet pop{"vardict_pop_curly", "vardict_pop_curly"};
+    tools->go_to_clear(pop, {'{', 'O', '*'}, tapes-1, -1, {(int) tapes-1}, {(int) tapes-1});
+    tools->write_on(pop, {'{'}, {(int) tapes-1}, {'\u0000'}, {(int) tapes-1});
+    tools->go_to_not(pop, {'\u0000'}, (int) tapes-1, -1, {(int) tapes-1});
+
+    tools->link_on_multiple(a, pop, {{'{'}, {'N'}}, {(int) tapes-1});
+
+    //check if stack has 'O' charcter saying we need to pop
     IncompleteSet clear_again{"vardict_clear_again", "vardict_clear_again"};
     tools->move(clear_again, {0,1}, -1);
     tools->go_to_clear(clear_again, {'{'}, 1, -1, {0,1}, {0,1});
@@ -147,6 +163,8 @@ void TuringVarDictionary::remove_nesting(IncompleteSet &a) {
     tools->link_put(clear_again, {'\u0000'}, {(int) tapes-1});
 
     tools->link_on(a, clear_again, {'O'}, {(int) tapes-1});
+
+    //put stack back on right spot
     tools->move(a, {(int) tapes-1}, 1);
 
     //clears what is before cleared bracket
