@@ -53,7 +53,8 @@ IncompleteSet TuringVarDictionary::storeVar() {
     tools->go_to(create_key, {'A', 'S'}, 0, -1, {0,1});
     tools->set_heap_mode(create_key, true);
     tools->heap_push_working(create_key, true);
-    string breaker = tools->branch_on(create_key, {'\u0000'}, {(int) tapes-1});
+    tools->move(create_key, {0,1}, -1);
+    //string breaker = tools->branch_on(create_key, {'\u0000'}, {(int) tapes-1});
 
     //check if already curly bracket present
     tools->move(add_nest, {0,1}, -1);

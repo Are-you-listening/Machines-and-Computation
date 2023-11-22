@@ -868,30 +868,7 @@ void TuringTools::heap_push_definer(IncompleteSet& a, const vector<int>&tuple_in
     //do entire copy to heap
     heap_push_working(push_heap_action, function);
 
-    clear_working(push_heap_action);
 
-    //store definer again on working tape
-    go_to(push_heap_action, {'!'}, (int) stack_tape, 1, {(int) stack_tape});
-    go_to(push_heap_action, {'#'}, (int) stack_tape, 1, {(int) stack_tape});
-    move(push_heap_action, {(int) stack_tape}, -1);
-
-
-
-    //make nesting on working tape
-    if (function){
-        //remove 'S' markers
-        write_on(push_heap_action, {'S'}, {0}, {'\u0000'}, {0});
-        go_to_copy(push_heap_action, {':'}, stack_tape, -1, {(int) stack_tape}, 1, 1, {0, 1});
-        link_put(push_heap_action, {'S'}, {0});
-    }
-
-    //change '!' to '#'
-    go_to(push_heap_action, {'!'}, (int) stack_tape, -1, {(int) stack_tape});
-    link_put(push_heap_action, {'#'}, {(int) stack_tape});
-
-    //go back to stack mode
-    //move(push_heap_action, {(int) stack_tape}, 1);
-    set_heap_mode(push_heap_action, false);
 
     link_on_multiple(a, push_heap_action, {{'A'}, {'S'}}, {tuple_indexes[0]});
 }
@@ -990,6 +967,29 @@ void TuringTools::heap_push_working(IncompleteSet &push_heap_action, bool functi
 
     //string branch_break = branch_on(fix_heap, {'E'}, {0});
     link_on_not(push_heap_action, fix_heap, {'\u0000'}, {1});
+
+    clear_working(push_heap_action);
+
+    //store definer again on working tape
+    go_to(push_heap_action, {'!'}, (int) stack_tape, 1, {(int) stack_tape});
+    go_to(push_heap_action, {'#'}, (int) stack_tape, 1, {(int) stack_tape});
+    move(push_heap_action, {(int) stack_tape}, -1);
+
+    //make nesting on working tape
+    if (function){
+        //remove 'S' markers
+        write_on(push_heap_action, {'S'}, {0}, {'\u0000'}, {0});
+        go_to_copy(push_heap_action, {':'}, stack_tape, -1, {(int) stack_tape}, 1, 1, {0, 1});
+        link_put(push_heap_action, {'S'}, {0});
+    }
+
+    //change '!' to '#'
+    go_to(push_heap_action, {'!'}, (int) stack_tape, -1, {(int) stack_tape});
+    link_put(push_heap_action, {'#'}, {(int) stack_tape});
+
+    //go back to stack mode
+    //move(push_heap_action, {(int) stack_tape}, 1);
+    set_heap_mode(push_heap_action, false);
 }
 
 
@@ -1200,8 +1200,8 @@ void TuringTools::find_match_heap(IncompleteSet &a, char start_marker, char end_
     //point to first character withing the nesting
     go_to(change_stack_pos, {'#'}, stack_tape, -1, {(int) stack_tape});
     move(change_stack_pos, {(int) stack_tape}, -1);
-
     move(change_stack_pos, {marker_tape, data_tape}, 1);
+    link_put(change_stack_pos, {'C'}, {marker_tape});
 
     link_on(searcher, change_stack_pos, {'{'}, {data_tape});
 
@@ -1211,10 +1211,21 @@ void TuringTools::find_match_heap(IncompleteSet &a, char start_marker, char end_
 
     go_to(searcher, {'\u0000'}, 1, 1, {0,1});
     move(searcher, {0,1}, 1);
-    //skip nesting that we don't care about
-    skip_nesting(searcher, 1, 1, stack_tape,-1);
 
-    go_to(searcher, {start_marker}, 0, -1, {0,1});
+    //skip nesting that we don't care about
+    //only skip if it has a nesting
+    go_to(searcher, {'#'}, stack_tape, -1, {(int) stack_tape});
+    move(searcher, {(int) stack_tape}, -1);
+
+    IncompleteSet find_match_skip_nesting{"find_match_skip_nesting_"+ to_string(counter), "find_match_skip_nesting_"+ to_string(counter)};
+    move(find_match_skip_nesting, {(int) stack_tape}, 1);
+    skip_nesting(find_match_skip_nesting, 1, 1, stack_tape,-1);
+    move(find_match_skip_nesting, {(int) stack_tape}, -1);
+
+    link_on(searcher, find_match_skip_nesting, {'}'}, {(int) stack_tape});
+    move(searcher, {(int) stack_tape}, 1);
+
+    go_to(searcher, {start_marker, 'C'}, 0, -1, {0,1});
     //loop somewhere here
     make_loop(searcher);
     //after loop on found
