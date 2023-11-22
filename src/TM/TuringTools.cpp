@@ -897,7 +897,7 @@ void TuringTools::heap_push_working(IncompleteSet &push_heap_action, bool functi
     //this will end on '{' at the end of the nesting
     go_to(move_heap, {'E'}, 0, 1, {0,1});
     move(move_heap, {0,1}, 1);
-    skip_nesting(move_heap, 1, 1, stack_tape, -1);
+    skip_nesting(move_heap, 1, 1, stack_tape, -1, {(int) stack_tape});
     go_to(move_heap, {'A'}, 0, -1, {0,1});
 
     move(move_heap, {(int) stack_tape}, 1);
@@ -1223,7 +1223,7 @@ void TuringTools::find_match_heap(IncompleteSet &a, char start_marker, char end_
 
     IncompleteSet find_match_skip_nesting{"find_match_skip_nesting_"+ to_string(counter), "find_match_skip_nesting_"+ to_string(counter)};
     move(find_match_skip_nesting, {(int) stack_tape}, 1);
-    skip_nesting(find_match_skip_nesting, 1, 1, stack_tape,-1);
+    skip_nesting(find_match_skip_nesting, 1, 1, stack_tape,-1, {(int) stack_tape});
     move(find_match_skip_nesting, {(int) stack_tape}, -1);
 
     link_on(searcher, find_match_skip_nesting, {'}'}, {(int) stack_tape});
@@ -1245,7 +1245,7 @@ void TuringTools::find_match_heap(IncompleteSet &a, char start_marker, char end_
 }
 
 void TuringTools::skip_nesting(IncompleteSet &a, int new_stack_tape, int
-stack_direction, int skip_tape, int skip_direction) {
+stack_direction, int skip_tape, int skip_direction, const vector<int>& affected) {
     /*
      * case 1: found '{' has '0' on stack -> pop 0
      * case 2: found '{' has not '0' on stack -> push 1
@@ -1258,7 +1258,7 @@ stack_direction, int skip_tape, int skip_direction) {
     IncompleteSet result{"skip_nesting_"+ to_string(counter), "skip_nesting_"+ to_string(counter)};
     counter++;
 
-    go_to(result, {'{', '}'}, skip_tape, skip_direction, {skip_tape});
+    go_to(result, {'{', '}'}, skip_tape, skip_direction, affected);
 
     IncompleteSet case_1{"skip_nesting_"+ to_string(counter), "skip_nesting_"+ to_string(counter)};
     IncompleteSet case_2{"skip_nesting_"+ to_string(counter+1), "skip_nesting_"+ to_string(counter+1)};
@@ -1293,7 +1293,7 @@ stack_direction, int skip_tape, int skip_direction) {
     link_on(result, case_handler_2, {'}'}, {skip_tape});
 
     string loop_end = branch_on(result, {'\u0000'}, {new_stack_tape});
-    move(result, {skip_tape}, skip_direction);
+    move(result, affected, skip_direction);
     make_loop(result);
     result.to_state = loop_end;
     move(result, {new_stack_tape}, -1*stack_direction);
@@ -1330,6 +1330,100 @@ void TuringTools::set_heap_mode(IncompleteSet &a, bool to_heap) {
         link(a, from_heap_mode);
     }
 
+
+}
+
+void
+TuringTools::nesting_marker(IncompleteSet &a, const vector<int> &tuple_indexes, int split_nesting, int max_nesting) {
+    IncompleteSet result{"nesting_marking_"+ to_string(counter), "nesting_marking_"+ to_string(counter+max_nesting+1)};
+
+    vector<IncompleteTransition> end_loops;
+    end_loops.reserve(max_nesting+1);
+
+    //create states till max nesting
+    for (int i=0; i<max_nesting+1; i++){
+        IncompleteTransition go_forward;
+        go_forward.state = "nesting_marking_"+ to_string(counter);
+        go_forward.to_state = "nesting_marking_"+ to_string(counter+1);
+        go_forward.def_move = 0;
+
+        go_forward.input = {'{'};
+        go_forward.input_index = {tuple_indexes[1]};
+
+        for (auto t: tuple_indexes){
+            char c = '\u0001';
+            if (i == split_nesting && t == tuple_indexes[0]){
+                c = 'S';
+            }
+            go_forward.output.push_back(c);
+            go_forward.output_index.push_back(t);
+            go_forward.move.push_back(1);
+        }
+
+        IncompleteTransition stay;
+        stay.state = "nesting_marking_"+ to_string(counter);
+        stay.to_state = "nesting_marking_"+ to_string(counter);
+        stay.def_move = 0;
+
+        for (auto t: tuple_indexes){
+            stay.output.push_back('\u0001');
+            stay.output_index.push_back(t);
+            stay.move.push_back(1);
+        }
+
+
+        IncompleteTransition go_backwards;
+        go_backwards.state = "nesting_marking_"+ to_string(counter+1);
+        go_backwards.to_state = "nesting_marking_"+ to_string(counter);
+        go_backwards.def_move = 0;
+
+        go_backwards.input = {'}'};
+        go_backwards.input_index = {tuple_indexes[1]};
+
+        for (auto t: tuple_indexes){
+            go_backwards.output.push_back('\u0001');
+            go_backwards.output_index.push_back(t);
+            go_backwards.move.push_back(1);
+        }
+
+        IncompleteTransition end_loop;
+        end_loop.state = "nesting_marking_"+ to_string(counter);
+        end_loop.to_state = "nesting_marking_"+ to_string(counter);
+        end_loop.def_move = 0;
+
+        end_loop.input = {'\u0000'};
+        end_loop.input_index = {tuple_indexes[1]};
+
+        end_loops.push_back(end_loop);
+
+
+        result.transitions.push_back(go_forward);
+        result.transitions.push_back(stay);
+        result.transitions.push_back(go_backwards);
+
+
+        counter++;
+    }
+
+    counter+=2;
+
+
+    //go till end of nesting
+    go_to(result, {'S'}, tuple_indexes[0], -1, tuple_indexes);
+    skip_nesting(result, stack_tape, 1, tuple_indexes[1], 1, tuple_indexes);
+
+    string final = result.to_state;
+
+    for (auto& e: end_loops){
+        e.to_state = final;
+        result.transitions.push_back(e);
+
+    }
+
+    link_put(result, {'E'}, {tuple_indexes[0]});
+    go_to(result, {'S'}, tuple_indexes[0], -1, tuple_indexes);
+
+    link(a, result);
 
 }
 
