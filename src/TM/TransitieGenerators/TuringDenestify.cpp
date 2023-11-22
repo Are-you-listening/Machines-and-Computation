@@ -15,6 +15,10 @@ IncompleteSet TuringDenestify::getTransitions() {
 
 IncompleteSet TuringDenestify::deNestify() {
     IncompleteSet result{"denestify_start", "denestify_start"};
-    tools->nesting_marker(result, get_tuple_index(), split_nesting, max_nesting);
+    //tools->nesting_marker(result, get_tuple_index(), split_nesting, max_nesting);
+
+    tools->move(result, get_tuple_index(), 3);
+    tools->mark_definer(result, get_tuple_index());
+    tools->make_working_nesting(result, get_tuple_index());
     return result;
 }

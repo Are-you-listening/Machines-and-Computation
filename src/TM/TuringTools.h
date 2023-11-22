@@ -97,6 +97,8 @@ public:
     void set_heap_mode(IncompleteSet& a, bool to_heap);
 
     void nesting_marker(IncompleteSet& a, const vector<int>&tuple_indexes, int split_nesting, int max_nesting);
+    void make_working_nesting(IncompleteSet& a, const vector<int>&tuple_indexes);
+    void mark_definer(IncompleteSet& a, const vector<int>&tuple_indexes);
 private:
 
     TuringTools(unsigned int stack_tape);

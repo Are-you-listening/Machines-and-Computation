@@ -1353,7 +1353,7 @@ TuringTools::nesting_marker(IncompleteSet &a, const vector<int> &tuple_indexes, 
         for (auto t: tuple_indexes){
             char c = '\u0001';
             if (i == split_nesting && t == tuple_indexes[0]){
-                c = 'S';
+                c = 'N';
             }
             go_forward.output.push_back(c);
             go_forward.output_index.push_back(t);
@@ -1409,7 +1409,7 @@ TuringTools::nesting_marker(IncompleteSet &a, const vector<int> &tuple_indexes, 
 
 
     //go till end of nesting
-    go_to(result, {'S'}, tuple_indexes[0], -1, tuple_indexes);
+    go_to(result, {'N'}, tuple_indexes[0], -1, tuple_indexes);
     skip_nesting(result, stack_tape, 1, tuple_indexes[1], 1, tuple_indexes);
 
     string final = result.to_state;
@@ -1420,11 +1420,49 @@ TuringTools::nesting_marker(IncompleteSet &a, const vector<int> &tuple_indexes, 
 
     }
 
-    link_put(result, {'E'}, {tuple_indexes[0]});
-    go_to(result, {'S'}, tuple_indexes[0], -1, tuple_indexes);
+    link_put(result, {'U'}, {tuple_indexes[0]});
+    go_to(result, {'N'}, tuple_indexes[0], -1, tuple_indexes);
 
     link(a, result);
 
+}
+
+void TuringTools::make_working_nesting(IncompleteSet &a, const vector<int> &tuple_indexes) {
+
+    IncompleteSet working_nesting{"make_working_nesting_"+ to_string(counter), "make_working_nesting_"+ to_string(counter)};
+    counter++;
+
+    copy_to_working(working_nesting, tuple_indexes);
+    move(working_nesting, {0, 1}, -1);
+    go_to_copy(working_nesting, {' ', 'S'}, 1, -1, {0,1}, stack_tape, 1, {(int) stack_tape});
+    go_to(working_nesting, {'E'}, 0, 1, {0,1});
+    go_to_clear(working_nesting, {'S', 'A'}, 0, -1, {0,1}, {0,1});
+
+    link_put(working_nesting, {'\u0000'}, {1});
+
+    move(working_nesting, {(int) stack_tape}, -1);
+    go_to_move(working_nesting, {'*', '{'}, stack_tape, -1, {(int) stack_tape}, 1, 1, {0,1});
+
+    link_put(working_nesting, {'S'}, {0});
+
+    link(a, working_nesting);
+
+}
+
+void TuringTools::mark_definer(IncompleteSet &a, const vector<int> &tuple_indexes) {
+    //precondition current symbol is an '{'
+    IncompleteSet working_nesting{"mark_definer_"+ to_string(counter), "mark_definer_"+ to_string(counter)};
+    counter++;
+    write_on(working_nesting, {'\u0000'}, {tuple_indexes[0]}, {'E'}, {tuple_indexes[0]});
+    write_on(working_nesting, {'S'}, {tuple_indexes[0]}, {'E'}, {tuple_indexes[0]});
+
+    move(working_nesting, tuple_indexes, -1);
+    go_to_not(working_nesting, {'E'}, tuple_indexes[1], -1, tuple_indexes);
+
+    write_on(working_nesting, {'\u0000'}, {tuple_indexes[0]}, {'S'}, {tuple_indexes[0]});
+    write_on(working_nesting, {'E'}, {tuple_indexes[0]}, {'S'}, {tuple_indexes[0]});
+
+    link(a, working_nesting);
 }
 
 
