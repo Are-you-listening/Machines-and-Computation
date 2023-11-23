@@ -67,6 +67,8 @@ public:
     void stack_replace(IncompleteSet& a, const vector<char>&input, const vector<char>& output);
     void move(IncompleteSet& a, const vector<int>& tape, int direction);
     void copy(IncompleteSet& a, unsigned int from_tape, unsigned int to_tape);
+    void copy_any(IncompleteSet& a, unsigned int from_tape, unsigned int to_tape);
+    void copy_till(IncompleteSet& a, const vector<char>&symbols, int check_tape, int from_tape, int to_tape, int direction, const vector<int>& affected);
     void link_on(IncompleteSet& a, const IncompleteSet& b, const vector<char>&input, const vector<int>& input_index);
     void link_on_not(IncompleteSet& a, const IncompleteSet& b, const vector<char>&input, const vector<int>& input_index);
     void link_on_sequence(IncompleteSet& a, const IncompleteSet& b, const vector<char>&input_sequence, int input_index);
@@ -89,6 +91,7 @@ public:
 
     //this needs to become private in future
     void find_match_heap(IncompleteSet& a, char start_marker, char end_marker, int marker_tape, int data_tape);
+    void find_match_heap_traverse(IncompleteSet& a, char start_marker, char end_marker, int marker_tape, int data_tape);
 
     //still needs to become private in future
     void skip_nesting(IncompleteSet& a, int new_stack_tape, int stack_direction, int skip_tape, int skip_direction, const vector<int>& affected);
@@ -101,6 +104,7 @@ public:
     void mark_definer(IncompleteSet& a, const vector<int>&tuple_indexes);
     void add_nesting_working(IncompleteSet& a);
     void remove_nesting_working(IncompleteSet& a);
+    void write_function_header(IncompleteSet& a);
 private:
 
     TuringTools(unsigned int stack_tape);

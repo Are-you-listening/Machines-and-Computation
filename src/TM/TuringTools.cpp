@@ -1193,7 +1193,32 @@ void TuringTools::find_match_heap(IncompleteSet &a, char start_marker, char end_
 
 
     string branch = branch_on(searcher, {end_marker}, {marker_tape});
-    //go_to(searcher, {start_marker}, marker_tape, -1, {marker_tape, data_tape});
+
+    //on not found
+    string end_tape = branch_on(searcher, {'\u0000'}, {(int) stack_tape});
+    string end_tape2 = branch_on(searcher, {'{'}, {(int) stack_tape});
+
+    IncompleteSet go_to_end{"find_match_to_end_"+ to_string(counter), "find_match_to_end_"+ to_string(counter)};
+    counter++;
+    for (auto& b: {end_tape, end_tape2}){
+        IncompleteTransition to_end;
+        to_end.state = b;
+        to_end.to_state = go_to_end.state;
+        to_end.def_move = 0;
+
+        go_to_end.transitions.push_back(to_end);
+    }
+    go_to(go_to_end, {'\u0000'}, stack_tape, -1, {(int) stack_tape});
+    move(go_to_end, {(int) stack_tape}, 2);
+
+    IncompleteTransition to_branch;
+    to_branch.state = go_to_end.to_state;
+    to_branch.to_state = branch;
+    to_branch.def_move = 0;
+
+    go_to_end.transitions.push_back(to_branch);
+
+    searcher.transitions.insert(searcher.transitions.end(), go_to_end.transitions.begin(), go_to_end.transitions.end());
 
     //recreate search loop
     move(searcher, {marker_tape, data_tape}, -1);
@@ -1210,8 +1235,6 @@ void TuringTools::find_match_heap(IncompleteSet &a, char start_marker, char end_
     link_on(searcher, change_stack_pos, {'{'}, {data_tape});
 
     make_loop_on(searcher, '}', stack_tape);
-
-
 
     go_to(searcher, {'\u0000'}, 1, 1, {0,1});
     move(searcher, {0,1}, 1);
@@ -1234,13 +1257,23 @@ void TuringTools::find_match_heap(IncompleteSet &a, char start_marker, char end_
     make_loop(searcher);
     //after loop on found
     searcher.to_state = branch;
-    go_to(searcher, {'}'}, stack_tape, -1, {(int) stack_tape});
+    go_to(searcher, {'#'}, stack_tape, -1, {(int) stack_tape});
+    move(searcher, {(int) stack_tape}, -1);
 
     //clear 'C' characters on marker tape
     move(searcher, {marker_tape, data_tape}, -1);
     go_to_clear(searcher, {start_marker}, marker_tape, -1, {marker_tape, data_tape}, {marker_tape});
     go_to(searcher, {end_marker}, marker_tape, 1, {marker_tape, data_tape});
     link(a, searcher);
+
+}
+
+void TuringTools::find_match_heap_traverse(IncompleteSet &a, char start_marker, char end_marker, int marker_tape,
+                                           int data_tape) {
+    //requires heap mode
+    //also check for variables before and after nesting
+    //after should not matter
+
 
 }
 
@@ -1625,6 +1658,118 @@ void TuringTools::remove_nesting_working(IncompleteSet &a) {
     write_on(a, {'\u0000'}, {0}, {'S'}, {0});
 
 }
+
+void TuringTools::copy_any(IncompleteSet &a, unsigned int from_tape, unsigned int to_tape) {
+    //also copies blank
+    IncompleteSet copy_set(to_string(counter), to_string(counter+1));
+    for (int j =32; j<128; j++){
+        char c = (char) j;
+        if (j == 127){
+            c = '\u0000';
+        }
+
+        IncompleteTransition copy;
+        copy.state = copy_set.state;
+        copy.to_state = copy_set.to_state;
+        copy.def_move = 0;
+        copy.input = {c};
+        copy.input_index = {(int) from_tape};
+        copy.output = {c};
+        copy.output_index = {(int) to_tape};
+        copy.move = {0};
+
+        copy_set.transitions.push_back(copy);
+    }
+    counter += 2;
+
+    link(a,copy_set);
+
+}
+
+void TuringTools::copy_till(IncompleteSet& a, const vector<char>&symbols, int check_tape, int from_tape,
+                            int to_tape, int direction, const vector<int>& affected) {
+
+    vector<int> affected_using = affected;
+    sort(affected_using.begin(), affected_using.end());
+
+    IncompleteSet b("go_to_"+ to_string(goto_counter) ,"go_to_"+ to_string(goto_counter+1));
+    vector<IncompleteTransition> outputs;
+
+    IncompleteSet copy_linker{"go_to_copy_"+ to_string(goto_counter),"go_to_copy_"+ to_string(goto_counter)};
+    copy_any(copy_linker, from_tape, to_tape);
+
+    outputs = copy_linker.transitions;
+
+    IncompleteTransition copy_go_back;
+    copy_go_back.state = copy_linker.to_state;
+    copy_go_back.to_state = "go_to_"+ to_string(goto_counter);
+
+    copy_go_back.def_move = 0;
+
+    copy_go_back.output_index = affected_using;
+
+    for (int i =0; i<copy_go_back.output_index.size(); i++){
+        char c = '\u0001';
+        int move_direction = direction;
+
+        copy_go_back.output.push_back(c);
+        copy_go_back.move.push_back(move_direction);
+
+    }
+
+    outputs.push_back(copy_go_back);
+
+    IncompleteTransition moving;
+    moving.state = "go_to_"+ to_string(goto_counter);
+    moving.to_state = "go_to_copy_"+ to_string(goto_counter);
+
+    moving.def_move = 0;
+
+    outputs.push_back(moving);
+
+    for (char sym: symbols){
+        IncompleteTransition arrived;
+        arrived.state = "go_to_"+ to_string(goto_counter);
+        arrived.to_state = "go_to_"+ to_string(goto_counter+1);
+
+        arrived.input = {sym};
+        arrived.input_index = {check_tape};
+        arrived.def_move = 0;
+
+
+        outputs.push_back(arrived);
+    }
+
+    goto_counter += 2;
+
+    b.transitions.insert(b.transitions.end(), outputs.begin(), outputs.end());
+
+    link(a, b);
+
+}
+
+void TuringTools::write_function_header(IncompleteSet &a) {
+    //requires: startpos S on working tape
+    //requires: startpos N on tuple tape for later var check
+    IncompleteSet write_function_header{"write_function_header_"+ to_string(counter), "write_function_header_"+ to_string(counter)};
+    counter++;
+
+    link_put(write_function_header, {'a'}, {1});
+    write_on(write_function_header, {'S'}, {0}, {'\u0000'}, {0});
+    move(write_function_header, {0,1}, 1);
+    link_put(write_function_header, {'{'}, {1});
+    move(write_function_header, {0,1}, 1);
+    write_on(write_function_header, {'\u0000'}, {0}, {'S'}, {0});
+
+    set_heap_mode(write_function_header, true);
+    go_to(write_function_header, {'A'}, 0, -1, {0,1});
+    find_match_heap(write_function_header, 'A', 'S', 0, 1);
+
+    link(a, write_function_header);
+
+}
+
+
 
 
 
