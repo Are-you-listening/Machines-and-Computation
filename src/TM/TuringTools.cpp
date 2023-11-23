@@ -1345,28 +1345,32 @@ TuringTools::nesting_marker(IncompleteSet &a, const vector<int> &tuple_indexes, 
     for (int i=0; i<max_nesting+1; i++){
 
         IncompleteSet forward_action{"forward_action_"+ to_string(original_counter), "forward_action_"+ to_string(original_counter)};
-        move(forward_action, tuple_indexes, -1);
-        mark_definer(forward_action, tuple_indexes);
+        if (i <= split_nesting){
+            move(forward_action, tuple_indexes, -1);
+            mark_definer(forward_action, tuple_indexes);
 
-        IncompleteSet store_definer{"store_definer_"+ to_string(counter), "store_definer_"+ to_string(counter)};
-        counter++;
-        make_working_nesting(store_definer, tuple_indexes);
+            IncompleteSet store_definer{"store_definer_"+ to_string(counter), "store_definer_"+ to_string(counter)};
+            counter++;
+            make_working_nesting(store_definer, tuple_indexes);
 
-        link_on_multiple(forward_action, store_definer, {{'C'}, {'U'}, {'O'}}, {tuple_indexes[1]});
-        add_nesting_working(forward_action);
+            link_on_multiple(forward_action, store_definer, {{'C'}, {'U'}, {'O'}}, {tuple_indexes[1]});
+            add_nesting_working(forward_action);
 
-        //marker cleanup
-        go_to(forward_action, {'S', 'A'}, tuple_indexes[0], -1, tuple_indexes);
-        write_on(forward_action, {'S'}, {tuple_indexes[0]}, {'\u0000'}, {tuple_indexes[0]});
-        move(forward_action, tuple_indexes, 1);
-        go_to_clear(forward_action, {'E'}, tuple_indexes[0], 1, tuple_indexes, {tuple_indexes[0]});
-        write_on(forward_action, {'E'}, {tuple_indexes[0]}, {'\u0000'}, {tuple_indexes[0]});
+            //marker cleanup
+            go_to(forward_action, {'S', 'A'}, tuple_indexes[0], -1, tuple_indexes);
+            write_on(forward_action, {'S'}, {tuple_indexes[0]}, {'\u0000'}, {tuple_indexes[0]});
+            move(forward_action, tuple_indexes, 1);
+            go_to_clear(forward_action, {'E'}, tuple_indexes[0], 1, tuple_indexes, {tuple_indexes[0]});
+            write_on(forward_action, {'E'}, {tuple_indexes[0]}, {'\u0000'}, {tuple_indexes[0]});
 
-        if (i == split_nesting){
-            write_on(forward_action, {'\u0000'}, {tuple_indexes[0]}, {'N'}, {tuple_indexes[0]});
+            if (i == split_nesting){
+                write_on(forward_action, {'\u0000'}, {tuple_indexes[0]}, {'N'}, {tuple_indexes[0]});
+            }
+
+            move(forward_action, tuple_indexes, 1);
         }
 
-        move(forward_action, tuple_indexes, 1);
+
         IncompleteTransition go_next;
         go_next.state = forward_action.to_state;
         go_next.def_move = 0;

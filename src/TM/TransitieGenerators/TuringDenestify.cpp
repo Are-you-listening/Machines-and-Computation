@@ -16,10 +16,16 @@ IncompleteSet TuringDenestify::getTransitions() {
 IncompleteSet TuringDenestify::deNestify() {
     IncompleteSet result{"denestify_start", "denestify_start"};
     tools->nesting_marker(result, get_tuple_index(), split_nesting, max_nesting);
-
-    //tools->mark_definer(result, get_tuple_index());
-    //tools->make_working_nesting(result, get_tuple_index());
-    //tools->add_nesting_working(result);
+    createNewFunction(result);
 
     return result;
+}
+
+void TuringDenestify::createNewFunction(IncompleteSet &a) {
+    IncompleteSet create_function{"create_function", "create_function"};
+    tools->go_to(create_function, {'\u0000'}, get_tuple_index()[1], 1, get_tuple_index());
+    tools->link_put(create_function, {'H'}, {get_tuple_index()[0]});
+    tools->go_to(create_function, {'U'}, get_tuple_index()[0], -1, get_tuple_index());
+
+    tools->link(a, create_function);
 }
