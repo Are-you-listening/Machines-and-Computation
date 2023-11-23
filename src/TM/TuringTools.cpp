@@ -1322,7 +1322,9 @@ void TuringTools::find_match_heap_traverse(IncompleteSet &a, char start_marker, 
     //still need to move last key
 
     go_to(traverse_loop, {'A'}, marker_tape, -1, {marker_tape, data_tape});
-    string not_found_branch = branch_on(traverse_loop, {'a', '\u0000'}, {data_tape, (int) stack_tape});
+    go_to(traverse_loop, {'{'}, data_tape, 1, {marker_tape, data_tape});
+    move(traverse_loop, {0, 1}, 1);
+    string not_found_branch = branch_on(traverse_loop, {'S', '\u0000'}, {marker_tape, (int) stack_tape});
     go_to(traverse_loop, {'S'}, marker_tape, 1, {marker_tape, data_tape});
 
     make_loop_on(traverse_loop, '\u0000', stack_tape);
@@ -1341,8 +1343,16 @@ void TuringTools::find_match_heap_traverse(IncompleteSet &a, char start_marker, 
     link_put(do_traverse_check, {'!'}, {(int) stack_tape});
 
     set_heap_mode(do_traverse_check, false);
-    go_to_clear(do_traverse_check, {'.'}, stack_tape, -1, {(int) stack_tape}, {(int) stack_tape});
-    link_put(do_traverse_check, {'\u0000'}, {(int) stack_tape});
+
+    //store old nesting on working
+    go_to_clear(do_traverse_check, {'A'}, marker_tape, -1, {marker_tape, data_tape}, {marker_tape, data_tape});
+    go_to(do_traverse_check, {'.'}, stack_tape, -1, {(int) stack_tape});
+    move(do_traverse_check, {(int) stack_tape}, 1);
+    go_to_move(do_traverse_check, {'\u0000'}, stack_tape, 1, {(int) stack_tape}, data_tape, 1, {marker_tape, data_tape});
+    go_to(do_traverse_check, {'.'}, stack_tape, -1, {(int) stack_tape});
+    link_put(do_traverse_check, {'S', '\u0000'}, {marker_tape, (int) stack_tape});
+
+    //go back to old heap pos
     set_heap_mode(do_traverse_check, true);
     go_to(do_traverse_check, {'!'}, stack_tape, -1, {(int) stack_tape});
     link_put(do_traverse_check, {'#'}, {(int) stack_tape});
@@ -1833,7 +1843,7 @@ void TuringTools::write_function_header(IncompleteSet &a) {
     IncompleteSet write_function_header{"write_function_header_"+ to_string(counter), "write_function_header_"+ to_string(counter)};
     counter++;
 
-    link_put(write_function_header, {'a'}, {1});
+    link_put(write_function_header, {'A'}, {1});
     write_on(write_function_header, {'S'}, {0}, {'\u0000'}, {0});
     move(write_function_header, {0,1}, 1);
     link_put(write_function_header, {'{'}, {1});
@@ -1843,6 +1853,15 @@ void TuringTools::write_function_header(IncompleteSet &a) {
     set_heap_mode(write_function_header, true);
     go_to(write_function_header, {'A'}, 0, -1, {0,1});
     find_match_heap_traverse(write_function_header, 'A', 'S', 0, 1);
+
+    string creatable = branch_on(write_function_header, {'\u0000'}, {(int) stack_tape});
+
+    set_heap_mode(write_function_header, false);
+
+    write_on(write_function_header, {'S'}, {0}, {'\u0000'}, {0});
+    move(write_function_header, {0,1}, -1);
+
+    make_loop(write_function_header);
 
     link(a, write_function_header);
 

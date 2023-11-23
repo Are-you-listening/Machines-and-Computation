@@ -3,9 +3,13 @@ public:
     void test();
 };
 
+void A(){
+    int A = 0;
+}
+
 void Base::test(){
     if (true){
-        int a = 0;
+        A();
         for (int j=0; j<5; j++){
 
             if (j == 4){
@@ -16,6 +20,7 @@ void Base::test(){
             }
 
         }
+        int A = 0;
 
     }
 }
