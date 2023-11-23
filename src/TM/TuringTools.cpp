@@ -1837,7 +1837,7 @@ void TuringTools::copy_till(IncompleteSet& a, const vector<char>&symbols, int ch
 
 }
 
-void TuringTools::write_function_header(IncompleteSet &a) {
+void TuringTools::write_function_header(IncompleteSet &a, const vector<int>&tuple_indexes) {
     //requires: startpos S on working tape
     //requires: startpos N on tuple tape for later var check
     IncompleteSet write_function_header{"write_function_header_"+ to_string(counter), "write_function_header_"+ to_string(counter)};
@@ -1863,7 +1863,75 @@ void TuringTools::write_function_header(IncompleteSet &a) {
 
     make_loop(write_function_header);
 
+    write_function_header.to_state = creatable;
+
+    //set heapmode was only disabled after branch
+    heap_mode = true;
+    set_heap_mode(write_function_header, false);
+
+    //copy function token to tokenize
+    go_to(write_function_header, {'H'}, tuple_indexes[0], 1, tuple_indexes);
+    //move S marker
+    write_on(write_function_header, {'S'}, {0}, {'\u0000'}, {0});
+    move(write_function_header, {0,1}, -1);
+    write_on(write_function_header, {'{'}, {1}, {'\u0000'}, {1});
+
+    go_to(write_function_header, {'{'}, 1, -1, {0,1});
+    move(write_function_header, {0,1}, 1);
+    write_on(write_function_header, {'\u0000'}, {0}, {'S'}, {0});
+
+    go_to(write_function_header, {'\u0000'}, 1, 1, {0,1});
+    write_on(write_function_header, {'\u0000'}, {0}, {'E'}, {0});
+    go_to(write_function_header, {'S'}, 0, -1, {0,1});
+
+    make_token(write_function_header, tuple_indexes, 'U');
+
+    //store all parameters on stack
+    //clear first working tape
+    go_to_clear(write_function_header, {'S'}, 0, -1, {0,1}, {0,1});
+    link_put(write_function_header, {'\u0000'}, {1});
+    push(write_function_header, '.');
+
     link(a, write_function_header);
+}
+
+void TuringTools::make_token(IncompleteSet &a, const vector<int> &tuple_indexes, char def_token) {
+    //requires 'S' and 'E' marker on working tape
+
+    link_put(a, {def_token}, {tuple_indexes[1]});
+
+    IncompleteSet copy_to_tuple{"copy_to_tuple_"+ to_string(counter), "copy_to_tuple_"+ to_string(counter)};
+    counter++;
+
+    vector<string> branch_states;
+
+    for (int i=2; i<tuple_indexes.size(); i++){
+        copy(copy_to_tuple, 1, tuple_indexes[i]);
+        move(copy_to_tuple, {0,1}, 1);
+
+        string branch = branch_on(copy_to_tuple, {'E'}, {0});
+        branch_states.push_back(branch);
+        if (i == tuple_indexes.size()-1){
+            move(copy_to_tuple, tuple_indexes, 1);
+            link_put(copy_to_tuple, {'E'}, {tuple_indexes[1]});
+            make_loop(copy_to_tuple);
+        }
+    }
+
+    copy_to_tuple.to_state = branch_states[0];
+    for (int i=1; i<branch_states.size(); i++){
+        string b = branch_states[i];
+
+        IncompleteTransition to_end;
+        to_end.state = b;
+        to_end.to_state = copy_to_tuple.to_state;
+        to_end.def_move = 0;
+
+        copy_to_tuple.transitions.push_back(to_end);
+    }
+
+    link(a, copy_to_tuple);
+    go_to(a, {'H'}, tuple_indexes[0], -1, tuple_indexes);
 
 }
 

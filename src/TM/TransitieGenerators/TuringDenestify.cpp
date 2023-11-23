@@ -27,7 +27,7 @@ void TuringDenestify::createNewFunction(IncompleteSet &a) {
     tools->link_put(create_function, {'H'}, {get_tuple_index()[0]});
     tools->go_to(create_function, {'N'}, get_tuple_index()[0], -1, get_tuple_index());
 
-    tools->write_function_header(create_function);
+    tools->write_function_header(create_function, get_tuple_index());
     /*
     //from here the data is moved to new function
     auto temp = get_tuple_index();

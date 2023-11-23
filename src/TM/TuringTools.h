@@ -104,7 +104,8 @@ public:
     void mark_definer(IncompleteSet& a, const vector<int>&tuple_indexes);
     void add_nesting_working(IncompleteSet& a);
     void remove_nesting_working(IncompleteSet& a);
-    void write_function_header(IncompleteSet& a);
+    void write_function_header(IncompleteSet& a, const vector<int>&tuple_indexes);
+    void make_token(IncompleteSet& a, const vector<int>&tuple_indexes, char def_token);
 private:
 
     TuringTools(unsigned int stack_tape);
