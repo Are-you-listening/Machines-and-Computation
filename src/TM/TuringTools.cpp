@@ -1275,16 +1275,24 @@ void TuringTools::find_match_heap_traverse(IncompleteSet &a, char start_marker, 
     //after should not matter for variables, just for functions
     //for functions we want to guarantee uniqueness
     find_match_heap(a, start_marker, end_marker, marker_tape, data_tape);
-    go_to_not(a, {'\u0000'}, stack_tape, 1, {(int) stack_tape});
 
-    go_to(a, {'A'}, marker_tape, -1, {marker_tape, data_tape});
+    IncompleteSet do_traverse_check{"do_traverse_check_"+ to_string(counter), "do_traverse_check_"+ to_string(counter)};
+    counter++;
 
-    set_heap_mode(a, false);
-    push(a, '.');
-    go_to_copy(a, {'\u0000'}, data_tape, 1, {marker_tape, data_tape}, stack_tape, 1, {(int) stack_tape});
+    go_to_not(do_traverse_check, {'\u0000'}, stack_tape, 1, {(int) stack_tape});
+
+    go_to(do_traverse_check, {'A'}, marker_tape, -1, {marker_tape, data_tape});
+
+    set_heap_mode(do_traverse_check, false);
+    push(do_traverse_check, '.');
+    go_to_copy(do_traverse_check, {'\u0000'}, data_tape, 1, {marker_tape, data_tape}, stack_tape, 1, {(int) stack_tape});
+
+    set_heap_mode(do_traverse_check, true);
 
     IncompleteSet traverse_loop{"traverse_loop_"+ to_string(counter), "traverse_loop_"+ to_string(counter)};
     counter++;
+
+    set_heap_mode(traverse_loop, false);
 
     link_put(traverse_loop, {'\u0000'}, {marker_tape});
     move(traverse_loop, {marker_tape, data_tape}, -1);
@@ -1314,17 +1322,34 @@ void TuringTools::find_match_heap_traverse(IncompleteSet &a, char start_marker, 
     //still need to move last key
 
     go_to(traverse_loop, {'A'}, marker_tape, -1, {marker_tape, data_tape});
-    string not_found_branch = branch_on(traverse_loop, {'\u0000', '\u0000'}, {data_tape, (int) stack_tape});
+    string not_found_branch = branch_on(traverse_loop, {'a', '\u0000'}, {data_tape, (int) stack_tape});
     go_to(traverse_loop, {'S'}, marker_tape, 1, {marker_tape, data_tape});
-
-    set_heap_mode(traverse_loop, false);
 
     make_loop_on(traverse_loop, '\u0000', stack_tape);
 
-    //after loop
+    IncompleteTransition not_found_to_now;
+    not_found_to_now.state = not_found_branch;
+    not_found_to_now.to_state = traverse_loop.to_state;
+    not_found_to_now.def_move = 0;
+
+    traverse_loop.transitions.push_back(not_found_to_now);
+
+    link(do_traverse_check, traverse_loop);
+
+    //clear stack
+    move(do_traverse_check, {(int) stack_tape}, 1);
+    link_put(do_traverse_check, {'!'}, {(int) stack_tape});
+
+    set_heap_mode(do_traverse_check, false);
+    go_to_clear(do_traverse_check, {'.'}, stack_tape, -1, {(int) stack_tape}, {(int) stack_tape});
+    link_put(do_traverse_check, {'\u0000'}, {(int) stack_tape});
+    set_heap_mode(do_traverse_check, true);
+    go_to(do_traverse_check, {'!'}, stack_tape, -1, {(int) stack_tape});
+    link_put(do_traverse_check, {'#'}, {(int) stack_tape});
+    move(do_traverse_check, {(int) stack_tape}, -1);
 
 
-    link(a, traverse_loop);
+    link_on(a, do_traverse_check, {'\u0000'}, {(int) stack_tape});
 
 
 }
@@ -1402,6 +1427,7 @@ void TuringTools::set_heap_mode(IncompleteSet &a, bool to_heap) {
         IncompleteSet to_heap_mode{"to_heap_mode_"+ to_string(counter), "to_heap_mode_"+ to_string(counter)};
         counter++;
         go_to(to_heap_mode, {'*'}, stack_tape, -1, {(int) stack_tape});
+        go_to(to_heap_mode, {'#'}, stack_tape, -1, {(int) stack_tape});
         heap_mode = true;
         link(a, to_heap_mode);
     }else{

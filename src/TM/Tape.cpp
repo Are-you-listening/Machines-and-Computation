@@ -77,7 +77,7 @@ void Tape::write(char symbol) {
 
 void Tape::moveHead(int move_direction) {
     if (tape_head_index+move_direction < 0){
-        increase_size(false, optional<unsigned long>());
+        increase_size(false, optional<unsigned long>(10));
     }
 
     if (tape_head_index+move_direction >= tape_size){

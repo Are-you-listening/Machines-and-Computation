@@ -30,15 +30,15 @@ TEST(TuringMachineTest, tape) {
     ASSERT_EQ(t->getTapeData(), "[ab ]");
     t->moveHead(-2);
     t->write('c');
-    ASSERT_EQ(t->getTapeData(), "[  cab ]");
+    ASSERT_EQ(t->getTapeData(), "[         cab ]");
     t->moveHead(5);
     t->write('d');
-    ASSERT_EQ(t->getTapeData(), "[  cab  d    ]");
+    ASSERT_EQ(t->getTapeData(), "[         cab  d           ]");
     t->write('e');
-    ASSERT_EQ(t->getTapeData(), "[  cab  e    ]");
+    ASSERT_EQ(t->getTapeData(), "[         cab  e           ]");
     t->moveHead(1);
     t->write('f');
-    ASSERT_EQ(t->getTapeData(), "[  cab  ef   ]");
+    ASSERT_EQ(t->getTapeData(), "[         cab  ef          ]");
 }
 
 TEST(TuringMachineTest, tape_production) {
