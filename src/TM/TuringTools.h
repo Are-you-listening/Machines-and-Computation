@@ -99,6 +99,8 @@ public:
     void nesting_marker(IncompleteSet& a, const vector<int>&tuple_indexes, int split_nesting, int max_nesting);
     void make_working_nesting(IncompleteSet& a, const vector<int>&tuple_indexes);
     void mark_definer(IncompleteSet& a, const vector<int>&tuple_indexes);
+    void add_nesting_working(IncompleteSet& a);
+    void remove_nesting_working(IncompleteSet& a);
 private:
 
     TuringTools(unsigned int stack_tape);

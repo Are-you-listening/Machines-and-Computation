@@ -15,7 +15,7 @@ private:
     IncompleteSet storeVar();
     void check_defined(IncompleteSet &a);
     void store_defined(IncompleteSet &a);
-    void remove_nesting(IncompleteSet &a);
+
 };
 
 #endif //TOG_TURINGVARDICTIONARY_H

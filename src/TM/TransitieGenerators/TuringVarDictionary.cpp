@@ -27,7 +27,7 @@ IncompleteSet TuringVarDictionary::storeVar() {
     tools->link_on_multiple(result, store_call_2, {{'D'}}, {get_tuple_index()[1]});
 
     IncompleteSet remove_nest{"vardict_remove_nesting", "vardict_remove_nesting"};
-    remove_nesting(remove_nest);
+    tools->remove_nesting_working(remove_nest);
     tools->move(remove_nest, get_tuple_index(), 1);
     tools->link_on(result, remove_nest, {'}'}, {get_tuple_index()[1]});
 
@@ -140,52 +140,4 @@ void TuringVarDictionary::store_defined(IncompleteSet &a) {
 }
 
 
-void TuringVarDictionary::remove_nesting(IncompleteSet &a) {
-    //clear nesting bracket itself, and all within
-    tools->go_to_clear(a, {'{'}, 1, -1, {0,1}, {0,1});
-    tools->link_put(a, {'\u0000'}, {1});
-
-
-    //check current stack symbol
-    tools->move(a, {(int) tapes-1}, -1);
-
-    //if top is '{' of stack -> POP
-    IncompleteSet pop{"vardict_pop_curly", "vardict_pop_curly"};
-    tools->go_to_clear(pop, {'{', 'O', '*'}, tapes-1, -1, {(int) tapes-1}, {(int) tapes-1});
-    tools->write_on(pop, {'{'}, {(int) tapes-1}, {'\u0000'}, {(int) tapes-1});
-    tools->go_to_not(pop, {'\u0000'}, (int) tapes-1, -1, {(int) tapes-1});
-
-    tools->link_on_multiple(a, pop, {{'{'}, {'N'}}, {(int) tapes-1});
-
-    //check if stack has 'O' charcter saying we need to pop
-    IncompleteSet clear_again{"vardict_clear_again", "vardict_clear_again"};
-    tools->move(clear_again, {0,1}, -1);
-    tools->go_to_clear(clear_again, {'{'}, 1, -1, {0,1}, {0,1});
-    tools->link_put(clear_again, {'\u0000'}, {1});
-    tools->link_put(clear_again, {'\u0000'}, {(int) tapes-1});
-
-    tools->link_on(a, clear_again, {'O'}, {(int) tapes-1});
-
-    //put stack back on right spot
-    tools->move(a, {(int) tapes-1}, 1);
-
-    //clears what is before cleared bracket
-    tools->go_to_multiple(a, {{'A'}, {'{'}}, {0,1}, -1, {0,1});
-
-    tools->move(a, {0,1}, 1);
-    tools->go_to_clear(a, {'\u0000'}, 1, 1, {0,1}, {0,1});
-    tools->go_to_multiple(a, {{'A'}, {'{'}}, {0,1}, -1, {0,1});
-
-    IncompleteSet remove_first_char{"remove_first_char", "remove_first_char"};
-    tools->link_put(remove_first_char, {'\u0000'}, {1});
-
-    tools->link_on(a, remove_first_char, {'A'}, {0});
-
-    IncompleteSet move_right{"remove_nesting_move_right", "remove_nesting_move_right"};
-    tools->move(move_right, {0,1}, 1);
-
-    tools->link_on(a, move_right, {'{'}, {1});
-
-    tools->write_on(a, {'\u0000'}, {0}, {'S'}, {0});
-}
 
