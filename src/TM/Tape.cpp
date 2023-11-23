@@ -15,7 +15,7 @@ Tape::Tape(unsigned long init_size): tape_size{init_size} {
 void Tape::increase_size(bool front, optional<unsigned long> optional_size) {
     unsigned long new_size = tape_size*2;
     if (optional_size){
-        new_size = optional_size.value();
+        new_size = optional_size.value()+tape_size;
     }
 
     if (new_size < tape_size){
@@ -77,7 +77,7 @@ void Tape::write(char symbol) {
 
 void Tape::moveHead(int move_direction) {
     if (tape_head_index+move_direction < 0){
-        increase_size(false, optional<unsigned long>());
+        increase_size(false, optional<unsigned long>(10));
     }
 
     if (tape_head_index+move_direction >= tape_size){

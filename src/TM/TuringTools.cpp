@@ -1360,7 +1360,6 @@ TuringTools::nesting_marker(IncompleteSet &a, const vector<int> &tuple_indexes, 
         write_on(forward_action, {'S'}, {tuple_indexes[0]}, {'\u0000'}, {tuple_indexes[0]});
         move(forward_action, tuple_indexes, 1);
         go_to_clear(forward_action, {'E'}, tuple_indexes[0], 1, tuple_indexes, {tuple_indexes[0]});
-
         write_on(forward_action, {'E'}, {tuple_indexes[0]}, {'\u0000'}, {tuple_indexes[0]});
 
         if (i == split_nesting){
@@ -1376,6 +1375,9 @@ TuringTools::nesting_marker(IncompleteSet &a, const vector<int> &tuple_indexes, 
         forward_action.transitions.push_back(go_next);
 
         IncompleteSet backward_action{"backward_action_"+ to_string(original_counter+1), "backward_action_"+ to_string(original_counter+1)};
+        //move(backward_action, tuple_indexes, -1);
+        remove_nesting_working(backward_action);
+        //move(backward_action, tuple_indexes, 1);
         IncompleteTransition go_back;
         go_back.state = backward_action.to_state;
         go_back.def_move = 0;
@@ -1475,23 +1477,41 @@ void TuringTools::make_working_nesting(IncompleteSet &a, const vector<int> &tupl
 
     copy_to_working(working_nesting, tuple_indexes);
     move(working_nesting, {0, 1}, -1);
-    go_to_copy(working_nesting, {' ', 'S'}, 1, -1, {0,1}, stack_tape, 1, {(int) stack_tape});
+    go_to_copy(working_nesting, {' ', ':'}, 1, -1, {0,1}, stack_tape, 1, {(int) stack_tape});
+
+    IncompleteSet copy_object{"make_working_nesting_"+ to_string(counter), "make_working_nesting_"+ to_string(counter)};
+
+    push(copy_object, ':');
+    go_to_not(copy_object, {':'}, 1, -1, {0, 1});
+    go_to_copy(copy_object, {' '}, 1, -1, {0, 1}, stack_tape, 1, {(int) stack_tape});
+    counter++;
+
+    link_on(working_nesting, copy_object, {':'}, {1});
+
     go_to(working_nesting, {'E'}, 0, 1, {0,1});
     go_to_clear(working_nesting, {'S', 'A'}, 0, -1, {0,1}, {0,1});
 
     link_put(working_nesting, {'\u0000'}, {1});
 
     move(working_nesting, {(int) stack_tape}, -1);
-    go_to_move(working_nesting, {'*', '{'}, stack_tape, -1, {(int) stack_tape}, 1, 1, {0,1});
+    go_to_move(working_nesting, {'*', '{', ':'}, stack_tape, -1, {(int) stack_tape}, 1, 1, {0,1});
+    IncompleteSet replace_double_dot{"replace_double_dot_"+ to_string(counter), "replace_double_dot_"+ to_string(counter)};
+    counter++;
+    //replaces ':' on stack by '{' on working tape
+    link_put(replace_double_dot, {'{'}, {1});
+    move(replace_double_dot, {0, 1}, 1);
+    link_put(replace_double_dot, {'\u0000'}, {(int) stack_tape});
+    move(replace_double_dot, {(int) stack_tape}, -1);
+
+    go_to_move(replace_double_dot, {'*', '{'}, stack_tape, -1, {(int) stack_tape}, 1, 1, {0,1});
+
+    link_on(working_nesting, replace_double_dot, {':'}, {(int) stack_tape});
+
     move(working_nesting, {(int) stack_tape}, 1);
 
     link_put(working_nesting, {'S'}, {0});
 
     go_to(working_nesting, {'E'}, tuple_indexes[0], 1, tuple_indexes);
-
-    IncompleteSet add_nest{"make_working_nesting_"+ to_string(counter), "make_working_nesting_"+ to_string(counter)};
-    counter++;
-    link_on(working_nesting, add_nest, {'{'}, {tuple_indexes[1]});
 
     link(a, working_nesting);
 
@@ -1505,7 +1525,7 @@ void TuringTools::mark_definer(IncompleteSet &a, const vector<int> &tuple_indexe
     write_on(working_nesting, {'S'}, {tuple_indexes[0]}, {'E'}, {tuple_indexes[0]});
 
     move(working_nesting, tuple_indexes, -1);
-    go_to_not(working_nesting, {'E'}, tuple_indexes[1], -1, tuple_indexes);
+    go_to(working_nesting, {'O','C','U','F','I'}, tuple_indexes[1], -1, tuple_indexes);
 
     write_on(working_nesting, {'\u0000'}, {tuple_indexes[0]}, {'S'}, {tuple_indexes[0]});
     write_on(working_nesting, {'E'}, {tuple_indexes[0]}, {'S'}, {tuple_indexes[0]});

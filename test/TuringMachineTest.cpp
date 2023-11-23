@@ -192,12 +192,12 @@ TEST(TuringMachineTest, TM_tokenazation) {
         tm.move();
 
 
-        if (tm.getCurrentState() == "go_to_253"){
+        if (tm.getCurrentState() == "go_to_375"){
             int j=0;
         }
 
 
-        if (i >= 157000){
+        if (i >= 15750){
             int j = 0;
 
             for (int i = 0; i < tm.getTapeAmount(); i++){
