@@ -1297,11 +1297,32 @@ void TuringTools::find_match_heap_traverse(IncompleteSet &a, char start_marker, 
     //now clear 1 var from the path
     link_put(traverse_loop, {'\u0000'}, {data_tape});
     move(traverse_loop, {marker_tape, data_tape}, -1);
-    go_to_clear(traverse_loop, {'{'}, data_tape, -1, {marker_tape, data_tape}, {data_tape});
+    go_to_clear(traverse_loop, {'{', '\u0000'}, data_tape, -1, {marker_tape, data_tape}, {data_tape});
+    move(traverse_loop, {marker_tape, data_tape}, 1);
 
+    //push lowest root again on working
+    move(traverse_loop, {(int) stack_tape}, -1);
+    go_to_move(traverse_loop, {'{', '.'}, stack_tape, -1, {(int) stack_tape}, 1, 1, {marker_tape, data_tape});
+    link_put(traverse_loop, {'{', '\u0000'}, {data_tape, (int) stack_tape});
 
+    move(traverse_loop, {marker_tape, data_tape}, 1);
+    link_put(traverse_loop, {'S'}, {marker_tape});
+
+    go_to(traverse_loop, {'A'}, 0, -1, {marker_tape, data_tape});
+    set_heap_mode(traverse_loop, true);
+    find_match_heap(traverse_loop, start_marker, end_marker, marker_tape, data_tape);
     //still need to move last key
-    //find_match_heap(traverse_loop, start_marker, 'T', marker_tape, data_tape);
+
+    go_to(traverse_loop, {'A'}, marker_tape, -1, {marker_tape, data_tape});
+    string not_found_branch = branch_on(traverse_loop, {'\u0000', '\u0000'}, {data_tape, (int) stack_tape});
+    go_to(traverse_loop, {'S'}, marker_tape, 1, {marker_tape, data_tape});
+
+    set_heap_mode(traverse_loop, false);
+
+    make_loop_on(traverse_loop, '\u0000', stack_tape);
+
+    //after loop
+
 
     link(a, traverse_loop);
 
@@ -1389,6 +1410,7 @@ void TuringTools::set_heap_mode(IncompleteSet &a, bool to_heap) {
         }
         IncompleteSet from_heap_mode{"from_heap_mode_"+ to_string(counter), "from_heap_mode_"+ to_string(counter)};
         counter++;
+        go_to(from_heap_mode, {'#'}, stack_tape, 1, {(int) stack_tape});
         go_to(from_heap_mode, {'\u0000'}, stack_tape, 1, {(int) stack_tape});
         heap_mode = false;
         link(a, from_heap_mode);
