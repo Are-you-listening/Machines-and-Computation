@@ -1272,7 +1272,38 @@ void TuringTools::find_match_heap_traverse(IncompleteSet &a, char start_marker, 
                                            int data_tape) {
     //requires heap mode
     //also check for variables before and after nesting
-    //after should not matter
+    //after should not matter for variables, just for functions
+    //for functions we want to guarantee uniqueness
+    find_match_heap(a, start_marker, end_marker, marker_tape, data_tape);
+    go_to_not(a, {'\u0000'}, stack_tape, 1, {(int) stack_tape});
+
+    go_to(a, {'A'}, marker_tape, -1, {marker_tape, data_tape});
+
+    set_heap_mode(a, false);
+    push(a, '.');
+    go_to_copy(a, {'\u0000'}, data_tape, 1, {marker_tape, data_tape}, stack_tape, 1, {(int) stack_tape});
+
+    IncompleteSet traverse_loop{"traverse_loop_"+ to_string(counter), "traverse_loop_"+ to_string(counter)};
+    counter++;
+
+    link_put(traverse_loop, {'\u0000'}, {marker_tape});
+    move(traverse_loop, {marker_tape, data_tape}, -1);
+    copy(traverse_loop, data_tape, stack_tape);
+    move(traverse_loop, {(int) stack_tape}, 1);
+    link_put(traverse_loop, {'\u0000'}, {data_tape});
+    move(traverse_loop, {marker_tape, data_tape}, -1);
+    go_to_move(traverse_loop, {'{'}, data_tape, -1, {marker_tape, data_tape}, stack_tape, 1, {(int) stack_tape});
+
+    //now clear 1 var from the path
+    link_put(traverse_loop, {'\u0000'}, {data_tape});
+    move(traverse_loop, {marker_tape, data_tape}, -1);
+    go_to_clear(traverse_loop, {'{'}, data_tape, -1, {marker_tape, data_tape}, {data_tape});
+
+
+    //still need to move last key
+    //find_match_heap(traverse_loop, start_marker, 'T', marker_tape, data_tape);
+
+    link(a, traverse_loop);
 
 
 }
@@ -1763,7 +1794,7 @@ void TuringTools::write_function_header(IncompleteSet &a) {
 
     set_heap_mode(write_function_header, true);
     go_to(write_function_header, {'A'}, 0, -1, {0,1});
-    find_match_heap(write_function_header, 'A', 'S', 0, 1);
+    find_match_heap_traverse(write_function_header, 'A', 'S', 0, 1);
 
     link(a, write_function_header);
 
