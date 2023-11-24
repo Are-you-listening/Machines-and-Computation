@@ -18,7 +18,7 @@ private:
      * if you encounter other symbols those are initializations of variables or uses.
      */
     std::vector<std::pair<std::string, std::string>> tokenVector;
-    
+
 public:
     Tokenisation()=default;
 

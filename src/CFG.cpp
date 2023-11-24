@@ -558,6 +558,7 @@ void CFG::toGNF() { // I used the algorithm described by https://www.geeksforgee
     if(!CNF){
         CFG::toCNF();
     }
+    std::cout <<"Start GNF convert" << std::endl;
     // step 2
     std::map<std::string,std::string> originals;
     unsigned long int n=1;
@@ -597,67 +598,54 @@ void CFG::toGNF() { // I used the algorithm described by https://www.geeksforgee
                 continue;
             }
             unsigned long int j=stoi((*it).substr(1, std::string::npos));
-            if(i>j){
-                bool first= true;
-                for(auto & rules2 : P){
-                    if(first&&*it==rules2.first){
-                        std::string temp;
-                        for(const auto& it3 :rules2.second){
-                            temp+=it3;
+            if(i>j){ // A4 -> A1A4 , replace A1 met alle rules van A1
+                //Find rules of A1
+                vector<vector<string>> RHS; //{ {"A2","A3"} , {A4,A4} }
+                for(const auto &rule :P){
+                    if(rule.first=="A"+to_string(j)){
+                        //Find Firsthalf
+                        vector<string> firsthalf;
+                        std::copy(P[m].second.begin(),it-1,back_inserter(firsthalf));
+                        vector<string> secondhalf;
+                        std::copy(it+1,P[m].second.end(),back_inserter(secondhalf));
+                        for(const auto & it2: rule.second){ //Add RHS in between
+                            firsthalf.push_back(it2);
                         }
-                        *it=temp;
-                        first= false;
-                    } else if(*it==rules2.first) {
-                        bool second=false;
-                        std::pair<std::string,std::vector<std::string>> temp;
-                        temp.first=P[m].first;
-                        temp.second=P[m].second;
-                        for(auto & it2 : temp.second){
-                            if(it2==rules2.first){
-                                if(second){
-                                    std::string c;
-                                    for(const auto& it3 :rules2.second){
-                                        c+=it3;
-                                    }
-                                    it2=c;
-                                }else{
-                                    second= true;
-                                }
-                            }
+                        for(const auto & it2: secondhalf){ //Add secondhalf
+                            firsthalf.push_back(it2);
                         }
-                        P.push_back(temp);
+                        RHS.push_back(firsthalf); //Firshalf is now complete, add it to RHS
                     }
                 }
-            } else if(i==j) {
-                auto it2=std::find(it,P[m].second.end(),*it);
-                while(true){
-                    if(std::find(it2+1,P[m].second.end(),*it)!=P[m].second.end()){
-                        it2=std::find(it2+1,P[m].second.end(),*it);
+                //Replace A1 met RHS
+                bool first=true;
+                for(const auto & rhsit: RHS){
+                    if(first){
+                        P[m].second=rhsit;
+                        first=false;
                     } else {
-                        break;
+                        P.emplace_back(P[m].first,rhsit);   
                     }
                 }
-                std::pair<std::string,std::vector<std::string>> temp;
-                temp.first="Z";
-                std::vector<std::string> vcopy =P[m].second;
-                vcopy.erase(vcopy.begin()+std::distance(P[m].second.begin(),it2));
-                temp.second=vcopy;
-                P.push_back(temp);
-                temp.second.push_back(temp.first);
-                P.push_back(temp);
-                unsigned long int originalSize=P.size();
-                for(unsigned long int d=0; d<originalSize; d++){
-                    if(P[m].first==P[d].first&&P[d].second!=P[m].second){
-                        std::pair<std::string,std::vector<std::string>> temp2;
-                        temp2.first=P[m].first;
-                        temp2.second=P[d].second;
-                        temp2.second.emplace_back("Z");
-                        P.push_back(temp2);
-                    }
-                }
-                P.erase(P.begin()+m);
-                m=-1;
                 break;
+            }
+        }
+    }
+    
+    
+    
+    for(long int m=0; m<P.size(); m++) { //Step 3.2, replace i==j
+        if (P[m].first == "Z") {
+            continue;
+        }
+        unsigned long int i = stoi(P[m].first.substr(1, std::string::npos));
+        for (auto it = P[m].second.begin(); it != P[m].second.end(); it++) {
+            if (std::find(T.cbegin(), T.cend(), *it) != T.cend() || *it == "Z") {
+                continue;
+            }
+            unsigned long int j=stoi((*it).substr(1, std::string::npos));
+            if(i==j){
+                
             }
         }
     }

@@ -1,0 +1,13 @@
+{
+  "Variables": ["S", "X", "A","B"],
+  "Terminals": ["b","a"],
+  "Productions": [
+    {"head": "S", "body": ["X", "A"]},
+    {"head": "S", "body": ["B","B"]},
+    {"head": "B", "body": ["b"]},
+    {"head": "B", "body": ["S", "B"]},
+    {"head": "X", "body": ["b"]},
+    {"head": "A", "body": ["a"]}
+  ],
+  "Start": "S"
+}

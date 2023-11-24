@@ -21,11 +21,11 @@ using json = nlohmann::json;
 class CFG {
 private:
     std::vector<std::string> V; //Variables
-    std::vector<std::string> T; //Terminals
+    std::vector<std::string> T;//Terminals
     std::vector<std::pair<std::string,std::vector<std::string>>> P; //Productions
     std::string S; //StartSymbol
 
-    bool CNF = false; //Decides if it's in CNF
+    bool CNF = false;//Decides if it's in CNF
     bool GNF = false; //Decides if it's in GNF
 
     [[nodiscard]] CFGKars convert() const; //Convert to Kars' CFG
