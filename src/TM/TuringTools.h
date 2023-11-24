@@ -106,6 +106,7 @@ public:
     void remove_nesting_working(IncompleteSet& a);
     void write_function_header(IncompleteSet& a, const vector<int>&tuple_indexes);
     void make_token(IncompleteSet& a, const vector<int>&tuple_indexes, char def_token);
+    void make_token_splitter(IncompleteSet& a, const vector<int>&tuple_indexes, char def_token, char splitter);
     void check_var_define_location(IncompleteSet& a, const vector<int>&tuple_indexes);
     void check_var_char_working(IncompleteSet& a);
 private:

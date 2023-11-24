@@ -1895,18 +1895,99 @@ void TuringTools::write_function_header(IncompleteSet &a, const vector<int>&tupl
     //store all parameters on stack
     go_to(write_function_header, {'N'}, tuple_indexes[0], -1, tuple_indexes);
 
-    check_var_define_location(write_function_header, tuple_indexes);
-    move(write_function_header, tuple_indexes, 1);
-    check_var_define_location(write_function_header, tuple_indexes);
-    move(write_function_header, tuple_indexes, 1);
-    check_var_define_location(write_function_header, tuple_indexes);
-    move(write_function_header, tuple_indexes, 1);
-    check_var_define_location(write_function_header, tuple_indexes);
-    move(write_function_header, tuple_indexes, 1);
-    check_var_define_location(write_function_header, tuple_indexes);
-    move(write_function_header, tuple_indexes, 1);
-    check_var_define_location(write_function_header, tuple_indexes);
+    IncompleteSet check_var_loop{"check_define_loop_"+ to_string(counter), "check_define_loop_"+ to_string(counter)};
+    counter++;
 
+    move(check_var_loop, tuple_indexes, 1);
+    string branch = branch_on(check_var_loop, {'U'}, {tuple_indexes[0]});
+
+    IncompleteSet do_check{"do_check_"+ to_string(counter), "do_check_"+ to_string(counter)};
+    counter++;
+    check_var_define_location(do_check, tuple_indexes);
+
+    link_on(check_var_loop, do_check, {'A'}, {tuple_indexes[1]});
+
+    make_loop(check_var_loop);
+    check_var_loop.to_state = branch;
+
+    link(write_function_header, check_var_loop);
+
+    link_put(write_function_header, {'('}, {1});
+    move(write_function_header, {0,1}, 1);
+    link_put(write_function_header, {'E'}, {0});
+    go_to(write_function_header, {'S'}, 0, -1, {0,1});
+
+    go_to(write_function_header, {'H'}, tuple_indexes[0], 1, tuple_indexes);
+    make_token(write_function_header, tuple_indexes, '(');
+
+    write_on(write_function_header, {'E'}, {0}, {'\u0000'}, {0});
+    go_to(write_function_header, {'S'}, 0, -1, {0,1});
+    link_put(write_function_header, {'\u0000'}, {1});
+
+    //putting stack data on working tape
+
+    //start dot
+    //copy to working loop
+    IncompleteSet copy_to_working{"copy_to_working_"+ to_string(counter), "copy_to_working_"+ to_string(counter)};
+    counter++;
+
+    go_to(copy_to_working, {'.'}, stack_tape, -1, {(int) stack_tape});
+    move(copy_to_working, {(int) stack_tape}, -1);
+
+    go_to(copy_to_working, {'.', '*'}, stack_tape, -1, {(int) stack_tape});
+    string end_branch = branch_on(copy_to_working, {'*'}, {(int) stack_tape});
+    IncompleteSet copy_data{"copy_data_"+ to_string(counter), "copy_data_"+ to_string(counter)};
+    counter++;
+
+    go_to(copy_data, {':'}, stack_tape, 1, {(int) stack_tape});
+    move(copy_data, {(int) stack_tape}, 1);
+    go_to_copy(copy_data, {'.'}, stack_tape, 1, {(int) stack_tape}, 1, 1, {0,1});
+    move(copy_data, {(int) stack_tape}, -1);
+    go_to(copy_data, {'.'}, stack_tape, -1, {(int) stack_tape});
+    move(copy_data, {(int) stack_tape}, 1);
+
+    //add by refrence and space on working tape
+    link_put(copy_data, {'&'}, {1});
+    move(copy_data, {0,1}, 1);
+
+    link_put(copy_data, {' '}, {1});
+    move(copy_data, {0,1}, 1);
+
+    go_to_copy(copy_data, {':'}, stack_tape, 1, {(int) stack_tape}, 1, 1, {0,1});
+
+    link_put(copy_data, {','}, {1});
+    move(copy_data, {0,1}, 1);
+
+    link_put(copy_data, {' '}, {1});
+    move(copy_data, {0,1}, 1);
+
+    //check if we don't copy a space
+    IncompleteSet copy_check{"copy_check_"+ to_string(counter), "copy_check_"+ to_string(counter)};
+    counter++;
+    move(copy_check, {(int) stack_tape}, 1);
+    link_on_not(copy_check, copy_data, {' '}, {(int) stack_tape});
+
+    link_on(copy_to_working, copy_check, {'.'}, {(int) stack_tape});
+
+    make_loop(copy_to_working);
+    copy_to_working.to_state = end_branch;
+
+    //remove last ',' and ' '
+    move(copy_to_working, {0,1}, -1);
+    link_put(copy_to_working, {'\u0000'}, {1});
+    move(copy_to_working, {0,1}, -1);
+    link_put(copy_to_working, {'\u0000'}, {1});
+
+    link_put(copy_to_working, {'E'}, {0});
+
+    //TODO: reset stack to start_pos
+    //do here and clear all on path
+
+    link(write_function_header, copy_to_working);
+
+    go_to(write_function_header, {'S'}, 0, -1, {0,1});
+
+    make_token_splitter(write_function_header, tuple_indexes, 'D', ',');
 
     link(a, write_function_header);
 
@@ -1948,7 +2029,76 @@ void TuringTools::make_token(IncompleteSet &a, const vector<int> &tuple_indexes,
     }
 
     link(a, copy_to_tuple);
+    move(a, tuple_indexes, 1);
+    link_put(a, {'H'}, {tuple_indexes[0]});
+    move(a, tuple_indexes, -1);
+
     go_to(a, {'H'}, tuple_indexes[0], -1, tuple_indexes);
+    link_put(a, {'\u0000'}, {tuple_indexes[0]});
+
+    go_to(a, {'H'}, tuple_indexes[0], 1, tuple_indexes);
+
+}
+
+void TuringTools::make_token_splitter(IncompleteSet &a, const vector<int> &tuple_indexes, char def_token, char splitter) {
+
+    IncompleteSet make_token_splitter{"make_token_splitter_"+ to_string(counter), "make_token_splitter_"+ to_string(counter)};
+    counter++;
+
+    IncompleteSet move_on{"move_on_"+ to_string(counter), "move_on_"+ to_string(counter)};
+    counter++;
+    move(move_on, {0,1}, 1);
+    link_on(make_token_splitter, move_on, {splitter}, {1});
+
+    link_put(make_token_splitter, {def_token}, {tuple_indexes[1]});
+
+    IncompleteSet copy_to_tuple{"copy_to_tuple_"+ to_string(counter), "copy_to_tuple_"+ to_string(counter)};
+    counter++;
+
+    vector<string> branch_states;
+
+    for (int i=2; i<tuple_indexes.size(); i++){
+        copy(copy_to_tuple, 1, tuple_indexes[i]);
+        move(copy_to_tuple, {0,1}, 1);
+
+        string branch = branch_on(copy_to_tuple, {'E'}, {0});
+        move(copy_to_tuple, {0,1}, -1);
+        string branch2 = branch_on(copy_to_tuple, {splitter}, {1});
+        move(copy_to_tuple, {0,1}, 1);
+        branch_states.push_back(branch);
+        branch_states.push_back(branch2);
+        if (i == tuple_indexes.size()-1){
+            move(copy_to_tuple, tuple_indexes, 1);
+            link_put(copy_to_tuple, {'E'}, {tuple_indexes[1]});
+            make_loop(copy_to_tuple);
+        }
+    }
+
+    copy_to_tuple.to_state = branch_states[0];
+    for (int i=1; i<branch_states.size(); i++){
+        string b = branch_states[i];
+
+        IncompleteTransition to_end;
+        to_end.state = b;
+        to_end.to_state = copy_to_tuple.to_state;
+        to_end.def_move = 0;
+
+        copy_to_tuple.transitions.push_back(to_end);
+    }
+
+    link(make_token_splitter, copy_to_tuple);
+    move(make_token_splitter, tuple_indexes, 1);
+    link_put(make_token_splitter, {'H'}, {tuple_indexes[0]});
+    move(make_token_splitter, tuple_indexes, -1);
+
+    go_to(make_token_splitter, {'H'}, tuple_indexes[0], -1, tuple_indexes);
+    link_put(make_token_splitter, {'\u0000'}, {tuple_indexes[0]});
+
+    go_to(make_token_splitter, {'H'}, tuple_indexes[0], 1, tuple_indexes);
+
+    make_loop_on(make_token_splitter, ',', 1);
+
+    link(a, make_token_splitter);
 
 }
 
@@ -1958,14 +2108,12 @@ void TuringTools::check_var_define_location(IncompleteSet &a, const vector<int> 
     //startpos is 'N' and end is marked with 'U'
     IncompleteSet find_var{"find_var_"+ to_string(counter), "find_var_"+ to_string(counter)};
     counter++;
-    //TODO: check if we pass '}' and if it has marker 'U' break
     go_to(find_var, {'A'}, tuple_indexes[1], 1, tuple_indexes);
 
     //set markers for copy to working
     link_put(find_var, {'S'}, {tuple_indexes[0]});
     move(find_var, tuple_indexes, 1);
     go_to_not(find_var, {'E'}, tuple_indexes[1], 1, tuple_indexes);
-    //TODO: for copy make sure we dont override U
     link_put(find_var, {'E'}, {tuple_indexes[0]});
 
     go_to(find_var, {'S'}, tuple_indexes[0], -1, tuple_indexes);
@@ -1979,7 +2127,34 @@ void TuringTools::check_var_define_location(IncompleteSet &a, const vector<int> 
     go_to(check_var_loop, {'S'}, 0, -1, {0,1});
 
     //marks var first splitter by 'P'
+    //stops at 'P'
     check_var_char_working(check_var_loop);
+
+    //in case under 'S' marker it starts with a non-variable symbol
+    IncompleteSet remove_useless{"remove_useless_"+ to_string(counter), "remove_useless_"+ to_string(counter)};
+    link_put(remove_useless, {'\u0000'}, {1});
+    move(remove_useless, {0,1}, 1);
+    //copy rest on stack
+    go_to_move(remove_useless, {'\u0000'}, 1, 1, {0,1}, stack_tape, 1, {(int) stack_tape});
+    write_on(remove_useless, {'E'}, {0}, {'\u0000'}, {0});
+    go_to(remove_useless, {'S'}, 0, -1, {0,1});
+    go_to(remove_useless, {'.'}, stack_tape, -1, {(int) stack_tape});
+    move(remove_useless, {(int) stack_tape}, 1);
+    go_to_move(remove_useless, {'\u0000'}, (int) stack_tape, 1, {(int) stack_tape}, 1, 1, {0,1});
+    go_to(remove_useless, {'.'}, stack_tape, -1, {(int) stack_tape});
+    move(remove_useless, {(int) stack_tape}, 1);
+
+    write_on(remove_useless, {'\u0000'}, {0}, {'E'}, {0});
+    go_to(remove_useless, {'S'}, 0, -1, {0,1});
+
+    check_var_char_working(remove_useless);
+
+    string remove_useless_quit = branch_on(remove_useless, {'S', '\u0000'}, {0, 1});
+    make_loop_on(remove_useless, 'S', 0);
+
+    link_on(check_var_loop, remove_useless, {'S'}, {0});
+
+    go_to(check_var_loop, {'S'}, 0, -1, {0,1});
 
     //move part from 'P' temporarly on stack
     push(check_var_loop, '.');
@@ -2002,7 +2177,6 @@ void TuringTools::check_var_define_location(IncompleteSet &a, const vector<int> 
     set_heap_mode(check_var_loop, true);
 
     find_match_heap_traverse(check_var_loop, 'A', 'S', 0, 1);
-    //TODO: only do if result is found
 
     //string not_found = branch_on(check_var_loop, {'\u0000'}, {(int) stack_tape});
 
@@ -2049,6 +2223,7 @@ void TuringTools::check_var_define_location(IncompleteSet &a, const vector<int> 
 
     //push remaining stuff on stack
     write_on(check_var_loop, {'P'}, {0}, {'\u0000'}, {0});
+
     //prevent move if marker is 'E'
     IncompleteSet move_on{"move_on_"+ to_string(counter), "move_on_"+ to_string(counter)};
     move(move_on, {0,1}, 1);
@@ -2074,13 +2249,20 @@ void TuringTools::check_var_define_location(IncompleteSet &a, const vector<int> 
     go_to_move(check_var_loop, {'\u0000'}, stack_tape, 1, {(int) stack_tape}, 1, 1, {0,1});
     go_to(check_var_loop, {'.'}, stack_tape, -1, {(int) stack_tape});
     move(check_var_loop, {(int) stack_tape}, 1);
-
+    write_on(check_var_loop, {'\u0000'}, {0}, {'E'}, {0});
     //this line is double but that is not a problem and is extra redundancy
     go_to(check_var_loop, {'S'}, 0, -1, {0,1});
     string branch_done = branch_on(check_var_loop, {'\u0000'}, {1});
 
     make_loop(check_var_loop);
     check_var_loop.to_state = branch_done;
+
+    IncompleteTransition from_remove_useless;
+    from_remove_useless.state = remove_useless_quit;
+    from_remove_useless.to_state = branch_done;
+    from_remove_useless.def_move = 0;
+
+    check_var_loop.transitions.push_back(from_remove_useless);
 
     link(find_var, check_var_loop);
 
@@ -2120,17 +2302,19 @@ void TuringTools::check_var_char_working(IncompleteSet &a) {
 
     //makes sure to to override wrong tokens
     write_on(var_char_check, {'\u0000'}, {0}, {'P'}, {0});
-    move(var_char_check, {0,1}, 1);
+
 
     //make_loop(var_char_check);
     //var_char_check.to_state = loop_branch;
 
     //go back to start
-    go_to(var_char_check, {'S'}, 0, -1, {0,1});
+
 
     link(a, var_char_check);
 
 }
+
+
 
 
 
