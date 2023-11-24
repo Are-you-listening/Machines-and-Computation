@@ -71,6 +71,10 @@ set(CodeFiles
         ${TuringCode}
         src/CFGConstructor.cpp
         src/CFGConstructor.h
+        
+        src/LALR.cpp
+        src/LALR.h
+        
 )
 
 add_executable(TESTS

@@ -588,10 +588,8 @@ void CFG::toGNF() { // I used the algorithm described by https://www.geeksforgee
     S=originals[S];
 
     //step 3, I replace A3 also, on the website this isn't done for some reason. A4 → b | A2A3A4 | A4A4A4
-    for(long int m=0; m<P.size(); m++){
-        if(P[m].first=="Z"){
-            continue;
-        }
+    std::cout << "step 3" <<std::endl;
+    for(long int m=0; m<P.size(); m++){ //Step 3.1 , replace j>i
         unsigned long int i= stoi(P[m].first.substr(1, std::string::npos));
         for(auto it=P[m].second.begin(); it!=P[m].second.end(); it++){
             if(std::find(T.cbegin(),T.cend(),*it)!=T.cend()||*it=="Z"){
@@ -651,6 +649,7 @@ void CFG::toGNF() { // I used the algorithm described by https://www.geeksforgee
     }
 
     //step 4
+    std::cout << "step 4" <<std::endl;
     for(auto & rules : P){
         for(auto & it:rules.second){
             if(std::find(T.cbegin(),T.cend(),it)!=T.cend()){
@@ -677,3 +676,37 @@ CFGKars CFG::convert() const {
 
     return CFGKars{V,T,P2,S}; //Construct CFG
 }
+
+set<string> CFG::First(const string &input) {
+    set<string> result;
+    for (const auto& rule : P){
+        if (rule.second.empty()){   // the empty string has no useful information for the parser, so we ignore it (left production side)
+            continue;
+        }
+        if (rule.first == input){
+            result.emplace(rule.second[0]); //P -> A , A wordt meegegeven, format: {"P",{"A"}})
+        }
+    }
+    return result;
+}
+
+const vector<std::string> &CFG::getV() const {
+    return V;
+}
+
+const vector<std::string> &CFG::getT() const {
+    return T;
+}
+
+const vector<std::pair<std::string, std::vector<std::string>>> &CFG::getP() const {
+    return P;
+}
+
+const string &CFG::getS() const {
+    return S;
+}
+
+void CFG::setCnf(bool cnf) {
+    CNF = cnf;
+}
+

@@ -73,6 +73,24 @@ public:
      * @return
      */
     [[nodiscard]] bool accepts(const std::string &w) const;
+
+    /**
+     * collect the terminals that start the _productions with head == input
+     * we assume the cfg is in greibach normal form --> the terminals we want are always at the start of the rule body
+     * @param input
+     * @return
+     */
+    set<string> First(const string& input);
+
+    const vector<std::string> &getV() const;
+
+    const vector<std::string> &getT() const;
+
+    const vector<std::pair<std::string, std::vector<std::string>>> &getP() const;
+
+    const string &getS() const;
+    
+    void setCnf(bool cnf);
 };
 
 

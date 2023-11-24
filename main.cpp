@@ -30,6 +30,8 @@ int main() { // Function names we create to replace nesting should have F or I i
     Tokenizer.join();
     core_amount++;
     //create LARL parser with tokenvector
+    auto vec = tokenVector.getTokenVector();
+    lalr.parse(vec);
     
     //threading every function for now, will later be changed
     // I also assume that every function we create to replace nesting is only called upon once
