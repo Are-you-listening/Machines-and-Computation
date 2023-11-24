@@ -1896,6 +1896,17 @@ void TuringTools::write_function_header(IncompleteSet &a, const vector<int>&tupl
     go_to(write_function_header, {'N'}, tuple_indexes[0], -1, tuple_indexes);
 
     check_var_define_location(write_function_header, tuple_indexes);
+    move(write_function_header, tuple_indexes, 1);
+    check_var_define_location(write_function_header, tuple_indexes);
+    move(write_function_header, tuple_indexes, 1);
+    check_var_define_location(write_function_header, tuple_indexes);
+    move(write_function_header, tuple_indexes, 1);
+    check_var_define_location(write_function_header, tuple_indexes);
+    move(write_function_header, tuple_indexes, 1);
+    check_var_define_location(write_function_header, tuple_indexes);
+    move(write_function_header, tuple_indexes, 1);
+    check_var_define_location(write_function_header, tuple_indexes);
+
 
     link(a, write_function_header);
 
@@ -2072,6 +2083,11 @@ void TuringTools::check_var_define_location(IncompleteSet &a, const vector<int> 
     check_var_loop.to_state = branch_done;
 
     link(find_var, check_var_loop);
+
+    go_to(find_var, {'E'}, tuple_indexes[0], 1, tuple_indexes);
+    link_put(find_var, {'\u0000'}, {tuple_indexes[0]});
+    go_to(find_var, {'S'}, tuple_indexes[0], -1, tuple_indexes);
+    link_put(find_var, {'\u0000'}, {tuple_indexes[0]});
 
     link(a, find_var);
 }

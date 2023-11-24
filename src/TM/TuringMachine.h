@@ -13,6 +13,7 @@
 #include "Tape.h"
 #include "TuringProduction.h"
 #include "lib/json.hpp"
+#include "TuringTools.h"
 
 using json = nlohmann::json;
 
@@ -24,6 +25,7 @@ public:
 
     void load(const string &path);
     void load(json &data);
+    void load(const vector<string>& states, const string& start_state, const string& input, int tape_size, const vector<Transition>& productions);
     void load_input(const string& input, int index);
     [[nodiscard]] string getTapeData(unsigned int index) const;
     void move();

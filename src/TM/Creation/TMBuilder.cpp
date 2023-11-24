@@ -9,16 +9,23 @@ TMBuilder::TMBuilder(unsigned int tuple_size): tapes{tuple_size+5} {
 }
 
 
-json TMBuilder::generateTM() {
-    json TM_data;
+TMBuilder_output TMBuilder::generateTM() {
+    //json TM_data;
     vector<string> states = {"still need to do"};
-    TM_data["States"] = states;
 
-    TM_data["Tapes"] = tapes; // 2 for resulting marker and token same for original
+    TMBuilder_output TM_data{};
+    //TM_data["States"] = states;
+    TM_data.states = states;
 
-    TM_data["Start"] = "program_start";
+    //TM_data["Tapes"] = tapes; // 2 for resulting marker and token same for original
+    TM_data.tape_size = tapes;
 
-    TM_data["Input"] = "";
+    //TM_data["Start"] = "program_start";
+
+    TM_data.start_state = "program_start";
+
+    //TM_data["Input"] = "";
+    TM_data.input = "";
 
 
     IncompleteSet program("program_start", "program_start");
@@ -43,8 +50,11 @@ json TMBuilder::generateTM() {
 
     for (auto incomp: program.transitions){
         Transition t = make_transition(incomp);
-        json production = add_transition(t);
-        TM_data["Productions"].push_back(production);
+
+        TM_data.productions.push_back(t);
+
+        //json production = add_transition(t);
+        //TM_data["Productions"].push_back(production);
     }
 
     return TM_data;

@@ -171,15 +171,15 @@ TEST(TuringMachineTest, TM_tokenazation) {
     // not in real use yet
     TuringTools::reset();
     auto t = new TMBuilder(4);
-    json data = t->generateTM();
+    TMBuilder_output data = t->generateTM();
     //ofstream o("output/TM_test.json");
     //o << data;
     TuringMachine tm;
-    tm.load(data);
+    tm.load(data.states, data.start_state, data.input, data.tape_size, data.productions);
     tm.load_input(test_string, 1);
 
     int halted_time = -1;
-    for (int i = 0; i<28000; i++){
+    for (int i = 0; i<60000; i++){
 
 
         if (tm.isHalted()){

@@ -59,6 +59,60 @@ void TuringMachine::load(json &data) {
     }
 }
 
+void TuringMachine::load(const vector<string> &states, const string &start_state, const string &input, int tape_size,
+                         const vector<Transition> &productions) {
+    halted = false;
+    for (const string& i : states){
+        this->states.insert(i);
+    }
+
+    this->start_state = start_state;
+    current_state = start_state;
+
+    unsigned int tape_amount = tape_size;
+    for (int i=0; i<tape_amount; i++){
+        tapes.push_back(new Tape{64});
+    }
+
+    load_input(input, 0);
+
+    for (int i = 0; i<productions.size(); i++){
+        Transition production = productions[i];
+        string state = production.state;
+        queue<char> symbols;
+        for (const auto & j : production.input){
+            symbols.push(j);
+        }
+
+        //json to = production["to"];
+        Production p = production.production;
+        /*
+        p.new_state = to["state"];
+
+        for (const auto & j : to["symbols"]){
+            p.replace_val.push_back(j.get<string>()[0]);
+        }
+
+        for (const auto & j : to["moves"]){
+            p.movement.push_back(j.get<int>());
+        }*/
+
+        auto loc = production_trees.find(state);
+
+        TuringProduction* tp;
+        if (loc != production_trees.end()){
+            tp = loc->second;
+        }else{
+            tp = new TuringProduction{};
+            production_trees.insert({state, tp});
+        }
+
+        tp->addRoute(symbols, std::move(p));
+    }
+
+}
+
+
 
 void TuringMachine::load(const string &path) {
     ifstream f(path);
@@ -122,3 +176,4 @@ void TuringMachine::load_input(const string &input, int index) {
 const string &TuringMachine::getCurrentState() const {
     return current_state;
 }
+

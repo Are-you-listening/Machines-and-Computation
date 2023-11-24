@@ -8,10 +8,20 @@
 #include "src/TM/TuringTools.h"
 #include "src/TM/TransitieGenerators/TuringVarDictionary.h"
 #include "src/TM/TransitieGenerators/TuringDenestify.h"
+
+struct TMBuilder_output{
+    vector<string> states;
+    string start_state;
+    string input;
+    int tape_size;
+    vector<Transition> productions;
+
+};
+
 class TMBuilder {
 public:
     TMBuilder(unsigned int tuple_size);
-    json generateTM();
+    TMBuilder_output generateTM();
 private:
     unsigned int tapes;
     TuringTools* tools;
