@@ -13,6 +13,7 @@ IncompleteSet TuringVarDictionary::getTransitions() {
 }
 
 IncompleteSet TuringVarDictionary::storeVar() {
+    //TODO: functions with paramerters supporter in heap storage
     IncompleteSet result("store_var_start", "store_var_start");
     //tools->heap_push_function(result, get_tuple_index());
     tools->go_to(result, {'C', 'U', 'O', '\u0000', '}', '{', 'O', 'D'}, get_tuple_index()[1], 1, {get_tuple_index()});

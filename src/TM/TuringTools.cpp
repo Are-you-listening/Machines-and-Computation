@@ -1961,7 +1961,6 @@ void TuringTools::check_var_define_location(IncompleteSet &a, const vector<int> 
 
     copy_to_working(find_var, tuple_indexes);
 
-
     //TODO: make this later a loop
     //split the substring for every non variable char
     go_to(find_var, {'S'}, 0, -1, {0,1});
@@ -1974,6 +1973,7 @@ void TuringTools::check_var_define_location(IncompleteSet &a, const vector<int> 
     go_to(find_var, {'P', 'E'}, 0, 1, {0,1});
     string branch_no_split = branch_on(find_var, {'E'}, {0});
     go_to_move(find_var, {'\u0000'}, 1, 1, {0, 1}, stack_tape, 1, {(int) stack_tape});
+
     //clear markers till 'S'
     go_to_clear(find_var, {'S', 'A'}, 0, -1, {0,1}, {0});
 
@@ -2012,9 +2012,48 @@ void TuringTools::check_var_define_location(IncompleteSet &a, const vector<int> 
     go_to(find_var, {'.'}, stack_tape, -1, {(int) stack_tape});
     link_put(find_var, {'\u0000'}, {(int) stack_tape});
 
-
     //overrides P if their are no values on stack
     link_put(find_var, {'E'}, {0});
+
+    //store heap data on stack
+    //go to S in case P doesnt exist
+    go_to(find_var, {'P', 'S'}, 0, -1, {0,1});
+
+    write_on(find_var, {'P'}, {0}, {'\u0000'}, {1});
+
+    go_to(find_var, {'S'}, 0, -1, {0,1});
+    go_to_move(find_var, {'\u0000'}, 1, 1, {0, 1},  stack_tape, 1, {(int) stack_tape});
+    push(find_var, '.');
+
+    //push remaining stuff on stack
+    write_on(find_var, {'P'}, {0}, {'\u0000'}, {0});
+    //prevent move if marker is 'E'
+    IncompleteSet move_on{"move_on_"+ to_string(counter), "move_on_"+ to_string(counter)};
+    move(move_on, {0,1}, 1);
+    link_on(find_var, move_on, {'\u0000'}, {0});
+
+    go_to_move(find_var, {'\u0000'}, 1, 1, {0,1}, stack_tape, 1, {(int) stack_tape});
+    write_on(find_var, {'E'}, {0}, {'\u0000'}, {0});
+
+
+    //remove 1 nesting
+    go_to(find_var, {'S'}, 0, -1, {0,1});
+    link_put(find_var, {'\u0000'}, {0});
+    go_to(find_var, {'{'}, 1, -1, {0,1});
+    link_put(find_var, {'\u0000'}, {1});
+    move(find_var, {0,1}, -1);
+    go_to_clear(find_var, {'{'}, 1, -1, {0,1}, {1});
+    move(find_var, {0,1}, 1);
+    link_put(find_var, {'S'}, {0});
+
+    //copy remaining stuff back on right spot
+    go_to(find_var, {'.'}, stack_tape, -1, {(int) stack_tape});
+    move(find_var, {(int) stack_tape}, 1);
+    go_to_move(find_var, {'\u0000'}, stack_tape, 1, {(int) stack_tape}, 1, 1, {0,1});
+    go_to(find_var, {'.'}, stack_tape, -1, {(int) stack_tape});
+
+    //this line is double but that is not a problem and is extra redundancy
+    go_to(find_var, {'S'}, 0, -1, {0,1});
 
     link(a, find_var);
 }

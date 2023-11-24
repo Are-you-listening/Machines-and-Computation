@@ -5,9 +5,9 @@ public:
 
 void Base::test(){
     if (true){
-        int A = 0;
-        for (int j=0; j<5; j++){
-            if (j+A == 4){
+        int AB = 0;
+        for (int jb=0; jb<5; jb++){
+            if (jb+AB == 4){
                 for (int k=0; k<5; k++){
                     int i = 0;
                 }
