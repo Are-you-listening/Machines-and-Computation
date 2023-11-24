@@ -1979,15 +1979,39 @@ void TuringTools::write_function_header(IncompleteSet &a, const vector<int>&tupl
     link_put(copy_to_working, {'\u0000'}, {1});
 
     link_put(copy_to_working, {'E'}, {0});
-
-    //TODO: reset stack to start_pos
-    //do here and clear all on path
-
     link(write_function_header, copy_to_working);
 
-    go_to(write_function_header, {'S'}, 0, -1, {0,1});
+    //clears all stack overhead
+    go_to(write_function_header, {'\u0000'}, stack_tape, 1, {(int) stack_tape});
+    go_to_clear(write_function_header, {'{'}, stack_tape, -1, {(int) stack_tape}, {(int) stack_tape});
+    move(write_function_header, {(int) stack_tape}, 1);
 
+    go_to(write_function_header, {'S'}, 0, -1, {0,1});
     make_token_splitter(write_function_header, tuple_indexes, 'D', ',');
+
+    go_to(write_function_header, {'S'}, 0, -1, {0,1});
+    //store every value that is a parameter on stack for later
+    IncompleteSet stack_loop{"stack_loop_"+ to_string(counter), "stack_loop_"+ to_string(counter)};
+    counter++;
+
+    push(stack_loop, '.');
+    go_to(stack_loop, {' '}, 1, 1, {0,1});
+    move(stack_loop, {0,1}, 1);
+    go_to_copy(stack_loop, {',', '\u0000'}, 1, 1, {0,1}, stack_tape, 1, {(int) stack_tape});
+
+    string stack_loop_branch = branch_on(stack_loop, {'\u0000'}, {1});
+    move(stack_loop, {0,1}, 2);
+    make_loop(stack_loop);
+
+    stack_loop.to_state = stack_loop_branch;
+
+    link(write_function_header, stack_loop);
+
+    //clears working
+    go_to_clear(write_function_header, {'S'}, 0, -1, {0,1}, {0,1});
+    link_put(write_function_header, {'\u0000'}, {1});
+
+    go_to(write_function_header, {'N'}, tuple_indexes[0], -1, tuple_indexes);
 
     link(a, write_function_header);
 
