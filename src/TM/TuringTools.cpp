@@ -1871,6 +1871,7 @@ void TuringTools::write_function_header(IncompleteSet &a, const vector<int>&tupl
 
     //copy function token to tokenize
     go_to(write_function_header, {'H'}, tuple_indexes[0], 1, tuple_indexes);
+
     //move S marker
     write_on(write_function_header, {'S'}, {0}, {'\u0000'}, {0});
     move(write_function_header, {0,1}, -1);
@@ -1886,13 +1887,18 @@ void TuringTools::write_function_header(IncompleteSet &a, const vector<int>&tupl
 
     make_token(write_function_header, tuple_indexes, 'U');
 
-    //store all parameters on stack
     //clear first working tape
     go_to_clear(write_function_header, {'S'}, 0, -1, {0,1}, {0,1});
     link_put(write_function_header, {'\u0000'}, {1});
     push(write_function_header, '.');
 
+    //store all parameters on stack
+    go_to(write_function_header, {'N'}, tuple_indexes[0], -1, tuple_indexes);
+
+    check_var_define_location(write_function_header, tuple_indexes);
+
     link(a, write_function_header);
+
 }
 
 void TuringTools::make_token(IncompleteSet &a, const vector<int> &tuple_indexes, char def_token) {
@@ -1932,6 +1938,121 @@ void TuringTools::make_token(IncompleteSet &a, const vector<int> &tuple_indexes,
 
     link(a, copy_to_tuple);
     go_to(a, {'H'}, tuple_indexes[0], -1, tuple_indexes);
+
+}
+
+void TuringTools::check_var_define_location(IncompleteSet &a, const vector<int> &tuple_indexes) {
+    //check every A token en check if the data of the token is defined
+    //required stack mode
+    //startpos is 'N' and end is marked with 'U'
+    IncompleteSet find_var{"find_var_"+ to_string(counter), "find_var_"+ to_string(counter)};
+    counter++;
+    //TODO: check if we pass '}' and if it has marker 'U' break
+    go_to(find_var, {'A'}, tuple_indexes[1], 1, tuple_indexes);
+
+    //set markers for copy to working
+    link_put(find_var, {'S'}, {tuple_indexes[0]});
+    move(find_var, tuple_indexes, 1);
+    go_to_not(find_var, {'E'}, tuple_indexes[1], 1, tuple_indexes);
+    //TODO: for copy make sure we dont override U
+    link_put(find_var, {'E'}, {tuple_indexes[0]});
+
+    go_to(find_var, {'S'}, tuple_indexes[0], -1, tuple_indexes);
+
+    copy_to_working(find_var, tuple_indexes);
+
+
+    //TODO: make this later a loop
+    //split the substring for every non variable char
+    go_to(find_var, {'S'}, 0, -1, {0,1});
+
+    //marks var first splitter by 'P'
+    check_var_char_working(find_var);
+
+    //move part from 'P' temporarly on stack
+    push(find_var, '.');
+    go_to(find_var, {'P', 'E'}, 0, 1, {0,1});
+    string branch_no_split = branch_on(find_var, {'E'}, {0});
+    go_to_move(find_var, {'\u0000'}, 1, 1, {0, 1}, stack_tape, 1, {(int) stack_tape});
+    //clear markers till 'S'
+    go_to_clear(find_var, {'S', 'A'}, 0, -1, {0,1}, {0});
+
+    //set var in nesting
+    write_on(find_var, {'S'}, {0}, {'\u0000'}, {0});
+    go_to(find_var, {'\u0000'}, 1, 1, {0,1});
+    link_put(find_var, {'{'}, {1});
+    move(find_var, {0,1}, 1);
+    link_put(find_var, {'S'}, {0});
+
+    //TODO: only do if normal find does not find it
+    //setup find match traverse
+    go_to(find_var, {'A'}, 0, -1, {0,1});
+    set_heap_mode(find_var, true);
+
+    find_match_heap_traverse(find_var, 'A', 'S', 0, 1);
+    //TODO: only do if result is found
+
+    //store heap definer on working
+    go_to(find_var, {'#'}, stack_tape, 1, {(int) stack_tape});
+    move(find_var, {(int) stack_tape}, 1);
+    go_to(find_var, {'#'}, stack_tape, 1, {(int) stack_tape});
+    move(find_var, {(int) stack_tape}, -1);
+    go_to_copy(find_var, {'#'}, stack_tape, -1, {(int) stack_tape}, 1, 1, {0,1});
+
+    set_heap_mode(find_var, false);
+
+    //pop other var on stack that are seperated by a operator
+    //push heap definer
+    link_put(find_var, {'P'}, {0});
+
+    //put data back on working
+    go_to(find_var, {'.'}, stack_tape, -1, {(int) stack_tape});
+    move(find_var, {(int) stack_tape}, 1);
+    go_to_move(find_var, {'\u0000'}, stack_tape, 1, {(int) stack_tape}, 1, 1, {0,1});
+    go_to(find_var, {'.'}, stack_tape, -1, {(int) stack_tape});
+    link_put(find_var, {'\u0000'}, {(int) stack_tape});
+
+
+    //overrides P if their are no values on stack
+    link_put(find_var, {'E'}, {0});
+
+    link(a, find_var);
+}
+
+void TuringTools::check_var_char_working(IncompleteSet &a) {
+    IncompleteSet var_char_check{"var_char_check_"+ to_string(counter), "var_char_check_"+ to_string(counter)};
+    counter++;
+
+    vector<char> var_char;
+    for (int i=48; i<= 57; i++){
+        var_char.push_back((char) i);
+    }
+
+    for (int i=65; i<= 90; i++){
+        var_char.push_back((char) i);
+    }
+
+    for (int i=97; i<= 122; i++){
+        var_char.push_back((char) i);
+    }
+
+    var_char.push_back('_');
+
+    go_to_not(var_char_check, var_char, 1, 1, {0,1});
+
+    //string loop_branch = branch_on(var_char_check, {'E'}, {0});
+
+    //makes sure to to override wrong tokens
+    write_on(var_char_check, {'\u0000'}, {0}, {'P'}, {0});
+    move(var_char_check, {0,1}, 1);
+
+    //make_loop(var_char_check);
+    //var_char_check.to_state = loop_branch;
+
+    //go back to start
+    go_to(var_char_check, {'S'}, 0, -1, {0,1});
+
+    link(a, var_char_check);
 
 }
 

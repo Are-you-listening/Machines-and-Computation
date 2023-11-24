@@ -172,8 +172,8 @@ TEST(TuringMachineTest, TM_tokenazation) {
     TuringTools::reset();
     auto t = new TMBuilder(4);
     json data = t->generateTM();
-    ofstream o("output/TM_test.json");
-    o << data;
+    //ofstream o("output/TM_test.json");
+    //o << data;
     TuringMachine tm;
     tm.load(data);
     tm.load_input(test_string, 1);
