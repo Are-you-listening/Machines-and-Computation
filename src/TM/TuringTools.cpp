@@ -1961,99 +1961,107 @@ void TuringTools::check_var_define_location(IncompleteSet &a, const vector<int> 
 
     copy_to_working(find_var, tuple_indexes);
 
+    IncompleteSet check_var_loop{"check_var_loop_"+ to_string(counter), "check_var_loop_"+ to_string(counter)};
+    counter++;
+
     //TODO: make this later a loop
     //split the substring for every non variable char
-    go_to(find_var, {'S'}, 0, -1, {0,1});
+    go_to(check_var_loop, {'S'}, 0, -1, {0,1});
 
     //marks var first splitter by 'P'
-    check_var_char_working(find_var);
+    check_var_char_working(check_var_loop);
 
     //move part from 'P' temporarly on stack
-    push(find_var, '.');
-    go_to(find_var, {'P', 'E'}, 0, 1, {0,1});
-    string branch_no_split = branch_on(find_var, {'E'}, {0});
-    go_to_move(find_var, {'\u0000'}, 1, 1, {0, 1}, stack_tape, 1, {(int) stack_tape});
+    push(check_var_loop, '.');
+    go_to(check_var_loop, {'P', 'E'}, 0, 1, {0,1});
+    string branch_no_split = branch_on(check_var_loop, {'E'}, {0});
+    go_to_move(check_var_loop, {'\u0000'}, 1, 1, {0, 1}, stack_tape, 1, {(int) stack_tape});
 
     //clear markers till 'S'
-    go_to_clear(find_var, {'S', 'A'}, 0, -1, {0,1}, {0});
+    go_to_clear(check_var_loop, {'S', 'A'}, 0, -1, {0,1}, {0});
 
     //set var in nesting
-    write_on(find_var, {'S'}, {0}, {'\u0000'}, {0});
-    go_to(find_var, {'\u0000'}, 1, 1, {0,1});
-    link_put(find_var, {'{'}, {1});
-    move(find_var, {0,1}, 1);
-    link_put(find_var, {'S'}, {0});
+    write_on(check_var_loop, {'S'}, {0}, {'\u0000'}, {0});
+    go_to(check_var_loop, {'\u0000'}, 1, 1, {0,1});
+    link_put(check_var_loop, {'{'}, {1});
+    move(check_var_loop, {0,1}, 1);
+    link_put(check_var_loop, {'S'}, {0});
 
     //TODO: only do if normal find does not find it
     //setup find match traverse
-    go_to(find_var, {'A'}, 0, -1, {0,1});
-    set_heap_mode(find_var, true);
+    go_to(check_var_loop, {'A'}, 0, -1, {0,1});
+    set_heap_mode(check_var_loop, true);
 
-    find_match_heap_traverse(find_var, 'A', 'S', 0, 1);
+    find_match_heap_traverse(check_var_loop, 'A', 'S', 0, 1);
     //TODO: only do if result is found
 
     //store heap definer on working
-    go_to(find_var, {'#'}, stack_tape, 1, {(int) stack_tape});
-    move(find_var, {(int) stack_tape}, 1);
-    go_to(find_var, {'#'}, stack_tape, 1, {(int) stack_tape});
-    move(find_var, {(int) stack_tape}, -1);
-    go_to_copy(find_var, {'#'}, stack_tape, -1, {(int) stack_tape}, 1, 1, {0,1});
+    go_to(check_var_loop, {'#'}, stack_tape, 1, {(int) stack_tape});
+    move(check_var_loop, {(int) stack_tape}, 1);
+    go_to(check_var_loop, {'#'}, stack_tape, 1, {(int) stack_tape});
+    move(check_var_loop, {(int) stack_tape}, -1);
+    go_to_copy(check_var_loop, {'#'}, stack_tape, -1, {(int) stack_tape}, 1, 1, {0,1});
 
-    set_heap_mode(find_var, false);
+    set_heap_mode(check_var_loop, false);
 
     //pop other var on stack that are seperated by a operator
     //push heap definer
-    link_put(find_var, {'P'}, {0});
+    link_put(check_var_loop, {'P'}, {0});
 
     //put data back on working
-    go_to(find_var, {'.'}, stack_tape, -1, {(int) stack_tape});
-    move(find_var, {(int) stack_tape}, 1);
-    go_to_move(find_var, {'\u0000'}, stack_tape, 1, {(int) stack_tape}, 1, 1, {0,1});
-    go_to(find_var, {'.'}, stack_tape, -1, {(int) stack_tape});
-    link_put(find_var, {'\u0000'}, {(int) stack_tape});
+    go_to(check_var_loop, {'.'}, stack_tape, -1, {(int) stack_tape});
+    move(check_var_loop, {(int) stack_tape}, 1);
+    go_to_move(check_var_loop, {'\u0000'}, stack_tape, 1, {(int) stack_tape}, 1, 1, {0,1});
+    go_to(check_var_loop, {'.'}, stack_tape, -1, {(int) stack_tape});
+    link_put(check_var_loop, {'\u0000'}, {(int) stack_tape});
 
     //overrides P if their are no values on stack
-    link_put(find_var, {'E'}, {0});
+    link_put(check_var_loop, {'E'}, {0});
 
     //store heap data on stack
     //go to S in case P doesnt exist
-    go_to(find_var, {'P', 'S'}, 0, -1, {0,1});
+    go_to(check_var_loop, {'P', 'S'}, 0, -1, {0,1});
 
-    write_on(find_var, {'P'}, {0}, {'\u0000'}, {1});
+    write_on(check_var_loop, {'P'}, {0}, {'\u0000'}, {1});
 
-    go_to(find_var, {'S'}, 0, -1, {0,1});
-    go_to_move(find_var, {'\u0000'}, 1, 1, {0, 1},  stack_tape, 1, {(int) stack_tape});
-    push(find_var, '.');
+    go_to(check_var_loop, {'S'}, 0, -1, {0,1});
+    go_to_move(check_var_loop, {'\u0000'}, 1, 1, {0, 1},  stack_tape, 1, {(int) stack_tape});
+    push(check_var_loop, '.');
 
     //push remaining stuff on stack
-    write_on(find_var, {'P'}, {0}, {'\u0000'}, {0});
+    write_on(check_var_loop, {'P'}, {0}, {'\u0000'}, {0});
     //prevent move if marker is 'E'
     IncompleteSet move_on{"move_on_"+ to_string(counter), "move_on_"+ to_string(counter)};
     move(move_on, {0,1}, 1);
-    link_on(find_var, move_on, {'\u0000'}, {0});
+    link_on(check_var_loop, move_on, {'\u0000'}, {0});
 
-    go_to_move(find_var, {'\u0000'}, 1, 1, {0,1}, stack_tape, 1, {(int) stack_tape});
-    write_on(find_var, {'E'}, {0}, {'\u0000'}, {0});
+    go_to_move(check_var_loop, {'\u0000'}, 1, 1, {0,1}, stack_tape, 1, {(int) stack_tape});
+    write_on(check_var_loop, {'E'}, {0}, {'\u0000'}, {0});
 
 
     //remove 1 nesting
-    go_to(find_var, {'S'}, 0, -1, {0,1});
-    link_put(find_var, {'\u0000'}, {0});
-    go_to(find_var, {'{'}, 1, -1, {0,1});
-    link_put(find_var, {'\u0000'}, {1});
-    move(find_var, {0,1}, -1);
-    go_to_clear(find_var, {'{'}, 1, -1, {0,1}, {1});
-    move(find_var, {0,1}, 1);
-    link_put(find_var, {'S'}, {0});
+    go_to(check_var_loop, {'S'}, 0, -1, {0,1});
+    link_put(check_var_loop, {'\u0000'}, {0});
+    go_to(check_var_loop, {'{'}, 1, -1, {0,1});
+    link_put(check_var_loop, {'\u0000'}, {1});
+    move(check_var_loop, {0,1}, -1);
+    go_to_clear(check_var_loop, {'{'}, 1, -1, {0,1}, {1});
+    move(check_var_loop, {0,1}, 1);
+    link_put(check_var_loop, {'S'}, {0});
 
     //copy remaining stuff back on right spot
-    go_to(find_var, {'.'}, stack_tape, -1, {(int) stack_tape});
-    move(find_var, {(int) stack_tape}, 1);
-    go_to_move(find_var, {'\u0000'}, stack_tape, 1, {(int) stack_tape}, 1, 1, {0,1});
-    go_to(find_var, {'.'}, stack_tape, -1, {(int) stack_tape});
+    go_to(check_var_loop, {'.'}, stack_tape, -1, {(int) stack_tape});
+    move(check_var_loop, {(int) stack_tape}, 1);
+    go_to_move(check_var_loop, {'\u0000'}, stack_tape, 1, {(int) stack_tape}, 1, 1, {0,1});
+    go_to(check_var_loop, {'.'}, stack_tape, -1, {(int) stack_tape});
 
     //this line is double but that is not a problem and is extra redundancy
-    go_to(find_var, {'S'}, 0, -1, {0,1});
+    go_to(check_var_loop, {'S'}, 0, -1, {0,1});
+    string branch_done = branch_on(check_var_loop, {'\u0000'}, {1});
+
+    make_loop(check_var_loop);
+
+    link(find_var, check_var_loop);
 
     link(a, find_var);
 }
