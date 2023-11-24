@@ -11,6 +11,7 @@
 #include "src/ThreadFunction.h"
 #include "filesystem"
 #include "src/Config.h"
+#include "src/LALR.h"
 
 //!!!!!!!!!!!!!!!!!!! Default Config Location is already SET in Orchestrator.cpp
 
