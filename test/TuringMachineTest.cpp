@@ -197,7 +197,7 @@ TEST(TuringMachineTest, TM_tokenazation) {
         }
 
 
-        if (i >= 172700){
+        if (i >= 232000){
             int j = 0;
 
             for (int i = 0; i < tm.getTapeAmount(); i++){

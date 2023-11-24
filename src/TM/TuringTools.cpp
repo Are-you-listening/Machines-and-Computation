@@ -1964,7 +1964,6 @@ void TuringTools::check_var_define_location(IncompleteSet &a, const vector<int> 
     IncompleteSet check_var_loop{"check_var_loop_"+ to_string(counter), "check_var_loop_"+ to_string(counter)};
     counter++;
 
-    //TODO: make this later a loop
     //split the substring for every non variable char
     go_to(check_var_loop, {'S'}, 0, -1, {0,1});
 
@@ -1974,7 +1973,6 @@ void TuringTools::check_var_define_location(IncompleteSet &a, const vector<int> 
     //move part from 'P' temporarly on stack
     push(check_var_loop, '.');
     go_to(check_var_loop, {'P', 'E'}, 0, 1, {0,1});
-    string branch_no_split = branch_on(check_var_loop, {'E'}, {0});
     go_to_move(check_var_loop, {'\u0000'}, 1, 1, {0, 1}, stack_tape, 1, {(int) stack_tape});
 
     //clear markers till 'S'
@@ -1995,13 +1993,23 @@ void TuringTools::check_var_define_location(IncompleteSet &a, const vector<int> 
     find_match_heap_traverse(check_var_loop, 'A', 'S', 0, 1);
     //TODO: only do if result is found
 
-    //store heap definer on working
-    go_to(check_var_loop, {'#'}, stack_tape, 1, {(int) stack_tape});
-    move(check_var_loop, {(int) stack_tape}, 1);
-    go_to(check_var_loop, {'#'}, stack_tape, 1, {(int) stack_tape});
-    move(check_var_loop, {(int) stack_tape}, -1);
-    go_to_copy(check_var_loop, {'#'}, stack_tape, -1, {(int) stack_tape}, 1, 1, {0,1});
+    //string not_found = branch_on(check_var_loop, {'\u0000'}, {(int) stack_tape});
 
+    IncompleteSet on_found{"on_found_"+ to_string(counter), "on_found_"+ to_string(counter)};
+    //store heap definer on working
+    go_to(on_found, {'#'}, stack_tape, 1, {(int) stack_tape});
+    move(on_found, {(int) stack_tape}, 1);
+    go_to(on_found, {'#'}, stack_tape, 1, {(int) stack_tape});
+    move(on_found, {(int) stack_tape}, -1);
+    go_to_copy(on_found, {'#'}, stack_tape, -1, {(int) stack_tape}, 1, 1, {0,1});
+    move(on_found, {0,1}, -1);
+
+    link_on_not(check_var_loop, on_found, {'\u0000'}, {(int) stack_tape});
+
+    //place holder for a not found character
+    write_on(check_var_loop, {'\u0000'}, {1}, {' '}, {1});
+
+    move(check_var_loop, {0,1}, 1);
     set_heap_mode(check_var_loop, false);
 
     //pop other var on stack that are seperated by a operator
@@ -2054,12 +2062,14 @@ void TuringTools::check_var_define_location(IncompleteSet &a, const vector<int> 
     move(check_var_loop, {(int) stack_tape}, 1);
     go_to_move(check_var_loop, {'\u0000'}, stack_tape, 1, {(int) stack_tape}, 1, 1, {0,1});
     go_to(check_var_loop, {'.'}, stack_tape, -1, {(int) stack_tape});
+    move(check_var_loop, {(int) stack_tape}, 1);
 
     //this line is double but that is not a problem and is extra redundancy
     go_to(check_var_loop, {'S'}, 0, -1, {0,1});
     string branch_done = branch_on(check_var_loop, {'\u0000'}, {1});
 
     make_loop(check_var_loop);
+    check_var_loop.to_state = branch_done;
 
     link(find_var, check_var_loop);
 
@@ -2084,6 +2094,9 @@ void TuringTools::check_var_char_working(IncompleteSet &a) {
     }
 
     var_char.push_back('_');
+
+    var_char.push_back('"');
+    var_char.push_back('\'');
 
     go_to_not(var_char_check, var_char, 1, 1, {0,1});
 
