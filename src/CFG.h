@@ -68,7 +68,7 @@ public:
     void toGNF();
 
     /**
-     * Check for a given string if it's in the language of the grammar
+     * Check for a given string if it's in the language of the grammar (CYK)
      * @param w
      * @return
      */

@@ -17,7 +17,7 @@ CFG* createCFG(){
 
     //Create other Productions
     for(auto &k: T){ //"Generic Programming"
-        P.push_back( {"B",{"B",k,"B"}}); //B van Bullshit
+        P.push_back( {"B",{"B",k,"B"}}); //B van Bullshit // B -> B Terminal B
     }
 
     return new CFG(V,T,P,"S");

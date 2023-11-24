@@ -20,9 +20,22 @@ private:
     std::vector<std::pair<std::string, std::string>> tokenVector;
 
 public:
+    /**
+     * Default Constructor
+     */
     Tokenisation()=default;
-
-    void Tokenize(const std::string& FileLocation);
+    
+    /**
+     * Transform code file to tokenVector
+     * @param FileLocation 
+     */
+    void Tokenize(const std::string &FileLocation);
+    
+    /**
+     * Simple Getter
+     * @return 
+     */
+    const std::vector<std::pair<std::string, std::string>> &getTokenVector() const;
 };
 
 #endif //TOG_TOKENISATION_H

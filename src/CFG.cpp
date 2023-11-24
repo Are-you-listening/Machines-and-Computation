@@ -69,9 +69,9 @@ CFG::CFG(const std::string& c) {
     }
     S=data["Start"];
 
-    std::sort(V.begin(), V.end());
-    std::sort(T.begin(), T.end());
-    std::sort(P.begin(), P.end());
+    //std::sort(V.begin(), V.end());
+    //std::sort(T.begin(), T.end());
+    //std::sort(P.begin(), P.end());
 
 }
 
@@ -556,7 +556,9 @@ void CFG::toCNF(){
 void CFG::toGNF() { // I used the algorithm described by https://www.geeksforgeeks.org/converting-context-free-grammar-greibach-normal-form/
     // step 1
     if(!CNF){
+        std::cout <<"Start CNF convert" << std::endl;
         CFG::toCNF();
+        std::cout <<"END CNF convert" << std::endl;
     }
     std::cout <<"Start GNF convert" << std::endl;
     // step 2
@@ -592,7 +594,8 @@ void CFG::toGNF() { // I used the algorithm described by https://www.geeksforgee
     for(long int m=0; m<P.size(); m++){ //Step 3.1 , replace j>i
         unsigned long int i= stoi(P[m].first.substr(1, std::string::npos));
         for(auto it=P[m].second.begin(); it!=P[m].second.end(); it++){
-            if(std::find(T.cbegin(),T.cend(),*it)!=T.cend()||*it=="Z"){
+            //{ { A1 , {A2, A3} }  , { A1 , {A4, A4} } } = P
+            if (std::find(T.cbegin(), T.cend(), *it) != T.cend()) {
                 continue;
             }
             unsigned long int j=stoi((*it).substr(1, std::string::npos));

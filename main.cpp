@@ -14,6 +14,7 @@
 #include "src/LALR.h"
 
 //!!!!!!!!!!!!!!!!!!! Default Config Location is already SET in Orchestrator.cpp
+// Variabel Define might be a problem?
 
 static unsigned int core_amount = std::thread::hardware_concurrency(); // gets "core amount", in windows you can allocate infinite threads. In linux this isn't possible, I believe. so pls care about this.
 // so whenever you thread something, pls change core_amount. Also core_amount isn't the perfect name for this
@@ -24,11 +25,22 @@ int main() { // Function names we create to replace nesting should have F or I i
     std::thread Tokenizer(&Tokenisation::Tokenize, &tokenVector, Filelocation); // i ignore rvalues in function calls
     core_amount--;
     
-    //CFG cfg("testFiles/CFG.json"); //don't forget to add CFG back into cmakelist in right set
-    //cfg.toGNF(); // this still needs massive debugging.
+    Orchestrator();
+    auto cfg = createCFG();
+    cfg->print();
+    CFG cfg2("input/CFG/testGNF.json");
+    cfg2.setCnf(true);
+    cfg2.toGNF(); // this still needs massive debugging.
+    cfg2.print();
+    cfg->toGNF(); // this still needs massive debugging.
+    cfg->print();
+    const CFG a = *cfg;
+    LALR lalr(a);
+    lalr.createTable();
     
     Tokenizer.join();
     core_amount++;
+    
     //create LARL parser with tokenvector
     auto vec = tokenVector.getTokenVector();
     lalr.parse(vec);
