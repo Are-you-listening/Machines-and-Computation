@@ -69,9 +69,9 @@ CFG::CFG(const std::string& c) {
     }
     S=data["Start"];
 
-    //std::sort(V.begin(), V.end());
-    //std::sort(T.begin(), T.end());
-    //std::sort(P.begin(), P.end());
+    std::sort(V.begin(), V.end());
+    std::sort(T.begin(), T.end());
+    std::sort(P.begin(), P.end());
 
 }
 
@@ -563,27 +563,51 @@ void CFG::toGNF() { // I used the algorithm described by https://www.geeksforgee
     std::cout <<"Start GNF convert" << std::endl;
     // step 2
     std::map<std::string,std::string> originals;
+    std::set<std::pair<std::string,unsigned long int>> order={{S,0}};
     unsigned long int n=1;
-    for(auto & i : P){
-        if(originals.find(i.first)!=originals.cend()){
-            i.first=originals[i.first];
-        }
-        if(i.first.size()==1||i.first[0]!='A'){
-            originals[i.first]="A"+ std::to_string(n);
-            i.first="A"+ std::to_string(n);
-            n++;
-        }
-        for(auto & it : i.second){
-            auto Variable= std::find(V.cbegin(),V.cend(),it);
-            if(Variable!=V.cend()&&originals.find(it)==originals.cend()){
-                originals[it]="A"+ std::to_string(n);
-                it="A"+ std::to_string(n);
+    for(unsigned long int orderN=0; orderN<order.size(); orderN++){
+        std::string copyorginal;
+        for(unsigned long int m=0; m<P.size(); m++){
+            if(originals.find(P[m].first)!=originals.cend()){
+                copyorginal=P[m].first;
+                P[m].first=originals[P[m].first];
+                for(auto& rule:P[m].second){
+                    auto Variable= std::find(V.cbegin(),V.cend(),rule);
+                    auto copyorginal2=rule;
+                    if(Variable!=V.cend()&&originals.find(rule)==originals.cend()){
+                        originals[rule]="A"+ std::to_string(n);
+                        rule="A"+ std::to_string(n);
+                        n++;
+                        order.emplace(copyorginal2,n);
+                    } else if(Variable!=V.cend()) {
+                        rule=originals[rule];
+                    }
+                }
+                m=-1;
+                continue;
+            }
+            if((P[m].first.size()==1||P[m].first[0]!='A')&&order.find({P[m].first,orderN})!=order.end()){
+                copyorginal=P[m].first;
+                originals[P[m].first]="A"+ std::to_string(n);
+                P[m].first="A"+ std::to_string(n);
                 n++;
-            } else if(Variable!=V.cend()) {
-                it=originals[it];
+                for(auto& rule:P[m].second){
+                    auto Variable= std::find(V.cbegin(),V.cend(),rule);
+                    auto copyorginal2=rule;
+                    if(Variable!=V.cend()&&originals.find(rule)==originals.cend()){
+                        originals[rule]="A"+ std::to_string(n);
+                        rule="A"+ std::to_string(n);
+                        n++;
+                        order.emplace(copyorginal2,n);
+                    } else if(Variable!=V.cend()) {
+                        rule=originals[rule];
+                    }
+                }
             }
         }
+        order.erase({copyorginal,orderN});
     }
+    
     for(auto & it : V){
         it=originals[it];
     }
