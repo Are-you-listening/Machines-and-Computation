@@ -7,7 +7,7 @@
 CFG* createCFG(){
     //Declare used variables
     vector<string> V{"S","B", "N"+to_string(Config::getConfig()->getMaxNesting())}; //S is StartSymbol, B off Bullshit in Between, Last variable Nx
-    vector<pair< string, vector<string>>> P{ {"S", {"B","N0","B"} },  {"B",{""}} , {"N"+to_string(Config::getConfig()->getMaxNesting()), {"B","N0","B"} }}; //Already define the simplest rule, epsilon rule, rule back to start
+    vector<pair< string, vector<string>>> P{ {"S", {"B","N0","B"} },  {"B",{""}} , {"N"+to_string(Config::getConfig()->getMaxNesting()), {"B","N1","B"} }}; //Already define the simplest rule, epsilon rule, rule back to start
 
     //Define V names
     for(unsigned int i = 0 ; i<Config::getConfig()->getMaxNesting(); i++){
