@@ -28,10 +28,6 @@ int main() { // Function names we create to replace nesting should have F or I i
     Orchestrator();
     auto cfg = createCFG();
     cfg->print();
-    CFG cfg2("input/CFG/testGNF.json");
-    cfg2.setCnf(true);
-    cfg2.toGNF(); // this still needs massive debugging.
-    cfg2.print();
     cfg->toGNF(); // this still needs massive debugging.
     cfg->print();
     const CFG a = *cfg;

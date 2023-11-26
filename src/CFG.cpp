@@ -595,11 +595,11 @@ void CFG::toGNF() { // I used the algorithm described by https://www.geeksforgee
         unsigned long int i= stoi(P[m].first.substr(1, std::string::npos));
         for(auto it=P[m].second.begin(); it!=P[m].second.end(); it++){
             //{ { A1 , {A2, A3} }  , { A1 , {A4, A4} } } = P
-            if (std::find(T.cbegin(), T.cend(), *it) != T.cend()) {
-                continue;
+            if (std::find(T.cbegin(), T.cend(), *it) != T.cend()&&it==P[m].second.begin()) {
+                break;
             }
             unsigned long int j=stoi((*it).substr(1, std::string::npos));
-            if(i>j){ // A4 -> A1A4 , replace A1 met alle rules van A1
+            if(i>j){ // A4 -> A1A4 , replace A1 met alle rules of A1
                 //Find rules of A1
                 vector<vector<string>> RHS; //{ {"A2","A3"} , {A4,A4} }
                 for(const auto &rule :P){
@@ -628,40 +628,58 @@ void CFG::toGNF() { // I used the algorithm described by https://www.geeksforgee
                         P.emplace_back(P[m].first,rhsit);   
                     }
                 }
+                m=-1;
                 break;
             }
         }
     }
-    
-    
     
     for(long int m=0; m<P.size(); m++) { //Step 3.2, replace i==j
         if (P[m].first == "Z") {
             continue;
         }
         unsigned long int i = stoi(P[m].first.substr(1, std::string::npos));
-        for (auto it = P[m].second.begin(); it != P[m].second.end(); it++) {
-            if (std::find(T.cbegin(), T.cend(), *it) != T.cend() || *it == "Z") {
-                continue;
+        if (std::find(T.cbegin(), T.cend(), P[m].second[0]) != T.cend() || P[m].second[0]== "Z") {
+            continue;
+        }
+        unsigned long int j=stoi(P[m].second[0].substr(1, std::string::npos));
+        if(i==j){
+            std::pair<std::string,std::vector<std::string>> temp;
+            temp.first="Z";
+            temp.second=vector(P[m].second.begin(),P[m].second.end()-1);
+            P.push_back(temp);
+            temp.second.emplace_back("Z");
+            P.push_back(temp);
+            for(const auto & rule:P){
+                if(P[m].first==rule.first&&P[m].second!=rule.second){
+                    temp.first=P[m].first;
+                    temp.second=rule.second;
+                    temp.second.emplace_back("Z");
+                    P.push_back(temp);
+                }
             }
-            unsigned long int j=stoi((*it).substr(1, std::string::npos));
-            if(i==j){
-                
-            }
+            P.erase(P.cbegin()+m);
+            m=-1;
         }
     }
 
     //step 4
     std::cout << "step 4" <<std::endl;
-    for(auto & rules : P){
-        for(auto & it:rules.second){
-            if(std::find(T.cbegin(),T.cend(),it)!=T.cend()){
-                for(auto & rules2 : P){
-                    if(rules2.second.size()==1&&rules2.second[0]==it&&rules.first!=rules2.first){
-                        it=rules2.first;
+    for(long int m=0; m<P.size(); m++) {
+        if(std::find(T.cbegin(),T.cend(),P[m].second[0])==T.cend()){
+            for(long int j=0; j<P.size(); j++) {
+                if(P[j].first==P[m].second[0]){
+                    std::pair<std::string,std::vector<std::string>> temp;
+                    temp.first=P[m].first;
+                    temp.second=P[j].second;
+                    for(auto it=P[m].second.begin()+1; it!=P[m].second.end(); it++){
+                        temp.second.push_back(*it);
                     }
-                }
+                    P.push_back(temp);
+                } 
             }
+            P.erase(P.cbegin()+m);
+            m=-1;
         }
     }
     GNF= true;
