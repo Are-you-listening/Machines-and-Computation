@@ -563,6 +563,24 @@ void CFG::toCNF(){
     }
     sort(P);
 
+    new_P = {};
+    for (int i=0; i<P.size(); i++){
+        bool found = false;
+        for (int j=0; j<P.size(); j++){
+            if (i == j){
+                continue;
+            }
+            if (P[i] == P[j]){
+                found = true;
+            }
+        }
+
+        if (!found){
+            new_P.push_back(P[i]);
+        }
+    }
+    P = new_P;
+
     std::cout << " >> Broke " << BrokeBodies << " bodies, added " << newerVariables << " new variables" << std::endl;
     std::cout << ">>> Result CFG:" << std::endl;
     std::cout << std::endl;
@@ -630,6 +648,177 @@ void CFG::toGNF() { // I used the algorithm described by https://www.geeksforgee
     }
     S=originals[S];
 
+    //Tibo started working here
+    typedef std::pair<std::string, std::vector<std::string>> production;
+
+    vector<production> total;
+    for (int i = 0; i<P.size(); i++){
+        vector<production> key_specific;
+        for (auto& prod: P){
+            if (prod.first == "A"+ to_string(i+1)){
+                key_specific.push_back(prod);
+            }
+        }
+
+        //do the i >= j replacement
+        vector<production> new_key_specific;
+        for (auto& prod: key_specific){
+            int key_index = stoi(prod.first.substr(1, prod.first.size()-1));
+            if (find(T.begin(), T.end(), prod.second[0]) != T.end()){
+
+                //check for no duplicates
+                if (find(new_key_specific.begin(), new_key_specific.end(), prod) == new_key_specific.end()){
+                    new_key_specific.push_back(prod);
+                }
+
+                continue;
+            }
+            int value_index = stoi(prod.second[0].substr(1, prod.second[0].size()-1));
+
+            if (key_index >= value_index){
+
+                vector<production> target_keys;
+                for (auto& prod2: total){
+                    if (prod2.first == prod.second[0]){
+                        target_keys.push_back(prod);
+                    }
+                }
+
+                auto old_production = prod.second;
+                old_production.erase(old_production.begin());
+
+                for (auto& prod2: target_keys){
+                    auto copy_prod = old_production;
+                    copy_prod.insert(copy_prod.begin(), prod2.second.begin(), prod2.second.end());
+                    //check for no duplicates
+                    if (find(new_key_specific.begin(), new_key_specific.end(), make_pair(prod.first, copy_prod)) == new_key_specific.end()){
+                        new_key_specific.push_back(make_pair(prod.first, copy_prod));
+                    }
+
+
+                }
+
+
+            }else{
+                //check for no duplicates
+                if (find(new_key_specific.begin(), new_key_specific.end(), prod) == new_key_specific.end()){
+                    new_key_specific.push_back(prod);
+                }
+
+            }
+        }
+
+        key_specific = new_key_specific;
+
+        new_key_specific = {};
+        for (auto& prod: key_specific){
+            int key_index = stoi(prod.first.substr(1, prod.first.size()-1));
+            if (find(T.begin(), T.end(), prod.second[0]) != T.end()){
+
+                //check for no duplicates
+                if (find(new_key_specific.begin(), new_key_specific.end(), prod) == new_key_specific.end()){
+                    new_key_specific.push_back(prod);
+                }
+
+                continue;
+            }
+
+            int value_index = stoi(prod.second[0].substr(1, prod.second[0].size()-1));
+
+            if (key_index == value_index){
+                auto right_hand = prod.second;
+                right_hand.erase(right_hand.begin());
+
+                vector<production> Z = {{"Z"+ to_string(key_index), right_hand}};
+                right_hand.push_back("Z"+ to_string(key_index));
+                Z.push_back({"Z"+ to_string(key_index), right_hand});
+
+                for (auto prod2: key_specific){
+                    if (find(T.begin(), T.end(), prod2.second[0]) != T.end()){
+                        prod2.second.push_back("Z"+ to_string(key_index));
+                        Z.push_back({prod2.first, {prod2.second}});
+                        continue;
+                    }
+                    int value_index2 = stoi(prod2.second[0].substr(1, prod2.second[0].size()-1));
+                    if (value_index2 == key_index){
+                        continue;
+                    }
+                    prod2.second.push_back("Z"+ to_string(key_index));
+                    Z.push_back({prod2.first, {prod2.second}});
+                }
+
+                for (auto& zw: Z){
+                    if (find(new_key_specific.begin(), new_key_specific.end(), zw) == new_key_specific.end()){
+                        new_key_specific.push_back(zw);
+                    }
+                }
+
+                //do left recursion
+            }else{
+                if (find(new_key_specific.begin(), new_key_specific.end(), prod) == new_key_specific.end()){
+                    new_key_specific.push_back(prod);
+                }
+            }
+        }
+
+        int j = 0;
+        total.insert(total.end(), new_key_specific.begin(), new_key_specific.end());
+    }
+
+    vector<production> final_total = total;
+
+    do{
+        total = final_total;
+        final_total = {};
+        for (auto prod: total){
+            if (find(T.begin(), T.end(), prod.second[0]) != T.end()){
+                if (find(final_total.begin(), final_total.end(), prod) == final_total.end()){
+                    final_total.push_back(prod);
+                }
+                continue;
+            }
+            for (auto& prod2: total){
+                if (prod2.first == prod.second[0]){
+                    prod.second.erase(prod.second.begin());
+                    prod.second.insert(prod.second.begin(), prod2.second.begin(), prod2.second.end());
+
+                    if (find(final_total.begin(), final_total.end(), prod) == final_total.end()){
+                        final_total.push_back(prod);
+                    }
+                }
+            }
+        }
+
+
+    }while(final_total.size() != total.size());
+
+
+    P = final_total;
+    /*
+    new_key_specific = {};
+    //do left recursion
+    for (auto& prod: key_specific){
+        int key_index = stoi(prod.first.substr(1, prod.first.size()-1));
+        if (find(T.begin(), T.end(), prod.second[0]) != T.end()){
+
+            //check for no duplicates
+            if (find(new_key_specific.begin(), new_key_specific.end(), prod) == new_key_specific.end()){
+                new_key_specific.push_back(prod);
+            }
+
+            continue;
+        }
+
+        int value_index = stoi(prod.second[0].substr(1, prod.second[0].size()-1));
+
+        if (key_index == value_index){
+            //do left recursion
+            int j = 0;
+        }
+    }
+    */
+
+    /*
     //step 3, I replace A3 also, on the website this isn't done for some reason. A4 → b | A2A3A4 | A4A4A4
     std::cout << "step 3" <<std::endl;
     for(long int m=0; m<P.size(); m++){ //Step 3.1 , replace j>i
@@ -723,6 +912,7 @@ void CFG::toGNF() { // I used the algorithm described by https://www.geeksforgee
             m=-1;
         }
     }
+     */
     GNF= true;
 }
 
