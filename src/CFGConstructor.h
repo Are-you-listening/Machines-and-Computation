@@ -26,7 +26,7 @@ using namespace std;
  * @param D, Declaration
  * @param V, Variable
  */
-static vector<string> T{"{","}","F","C","I","E","e","D","V"};
+static vector<string> T{"{","}", "F","C","I","E","e","D","V"};
 
 /**
  * Create a CFG, accepting the Language made by Tokenisation, from the Config Data

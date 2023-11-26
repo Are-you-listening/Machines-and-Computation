@@ -341,14 +341,15 @@ void CFG::toCNF(){
             }
         }
     }
+
     Reachable.emplace(S);
     std::vector<std::string> symbols={S};
     while(!symbols.empty()){
         auto symbol = symbols[0];
-        for(auto & it : P){
-            if(it.first==symbol){
-                for(auto it2=it.second.begin(); it2!=it.second.end(); it2++){
-                    if(std::find(V.begin(), V.end(), *it2)!=V.end()&&it.first!=*it2&&Reachable.find(*it2)==Reachable.end()){
+        for(auto it=P.begin(); it!=P.end(); it++){
+            if(it->first==symbol){
+                for(auto it2=it->second.begin(); it2!=it->second.end(); it2++){
+                    if(std::find(V.begin(), V.end(), *it2)!=V.end()&&it->first!=*it2&&Reachable.find(*it2)==Reachable.end()){
                         symbols.push_back(*it2);
                     }
                     Reachable.emplace(*it2);
