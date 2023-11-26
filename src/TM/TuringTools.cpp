@@ -2054,7 +2054,7 @@ void TuringTools::write_function_header(IncompleteSet &a, const vector<int>&tupl
 
 }
 
-void TuringTools::make_token(IncompleteSet &a, const vector<int> &tuple_indexes, char def_token) {
+void TuringTools::make_token(IncompleteSet &a, const vector<int> &tuple_indexes, char def_token, char replace) {
     //requires 'S' and 'E' marker on working tape
 
     link_put(a, {def_token}, {tuple_indexes[1]});
@@ -2091,12 +2091,12 @@ void TuringTools::make_token(IncompleteSet &a, const vector<int> &tuple_indexes,
 
     link(a, copy_to_tuple);
     move(a, tuple_indexes, 1);
+
     link_put(a, {'H'}, {tuple_indexes[0]});
     move(a, tuple_indexes, -1);
 
     go_to(a, {'H'}, tuple_indexes[0], -1, tuple_indexes);
-    link_put(a, {'\u0000'}, {tuple_indexes[0]});
-
+    link_put(a, {replace}, {tuple_indexes[0]});
     go_to(a, {'H'}, tuple_indexes[0], 1, tuple_indexes);
 
 }
