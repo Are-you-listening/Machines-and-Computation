@@ -16,16 +16,16 @@ IncompleteSet TuringDenestify::getTransitions() {
 IncompleteSet TuringDenestify::deNestify() {
     IncompleteSet result{"denestify_start", "denestify_start"};
     tools->nesting_marker(result, get_tuple_index(), split_nesting, max_nesting);
-    //createNewFunction(result);
+    createNewFunction(result);
 
     //clear stack
     //clear working
     //go to start denestifier
-    /*
+
     tools->clear_stack(result);
     tools->go_to_clear(result, {'A'}, 0, -1, {0,1}, {0,1});
     tools->link_put(result, {'\u0000'}, {1});
-     */
+
 
 
     //small verify

@@ -103,7 +103,16 @@ void TuringVarDictionary::check_defined(IncompleteSet &a) {
 
     IncompleteSet store_on_heap("vardict_store_on_heap", "vardict_store_on_heap");
     tools->go_to(store_on_heap, {'S', 'A'}, tuple_index[0], -1, tuple_index);
-    tools->heap_push_definer(store_on_heap, get_tuple_index(), true);
+
+    IncompleteSet store_bracket{"vardict_store_on_heap_bracket", "vardict_store_on_heap_bracket"};
+    tools->heap_push_definer(store_bracket, get_tuple_index(), true, true);
+
+    tools->link_on_multiple(store_on_heap, store_bracket, {{'U'}, {'O'}}, {tuple_index[1]});
+
+    IncompleteSet store_no_bracket{"vardict_store_on_heap_no_bracket", "vardict_store_on_heap_no_bracket"};
+    tools->heap_push_definer(store_no_bracket, get_tuple_index(), true, false);
+
+    tools->link_on_multiple(store_on_heap, store_no_bracket, {{'C'}}, {tuple_index[1]});
 
 
     tools->go_to(store_on_heap, {'E'}, tuple_index[0], 1, tuple_index);
@@ -127,7 +136,7 @@ void TuringVarDictionary::store_defined(IncompleteSet &a) {
 
     IncompleteSet store_on_heap("vardict_store_data_on_heap", "vardict_store_data_on_heap");
     tools->go_to(store_on_heap, {'S', 'A'}, tuple_index[0], -1, tuple_index);
-    tools->heap_push_definer(store_on_heap, get_tuple_index(), false);
+    tools->heap_push_definer(store_on_heap, get_tuple_index(), false, false);
 
 
     tools->go_to(store_on_heap, {'E'}, tuple_index[0], 1, tuple_index);

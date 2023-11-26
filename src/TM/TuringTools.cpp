@@ -809,7 +809,7 @@ void TuringTools::copy_to_working(IncompleteSet &a, const vector<int> &tuple_ind
 }
 
 
-void TuringTools::heap_push_definer(IncompleteSet& a, const vector<int>&tuple_indexes, bool function) {
+void TuringTools::heap_push_definer(IncompleteSet& a, const vector<int>&tuple_indexes, bool function, bool has_bracket) {
     //requires that string that is marked is seperated by at least 1 space
     IncompleteSet push_heap_action{"push_heap_"+ to_string(counter), "push_heap_"+ to_string(counter)};
     counter++;
@@ -817,7 +817,7 @@ void TuringTools::heap_push_definer(IncompleteSet& a, const vector<int>&tuple_in
     copy_to_working(push_heap_action, tuple_indexes);
 
     //from here on we will copy data from working tape and put it on the heap
-    if (function){
+    if (has_bracket){
         go_to(push_heap_action, {'('}, 1, -1, {0,1});
     }
 
