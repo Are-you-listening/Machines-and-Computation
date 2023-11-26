@@ -81,7 +81,7 @@ public:
     void write_on(IncompleteSet& a, const vector<char>&input, const vector<int>& input_index,
                   const vector<char>&output, const vector<int>& output_index);
 
-    void heap_push_definer(IncompleteSet& a, const vector<int>&tuple_indexes, bool function);
+    void heap_push_definer(IncompleteSet& a, const vector<int>&tuple_indexes, bool function, bool has_bracket);
     void heap_push_working(IncompleteSet& a, bool function);
 
     void copy_to_working(IncompleteSet& a, const vector<int>&tuple_indexes);
@@ -94,7 +94,7 @@ public:
     void find_match_heap_traverse(IncompleteSet& a, char start_marker, char end_marker, int marker_tape, int data_tape);
 
     //still needs to become private in future
-    void skip_nesting(IncompleteSet& a, int new_stack_tape, int stack_direction, int skip_tape, int skip_direction, const vector<int>& affected);
+    void skip_nesting(IncompleteSet& a, int new_stack_tape, int stack_direction, int skip_tape, int skip_direction, const vector<int>& affected, char i='{', char j='}');
 
     void push_on_sequence(IncompleteSet& a, const vector<char>&input_sequence, int input_index, char push_char);
     void set_heap_mode(IncompleteSet& a, bool to_heap);
