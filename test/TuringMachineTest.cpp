@@ -157,7 +157,7 @@ TEST(TuringMachineTest, TM_tools){
 
 TEST(TuringMachineTest, TM_tokenazation) {
 
-    ifstream test_file("../test/testFiles/TM_test_7.cpp");
+    ifstream test_file("../test/testFiles/TM_test_9.cpp");
     string test_string;
     cout << test_file.is_open() << endl;
     while (!test_file.eof()){

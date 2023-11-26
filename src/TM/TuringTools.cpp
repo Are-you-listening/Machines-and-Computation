@@ -817,6 +817,10 @@ void TuringTools::heap_push_definer(IncompleteSet& a, const vector<int>&tuple_in
     copy_to_working(push_heap_action, tuple_indexes);
 
     //from here on we will copy data from working tape and put it on the heap
+    if (function){
+        go_to(push_heap_action, {'('}, 1, -1, {0,1});
+    }
+
     go_to(push_heap_action, {' '}, 1, -1, {0,1});
     link_put(push_heap_action, {'P'}, {0});
 
@@ -1590,7 +1594,7 @@ TuringTools::nesting_marker(IncompleteSet &a, const vector<int> &tuple_indexes, 
     }
 
     link_put(result, {'U'}, {tuple_indexes[0]});
-    go_to(result, {'N'}, tuple_indexes[0], -1, tuple_indexes);
+    go_to(result, {'N', 'A'}, tuple_indexes[0], -1, tuple_indexes);
 
     link(a, result);
 
