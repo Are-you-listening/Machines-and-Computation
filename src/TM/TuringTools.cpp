@@ -1869,6 +1869,7 @@ void TuringTools::write_function_header(IncompleteSet &a, const vector<int>&tupl
     heap_mode = true;
     set_heap_mode(write_function_header, false);
 
+
     //copy function token to tokenize
     go_to(write_function_header, {'H'}, tuple_indexes[0], 1, tuple_indexes);
 
@@ -1885,6 +1886,35 @@ void TuringTools::write_function_header(IncompleteSet &a, const vector<int>&tupl
     write_on(write_function_header, {'\u0000'}, {0}, {'E'}, {0});
     go_to(write_function_header, {'S'}, 0, -1, {0,1});
 
+
+    //make sure to add void type in front of the function name
+    //we are on working currently marked by S marker
+
+    push(write_function_header, '.');
+    go_to_move(write_function_header, {'\u0000'}, 1, 1, {0,1}, stack_tape, 1, {(int) stack_tape});
+    write_on(write_function_header, {'E'}, {0}, {'\u0000'}, {0});
+    go_to(write_function_header, {'S'}, 0, -1, {0,1});
+
+    //add 'void ' on working tape
+    string void_word = "void ";
+    for (char v: void_word){
+        link_put(write_function_header, {v}, {1});
+        move(write_function_header, {0,1}, 1);
+    }
+
+    //put stack back on working
+    go_to(write_function_header, {'.'}, stack_tape, -1, {(int) stack_tape});
+    link_put(write_function_header, {'\u0000'}, {(int) stack_tape});
+    move(write_function_header, {(int) stack_tape}, 1);
+    go_to_move(write_function_header, {'\u0000'}, stack_tape, 1, {(int) stack_tape}, 1, 1, {0,1});
+    go_to_not(write_function_header, {'\u0000'}, stack_tape, -1, {(int) stack_tape});
+    move(write_function_header, {(int) stack_tape}, 1);
+
+    write_on(write_function_header, {'\u0000'}, {0}, {'E'}, {0});
+    go_to(write_function_header, {'S'}, 0, -1, {0,1});
+
+
+    //make function caller token
     make_token(write_function_header, tuple_indexes, 'U');
 
     //clear first working tape
@@ -1912,6 +1942,7 @@ void TuringTools::write_function_header(IncompleteSet &a, const vector<int>&tupl
 
     link(write_function_header, check_var_loop);
 
+    //add '(' for function definition
     link_put(write_function_header, {'('}, {1});
     move(write_function_header, {0,1}, 1);
     link_put(write_function_header, {'E'}, {0});
@@ -2010,6 +2041,12 @@ void TuringTools::write_function_header(IncompleteSet &a, const vector<int>&tupl
     //clears working
     go_to_clear(write_function_header, {'S'}, 0, -1, {0,1}, {0,1});
     link_put(write_function_header, {'\u0000'}, {1});
+
+    //store last ')'
+    go_to(write_function_header, {'H'}, tuple_indexes[0], 1, tuple_indexes);
+    link_put(write_function_header, {'\u0000', ')', ')'}, {tuple_indexes[0], tuple_indexes[1], tuple_indexes[2]});
+    move(write_function_header, tuple_indexes, 1);
+    link_put(write_function_header, {'H'}, {tuple_indexes[0]});
 
     go_to(write_function_header, {'N'}, tuple_indexes[0], -1, tuple_indexes);
 

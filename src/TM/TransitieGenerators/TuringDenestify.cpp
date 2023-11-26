@@ -63,5 +63,28 @@ void TuringDenestify::createNewFunction(IncompleteSet &a) {
     tools->go_to(create_function, {'\u0000'}, get_tuple_index()[1], 1, get_tuple_index());
     tools->link_put(create_function, {'H'}, {get_tuple_index()[0]});
 
+    //clear current function and replace it by function call
+
+    //create function call at the end(because size can be bigger than original size)
+    //keep H on same position
+
+    //for every tuple
+    //copy after H on working
+    //copy U-H on working
+    //clear entire tuple_line from N-H
+    //copy working after N
+
+    //find original function
+    tools->move(create_function, get_tuple_index(), -1);
+    tools->skip_nesting(create_function, tapes-1, 1, get_tuple_index()[1], -1, get_tuple_index());
+
+    //go to start of function definition
+    tools->go_to(create_function, {'O', 'U'}, get_tuple_index()[1], -1, get_tuple_index());
+    tools->write_on(create_function, {'\u0000'}, {get_tuple_index()[0]}, {'S'}, {get_tuple_index()[0]});
+    tools->go_to(create_function, {'('}, get_tuple_index()[1], 1, get_tuple_index());
+    tools->write_on(create_function, {'\u0000'}, {get_tuple_index()[0]}, {'E'}, {get_tuple_index()[0]});
+    tools->go_to(create_function, {'S'}, get_tuple_index()[0], -1, get_tuple_index());
+    tools->copy_to_working(create_function, get_tuple_index());
+
     tools->link(a, create_function);
 }
