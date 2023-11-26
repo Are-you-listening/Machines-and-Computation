@@ -227,6 +227,7 @@ void CFG::toCNF(){
         new_P.push_back(prod);
     }
     P = new_P;
+    //end changes
 
     std::cout << "  Created " << P.size() << " productions, original had " << originalSize << std::endl;
     std::cout<<std::endl;
