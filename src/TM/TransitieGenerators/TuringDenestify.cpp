@@ -16,6 +16,9 @@ IncompleteSet TuringDenestify::getTransitions() {
 IncompleteSet TuringDenestify::deNestify() {
     IncompleteSet result{"denestify_start", "denestify_start"};
     tools->nesting_marker(result, get_tuple_index(), split_nesting, max_nesting);
+    string end_denesting = tools->branch_on(result, {'\u0000'}, {get_tuple_index()[1]});
+    tools->go_to(result, {'N', 'A'}, get_tuple_index()[0], -1, get_tuple_index());
+
     createNewFunction(result);
 
     //clear stack

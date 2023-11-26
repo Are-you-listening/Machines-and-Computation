@@ -45,7 +45,7 @@ TMBuilder_output TMBuilder::generateTM() {
 
     TuringDenestify denest{2, 4};
 
-    tools->link(program, denest.getTransitions());
+    //tools->link(program, denest.getTransitions());
 
 
     for (auto incomp: program.transitions){
