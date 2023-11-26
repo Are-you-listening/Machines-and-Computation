@@ -212,6 +212,21 @@ void CFG::toCNF(){
     }
     sort(P);
 
+    //comment made by Tibo
+    //na epsilon elim blijven er nog de volgende tranisties over B -> ''
+    //dit komt doordat nullable variables weggehaald worden en er geen extra check is
+    std::vector<std::pair<std::string, std::vector<std::string>>> new_P;
+    for (auto& prod: P){
+        if (prod.second.empty()){
+            continue;
+        }
+
+        if (prod.first == prod.second[0] && prod.second.size() == 1){
+            continue;
+        }
+        new_P.push_back(prod);
+    }
+    P = new_P;
 
     std::cout << "  Created " << P.size() << " productions, original had " << originalSize << std::endl;
     std::cout<<std::endl;
