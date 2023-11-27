@@ -1,0 +1,6 @@
+S       →       N
+B       →       ε | T B
+N      →       B | N N | { K }
+K      →       B | K K | { A }
+A      →       B | A A | { K }
+T       →      c | d | e | f | i | v | a

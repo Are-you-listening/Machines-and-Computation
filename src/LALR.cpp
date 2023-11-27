@@ -350,17 +350,25 @@ void LALR::parse(std::vector<std::pair<std::string, std::string>> &input) {
             remaininginputvector.insert(remaininginputvector.begin(), make_pair(rule->first, ""));
             parseTree* newparent = new parseTree;
             treetops.push_back(newparent);
+            newparent->symbol = rule->first;
             if (rule->first == _cfg.getS()){
                 _root = newparent;
             }
-            newparent->symbol = rule->first;
             for (string symbol : rule->second){
                 bool found = false;
-                for (int i = 0; i < treetops.size(); i++){
-                    if (symbol == treetops[i]->symbol){
-                        newparent->children.push_back(treetops[i]);
+                auto it = treetops.begin();
+                set<vector<parseTree*>::iterator> toRemove;
+                while(it != treetops.end()){
+                    if ((*it)->symbol == symbol){
+                        parseTree* temp = *it;
+                        newparent->children.push_back(temp);
                         found = true;
+                        toRemove.insert(it);
                     }
+                    it++;
+                }
+                for (auto temp : toRemove){
+                    treetops.erase(temp);
                 }
                 if (not found) {
                     parseTree *newchild = new parseTree;
@@ -369,6 +377,7 @@ void LALR::parse(std::vector<std::pair<std::string, std::string>> &input) {
                 }
                 s.pop();
             }
+            treetops.push_back(newparent);
         } else {
             s.push(stoi(operation));
         }
