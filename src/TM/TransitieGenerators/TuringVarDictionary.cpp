@@ -89,6 +89,8 @@ IncompleteSet TuringVarDictionary::storeVar() {
     tools->link_on(add_nest, continue_in_bracket, {')'}, {get_tuple_index()[1]});
 
     tools->move(add_nest, get_tuple_index(), 1);
+    tools->go_to_not(add_nest, {'P', 'E'}, get_tuple_index()[1], 1, get_tuple_index());
+    tools->move(add_nest, get_tuple_index(), 1);
 
     tools->link_on(result, add_nest, {'{'}, {get_tuple_index()[1]});
 
