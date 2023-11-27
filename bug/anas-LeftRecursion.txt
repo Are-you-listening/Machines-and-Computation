@@ -1,0 +1,125 @@
+Translated Anas:
+C -> KD
+S -> NN | TB | c | d | e | f | i | v | a | EC | ED
+B -> TB | c | d | e | f | i | v | a
+T -> c | d | e | f | i | v | a
+N -> NN | TB | c | d | e | f | i | v | a | EH | ED
+K -> KK | TB | c | d | e | f | i | v | a | EF | ED
+A -> AA | TB | c | d | e | f | i | v | a | EG | ED
+F -> AD
+G -> KD
+E -> {
+D -> }
+H -> KD
+
+Eliminated Left Recursion:
+
+C -> KD
+S -> NN | TB | c | d | e | f | i | v | a | EC | ED
+B -> TB | c | d | e | f | i | v | a
+T -> c | d | e | f | i | v | a
+N -> cBN' | dBN' | eBN' | fBN' | iBN' | vBN' | aBN' | cN' | dN' | eN' | fN' | iN' | vN' | aN' | EHN' | EDN'
+K -> cBK' | dBK' | eBK' | fBK' | iBK' | vBK' | aBK' | cK' | dK' | eK' | fK' | iK' | vK' | aK' | EFK' | EDK'
+A -> cBA' | dBA' | eBA' | fBA' | iBA' | vBA' | aBA' | cA' | dA' | eA' | fA' | iA' | vA' | aA' | EGA' | EDA'
+F -> cBA'D | dBA'D | eBA'D | fBA'D | iBA'D | vBA'D | aBA'D | cA'D | dA'D | eA'D | fA'D | iA'D | vA'D | aA'D | EGA'D | EDA'D
+G -> cBK'D | dBK'D | eBK'D | fBK'D | iBK'D | vBK'D | aBK'D | cK'D | dK'D | eK'D | fK'D | iK'D | vK'D | aK'D | EFK'D | EDK'D
+E -> {
+D -> }
+H -> cBK'D | dBK'D | eBK'D | fBK'D | iBK'D | vBK'D | aBK'D | cK'D | dK'D | eK'D | fK'D | iK'D | vK'D | aK'D | {FK'D | {DK'D
+N' -> NN' | ε
+K' -> KK' | ε
+A' -> AA' | ε
+
+Rules which VIOLATE GNF:
+
+C -> KD
+S -> NN | TB | EC | ED
+B -> TB
+N -> EHN' | EDN'
+K -> EFK' | EDK'
+A -> EGA' | EDA'
+F -> EGA'D | EDA'D
+G -> EFK'D | EDK'D
+N' -> NN'
+K' -> KK'
+A' -> AA'
+
+Solutions:
+1. Replace T
+// Replace E
+// Solve with replacing K
+// Replace N
+//Replace A
+
+//Replace T (In this case we can even completely remove T)
+C -> KD
+S -> NN | cB | dB | eB | fB | iB | vB | aB | c | d | e | f | i | v | a | EC | ED
+B -> cB | dB | eB | fB | iB | vB | aB | c | d | e | f | i | v | a
+N -> cBN' | dBN' | eBN' | fBN' | iBN' | vBN' | aBN' | cN' | dN' | eN' | fN' | iN' | vN' | aN' | EHN' | EDN'
+K -> cBK' | dBK' | eBK' | fBK' | iBK' | vBK' | aBK' | cK' | dK' | eK' | fK' | iK' | vK' | aK' | EFK' | EDK'
+A -> cBA' | dBA' | eBA' | fBA' | iBA' | vBA' | aBA' | cA' | dA' | eA' | fA' | iA' | vA' | aA' | EGA' | EDA'
+F -> cBA'D | dBA'D | eBA'D | fBA'D | iBA'D | vBA'D | aBA'D | cA'D | dA'D | eA'D | fA'D | iA'D | vA'D | aA'D | EGA'D | EDA'D
+G -> cBK'D | dBK'D | eBK'D | fBK'D | iBK'D | vBK'D | aBK'D | cK'D | dK'D | eK'D | fK'D | iK'D | vK'D | aK'D | EFK'D | EDK'D
+E -> {
+D -> }
+H -> cBK'D | dBK'D | eBK'D | fBK'D | iBK'D | vBK'D | aBK'D | cK'D | dK'D | eK'D | fK'D | iK'D | vK'D | aK'D | {FK'D | {DK'D
+N' -> NN' | ε
+K' -> KK' | ε
+A' -> AA' | ε
+
+//Replace E (In this case we can remove E -> { also!)
+C -> KD
+S -> NN | cB | dB | eB | fB | iB | vB | aB | c | d | e | f | i | v | a | {C | {D
+B -> cB | dB | eB | fB | iB | vB | aB | c | d | e | f | i | v | a
+N -> cBN' | dBN' | eBN' | fBN' | iBN' | vBN' | aBN' | cN' | dN' | eN' | fN' | iN' | vN' | aN' | {HN' | {DN'
+K -> cBK' | dBK' | eBK' | fBK' | iBK' | vBK' | aBK' | cK' | dK' | eK' | fK' | iK' | vK' | aK' | {FK' | {DK'
+A -> cBA' | dBA' | eBA' | fBA' | iBA' | vBA' | aBA' | cA' | dA' | eA' | fA' | iA' | vA' | aA' | {GA' | {DA'
+F -> cBA'D | dBA'D | eBA'D | fBA'D | iBA'D | vBA'D | aBA'D | cA'D | dA'D | eA'D | fA'D | iA'D | vA'D | aA'D | {GA'D | {DA'D
+G -> cBK'D | dBK'D | eBK'D | fBK'D | iBK'D | vBK'D | aBK'D | cK'D | dK'D | eK'D | fK'D | iK'D | vK'D | aK'D | {FK'D | {DK'D
+D -> }
+H -> cBK'D | dBK'D | eBK'D | fBK'D | iBK'D | vBK'D | aBK'D | cK'D | dK'D | eK'D | fK'D | iK'D | vK'D | aK'D | {FK'D | {DK'D
+N' -> NN' | ε
+K' -> KK' | ε
+A' -> AA' | ε
+
+// Replace K //I think we can also completely remove K -> here
+C -> cBK'D | dBK'D | eBK'D | fBK'D | iBK'D | vBK'D | aBK'D | cK'D | dK'D | eK'D | fK'D | iK'D | vK'D | aK'D | {FK'D | {DK'D
+S -> NN | cB | dB | eB | fB | iB | vB | aB | c | d | e | f | i | v | a | {C | {D
+B -> cB | dB | eB | fB | iB | vB | aB | c | d | e | f | i | v | a
+N -> cBN' | dBN' | eBN' | fBN' | iBN' | vBN' | aBN' | cN' | dN' | eN' | fN' | iN' | vN' | aN' | {HN' | {DN'
+A -> cBA' | dBA' | eBA' | fBA' | iBA' | vBA' | aBA' | cA' | dA' | eA' | fA' | iA' | vA' | aA' | {GA' | {DA'
+F -> cBA'D | dBA'D | eBA'D | fBA'D | iBA'D | vBA'D | aBA'D | cA'D | dA'D | eA'D | fA'D | iA'D | vA'D | aA'D | {GA'D | {DA'D
+G -> cBK'D | dBK'D | eBK'D | fBK'D | iBK'D | vBK'D | aBK'D | cK'D | dK'D | eK'D | fK'D | iK'D | vK'D | aK'D | {FK'D | {DK'D
+D -> }
+H -> cBK'D | dBK'D | eBK'D | fBK'D | iBK'D | vBK'D | aBK'D | cK'D | dK'D | eK'D | fK'D | iK'D | vK'D | aK'D | {FK'D | {DK'D
+N' -> NN' | ε
+K' -> cBK'K' | dBK'K' | eBK'K' | fBK'K' | iBK'K' | vBK'K' | aBK'K' | cK'K' | dK'K' | eK'K' | fK'K' | iK'K' | vK'K' | aK'K' | {FK'K' | {DK'K' | ε //Maybe we can even remove the nd "K'" here?
+A' -> AA' | ε
+
+//Replace N
+C -> cBK'D | dBK'D | eBK'D | fBK'D | iBK'D | vBK'D | aBK'D | cK'D | dK'D | eK'D | fK'D | iK'D | vK'D | aK'D | {FK'D | {DK'D
+S -> cBN'N | dBN'N | eBN'N | fBN'N | iBN'N | vBN'N | aBN'N | cN'N | dN'N | eN'N | fN'N | iN'N | vN'N | aN'N | {HN'N | {DN'N | cB | dB | eB | fB | iB | vB | aB | c | d | e | f | i | v | a | {C | {D
+B -> cB | dB | eB | fB | iB | vB | aB | c | d | e | f | i | v | a
+N -> cBN' | dBN' | eBN' | fBN' | iBN' | vBN' | aBN' | cN' | dN' | eN' | fN' | iN' | vN' | aN' | {HN' | {DN'
+A -> cBA' | dBA' | eBA' | fBA' | iBA' | vBA' | aBA' | cA' | dA' | eA' | fA' | iA' | vA' | aA' | {GA' | {DA'
+F -> cBA'D | dBA'D | eBA'D | fBA'D | iBA'D | vBA'D | aBA'D | cA'D | dA'D | eA'D | fA'D | iA'D | vA'D | aA'D | {GA'D | {DA'D
+G -> cBK'D | dBK'D | eBK'D | fBK'D | iBK'D | vBK'D | aBK'D | cK'D | dK'D | eK'D | fK'D | iK'D | vK'D | aK'D | {FK'D | {DK'D
+D -> }
+H -> cBK'D | dBK'D | eBK'D | fBK'D | iBK'D | vBK'D | aBK'D | cK'D | dK'D | eK'D | fK'D | iK'D | vK'D | aK'D | {FK'D | {DK'D
+N' -> cBN'N' | dBN'N' | eBN'N' | fBN'N' | iBN'N' | vBN'N' | aBN'N' | cN'N' | dN'N' | eN'N' | fN'N' | iN'N' | vN'N' | aN'N' | {HN'N' | {DN'N' | ε //Maybe we can remove the 2nd "N'" here?
+K' -> cBK'K' | dBK'K' | eBK'K' | fBK'K' | iBK'K' | vBK'K' | aBK'K' | cK'K' | dK'K' | eK'K' | fK'K' | iK'K' | vK'K' | aK'K' | {FK'K' | {DK'K' | ε //Maybe we can even remove the 2nd "K'" here?
+A' -> AA' | ε
+
+//Replace A
+C -> cBK'D | dBK'D | eBK'D | fBK'D | iBK'D | vBK'D | aBK'D | cK'D | dK'D | eK'D | fK'D | iK'D | vK'D | aK'D | {FK'D | {DK'D
+S -> cBN'N | dBN'N | eBN'N | fBN'N | iBN'N | vBN'N | aBN'N | cN'N | dN'N | eN'N | fN'N | iN'N | vN'N | aN'N | {HN'N | {DN'N | cB | dB | eB | fB | iB | vB | aB | c | d | e | f | i | v | a | {C | {D
+B -> cB | dB | eB | fB | iB | vB | aB | c | d | e | f | i | v | a
+N -> cBN' | dBN' | eBN' | fBN' | iBN' | vBN' | aBN' | cN' | dN' | eN' | fN' | iN' | vN' | aN' | {HN' | {DN'
+A -> cBA' | dBA' | eBA' | fBA' | iBA' | vBA' | aBA' | cA' | dA' | eA' | fA' | iA' | vA' | aA' | {GA' | {DA'
+F -> cBA'D | dBA'D | eBA'D | fBA'D | iBA'D | vBA'D | aBA'D | cA'D | dA'D | eA'D | fA'D | iA'D | vA'D | aA'D | {GA'D | {DA'D
+G -> cBK'D | dBK'D | eBK'D | fBK'D | iBK'D | vBK'D | aBK'D | cK'D | dK'D | eK'D | fK'D | iK'D | vK'D | aK'D | {FK'D | {DK'D
+D -> }
+H -> cBK'D | dBK'D | eBK'D | fBK'D | iBK'D | vBK'D | aBK'D | cK'D | dK'D | eK'D | fK'D | iK'D | vK'D | aK'D | {FK'D | {DK'D
+N' -> cBN'N' | dBN'N' | eBN'N' | fBN'N' | iBN'N' | vBN'N' | aBN'N' | cN'N' | dN'N' | eN'N' | fN'N' | iN'N' | vN'N' | aN'N' | {HN'N' | {DN'N' | ε //Maybe we can remove the 2nd "N'" here?
+K' -> cBK'K' | dBK'K' | eBK'K' | fBK'K' | iBK'K' | vBK'K' | aBK'K' | cK'K' | dK'K' | eK'K' | fK'K' | iK'K' | vK'K' | aK'K' | {FK'K' | {DK'K' | ε //Maybe we can even remove the 2nd "K'" here?
+A' -> cBA'A' | dBA'A' | eBA'A' | fBA'A' | iBA'A' | vBA'A' | aBA'A' | cA'A' | dA'A' | eA'A' | fA'A' | iA'A' | vA'A' | aA'A' | {GA'A' | {DA'A' | ε //Maybe we can even remove the 2nd "A'" here?

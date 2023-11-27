@@ -30,7 +30,14 @@ E = e
 F = f
 I = i
 V = v
-e = a 
+e = a
+S_2 = C
+<Z4> = D
+<Z3> = E
+<Z2> = F
+N2_2 = G
+N0_2 = H
+
 
 
 Website:
