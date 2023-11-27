@@ -24,7 +24,7 @@ CFG* createCFG(){
             continue;
         }
 
-        P.push_back( {"B",{"B",k,"B"}}); //B van Bullshit // B -> B Terminal B
+        P.push_back( {"B",{k,"B"}}); //B van Bullshit // B -> B Terminal B
     }
     P.push_back({"B", {"B", "B"}});
 

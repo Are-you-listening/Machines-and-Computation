@@ -652,7 +652,9 @@ void CFG::toGNF() { // I used the algorithm described by https://www.geeksforgee
     typedef std::pair<std::string, std::vector<std::string>> production;
 
     vector<production> total;
-    for (int i = 0; i<P.size(); i++){
+    for (int i = 0; i<V.size(); i++){
+        //iteraties over every variable
+        //store all productions of this variable
         vector<production> key_specific;
         for (auto& prod: P){
             if (prod.first == "A"+ to_string(i+1)){
@@ -676,7 +678,8 @@ void CFG::toGNF() { // I used the algorithm described by https://www.geeksforgee
             int value_index = stoi(prod.second[0].substr(1, prod.second[0].size()-1));
 
             if (key_index >= value_index){
-
+                //do replacement by replacing by target_keys productions
+                //assume A4 -> A1 than the targetkeys will be every production of A1 -> ...
                 vector<production> target_keys;
                 for (auto& prod2: total){
                     if (prod2.first == prod.second[0]){
@@ -684,6 +687,7 @@ void CFG::toGNF() { // I used the algorithm described by https://www.geeksforgee
                     }
                 }
 
+                //modify old production and add to resulting productions
                 auto old_production = prod.second;
                 old_production.erase(old_production.begin());
 
@@ -698,7 +702,6 @@ void CFG::toGNF() { // I used the algorithm described by https://www.geeksforgee
 
                 }
 
-
             }else{
                 //check for no duplicates
                 if (find(new_key_specific.begin(), new_key_specific.end(), prod) == new_key_specific.end()){
@@ -711,6 +714,7 @@ void CFG::toGNF() { // I used the algorithm described by https://www.geeksforgee
         key_specific = new_key_specific;
 
         new_key_specific = {};
+        //do i == j process
         for (auto& prod: key_specific){
             int key_index = stoi(prod.first.substr(1, prod.first.size()-1));
             if (find(T.begin(), T.end(), prod.second[0]) != T.end()){
@@ -726,6 +730,7 @@ void CFG::toGNF() { // I used the algorithm described by https://www.geeksforgee
             int value_index = stoi(prod.second[0].substr(1, prod.second[0].size()-1));
 
             if (key_index == value_index){
+                //do left recursion
                 auto right_hand = prod.second;
                 right_hand.erase(right_hand.begin());
 
@@ -753,7 +758,7 @@ void CFG::toGNF() { // I used the algorithm described by https://www.geeksforgee
                     }
                 }
 
-                //do left recursion
+
             }else{
                 if (find(new_key_specific.begin(), new_key_specific.end(), prod) == new_key_specific.end()){
                     new_key_specific.push_back(prod);
@@ -761,12 +766,12 @@ void CFG::toGNF() { // I used the algorithm described by https://www.geeksforgee
             }
         }
 
-        int j = 0;
         total.insert(total.end(), new_key_specific.begin(), new_key_specific.end());
     }
 
     vector<production> final_total = total;
 
+    //do step 4 I guess
     do{
         total = final_total;
         final_total = {};
@@ -779,11 +784,12 @@ void CFG::toGNF() { // I used the algorithm described by https://www.geeksforgee
             }
             for (auto& prod2: total){
                 if (prod2.first == prod.second[0]){
-                    prod.second.erase(prod.second.begin());
-                    prod.second.insert(prod.second.begin(), prod2.second.begin(), prod2.second.end());
+                    auto prod_copy = prod;
+                    prod_copy.second.erase(prod_copy.second.begin());
+                    prod_copy.second.insert(prod_copy.second.begin(), prod2.second.begin(), prod2.second.end());
 
-                    if (find(final_total.begin(), final_total.end(), prod) == final_total.end()){
-                        final_total.push_back(prod);
+                    if (find(final_total.begin(), final_total.end(), prod_copy) == final_total.end()){
+                        final_total.push_back(prod_copy);
                     }
                 }
             }
