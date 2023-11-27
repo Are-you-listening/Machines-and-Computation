@@ -1330,17 +1330,22 @@ void TuringTools::find_match_heap_traverse(IncompleteSet &a, char start_marker, 
     move(traverse_loop, {0, 1}, 1);
     string not_found_branch = branch_on(traverse_loop, {'S', '\u0000'}, {marker_tape, (int) stack_tape});
 
+    //in case the last one and also found target
     string issue_fixer = branch_on(traverse_loop, {'S'}, {marker_tape});
+
+    IncompleteSet betweener{"betweener_"+ to_string(counter), "betweener_"+ to_string(counter)};
+    link(traverse_loop,betweener);
+
+    IncompleteTransition fix_transition;
+    fix_transition.state = issue_fixer;
+    fix_transition.to_state = traverse_loop.to_state;
+    fix_transition.def_move = 0;
+
+    traverse_loop.transitions.push_back(fix_transition);
 
     //string not_found_branch = branch_on(traverse_loop, {'\u0000'}, {(int) stack_tape});
     go_to(traverse_loop, {'S'}, marker_tape, 1, {marker_tape, data_tape});
 
-    IncompleteTransition fix_transition;
-    fix_transition.state = issue_fixer;
-    fix_transition.to_state = traverse_loop.state;
-    fix_transition.def_move = 0;
-
-    traverse_loop.transitions.push_back(fix_transition);
 
     make_loop_on(traverse_loop, '\u0000', stack_tape);
 
@@ -1351,7 +1356,7 @@ void TuringTools::find_match_heap_traverse(IncompleteSet &a, char start_marker, 
 
     traverse_loop.transitions.push_back(not_found_to_now);
 
-    //TODO: here is bug
+
     link(do_traverse_check, traverse_loop);
 
     //clear stack
@@ -1485,7 +1490,7 @@ TuringTools::nesting_marker(IncompleteSet &a, const vector<int> &tuple_indexes, 
     for (int i=0; i<max_nesting+1; i++){
 
         IncompleteSet forward_action{"forward_action_"+ to_string(original_counter), "forward_action_"+ to_string(original_counter)};
-        if (i <= split_nesting){
+        if (i <= split_nesting || true){
             move(forward_action, tuple_indexes, -1);
             mark_definer(forward_action, tuple_indexes);
 
@@ -1596,7 +1601,21 @@ TuringTools::nesting_marker(IncompleteSet &a, const vector<int> &tuple_indexes, 
 
 
     //go till end of nesting
-    go_to(result, {'N'}, tuple_indexes[0], -1, tuple_indexes);
+
+    //go back loop
+    IncompleteSet go_back{"go_back_"+ to_string(counter), "go_back_"+ to_string(counter)};
+    counter++;
+
+    go_to_multiple(go_back, {{'N'}, {'{'}}, {tuple_indexes[0], tuple_indexes[1]}, -1, tuple_indexes);
+    string go_back_branch = branch_on(go_back, {'N'}, {tuple_indexes[0]});
+
+    remove_nesting_working(go_back);
+    move(go_back, tuple_indexes, -1);
+
+    make_loop(go_back);
+    go_back.to_state = go_back_branch;
+    link(result, go_back);
+
     skip_nesting(result, stack_tape, 1, tuple_indexes[1], 1, tuple_indexes);
 
     string final = result.to_state;
