@@ -136,15 +136,28 @@ void Tokenisation::Tokenize(const std::string &FileLocation) {
             }
             for(unsigned long int i=Oldsize; i<tokenVector.size();i++){
                 std::ifstream File1(FileLocation);
-                std::string line1;
-                while(getline(File1,line1)){
-                    std::string spaces;
+                std::string line2;
+                
+                std::vector<std::string> lines;
+                while(getline(File1,line2)){
                     unsigned long int count2=0;
-                    while(line1[count2]==' '){
+                    std::string spaces;
+                    while(line2[count2]==' '){
                         spaces+=" ";
                         count2++;
                     }
-                    if((line1.find(tokenVector[i].second+" ")!=std::string::npos||line1.find(tokenVector[i].second+"=")!=std::string::npos||line1.find(tokenVector[i].second+"(")!=std::string::npos||line1.find(tokenVector[i].second+")")!=std::string::npos||line1.find(tokenVector[i].second+";")!=std::string::npos||line1.find(tokenVector[i].second+"{")!=std::string::npos||line1.find(tokenVector[i].second+",")!=std::string::npos)&&line1.find(' ')!=std::string::npos&&(line1.find(';')!=std::string::npos||line1.find(',')!=std::string::npos)&&line1.find("return")==std::string::npos&&line1!=spaces+line){
+                    if(spaces+line==line2){
+                        break;
+                    }
+                    lines.push_back(line2);
+                }
+                
+                for(auto it=lines.rbegin(); it!=lines.rend(); it++){
+                    std::string line1=*it;
+                    while(line1.substr(0,1)==" "){
+                        line1=line1.substr(1,std::string::npos);
+                    }
+                    if((line1.find(tokenVector[i].second+" ")!=std::string::npos||line1.find(tokenVector[i].second+"=")!=std::string::npos||line1.find(tokenVector[i].second+"(")!=std::string::npos||line1.find(tokenVector[i].second+")")!=std::string::npos||line1.find(tokenVector[i].second+";")!=std::string::npos||line1.find(tokenVector[i].second+"{")!=std::string::npos||line1.find(tokenVector[i].second+",")!=std::string::npos)&&line1.find(' ')!=std::string::npos&&(line1.find(';')!=std::string::npos||line1.find(',')!=std::string::npos)&&line1.find("return")==std::string::npos&&line1!=line){
                         std::string copy=tokenVector[i].second;
                         tokenVector[i].second="";
                         if(line1.find('(')!=std::string::npos){
