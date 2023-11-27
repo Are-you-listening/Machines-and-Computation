@@ -649,6 +649,7 @@ void CFG::toGNF() { // I used the algorithm described by https://www.geeksforgee
     S=originals[S];
 
     //Tibo started working here
+    /*
     typedef std::pair<std::string, std::vector<std::string>> production;
 
     vector<production> total;
@@ -800,6 +801,7 @@ void CFG::toGNF() { // I used the algorithm described by https://www.geeksforgee
 
 
     P = final_total;
+     */
     /*
     new_key_specific = {};
     //do left recursion
@@ -823,8 +825,7 @@ void CFG::toGNF() { // I used the algorithm described by https://www.geeksforgee
         }
     }
     */
-
-    /*
+    
     //step 3, I replace A3 also, on the website this isn't done for some reason. A4 → b | A2A3A4 | A4A4A4
     std::cout << "step 3" <<std::endl;
     for(long int m=0; m<P.size(); m++){ //Step 3.1 , replace j>i
@@ -864,7 +865,7 @@ void CFG::toGNF() { // I used the algorithm described by https://www.geeksforgee
                         P.emplace_back(P[m].first,rhsit);   
                     }
                 }
-                m=-1;
+                //m=-1; commented this cause the online algoritme doesn't seem to loop
                 break;
             }
         }
@@ -918,7 +919,6 @@ void CFG::toGNF() { // I used the algorithm described by https://www.geeksforgee
             m=-1;
         }
     }
-     */
     GNF= true;
 }
 
