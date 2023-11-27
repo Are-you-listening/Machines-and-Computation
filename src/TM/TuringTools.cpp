@@ -1607,7 +1607,17 @@ void TuringTools::make_working_nesting(IncompleteSet &a, const vector<int> &tupl
     counter++;
 
     copy_to_working(working_nesting, tuple_indexes);
+
     move(working_nesting, {0, 1}, -1);
+
+    IncompleteSet on_bracket{"on_bracket_"+ to_string(counter), "on_bracket_"+ to_string(counter)};
+    counter++;
+    go_to_copy(on_bracket, {'('}, 1, -1, {0,1}, stack_tape, 1, {(int) stack_tape});
+    copy(on_bracket, 1, stack_tape);
+    move(on_bracket, {(int) stack_tape}, 1);
+    move(on_bracket, {0, 1}, -1);
+    link_on(working_nesting, on_bracket, {')'}, {1});
+
     go_to_copy(working_nesting, {' ', ':'}, 1, -1, {0,1}, stack_tape, 1, {(int) stack_tape});
 
     IncompleteSet copy_object{"make_working_nesting_"+ to_string(counter), "make_working_nesting_"+ to_string(counter)};
