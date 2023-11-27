@@ -33,14 +33,14 @@ void CFG::print() {
 
     std::cout << "P = {" << std::endl;
     for(auto it=P.begin(); it!=P.end();it++){
-        std::string c="`";
+        std::string c="";
         if(it->second.empty()){
             c+="`";
         } else {
             for (auto it2 = it->second.begin(); it2 != it->second.end() - 1; it2++) {
                 c += *it2 + " ";
             }
-            c += it->second[it->second.size() - 1] + "`";
+            c += it->second[it->second.size() - 1] + "";
         }
         std::cout <<"   "<< it->first <<" -> " << c << std::endl;
     }
