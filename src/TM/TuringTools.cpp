@@ -1329,7 +1329,18 @@ void TuringTools::find_match_heap_traverse(IncompleteSet &a, char start_marker, 
     go_to(traverse_loop, {'{'}, data_tape, 1, {marker_tape, data_tape});
     move(traverse_loop, {0, 1}, 1);
     string not_found_branch = branch_on(traverse_loop, {'S', '\u0000'}, {marker_tape, (int) stack_tape});
+
+    string issue_fixer = branch_on(traverse_loop, {'S'}, {marker_tape});
+
+    //string not_found_branch = branch_on(traverse_loop, {'\u0000'}, {(int) stack_tape});
     go_to(traverse_loop, {'S'}, marker_tape, 1, {marker_tape, data_tape});
+
+    IncompleteTransition fix_transition;
+    fix_transition.state = issue_fixer;
+    fix_transition.to_state = traverse_loop.state;
+    fix_transition.def_move = 0;
+
+    traverse_loop.transitions.push_back(fix_transition);
 
     make_loop_on(traverse_loop, '\u0000', stack_tape);
 
@@ -1340,6 +1351,7 @@ void TuringTools::find_match_heap_traverse(IncompleteSet &a, char start_marker, 
 
     traverse_loop.transitions.push_back(not_found_to_now);
 
+    //TODO: here is bug
     link(do_traverse_check, traverse_loop);
 
     //clear stack
@@ -2406,6 +2418,18 @@ void TuringTools::check_var_char_working(IncompleteSet &a) {
 
 
     link(a, var_char_check);
+
+}
+
+void TuringTools::clear_heap(IncompleteSet &a) {
+    set_heap_mode(a, true);
+    move(a, {(int) stack_tape}, -1);
+    go_to_clear(a, {'\u0000'}, stack_tape, -1, {(int) stack_tape}, {(int) stack_tape});
+
+
+    go_to(a, {'*'}, stack_tape, 1, {(int) stack_tape});
+    go_to(a, {'\u0000'}, stack_tape, 1, {(int) stack_tape});
+    heap_mode = false;
 
 }
 

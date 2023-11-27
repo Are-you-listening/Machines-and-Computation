@@ -41,12 +41,21 @@ TMBuilder_output TMBuilder::generateTM() {
 
     TuringVarDictionary vardict{};
 
-    tools->link(program, vardict.getTransitions());
+    IncompleteSet vardict_set = vardict.getTransitions();
+    tools->link(program, vardict_set);
 
     TuringDenestify denest{2, 4};
 
     tools->link(program, denest.getTransitions());
 
+    tools->clear_heap(program);
+
+    IncompleteTransition re_heap;
+    re_heap.state = program.to_state;
+    re_heap.to_state = vardict_set.state;
+    re_heap.def_move = 0;
+
+    program.transitions.push_back(re_heap);
 
     for (auto incomp: program.transitions){
         Transition t = make_transition(incomp);

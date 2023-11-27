@@ -684,7 +684,7 @@ void CFG::toGNF() { // I used the algorithm described by https://www.geeksforgee
                 vector<production> target_keys;
                 for (auto& prod2: total){
                     if (prod2.first == prod.second[0]){
-                        target_keys.push_back(prod);
+                        target_keys.push_back(prod2);
                     }
                 }
 

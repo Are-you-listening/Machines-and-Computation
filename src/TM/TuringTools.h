@@ -109,6 +109,7 @@ public:
     void make_token_splitter(IncompleteSet& a, const vector<int>&tuple_indexes, char def_token, char splitter);
     void check_var_define_location(IncompleteSet& a, const vector<int>&tuple_indexes);
     void check_var_char_working(IncompleteSet& a);
+    void clear_heap(IncompleteSet& a);
 private:
 
     TuringTools(unsigned int stack_tape);
