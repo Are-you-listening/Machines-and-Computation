@@ -55,6 +55,8 @@ public:
     CFG _cfg;
     int state_counter = 0;
     parseTree* _root;
+
+    void printTable();  // this function is mainly for debugging and is not needed for LALR parsing
     
     augmentedrules createAugmented(const tuple<string, vector<string>, set<string>> &inputrule);
     

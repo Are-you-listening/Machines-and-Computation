@@ -374,6 +374,16 @@ void LALR::parse(std::vector<std::pair<std::string, std::string>> &input) {
         }
     }
 }
+
+void LALR::printTable() {
+    for (const auto& rowpair : parseTable){
+        cout << "State: " << to_string(rowpair.first) << endl;
+        for (const auto& columnpair : rowpair.second){
+            cout << "\tSymbol: " << columnpair.first << ", Table element: " << columnpair.second << endl;
+        }
+    }
+}
+
 parseTree::~parseTree() {
     for (const auto& child : children){
         delete child;
