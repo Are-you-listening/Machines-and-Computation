@@ -21,3 +21,4 @@ https://www.codingninjas.com/studio/library/greibach-normal-form
 https://www3.cs.stonybrook.edu/~cse350/slides/cfg3.pdf
 https://www.geeksforgeeks.org/removing-direct-and-indirect-left-recursion-in-a-grammar/
 https://devimam.github.io/cfgtocnf/
+Book: John_E._Hopcroft_Rajeev_Motwani_Jeffrey_D._Ullman_-_Introduction_to_Automata_Theory_Languages_and_Co.pdf
