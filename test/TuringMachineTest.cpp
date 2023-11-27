@@ -190,14 +190,17 @@ TEST(TuringMachineTest, TM_tokenazation) {
             continue;
         }
         tm.move();
-
-
-        if (tm.getCurrentState() == "continue_in_bracket"){
+        if (tm.getCurrentState() == "go_to_804"){
             int j=0;
         }
 
 
-        if (i >= 303800){
+        if (tm.getCurrentState() == "go_to_1050"){
+            int j=0;
+        }
+
+
+        if (i >= 162450){
             int j = 0;
 
             for (int i = 0; i < tm.getTapeAmount(); i++){

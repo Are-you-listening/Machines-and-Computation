@@ -1874,9 +1874,10 @@ void TuringTools::write_function_header(IncompleteSet &a, const vector<int>&tupl
     heap_mode = true;
     set_heap_mode(write_function_header, false);
 
-
     //copy function token to tokenize
     go_to(write_function_header, {'H'}, tuple_indexes[0], 1, tuple_indexes);
+
+
 
     //move S marker
     write_on(write_function_header, {'S'}, {0}, {'\u0000'}, {0});
@@ -1918,7 +1919,6 @@ void TuringTools::write_function_header(IncompleteSet &a, const vector<int>&tupl
     write_on(write_function_header, {'\u0000'}, {0}, {'E'}, {0});
     go_to(write_function_header, {'S'}, 0, -1, {0,1});
 
-
     //make function caller token
     make_token(write_function_header, tuple_indexes, 'U');
 
@@ -1929,6 +1929,7 @@ void TuringTools::write_function_header(IncompleteSet &a, const vector<int>&tupl
 
     //store all parameters on stack
     go_to(write_function_header, {'N'}, tuple_indexes[0], -1, tuple_indexes);
+
 
     IncompleteSet check_var_loop{"check_define_loop_"+ to_string(counter), "check_define_loop_"+ to_string(counter)};
     counter++;
@@ -1947,6 +1948,8 @@ void TuringTools::write_function_header(IncompleteSet &a, const vector<int>&tupl
 
     link(write_function_header, check_var_loop);
 
+
+
     //add '(' for function definition
     link_put(write_function_header, {'('}, {1});
     move(write_function_header, {0,1}, 1);
@@ -1961,7 +1964,6 @@ void TuringTools::write_function_header(IncompleteSet &a, const vector<int>&tupl
     link_put(write_function_header, {'\u0000'}, {1});
 
     //putting stack data on working tape
-
     //start dot
     //copy to working loop
     IncompleteSet copy_to_working{"copy_to_working_"+ to_string(counter), "copy_to_working_"+ to_string(counter)};
@@ -2009,12 +2011,24 @@ void TuringTools::write_function_header(IncompleteSet &a, const vector<int>&tupl
     copy_to_working.to_state = end_branch;
 
     //remove last ',' and ' '
-    move(copy_to_working, {0,1}, -1);
-    link_put(copy_to_working, {'\u0000'}, {1});
-    move(copy_to_working, {0,1}, -1);
-    link_put(copy_to_working, {'\u0000'}, {1});
+    IncompleteSet remove_last{"remove_last_"+ to_string(counter), "remove_last_"+ to_string(counter)};
+    counter++;
+    move(remove_last, {0,1}, -1);
+    link_put(remove_last, {'\u0000'}, {1});
+    move(remove_last, {0,1}, -1);
+    link_put(remove_last, {'\u0000'}, {1});
 
-    link_put(copy_to_working, {'E'}, {0});
+    link_put(remove_last, {'E'}, {0});
+    link_on_not(copy_to_working, remove_last, {'S'}, {0});
+
+    IncompleteSet no_last{"no_last_"+ to_string(counter), "no_last_"+ to_string(counter)};
+    counter++;
+    link_put(no_last, {' '}, {1});
+    move(no_last, {0,1}, 1);
+    link_put(no_last, {'E'}, {0});
+
+    link_on(copy_to_working, no_last, {'S'}, {0});
+
     link(write_function_header, copy_to_working);
 
     //clears all stack overhead
@@ -2023,7 +2037,12 @@ void TuringTools::write_function_header(IncompleteSet &a, const vector<int>&tupl
     move(write_function_header, {(int) stack_tape}, 1);
 
     go_to(write_function_header, {'S'}, 0, -1, {0,1});
-    make_token_splitter(write_function_header, tuple_indexes, 'D', ',');
+
+    //we dont store spaces as token for arguments
+    IncompleteSet if_definer{"if_definer_"+ to_string(counter), "if_definer_"+ to_string(counter)};
+    counter++;
+    make_token_splitter(if_definer, tuple_indexes, 'D', ',');
+    link_on_not(write_function_header, if_definer, {' '}, {1});
 
     go_to(write_function_header, {'S'}, 0, -1, {0,1});
     //store every value that is a parameter on stack for later
