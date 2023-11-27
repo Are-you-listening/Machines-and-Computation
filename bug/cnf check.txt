@@ -1,0 +1,81 @@
+Onze CFG
+
+S -> N0
+B -> T B
+B -> ϵ
+N0 -> B | N0 N0 | { N1 }
+N1 -> B | N1 N1 | { N2 }
+N2 -> B | N2 N2 | { N1 }
+T -> C | D | E | F | I | V | e
+
+Onze CFG Vertaald
+S -> N
+B -> T B
+B -> ϵ
+N -> B | N N | s K x
+K -> B | K K | s A x
+A -> B | A A | s K x
+T -> c | d | e | f | i | v | a
+
+Translations:
+
+N0 = N
+N1 = K
+N2 = A
+{ = s
+} = x
+C = c
+D = d
+E = e
+F = f
+I = i
+V = v
+e = a 
+
+
+Website:
+
+
+<S0> 	→ 	ε | NN | TB | c | d | e | f | i | v | a | <Z3><Z1> | <Z3><Z4>
+S 	→ 	NN | TB | c | d | e | f | i | v | a | <Z3><Z1> | <Z3><Z4>
+B 	→ 	TB | c | d | e | f | i | v | a
+N 	→ 	NN | TB | c | d | e | f | i | v | a | <Z3><Z1> | <Z3><Z4>
+K 	→ 	KK | TB | c | d | e | f | i | v | a | <Z3><Z2> | <Z3><Z4>
+A 	→ 	AA | TB | c | d | e | f | i | v | a | <Z3><Z1> | <Z3><Z4>
+T 	→ 	c | d | e | f | i | v | a
+<Z1> 	→ 	K<Z4>
+<Z2> 	→ 	A<Z4>
+<Z3> 	→ 	s
+<Z4> 	→ 	x
+
+Website Translated:
+
+S_2 	→ 	ε | N0 N0 | T B | C | D | E | F | I | V | e | <Z3> <Z1> | <Z3> <Z4>
+S 	→ 	N0 N0 | T B | C | D | E | F | I | V | e | <Z3> <Z1> | <Z3> <Z4>
+B 	→ 	T B | C | D | E | F | I | V | e
+N0 	→ 	N0 N0 | T B | C | D | E | F | I | V | e | <Z3> <Z1> | <Z3> <Z4>
+N1 	→ 	N1 N1 | T B | C | D | E | F | I | V | e | <Z3> <Z2> | <Z3> <Z4>
+N2 	→ 	N2 N2 | T B | C | D | E | F | I | V | e | <Z3> <Z1> | <Z3> <Z4>
+T 	→ 	T B | C | D | E | F | I | V | e
+<Z1> 	→ 	N1 <Z4>
+<Z2> 	→ 	N2 <Z4>
+<Z3> 	→ 	{
+<Z4> 	→ 	}
+
+
+Anas:
+S_2 	-> 	N1 <Z4>  !!!!!!!
+S 	-> 	N0 N0 | T B | C | D | E | F | I | V | e | <Z3> S_2 | <Z3> <Z4>
+B 	-> 	T B | C | D | E | F | I | V | e
+N0 	->	N0 N0 | T B | C | D | E | F | I | V | e | <Z3> N0_2 | <Z3> <Z4>
+N1 	->	N1 N1 | T B | C | D | E | F | I | V | e | <Z3> <Z2> | <Z3> <Z4>
+N2 	->	N2 N2 | T B | C | D | E | F | I | V | e | <Z3> N2_2 | <Z3> <Z4>
+T 	->	!!!!!!  C | D | E | F | I | V | e
+N0_2 	->	N1 <Z4>
+<Z2> 	->	N2 <Z4>
+N2_2 	->	N1 <Z4>
+<Z3>	->	{
+<Z4> 	->	}
+
+
+

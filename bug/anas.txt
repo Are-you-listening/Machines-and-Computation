@@ -1,0 +1,13 @@
+S_2 	→       N1 <Z4>
+S 	    → 	            N0 N0 | T B | C | D | E | F | I | V | e | <Z3> S_2 | <Z3> <Z4>
+B 	    → 	                    T B | C | D | E | F | I | V | e
+N0 	    →	            N0 N0 | T B | C | D | E | F | I | V | e | <Z3> N0_2 | <Z3> <Z4>
+N1 	    →	            N1 N1 | T B | C | D | E | F | I | V | e | <Z3> <Z2> | <Z3> <Z4>
+N2 	    →	            N2 N2 | T B | C | D | E | F | I | V | e | <Z3> N2_2 | <Z3> <Z4>
+T 	    →	                          C | D | E | F | I | V | e
+<Z2> 	→	    N2 <Z4>
+N2_2 	→	    N1 <Z4>
+<Z3>	→	    {
+<Z4> 	→	    }
+
+N0_2 	→	    N1 <Z4>
