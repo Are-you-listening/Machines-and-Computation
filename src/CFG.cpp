@@ -929,9 +929,12 @@ bool CFG::accepts(const string &w) const {
 CFGKars CFG::convert() const {
     map<string,vector<vector<string>>> P2; //Convert P to Kars' P=P2
     for(auto &tup: P){
-        P2[tup.first].push_back(tup.second);
+        if(tup.second.empty()){
+            P2[tup.first].push_back({""});
+        }else{
+            P2[tup.first].push_back(tup.second);
+        }
     }
-
     return CFGKars{V,T,P2,S}; //Construct CFG
 }
 

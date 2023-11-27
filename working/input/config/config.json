@@ -1,5 +1,5 @@
 {
-  "max_nesting" : 3,
+  "max_nesting" : 2,
   "split_nesting": 0,
   "ifElse_nesting": 0,
   "threading": false,
