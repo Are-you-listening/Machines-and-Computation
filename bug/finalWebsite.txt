@@ -1,0 +1,194 @@
+C -> c B I D
+C -> d B I D
+C -> e B I D
+C -> f B I D
+C -> i B I D
+C -> v B I D
+C -> a B I D
+C -> c I D
+C -> d I D
+C -> e I D
+C -> f I D
+C -> i I D
+C -> v I D
+C -> a I D
+C -> { F I D
+
+S -> c B J N
+S -> d B J N
+S -> e B J N
+S -> f B J N
+S -> i B J N
+S -> v B J N
+S -> a B J N
+S -> c J N
+S -> d J N
+S -> e J N
+S -> f J N
+S -> i J N
+S -> v J N
+S -> a J N
+S -> { H J N
+S -> { DJ N
+S -> c B
+S -> d B
+S -> e B
+S -> f B
+S -> i B
+S -> v B
+S -> a B
+S -> c
+S -> d
+S -> e
+S -> f
+S -> i
+S -> v
+S -> a
+S -> { C
+
+B -> c B
+B -> d B
+B -> e B
+B -> f B
+B -> i B
+B -> v B
+B -> aB
+B -> c
+B -> d
+B -> e
+B -> f
+B -> i
+B -> v
+
+N -> c B J
+N -> d B J
+N -> e B J
+N -> f B J
+N -> i B J
+N -> v B J
+N -> a B J
+N -> c J
+N -> d J
+N -> e J
+N -> f J
+N -> i J
+N -> v J
+N -> a J
+N -> { H J
+
+A -> c B W
+A -> d B W
+A -> e B W
+A -> f B W
+A -> i B W
+A -> v B W
+A -> a B W
+A -> c W
+A -> d W
+A -> e W
+A -> f W
+A -> i W
+A -> v W
+A -> a W
+A -> { G W
+
+F -> c B W D
+F -> d B W D
+F -> e B W D
+F -> f B W D
+F -> i B W D
+F -> v B W D
+F -> a B W D
+F -> c W D
+F -> d W D
+F -> e W D
+F -> f W D
+F -> i W D
+F -> v W D
+F -> a W D
+F -> { G W D
+
+G -> c B I D
+G -> d B I D
+G -> e B I D
+G -> f B I D
+G -> i B I D
+G -> v B I D
+G -> a B I D
+G -> c I D
+G -> d I D
+G -> e I D
+G -> f I D
+G -> i I D
+G -> v I D
+G -> a I D
+G -> { F I D
+
+D -> }
+
+H -> c B I D
+H -> d B I D
+H -> e B I D
+H -> f B I D
+H -> i B I D
+H -> v B I D
+H -> a B I D
+H -> c I D
+H -> d I D
+H -> e I D
+H -> f I D
+H -> i I D
+H -> v I D
+H -> a I D
+H -> { F I D
+
+J -> c B J J
+J -> d B J J
+J -> e B J J
+J -> f B J J
+J -> i B J J
+J -> v B J J
+J -> a B J J
+J -> c J J
+J -> d J J
+J -> e J J
+J -> f J J
+J -> i J J
+J -> v J J
+J -> a J J
+J -> { H J J
+J -> { D J J
+
+I -> c B I I
+I -> d B I I
+I -> e B I I
+I -> f B I I
+I -> i B I I
+I -> v B I I
+I -> a B I I
+I -> c I I
+I -> d I I
+I -> e I I
+I -> f I I
+I -> i I I
+I -> v I I
+I -> a I I
+I -> { F I I
+I -> { D I I
+
+W -> c B W W
+W -> d B W W
+W -> e B W W
+W -> f B W W
+W -> i B W W
+W -> v B W W
+W -> a B W W
+W -> c W W
+W -> d W W
+W -> e W W
+W -> f W W
+W -> i W W
+W -> v W W
+W -> a W W
+W -> { G W W
+W -> { D W W

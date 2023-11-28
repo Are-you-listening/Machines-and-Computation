@@ -1,0 +1,19 @@
+Translated from anas-LeftRecurstion.txt
+I = K'
+J = N'
+W = a'
+
+C -> cBID | dBID | eBID | fBID | iBID | vBID | aBID | cID | dID | eID | fID | iID | vID | aID | {FID | {DID
+S -> cBJN | dBJN | eBJN | fBJN | iBJN | vBJN | aBJN | cJN | dJN | eJN | fJN | iJN | vJN | aJN | {HJN | {DJN | cB | dB | eB | fB | iB | vB | aB | c | d | e | f | i | v | a | {C | {D
+B -> cB | dB | eB | fB | iB | vB | aB | c | d | e | f | i | v | a
+N -> cBJ | dBJ | eBJ | fBJ | iBJ | vBJ | aBJ | cJ | dJ | eJ | fJ | iJ | vJ | aJ | {HJ | {DJ
+A -> cBW | dBW | eBW | fBW | iBW | vBW | aBW | cW | dW | eW | fW | iW | vW | aW | {GW | {DW
+F -> cBWD | dBWD | eBWD | fBWD | iBWD | vBWD | aBWD | cWD | dWD | eWD | fWD | iWD | vWD | aWD | {GWD | {DWD
+G -> cBID | dBID | eBID | fBID | iBID | vBID | aBID | cID | dID | eID | fID | iID | vID | aID | {FID | {DID
+D -> }
+H -> cBID | dBID | eBID | fBID | iBID | vBID | aBID | cID | dID | eID | fID | iID | vID | aID | {FID | {DID
+J -> cBJJ | dBJJ | eBJJ | fBJJ | iBJJ | vBJJ | aBJJ | cJJ | dJJ | eJJ | fJJ | iJJ | vJJ | aJJ | {HJJ | {DJJ | ε //Maybe we can remove the 2nd "J" here?
+I -> cBII | dBII | eBII | fBII | iBII | vBII | aBII | cII | dII | eII | fII | iII | vII | aII | {FII | {DII | ε //Maybe we can even remove the 2nd "I" here?
+W -> cBWW | dBWW | eBWW | fBWW | iBWW | vBWW | aBWW | cWW | dWW | eWW | fWW | iWW | vWW | aWW | {GWW | {DWW | ε //Maybe we can even remove the 2nd "W" here?
+
+Split Up Via StringSPlit Functions:
