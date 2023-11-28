@@ -1676,6 +1676,9 @@ void TuringTools::make_working_nesting(IncompleteSet &a, const vector<int> &tupl
     move(replace_double_dot, {(int) stack_tape}, -1);
 
     go_to_move(replace_double_dot, {'*', '{'}, stack_tape, -1, {(int) stack_tape}, 1, 1, {0,1});
+    move(replace_double_dot, {(int) stack_tape}, 1);
+    push(replace_double_dot, 'O');
+    move(replace_double_dot, {(int) stack_tape}, -1);
 
     link_on(working_nesting, replace_double_dot, {':'}, {(int) stack_tape});
 
@@ -1948,6 +1951,73 @@ void TuringTools::write_function_header(IncompleteSet &a, const vector<int>&tupl
         link_put(write_function_header, {v}, {1});
         move(write_function_header, {0,1}, 1);
     }
+
+
+
+    //add class specifier if needed
+    //add start working tape is at end of function
+    //and stack is at emd
+    go_to(write_function_header, {'*'}, stack_tape, -1, {(int) stack_tape});
+    move(write_function_header, {(int) stack_tape}, 1);
+    IncompleteSet set_specifier{"set_specifier_"+ to_string(counter), "set_specifier_"+ to_string(counter)};
+    counter++;
+    go_to(set_specifier, {'\u0000'}, stack_tape, 1, {(int) stack_tape});
+
+    set_heap_mode(set_specifier, true);
+
+    IncompleteSet find_class_loop{"find_class_loop_"+ to_string(counter), "find_class_loop_"+ to_string(counter)};
+    counter++;
+    //search for class
+    //requires that Class exists in hierarchy
+    //move T to next position if already exists
+
+    //recalibrate stack
+    set_heap_mode(find_class_loop, false);
+    set_heap_mode(find_class_loop, true);
+
+    go_to(find_class_loop, {'A', 'T'}, 0, -1, {0,1});
+    write_on(find_class_loop, {'T'}, {0}, {'\u0000'}, {0});
+
+    go_to(find_class_loop, {'{'}, 1, 1, {0,1});
+    move(find_class_loop, {0,1}, 1);
+    write_on(find_class_loop, {'\u0000'}, {0}, {'T'}, {0});
+    go_to(find_class_loop, {'A'}, 0, -1, {0,1});
+    find_match_heap(find_class_loop, 'A', 'T', 0, 1);
+
+    //TODO: test loop more
+    make_loop_on(find_class_loop, '\u0000', stack_tape);
+
+    go_to(find_class_loop, {':'}, stack_tape, 1, {(int) stack_tape});
+
+    //copies class on working
+    IncompleteSet copy_to_working_stack{"copy_to_working_"+ to_string(counter), "copy_to_working_"+ to_string(counter)};
+    counter++;
+    go_to(copy_to_working_stack, {'#'}, stack_tape, 1, {(int) stack_tape});
+    move(copy_to_working_stack, {(int) stack_tape}, -1);
+    go_to(copy_to_working_stack, {'\u0000'}, 1, 1, {0,1});
+    go_to_copy(copy_to_working_stack, {':'}, stack_tape, -1, {(int) stack_tape}, 1, 1 , {0,1});
+
+    link_put(copy_to_working_stack, {':'}, {1});
+    move(copy_to_working_stack, {0,1}, 1);
+    link_put(copy_to_working_stack, {':'}, {1});
+    move(copy_to_working_stack, {0,1}, 1);
+
+    link_on_sequence(find_class_loop, copy_to_working_stack, {'s', 's', 'a', 'l', 'c'}, stack_tape);
+
+    link(set_specifier, find_class_loop);
+
+    //cleanup
+    set_heap_mode(set_specifier, false);
+    go_to(set_specifier, {'S'}, 0, -1, {0,1});
+    move(set_specifier, {0,1}, -1);
+    go_to_clear(set_specifier, {'A'}, 0, -1, {0,1}, {0});
+    go_to(set_specifier, {'\u0000'}, 1, 1, {0,1});
+
+
+    link_on(write_function_header, set_specifier, {'O'}, {(int) stack_tape});
+
+    move(write_function_header, {(int) stack_tape}, -1);
+    go_to(write_function_header, {'\u0000'}, stack_tape, 1, {(int) stack_tape});
 
     //put stack back on working
     go_to(write_function_header, {'.'}, stack_tape, -1, {(int) stack_tape});

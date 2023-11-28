@@ -174,10 +174,9 @@ IncompleteSet TuringTokenizer::tokenize_runner_productions() {
 
                 tools->push_on_sequence(spatie_pusher, {'c','l','a','s','s', ' '}, 1, 'C');
                 tools->push_on_sequence(spatie_pusher, {'n','e','w', ' '}, 1, 'X');
-                //TODO: enable again after debugging
-                //tools->push_on_sequence(spatie_pusher, {'d','e','l', 'e', 't', 'e', ' '}, 1, 'X');
-                //tools->push_on_sequence(spatie_pusher, {'r','e','t', 'u', 'r', 'n', ' '}, 1, 'X');
-
+                tools->push_on_sequence(spatie_pusher, {'d','e','l', 'e', 't', 'e', ' '}, 1, 'X');
+                tools->push_on_sequence(spatie_pusher, {'r','e','t', 'u', 'r', 'n', ' '}, 1, 'X');
+                tools->push_on_sequence(spatie_pusher, {'n','a','m', 'e', 's', 'p', 'a', 'c', 'e', ' '}, 1, 'X');
 
                 //sets S on stack if no other S is before
                 tools->stack_replace(spatie_pusher, {'*'}, {'P'});

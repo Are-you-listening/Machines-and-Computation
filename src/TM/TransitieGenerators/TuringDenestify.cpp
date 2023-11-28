@@ -15,6 +15,7 @@ IncompleteSet TuringDenestify::getTransitions() {
 
 IncompleteSet TuringDenestify::deNestify() {
     IncompleteSet result{"denestify_start", "denestify_start"};
+
     tools->nesting_marker(result, get_tuple_index(), split_nesting, max_nesting);
     string end_denesting = tools->branch_on(result, {'\u0000'}, {get_tuple_index()[1]});
 
@@ -31,14 +32,20 @@ IncompleteSet TuringDenestify::deNestify() {
     tools->go_to_clear(result, {'A'}, 0, -1, {0,1}, {0,1});
     tools->link_put(result, {'\u0000'}, {1});
 
-
-
     //small verify
+    string looping = result.to_state;
+    result.to_state = end_denesting;
+    tools->go_to_clear(result, {'A'}, 0, -1, {0,1}, {0,1});
+    //tools->go_to_clear(result, {'A'}, 0, -1, {0,1}, {1});
+    tools->link_put(result, {'\u0000'}, {1});
 
-    //tools->go_to(result, {'\u0000'}, get_tuple_index()[1], 1, get_tuple_index());
-    //tools->link_put(result, {'E'}, {get_tuple_index()[0]});
-    //tools->go_to(result, {'A'}, get_tuple_index()[0], -1, get_tuple_index());
-    //tools->copy_to_working(result, get_tuple_index());
+    tools->go_to(result, {'\u0000'}, get_tuple_index()[1], 1, get_tuple_index());
+    tools->link_put(result, {'E'}, {get_tuple_index()[0]});
+    tools->move(result, get_tuple_index(), -1);
+    tools->go_to_clear(result, {'A'}, get_tuple_index()[0], -1, get_tuple_index(), {get_tuple_index()[0]});
+    tools->copy_to_working(result, get_tuple_index());
+
+    result.to_state = looping;
 
     return result;
 }
