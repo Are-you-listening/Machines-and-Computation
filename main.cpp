@@ -11,12 +11,13 @@
 #include "src/ThreadFunction.h"
 #include "filesystem"
 #include "src/Config.h"
+#include "src/CFGConstructor.h"
 #include "src/LALR.h"
 
 //!!!!!!!!!!!!!!!!!!! Default Config Location is already SET in Orchestrator.cpp
 // Variabel Define might be a problem?
 
-string Orchestrator::file = "input/config/config.json"; //Static variables should be initialised outside the class
+
 static unsigned int core_amount = std::thread::hardware_concurrency(); // gets "core amount", in windows you can allocate infinite threads. In linux this isn't possible, I believe. so pls care about this.
 // so whenever you thread something, pls change core_amount. Also core_amount isn't the perfect name for this
 
@@ -41,7 +42,7 @@ int main() { // Function names we create to replace nesting should have F or I i
     cfg3->toCNF();
     
     //string permutatar found online
-    std::string str="{}FCIEeDV";
+    /*std::string str="{}FCIEeDV";
     unsigned int n = str.length();
     unsigned long int opsize = pow(2, n);
     
@@ -64,7 +65,7 @@ int main() { // Function names we create to replace nesting should have F or I i
             }
         }
         while (next_permutation(subs.begin(), subs.end()));
-    }
+    }*/
     //
     
     const CFG a = *cfg;
