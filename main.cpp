@@ -16,6 +16,7 @@
 //!!!!!!!!!!!!!!!!!!! Default Config Location is already SET in Orchestrator.cpp
 // Variabel Define might be a problem?
 
+string Orchestrator::file = "input/config/config.json"; //Static variables should be initialised outside the class
 static unsigned int core_amount = std::thread::hardware_concurrency(); // gets "core amount", in windows you can allocate infinite threads. In linux this isn't possible, I believe. so pls care about this.
 // so whenever you thread something, pls change core_amount. Also core_amount isn't the perfect name for this
 
@@ -26,13 +27,46 @@ int main() { // Function names we create to replace nesting should have F or I i
     core_amount--;
     
     Orchestrator();
+    
     auto cfg = createCFG();
+    auto cfg3 = createCFG();
     CFG cfg2("input/CFG/testGNF.json");
+    cfg2.setCnf(true);
     cfg2.toGNF();
     cfg2.print();
     cfg->print();
     cfg->toGNF(); // this still needs massive debugging.
     cfg->print();
+    cfg->toCNF();
+    cfg3->toCNF();
+    
+    //string permutatar found online
+    std::string str="{}FCIEeDV";
+    unsigned int n = str.length();
+    unsigned long int opsize = pow(2, n);
+    
+    for (int counter = 1; counter < opsize; counter++)
+    {
+        string subs;
+        for (int j = 0; j < n; j++)
+        {
+            if (counter & (1<<j))
+                subs.push_back(str[j]);
+        }
+        
+        do
+        {
+            cout << subs << " "<<std::endl;
+            // do here CYK checks
+            if(cfg3->accepts("{"+subs+"}")!=cfg->accepts("{"+subs+"}")){
+                std::cout << "oops i did it again" << std::endl;
+                return -3;
+            }
+        }
+        while (next_permutation(subs.begin(), subs.end()));
+    }
+    //
+    
     const CFG a = *cfg;
     LALR lalr(a);
     lalr.createTable();

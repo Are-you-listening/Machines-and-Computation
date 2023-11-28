@@ -69,9 +69,9 @@ CFG::CFG(const std::string& c) {
     }
     S=data["Start"];
 
-    std::sort(V.begin(), V.end());
-    std::sort(T.begin(), T.end());
-    std::sort(P.begin(), P.end());
+    //std::sort(V.begin(), V.end());
+    //std::sort(T.begin(), T.end());
+    //std::sort(P.begin(), P.end());
 
 }
 
@@ -828,75 +828,71 @@ void CFG::toGNF() { // I used the algorithm described by https://www.geeksforgee
     
     //step 3, I replace A3 also, on the website this isn't done for some reason. A4 → b | A2A3A4 | A4A4A4
     std::cout << "step 3" <<std::endl;
-    for(long int m=0; m<P.size(); m++){ //Step 3.1 , replace j>i
-        unsigned long int i= stoi(P[m].first.substr(1, std::string::npos));
-        for(auto it=P[m].second.begin(); it!=P[m].second.end(); it++){
-            //{ { A1 , {A2, A3} }  , { A1 , {A4, A4} } } = P
-            if (std::find(T.cbegin(), T.cend(), *it) != T.cend()&&it==P[m].second.begin()) {
-                break;
+    for(unsigned long int ordern=1; ordern<=V.size();ordern++){
+        for(unsigned long int m=0; m<P.size(); m++){ //Step 3.1 , replace j>i
+            if (P[m].first == "Z") {
+                continue;
             }
-            unsigned long int j=stoi((*it).substr(1, std::string::npos));
-            if(i>j){ // A4 -> A1A4 , replace A1 met alle rules of A1
-                //Find rules of A1
-                vector<vector<string>> RHS; //{ {"A2","A3"} , {A4,A4} }
-                for(const auto &rule :P){
-                    if(rule.first=="A"+to_string(j)){
-                        //Find Firsthalf
-                        vector<string> firsthalf;
-                        std::copy(P[m].second.begin(),it-1,back_inserter(firsthalf));
-                        vector<string> secondhalf;
-                        std::copy(it+1,P[m].second.end(),back_inserter(secondhalf));
-                        for(const auto & it2: rule.second){ //Add RHS in between
-                            firsthalf.push_back(it2);
-                        }
-                        for(const auto & it2: secondhalf){ //Add secondhalf
-                            firsthalf.push_back(it2);
-                        }
-                        RHS.push_back(firsthalf); //Firshalf is now complete, add it to RHS
-                    }
+            unsigned long int i= stoi(P[m].first.substr(1, std::string::npos));
+            for(auto it=P[m].second.begin(); it!=P[m].second.end(); it++){
+                //{ { A1 , {A2, A3} }  , { A1 , {A4, A4} } } = P
+                if (std::find(T.cbegin(), T.cend(), *it) != T.cend()&&it==P[m].second.begin() || *it== "Z") {
+                    break;
                 }
-                //Replace A1 met RHS
-                bool first=true;
-                for(const auto & rhsit: RHS){
-                    if(first){
-                        P[m].second=rhsit;
-                        first=false;
-                    } else {
-                        P.emplace_back(P[m].first,rhsit);   
+                unsigned long int j=stoi((*it).substr(1, std::string::npos));
+                unsigned long int j1=stoi(P[m].second[0].substr(1, std::string::npos));
+                if(i>j&&i==ordern){ // A4 -> A1A4 , replace A1 met alle rules of A1
+                    //Find rules of A1
+                    vector<vector<string>> RHS; //{ {"A2","A3"} , {A4,A4} }
+                    for(const auto &rule :P){
+                        if(rule.first=="A"+to_string(j)){
+                            //Find Firsthalf
+                            vector<string> firsthalf;
+                            std::copy(P[m].second.begin(),it-1,back_inserter(firsthalf));
+                            vector<string> secondhalf;
+                            std::copy(it+1,P[m].second.end(),back_inserter(secondhalf));
+                            for(const auto & it2: rule.second){ //Add RHS in between
+                                firsthalf.push_back(it2);
+                            }
+                            for(const auto & it2: secondhalf){ //Add secondhalf
+                                firsthalf.push_back(it2);
+                            }
+                            RHS.push_back(firsthalf); //Firshalf is now complete, add it to RHS
+                        }
                     }
+                    //Replace A1 met RHS
+                    bool first=true;
+                    for(const auto & rhsit: RHS){
+                        if(first){
+                            P[m].second=rhsit;
+                            first=false;
+                        } else {
+                            P.emplace_back(P[m].first,rhsit);
+                        }
+                    }
+                    m=-1; //commented this cause the online algoritme doesn't seem to loop
+                    break;
                 }
-                //m=-1; commented this cause the online algoritme doesn't seem to loop
-                break;
-            }
-        }
-    }
-    
-    for(long int m=0; m<P.size(); m++) { //Step 3.2, replace i==j
-        if (P[m].first == "Z") {
-            continue;
-        }
-        unsigned long int i = stoi(P[m].first.substr(1, std::string::npos));
-        if (std::find(T.cbegin(), T.cend(), P[m].second[0]) != T.cend() || P[m].second[0]== "Z") {
-            continue;
-        }
-        unsigned long int j=stoi(P[m].second[0].substr(1, std::string::npos));
-        if(i==j){
-            std::pair<std::string,std::vector<std::string>> temp;
-            temp.first="Z";
-            temp.second=vector(P[m].second.begin(),P[m].second.end()-1);
-            P.push_back(temp);
-            temp.second.emplace_back("Z");
-            P.push_back(temp);
-            for(const auto & rule:P){
-                if(P[m].first==rule.first&&P[m].second!=rule.second){
-                    temp.first=P[m].first;
-                    temp.second=rule.second;
+                if(i==j1&&i==ordern){
+                    std::pair<std::string,std::vector<std::string>> temp;
+                    temp.first="Z";
+                    temp.second=vector(P[m].second.begin(),P[m].second.end()-1);
+                    P.push_back(temp);
                     temp.second.emplace_back("Z");
                     P.push_back(temp);
+                    for(const auto & rule:P){
+                        if(P[m].first==rule.first&&P[m].second!=rule.second){
+                            temp.first=P[m].first;
+                            temp.second=rule.second;
+                            temp.second.emplace_back("Z");
+                            P.push_back(temp);
+                        }
+                    }
+                    P.erase(P.cbegin()+m);
+                    m=-1;
+                    break;
                 }
             }
-            P.erase(P.cbegin()+m);
-            m=-1;
         }
     }
 
