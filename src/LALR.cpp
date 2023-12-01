@@ -140,18 +140,18 @@ void LALR::createTable() {
             createdTable[currentstate->_stateName] = rowcontent;
             continue;
         }
-
-        for (auto connection : currentstate->_connections){
-            string inputsymbol = connection.first;
-            state* otherstate = connection.second;
-
-            if (std::find(_cfg.getV().begin(), _cfg.getV().end(), inputsymbol) != _cfg.getV().end()){
-                rowcontent[inputsymbol] = to_string(otherstate->_stateName);
-            } else {
-                rowcontent[inputsymbol] = "S" + to_string(otherstate->_stateName);
+        
+        if (createdTable.find(currentstate->_stateName) != createdTable.end()){
+            for (auto& element : createdTable[currentstate->_stateName]){
+                if (rowcontent.find(element.first) != rowcontent.end()){
+                    if (element.second.substr(0, 1) == "R" && rowcontent[element.first].substr(0,1) == "S"){
+                        element.second = rowcontent[element.first]; // the new row has a shift in the corresponding position while the original has a reduce
+                    }
+                }
             }
+        } else {
+            createdTable[currentstate->_stateName] = rowcontent;
         }
-        createdTable[currentstate->_stateName] = rowcontent;
 
         for (const auto& connection : currentstate->_connections){
             if (visited.find(connection.second) == visited.end()){
@@ -262,7 +262,6 @@ void state::createConnections(LALR &lalr) {
                     }
                 }
             }
-
             newstate->createConnections(lalr);
         }
     }
