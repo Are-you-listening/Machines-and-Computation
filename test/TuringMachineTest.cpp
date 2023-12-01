@@ -179,7 +179,7 @@ TEST(TuringMachineTest, TM_tokenazation) {
     tm.load_input(test_string, 1);
 
     int halted_time = -1;
-    for (int i = 0; i<150200; i++){
+    for (int i = 0; i<300200; i++){
 
 
         if (tm.isHalted()){
@@ -187,7 +187,7 @@ TEST(TuringMachineTest, TM_tokenazation) {
                 halted_time = i;
             }
 
-            continue;
+            break;
         }
         tm.move();
         if (tm.getCurrentState() == "2256"){
@@ -215,5 +215,46 @@ TEST(TuringMachineTest, TM_tokenazation) {
 }
 
 TEST(TuringMachineTest, TM_builder) {
+    for (int k=2; k<= 12; k++){
+        ifstream test_file("../test/testFiles/TM_test_"+ to_string(k)+".cpp");
+        string test_string;
+        cout << test_file.is_open() << endl;
+        while (!test_file.eof()){
+            string line;
+            getline(test_file, line);
+            test_string  += line;
+        }
+
+        TuringTools::reset();
+        auto t = new TMBuilder(4);
+        TMBuilder_output data = t->generateTM();
+        //ofstream o("output/TM_test.json");
+        //o << data;
+        TuringMachine tm;
+        tm.load(data.states, data.start_state, data.input, data.tape_size, data.productions);
+        tm.load_input(test_string, 1);
+
+        int halted_time = -1;
+        for (int i = 0; i<300200; i++){
+
+
+            if (tm.isHalted()){
+                if (halted_time == -1){
+                    halted_time = i;
+                }
+
+                break;
+            }
+            tm.move();
+        }
+
+        for (int i = 0; i < tm.getTapeAmount(); i++){
+            cout << tm.getTapeData(i) << endl;
+        }
+
+        cout << endl;
+        cout << "halted time of " << to_string(k)<< ": " << halted_time << endl;
+    }
+
 
 }

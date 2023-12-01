@@ -100,12 +100,16 @@ void TuringDenestify::createNewFunction(IncompleteSet &a) {
 
     tools->link(create_function, check_object);
 
-    IncompleteSet breaker{"breaker", "breaker2"};
-    //tools->link(create_function, breaker);
 
-
+    //go back to N
+    //clear workingtape if not empty
     tools->go_to(create_function, {'N'}, get_tuple_index()[0], -1, get_tuple_index());
+    tools->go_to_multiple(create_function, {{'E'}, {'\u0000'}}, {0, 1}, 1, {0,1});
+    tools->go_to_clear(create_function, {'S'}, 0, -1, {0,1}, {0,1});
+    tools->link_put(create_function, {'\u0000'}, {1});
 
+    //IncompleteSet breaker{"breaker", "breaker2"};
+    //tools->link(create_function, breaker);
 
 
     //from here the data is moved to new function
