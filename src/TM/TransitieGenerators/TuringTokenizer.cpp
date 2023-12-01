@@ -89,6 +89,7 @@ IncompleteSet TuringTokenizer::tokenize() {
     //tools->stack_replace(result, {'('}, {'A'});
     tools->stack_replace(result, {':'}, {'S'});
     tools->stack_replace(result, {'X'}, {'A'});
+    tools->stack_replace(result, {'\n'}, {'I'});
 
 
 
@@ -152,7 +153,8 @@ IncompleteSet TuringTokenizer::tokenize_runner_productions() {
         }
 
         IncompleteSet tokenize_set(from,to);
-        for (int j =32; j<127; j++){
+        for (int j =31; j<127; j++){
+
             bool is_spatie = j == 32;
             bool is_seperator = (find(seperators.begin(), seperators.end(), (char) j) != seperators.end());
 
@@ -162,6 +164,10 @@ IncompleteSet TuringTokenizer::tokenize_runner_productions() {
             trans_prod.to_state = to;
 
             char c = (char) j;
+            if (j == 31){
+                c = '\n';
+            }
+
             trans_prod.input = {c};
             trans_prod.input_index = {1};
             trans_prod.output = {'\u0001', c, c};
@@ -176,7 +182,7 @@ IncompleteSet TuringTokenizer::tokenize_runner_productions() {
                 tools->push_on_sequence(spatie_pusher, {'n','e','w', ' '}, 1, 'X');
                 tools->push_on_sequence(spatie_pusher, {'d','e','l', 'e', 't', 'e', ' '}, 1, 'X');
                 tools->push_on_sequence(spatie_pusher, {'r','e','t', 'u', 'r', 'n', ' '}, 1, 'X');
-                tools->push_on_sequence(spatie_pusher, {'n','a','m', 'e', 's', 'p', 'a', 'c', 'e', ' '}, 1, 'X');
+                tools->push_on_sequence(spatie_pusher, {'n','a','m', 'e', 's', 'p', 'a', 'c', 'e', ' '}, 1, 'C');
 
                 //sets S on stack if no other S is before
                 tools->stack_replace(spatie_pusher, {'*'}, {'P'});

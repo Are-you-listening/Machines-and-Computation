@@ -157,13 +157,13 @@ TEST(TuringMachineTest, TM_tools){
 
 TEST(TuringMachineTest, TM_tokenazation) {
 
-    ifstream test_file("../test/testFiles/TM_test_12.cpp");
+    ifstream test_file("../test/testFiles/TM_test_13.cpp");
     string test_string;
     cout << test_file.is_open() << endl;
     while (!test_file.eof()){
         string line;
         getline(test_file, line);
-        test_string  += line;
+        test_string  += line+'\n';
     }
 
     //test_string = "class base{}; class derived{}";
@@ -179,7 +179,7 @@ TEST(TuringMachineTest, TM_tokenazation) {
     tm.load_input(test_string, 1);
 
     int halted_time = -1;
-    for (int i = 0; i<300200; i++){
+    for (int i = 0; i<100200; i++){
 
 
         if (tm.isHalted()){
@@ -222,7 +222,7 @@ TEST(TuringMachineTest, TM_builder) {
         while (!test_file.eof()){
             string line;
             getline(test_file, line);
-            test_string  += line;
+            test_string  += line+'\n';
         }
 
         TuringTools::reset();

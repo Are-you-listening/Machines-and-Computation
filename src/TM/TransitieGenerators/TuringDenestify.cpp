@@ -35,6 +35,7 @@ IncompleteSet TuringDenestify::deNestify() {
     //small verify
     string looping = result.to_state;
     result.to_state = end_denesting;
+
     tools->go_to_clear(result, {'A'}, 0, -1, {0,1}, {0,1});
     //tools->go_to_clear(result, {'A'}, 0, -1, {0,1}, {1});
     tools->link_put(result, {'\u0000'}, {1});
@@ -51,6 +52,7 @@ IncompleteSet TuringDenestify::deNestify() {
 }
 
 void TuringDenestify::createNewFunction(IncompleteSet &a) {
+
     IncompleteSet create_function{"create_function", "create_function"};
     tools->go_to(create_function, {'\u0000'}, get_tuple_index()[1], 1, get_tuple_index());
     tools->link_put(create_function, {'H'}, {get_tuple_index()[0]});

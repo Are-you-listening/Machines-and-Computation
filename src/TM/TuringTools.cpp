@@ -514,8 +514,13 @@ void TuringTools::move(IncompleteSet &a, const vector<int>& tape, int direction)
 
 void TuringTools::copy(IncompleteSet &a, unsigned int from_tape, unsigned int to_tape) {
     IncompleteSet copy_set(to_string(counter), to_string(counter+1));
-    for (int j =32; j<127; j++){
+    for (int j =31; j<127; j++){
         char c = (char) j;
+
+        if (j == 31){
+            c = '\n';
+        }
+
         IncompleteTransition copy;
         copy.state = copy_set.state;
         copy.to_state = copy_set.to_state;
@@ -1164,13 +1169,18 @@ void TuringTools::find_match_heap(IncompleteSet &a, char start_marker, char end_
     IncompleteSet check_match{"check_match_"+ to_string(counter), "check_match_"+ to_string(counter+1)};
 
 
-    for (int j =32; j<127; j++){
+    for (int j =31; j<127; j++){
+        char c = (char) j;
+        if (j == 31){
+            c = '\n';
+        }
+
         IncompleteTransition check_equal;
         check_equal.state = "check_match_"+ to_string(counter);
         check_equal.to_state = "check_match_"+ to_string(counter);
         check_equal.def_move = 0;
 
-        check_equal.input = {(char) j, (char) j};
+        check_equal.input = {c, c};
         check_equal.input_index = {data_tape, (int) stack_tape};
         check_equal.output = {'\u0001', '\u0001', '\u0001'};
         check_equal.output_index = {marker_tape, data_tape, (int) stack_tape};
@@ -1183,7 +1193,7 @@ void TuringTools::find_match_heap(IncompleteSet &a, char start_marker, char end_
         end_check.to_state = "check_match_"+ to_string(counter+1);
         end_check.def_move = 0;
 
-        end_check.input = {(char) j, '\u0001'};
+        end_check.input = {c, '\u0001'};
         end_check.input_index = {data_tape, (int) stack_tape};
 
         check_match.transitions.push_back(end_check);
@@ -1498,6 +1508,13 @@ TuringTools::nesting_marker(IncompleteSet &a, const vector<int> &tuple_indexes, 
             counter++;
             make_working_nesting(store_definer, tuple_indexes);
 
+            //clear old S marker
+            move(store_definer, {0,1}, -1);
+            go_to(store_definer, {'A', 'S'}, 0, -1, {0,1});
+            write_on(store_definer, {'S'}, {0}, {'\u0000'}, {0});
+            go_to(store_definer, {'S'}, 0, 1, {0,1});
+
+
             link_on_multiple(forward_action, store_definer, {{'C'}, {'U'}, {'O'}}, {tuple_indexes[1]});
             add_nesting_working(forward_action);
 
@@ -1800,10 +1817,13 @@ void TuringTools::remove_nesting_working(IncompleteSet &a) {
 void TuringTools::copy_any(IncompleteSet &a, unsigned int from_tape, unsigned int to_tape) {
     //also copies blank
     IncompleteSet copy_set(to_string(counter), to_string(counter+1));
-    for (int j =32; j<128; j++){
+    for (int j =31; j<128; j++){
         char c = (char) j;
         if (j == 127){
             c = '\u0000';
+        }
+        if (j == 31){
+            c = '\n';
         }
 
         IncompleteTransition copy;
@@ -1901,6 +1921,7 @@ void TuringTools::write_function_header(IncompleteSet &a, const vector<int>&tupl
 
     set_heap_mode(write_function_header, true);
     go_to(write_function_header, {'A'}, 0, -1, {0,1});
+
     find_match_heap_traverse(write_function_header, 'A', 'S', 0, 1);
 
     string creatable = branch_on(write_function_header, {'\u0000'}, {(int) stack_tape});
@@ -1913,6 +1934,7 @@ void TuringTools::write_function_header(IncompleteSet &a, const vector<int>&tupl
     make_loop(write_function_header);
 
     write_function_header.to_state = creatable;
+
 
     //set heapmode was only disabled after branch
     heap_mode = true;
@@ -2564,8 +2586,12 @@ TuringTools::compare_single_tape(IncompleteSet &a, char s1, char e1, char s2, ch
     //state_check_a_2 on same symbol replace symbol link to compare
     //state_check_a_2 on different symbol, transition to compared_failed state
 
-    for (int j =32; j<127; j++){
+    for (int j =31; j<127; j++){
         char c = (char) j;
+        if (j == 31){
+            c = '\n';
+        }
+
         IncompleteTransition to_state_check_a;
         to_state_check_a.state = compare.to_state;
         to_state_check_a.to_state = "state_check_"+to_string(c)+"_"+ to_string(counter);

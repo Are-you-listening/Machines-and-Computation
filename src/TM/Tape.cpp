@@ -61,6 +61,9 @@ string Tape::getTapeData() const noexcept {
         if (c == '\0'){
             c = ' ';
         }
+        if (c == '\n'){
+            c = 'N';
+        }
         output += c;
         tape_reader++;
     }
