@@ -1,0 +1,1 @@
+class a{};class Base{void A(int& a);    int test();};int Base::test() {    if (int a = 0){        if (int b = 0){ Base::A(a);}    }}void Base::A(int& a){            if (int c = 0){                if (int d = 0){                    a = 0;                }            }        }

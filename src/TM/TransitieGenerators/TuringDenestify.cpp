@@ -203,6 +203,9 @@ void TuringDenestify::createNewFunction(IncompleteSet &a) {
     tools->link_put(copy_loop, {')'}, {1});
     tools->move(copy_loop, {0,1}, 1);
 
+    tools->link_put(copy_loop, {';'}, {1});
+    tools->move(copy_loop, {0,1}, 1);
+
     tools->link_put(copy_loop, {'E'}, {0});
 
     tools->link(create_function, copy_loop);
