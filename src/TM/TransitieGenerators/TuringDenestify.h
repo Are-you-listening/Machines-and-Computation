@@ -14,6 +14,7 @@ public:
 private:
     IncompleteSet deNestify();
     void createNewFunction(IncompleteSet& a);
+    void storeObjectDefinition(IncompleteSet& a);
 
     int split_nesting;
     int max_nesting;

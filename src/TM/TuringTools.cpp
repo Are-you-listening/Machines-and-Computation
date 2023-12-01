@@ -2031,7 +2031,19 @@ void TuringTools::write_function_header(IncompleteSet &a, const vector<int>&tupl
     go_to(write_function_header, {'S'}, 0, -1, {0,1});
 
     //make function caller token
-    make_token(write_function_header, tuple_indexes, 'U');
+    make_token(write_function_header, tuple_indexes, 'U', 'C');
+
+
+    //check if it is an object, if so at the end add a token with the function definition to put later in the class
+    /*
+    go_to_multiple(write_function_header, {{'S'}, {':'}}, {0, 1}, -1, {0,1});
+
+    IncompleteSet store_obj_definer{"store_obj_definer_"+ to_string(counter), "store_obj_definer_"+ to_string(counter)};
+    move(store_obj_definer, {0,1}, 1);
+    make_token(store_obj_definer, tuple_indexes, 'U', 'O');
+    link_on(write_function_header, store_obj_definer, {':'}, {1});
+    go_to(write_function_header, {'E'}, 0, 1, {0,1});
+    */
 
     //clear first working tape
     go_to_clear(write_function_header, {'S'}, 0, -1, {0,1}, {0,1});
@@ -2519,6 +2531,129 @@ void TuringTools::clear_heap(IncompleteSet &a) {
     go_to(a, {'*'}, stack_tape, 1, {(int) stack_tape});
     go_to(a, {'\u0000'}, stack_tape, 1, {(int) stack_tape});
     heap_mode = false;
+
+}
+
+void
+TuringTools::compare_single_tape(IncompleteSet &a, char s1, char e1, char s2, char e2, int marker_tape, int data_tape) {
+    //if equal end position: 'e1'
+    //if not found end position: 'e2'
+    //startpositon must be s1
+    IncompleteSet compare{"compare_"+ to_string(counter), "compare_"+ to_string(counter)};
+    counter++;
+
+    go_to_not(compare, {'\u0000'}, data_tape, 1, {marker_tape, data_tape});
+
+    //TODO: after branch still check end is also fully cleared
+    string branch_end_first = branch_on(compare, {e1}, {marker_tape});
+
+    //when 1 char is not successfully compared
+    IncompleteSet compare_failed{"compare_failed"+ to_string(counter), "compare_failed"+ to_string(counter)};
+    counter++;
+
+    go_to(compare_failed, {e2}, marker_tape, 1, {marker_tape, data_tape});
+
+
+    //when 1 char is successfully compared
+    IncompleteSet compare_fine{"compare_fine"+ to_string(counter), "compare_fine"+ to_string(counter)};
+    counter++;
+
+    //construction using a couple new states
+    //for each character their is an own state
+    //state_check_a ->(when reached 's2' marker) state_check_a_2
+    //state_check_a_2 on same symbol replace symbol link to compare
+    //state_check_a_2 on different symbol, transition to compared_failed state
+
+    for (int j =32; j<127; j++){
+        char c = (char) j;
+        IncompleteTransition to_state_check_a;
+        to_state_check_a.state = compare.to_state;
+        to_state_check_a.to_state = "state_check_"+to_string(c)+"_"+ to_string(counter);
+        to_state_check_a.def_move = 0;
+        to_state_check_a.input = {c};
+        to_state_check_a.input_index = {data_tape};
+        to_state_check_a.output = {'\u0001', '\u0000'};
+        to_state_check_a.output_index = {marker_tape, data_tape};
+        to_state_check_a.move = {0, 0};
+
+        IncompleteTransition to_state_check_2a_no_marker;
+        to_state_check_2a_no_marker.state = "state_check_"+to_string(c)+"_"+ to_string(counter);
+        to_state_check_2a_no_marker.to_state = "state_check_"+to_string(c)+"_"+ to_string(counter);
+        to_state_check_2a_no_marker.def_move = 0;
+        to_state_check_2a_no_marker.output = {'\u0001', '\u0001'};
+        to_state_check_2a_no_marker.output_index = {marker_tape, data_tape};
+        to_state_check_2a_no_marker.move = {1, 1};
+
+        IncompleteTransition to_state_check_2a_marker;
+        to_state_check_2a_marker.state = "state_check_"+to_string(c)+"_"+ to_string(counter);
+        to_state_check_2a_marker.to_state = "state_check_2"+to_string(c)+"_"+ to_string(counter);
+        to_state_check_2a_marker.def_move = 0;
+        to_state_check_2a_marker.input = {s2};
+        to_state_check_2a_marker.input_index = {marker_tape};
+
+        //loops while blank
+
+        IncompleteTransition to_state_check_3a_no_marker;
+        to_state_check_3a_no_marker.state = "state_check_2"+to_string(c)+"_"+ to_string(counter);
+        to_state_check_3a_no_marker.to_state = "state_check_2"+to_string(c)+"_"+ to_string(counter);
+        to_state_check_3a_no_marker.def_move = 0;
+        to_state_check_3a_no_marker.input = {'\u0000'};
+        to_state_check_3a_no_marker.input_index = {data_tape};
+        to_state_check_3a_no_marker.output = {'\u0001', '\u0001'};
+        to_state_check_3a_no_marker.output_index = {marker_tape, data_tape};
+        to_state_check_3a_no_marker.move = {1, 1};
+
+        IncompleteTransition to_state_check_3a_not_equal;
+        to_state_check_3a_not_equal.state = "state_check_2"+to_string(c)+"_"+ to_string(counter);
+        to_state_check_3a_not_equal.to_state = compare_failed.state;
+        to_state_check_3a_not_equal.def_move = 0;
+
+        //incase first string is longer than second
+        IncompleteTransition to_state_check_3a_not_equal2;
+        to_state_check_3a_not_equal2.state = "state_check_2"+to_string(c)+"_"+ to_string(counter);
+        to_state_check_3a_not_equal2.to_state = compare_failed.state;
+        to_state_check_3a_not_equal2.def_move = 0;
+        to_state_check_3a_not_equal2.input = {e2};
+        to_state_check_3a_not_equal2.input_index = {marker_tape};
+
+        IncompleteTransition to_state_check_3a_equal;
+        to_state_check_3a_equal.state = "state_check_2"+to_string(c)+"_"+ to_string(counter);
+        to_state_check_3a_equal.to_state = compare_fine.state;
+        to_state_check_3a_equal.def_move = 0;
+        to_state_check_3a_equal.input = {c};
+        to_state_check_3a_equal.input_index = {data_tape};
+        to_state_check_3a_equal.output = {'\u0001', '\u0000'};
+        to_state_check_3a_equal.output_index = {marker_tape, data_tape};
+        to_state_check_3a_equal.move = {0, 0};
+
+
+        compare.transitions.push_back(to_state_check_a);
+        compare.transitions.push_back(to_state_check_2a_no_marker);
+        compare.transitions.push_back(to_state_check_2a_marker);
+        compare.transitions.push_back(to_state_check_3a_no_marker);
+        compare.transitions.push_back(to_state_check_3a_not_equal);
+        compare.transitions.push_back(to_state_check_3a_not_equal2);
+        compare.transitions.push_back(to_state_check_3a_equal);
+
+    }
+    counter++;
+
+    compare.to_state = compare_fine.to_state;
+    go_to(compare, {s1}, marker_tape, -1, {marker_tape, data_tape});
+    make_loop(compare);
+
+    compare.to_state = branch_end_first;
+
+    IncompleteTransition failed_to_quit;
+    failed_to_quit.state = compare_failed.to_state;
+    failed_to_quit.to_state = compare.to_state;
+    failed_to_quit.def_move = 0;
+
+    compare.transitions.push_back(failed_to_quit);
+    compare.transitions.insert(compare.transitions.end(), compare_failed.transitions.begin(), compare_failed.transitions.end());
+    compare.transitions.insert(compare.transitions.end(), compare_fine.transitions.begin(), compare_fine.transitions.end());
+
+    link(a, compare);
 
 }
 

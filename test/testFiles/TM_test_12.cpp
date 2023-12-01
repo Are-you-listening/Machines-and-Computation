@@ -1,4 +1,4 @@
-
+class a{};
 class Base{
     int test();
 };

@@ -110,6 +110,7 @@ public:
     void check_var_define_location(IncompleteSet& a, const vector<int>&tuple_indexes);
     void check_var_char_working(IncompleteSet& a);
     void clear_heap(IncompleteSet& a);
+    void compare_single_tape(IncompleteSet& a, char s1, char e1, char s2, char e2, int marker_tape, int data_tape);
 private:
 
     TuringTools(unsigned int stack_tape);
