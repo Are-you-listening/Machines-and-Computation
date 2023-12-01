@@ -172,50 +172,48 @@ augmentedrules LALR::createAugmented(const tuple<string, vector<string>, set<str
     result.emplace(inputrule);
     set<tuple<string, vector<string>, set<string>>> newProductions;
 
-    bool done = false;
 
-    while (not done) {
-        done = true;
-        for (const auto &Arule: result) {
-            string currentSymbol;
-            auto dotPosition = std::find(get<1>(Arule).begin(), get<1>(Arule).end(), ".");
+    for (const auto &Arule: result) {
 
-            if (dotPosition != std::get<1>(Arule).end() && std::next(dotPosition) != std::get<1>(Arule).end()) {
-                currentSymbol = *next(dotPosition);
-            } else {
-                continue;// the "." is at the end of the rule body, so we don't need to add any new _productions
-            }
+        string currentSymbol;
+        auto dotPosition = std::find(get<1>(Arule).begin(), get<1>(Arule).end(), ".");
 
-            if (std::find(_cfg.getT().begin(), _cfg.getT().end(), currentSymbol) != _cfg.getT().end()){
-                // currentSymbol is a terminal --> there are no _productions with currentSymbol in head --> no _productions to add
+        if (dotPosition != std::get<1>(Arule).end() && std::next(dotPosition) != std::get<1>(Arule).end()) {
+            currentSymbol = *next(dotPosition);
+        } else {
+            continue;// the "." is at the end of the rule body, so we don't need to add any new _productions
+        }
+
+        if (std::find(_cfg.getT().begin(), _cfg.getT().end(), currentSymbol) != _cfg.getT().end()){
+            // currentSymbol is a terminal --> there are no _productions with currentSymbol in head --> no _productions to add
+            continue;
+        }
+
+
+        // currentSymbol is a non-terminal --> add the corresponding _productions
+        for (const auto &rule: _cfg.getP()) {
+            if (rule.first != currentSymbol) {
                 continue;
             }
 
-            // currentSymbol is a non-terminal --> add the corresponding _productions
-            for (const auto &rule: _cfg.getP()) {
-                if (rule.first == currentSymbol) {
-                    // add rule to newProductions
-                    vector<string> tempvector = rule.second;
-                    tempvector.insert(tempvector.begin(), ".");
-                    // if currentSymbol + 1 exists --> first(nextsymbol) else --> copy lookahead from Arule
-                    set<string> lookahead;
-                    if (next(next(dotPosition)) < get<1>(Arule).end()){
-                        lookahead = _cfg.First(*next(next(dotPosition)));
-                    } else {
-                        lookahead = get<2>(Arule);
-                    }
-                    if (result.find(make_tuple(currentSymbol, tempvector, lookahead)) == result.end()) {
-                        newProductions.emplace(currentSymbol, tempvector, lookahead);
-                    }
-                }
+            // add rule to newProductions
+            vector<string> tempvector = rule.second;
+            tempvector.insert(tempvector.begin(), ".");
+            // if currentSymbol + 1 exists --> first(nextsymbol) else --> copy lookahead from Arule
+            set<string> lookahead;
+            if (next(next(dotPosition)) < get<1>(Arule).end()){
+                lookahead = _cfg.First(*next(next(dotPosition)));
+            } else {
+                lookahead = get<2>(Arule);
+            }
+            if (result.find(make_tuple(currentSymbol, tempvector, lookahead)) == result.end()) {
+                newProductions.emplace(currentSymbol, tempvector, lookahead);
             }
         }
-        if (not newProductions.empty()) {
-            result.insert(newProductions.begin(), newProductions.end());
-            newProductions.clear();
-            done = false;
-        }
     }
+    result.insert(newProductions.begin(), newProductions.end());
+    newProductions.clear();
+
     return result;
 }
 
