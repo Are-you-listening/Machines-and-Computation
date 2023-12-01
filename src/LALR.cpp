@@ -118,9 +118,7 @@ void LALR::mergeSimilar() {
 
 void LALR::createTable() {
     unordered_map<int, map<string, string>> createdTable;
-    std::cout << "start creating states" << std::endl;
     createStates();
-    std::cout << "end creating states" << std::endl;
 
     queue<state*> remaining;
     set<state*> visited;
@@ -128,7 +126,6 @@ void LALR::createTable() {
     visited.emplace(I0);
 
     while(not remaining.empty()){
-        std::cout << "in while loop" << std::endl;
         state* currentstate = remaining.front();
         remaining.pop();
 
@@ -166,9 +163,7 @@ void LALR::createTable() {
             }
         }
     }
-    std::cout << "end while loop" << std::endl;
     parseTable = createdTable;
-    std::cout << "start mergeSimilar()" << std::endl;
     mergeSimilar();
 }
 
