@@ -4,6 +4,11 @@
 
 #include <iostream>
 #include <gtest/gtest.h>
+#include <string>
+
+#include "src/Orchestrator.h"
+
+//string Orchestrator::file = "input/config/config.json"; //Static variables should be initialised outside the class
 
 int main(int argc, char **argv) {
 
