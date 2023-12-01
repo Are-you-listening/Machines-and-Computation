@@ -81,6 +81,11 @@ int main() { // Function names we create to replace nesting should have F or I i
     //create LARL parser with tokenvector
     auto vec = tokenVector.getTokenVector();
     lalr.parse(vec);
+    //cleanup
+    //if-else antinesting
+    //move
+    //naam wijzinging states, zie cleanup.
+    
     
     /*
     //threading every function for now, will later be changed

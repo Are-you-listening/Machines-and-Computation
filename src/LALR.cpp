@@ -342,7 +342,6 @@ void LALR::parse(std::vector<std::pair<std::string, std::string>> &input) {
         if (operation == "accept"){
             break;
         } else if (operation.substr(0, 1) == "S"){
-            std::cout << operation << std::endl;
             s.push(stoi(operation.substr(1, operation.length()-1)));
         } else if (operation.substr(0, 1) == "R"){
             int count = 0;
