@@ -25,6 +25,7 @@ int main() { // Function names we create to replace nesting should have F or I i
     std::string Filelocation="input/nestedExamples/engine.cc"; // for now, doesn't support double declarations like int a,d;
     std::thread Tokenizer(&Tokenisation::Tokenize, &tokenVector, Filelocation); // i ignore rvalues in function calls
     core_amount--;
+    Tokenizer.join();
     
     Orchestrator();
     
@@ -56,9 +57,11 @@ int main() { // Function names we create to replace nesting should have F or I i
         
         do
         {
+            cout << std::endl;
             cout << subs << " "<<std::endl;
+            cout << std::endl;
             // do here CYK checks
-            if(cfg3->accepts("{"+subs+"}")!=cfg->accepts("{"+subs+"}")){
+            if(cfg3->accepts(subs)!=cfg->accepts(subs)){
                 std::cout << "oops i did it again" << std::endl;
                 return -3;
             }

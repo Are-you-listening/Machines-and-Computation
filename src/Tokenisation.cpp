@@ -4,6 +4,61 @@
 
 #include "Tokenisation.h"
 
+void findD(unsigned long int Oldsize,std::vector<std::pair<std::string,std::string>>& tokenVector, const std::string& line, const std::string& FileLocation){
+    for(unsigned long int i=Oldsize; i<tokenVector.size();i++){
+        std::ifstream File1(FileLocation);
+        std::string line2;
+
+        std::vector<std::string> lines;
+        while(getline(File1,line2)){
+            unsigned long int count2=0;
+            std::string spaces;
+            while(line2[count2]==' '){
+                spaces+=" ";
+                count2++;
+            }
+            if(spaces+line==line2){
+                break;
+            }
+            lines.push_back(line2);
+        }
+
+        for(auto it=lines.rbegin(); it!=lines.rend(); it++){
+            std::string line1=*it;
+            while(line1.substr(0,1)==" "){
+                line1=line1.substr(1,std::string::npos);
+            }
+            if((line1.find(tokenVector[i].second+" ")!=std::string::npos||line1.find(tokenVector[i].second+"=")!=std::string::npos||line1.find(tokenVector[i].second+"(")!=std::string::npos||line1.find(tokenVector[i].second+")")!=std::string::npos||line1.find(tokenVector[i].second+";")!=std::string::npos||line1.find(tokenVector[i].second+"{")!=std::string::npos||line1.find(tokenVector[i].second+",")!=std::string::npos)&&line1.find(' ')!=std::string::npos&&(line1.find(';')!=std::string::npos||line1.find(',')!=std::string::npos)&&line1.find("return")==std::string::npos&&line1!=line){
+                std::string copy=tokenVector[i].second;
+                tokenVector[i].second="";
+                if(line1.find('(')!=std::string::npos){
+                    std::string TempSave;
+                    std::string lastSave;
+                    for(const auto & LC:line1){
+                        if(TempSave.find(copy)!=std::string::npos&&(LC==' '||LC==','||LC=='='||LC==')')&&(TempSave.size()-copy.size())<=1){
+                            tokenVector[i].second=lastSave+" "+TempSave;
+                            break;
+                        }
+                        if(LC!=' '&&LC!='('&&LC!=','){
+                            TempSave+=LC;
+                        } else {
+                            lastSave=TempSave;
+                            TempSave="";
+                        }
+                    }
+                    break;
+                } else {
+                    while(line1[0]==' '){
+                        line1.erase(0,1);
+                    }
+                    tokenVector[i].second=line1.substr(0,line1.find(' '))+" "+copy;
+                    break;
+                }
+            }
+        }
+    }
+}
+
 void Tokenisation::Tokenize(const std::string &FileLocation) {
     std::ifstream File(FileLocation);
     std::string line;
@@ -23,6 +78,80 @@ void Tokenisation::Tokenize(const std::string &FileLocation) {
         bool forloop=false;
         if(line.substr(0,3)=="for"){
             tokenVector.emplace_back("F",line.substr(0,line.size()-1));
+            if(line.find(':')!=std::string::npos&&line.find('=')==std::string::npos){
+                tokenVector.emplace_back("V0",line.substr(line.find(':')+1,line.find(')')-line.find(':'))); // this still needs to be tested
+                findD(tokenVector.size()-1,tokenVector,line,FileLocation);
+            } else {
+                unsigned long int Oldsize=tokenVector.size();
+                unsigned long int LastCharPos;
+                if(line.find('.')!=std::string::npos){
+                    LastCharPos=line.find('.');
+                } else {
+                    LastCharPos=line.find(';');
+                }
+                std::string tempS = line.substr(line.find('=')+1,LastCharPos-line.find('='));
+                tempS+="+"+line.substr(line.find(';')+1,line.find(')')-line.find(';'));
+                std::string tempV;
+                unsigned long int count=0;
+                bool append=false;
+                bool SecondNotV=false;
+                bool SecondNotVother=false;
+                for(const char C: tempS){
+                    if(append){
+                        if(VariableCharSecond.find(C)!=VariableCharSecond.end()){
+                            tempV+=C;
+                            continue;
+                        } else if(C=='('){
+                            tempV="";
+                            append= false;
+                            SecondNotV=false;
+                            continue;
+                        } else if(C=='.'){
+                            if(!SecondNotV){
+                                tokenVector.emplace_back("V"+ std::to_string(count),tempV);
+                                count++;
+                                append= false;
+                            }
+                            tempV="";
+                            SecondNotV= true;
+                            continue;
+                        } else if(C=='-'){
+                            if(!SecondNotV){
+                                tokenVector.emplace_back("V"+ std::to_string(count),tempV);
+                                count++;
+                                append= false;
+                            } else {
+                                SecondNotV= false;
+                            }
+                            tempV="";
+                            SecondNotVother= true;
+                            continue;
+                        } else if(C=='>'&&SecondNotVother){
+                            append= false;
+                            tempV="";
+                            SecondNotV= true;
+                            continue;
+                        } else {
+                            if(!SecondNotV){
+                                tokenVector.emplace_back("V"+ std::to_string(count),tempV);
+                                count++;
+                                append= false;
+                            } else {
+                                SecondNotV= false;
+                            }
+                            tempV="";
+                            continue;
+                        }
+                    }
+                    if(VariableChar.find(C)!=VariableChar.end()){
+                        append= true;
+                        tempV+=C;
+                    } else{
+                        append=false;
+                    }
+                }
+                findD(Oldsize,tokenVector,line,FileLocation);
+            }
             forloop= true;
         } else if(line.substr(0,2)=="if"){
             tokenVector.emplace_back("I",line);
@@ -134,58 +263,7 @@ void Tokenisation::Tokenize(const std::string &FileLocation) {
                     append=false;
                 }
             }
-            for(unsigned long int i=Oldsize; i<tokenVector.size();i++){
-                std::ifstream File1(FileLocation);
-                std::string line2;
-                
-                std::vector<std::string> lines;
-                while(getline(File1,line2)){
-                    unsigned long int count2=0;
-                    std::string spaces;
-                    while(line2[count2]==' '){
-                        spaces+=" ";
-                        count2++;
-                    }
-                    if(spaces+line==line2){
-                        break;
-                    }
-                    lines.push_back(line2);
-                }
-                
-                for(auto it=lines.rbegin(); it!=lines.rend(); it++){
-                    std::string line1=*it;
-                    while(line1.substr(0,1)==" "){
-                        line1=line1.substr(1,std::string::npos);
-                    }
-                    if((line1.find(tokenVector[i].second+" ")!=std::string::npos||line1.find(tokenVector[i].second+"=")!=std::string::npos||line1.find(tokenVector[i].second+"(")!=std::string::npos||line1.find(tokenVector[i].second+")")!=std::string::npos||line1.find(tokenVector[i].second+";")!=std::string::npos||line1.find(tokenVector[i].second+"{")!=std::string::npos||line1.find(tokenVector[i].second+",")!=std::string::npos)&&line1.find(' ')!=std::string::npos&&(line1.find(';')!=std::string::npos||line1.find(',')!=std::string::npos)&&line1.find("return")==std::string::npos&&line1!=line){
-                        std::string copy=tokenVector[i].second;
-                        tokenVector[i].second="";
-                        if(line1.find('(')!=std::string::npos){
-                            std::string TempSave;
-                            std::string lastSave;
-                            for(const auto & LC:line1){
-                                if(TempSave.find(copy)!=std::string::npos&&(LC==' '||LC==','||LC=='='||LC==')')&&(TempSave.size()-copy.size())<=1){
-                                    tokenVector[i].second=lastSave+" "+TempSave;
-                                    break;
-                                }
-                                if(LC!=' '&&LC!='('&&LC!=','){
-                                    TempSave+=LC;
-                                } else {
-                                    lastSave=TempSave;
-                                    TempSave="";
-                                }
-                            }
-                            break;
-                        } else {
-                            while(line1[0]==' '){
-                                line1.erase(0,1);
-                            }
-                            tokenVector[i].second=line1.substr(0,line1.find(' '))+" "+copy;
-                            break;
-                        }
-                    }
-                }
-            }
+            findD(Oldsize,tokenVector,line,FileLocation);
         }
         long int bracecount=0;
         for(char it: line){
