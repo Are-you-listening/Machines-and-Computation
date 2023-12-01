@@ -22,8 +22,8 @@ set(TestCaseFiles
         test/test-main.cpp
         test/TuringMachineTest.cpp
         test/ThreadingTest.cpp
+        test/CFGTokenTest.cpp
 )
-
 
 set(TuringCode
         src/TM/TuringMachine.cpp
@@ -74,7 +74,6 @@ set(CodeFiles
         
         src/LALR.cpp
         src/LALR.h
-        
 )
 
 add_executable(TESTS
@@ -103,5 +102,3 @@ install(TARGETS TESTS
 install(TARGETS Tog
         DESTINATION ${CMAKE_INSTALL_PREFIX}
 )
-
-
