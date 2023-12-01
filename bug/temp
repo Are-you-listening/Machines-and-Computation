@@ -1,0 +1,65 @@
+B -> C
+B -> D
+B -> E
+B -> F
+B -> I
+B -> T B
+B -> V
+B -> e
+K -> C
+K -> D
+K -> E
+K -> F
+K -> I
+K -> K K
+K -> T B
+K -> V
+K -> X R
+K -> X Y
+K -> e
+R -> L Y
+L -> C
+L -> D
+L -> E
+L -> F
+L -> I
+L -> L L
+L -> T B
+L -> V
+L -> X P
+L -> X Y
+L -> e
+P -> M Y
+M -> C
+M -> D
+M -> E
+M -> F
+M -> I
+M -> M M
+M -> T B
+M -> V
+M -> X W
+M -> X Y
+M -> e
+W -> L Y
+S -> C
+S -> D
+S -> E
+S -> F
+S -> I
+S -> K K
+S -> T B
+S -> V
+S -> X Q
+S -> X Y
+S -> e
+Q -> L Y
+T -> C
+T -> D
+T -> E
+T -> F
+T -> I
+T -> V
+T -> e
+X -> {
+Y -> }

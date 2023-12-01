@@ -4,6 +4,7 @@
 
 #include "Config.h"
 
+string Orchestrator::file = "input/config/config.json";
 Config* Config::init{nullptr}; //Static Members should be initialised outside the Class
 
 Config::Config(){

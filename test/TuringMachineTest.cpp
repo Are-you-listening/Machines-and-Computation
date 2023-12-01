@@ -157,7 +157,7 @@ TEST(TuringMachineTest, TM_tools){
 
 TEST(TuringMachineTest, TM_tokenazation) {
 
-    ifstream test_file("../test/testFiles/TM_test_11.cpp");
+    ifstream test_file("../test/testFiles/TM_test_12.cpp");
     string test_string;
     cout << test_file.is_open() << endl;
     while (!test_file.eof()){
@@ -179,7 +179,7 @@ TEST(TuringMachineTest, TM_tokenazation) {
     tm.load_input(test_string, 1);
 
     int halted_time = -1;
-    for (int i = 0; i<163200; i++){
+    for (int i = 0; i<100200; i++){
 
 
         if (tm.isHalted()){
@@ -190,13 +190,13 @@ TEST(TuringMachineTest, TM_tokenazation) {
             continue;
         }
         tm.move();
-        if (tm.getCurrentState() == "make_working_nesting_1119"){
+        if (tm.getCurrentState() == "2256"){
             int j=0;
         }
 
 
 
-        if (i >= 1530000){
+        if (i >= 2138300){
             int j = 0;
 
             for (int i = 0; i < tm.getTapeAmount(); i++){
