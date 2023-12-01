@@ -935,16 +935,14 @@ CFGKars CFG::convert() const {
 }
 
 set<string> CFG::First(const string &input) {
-    set<string> result;
-    for (const auto& rule : P){
-        if (rule.second.empty()){   // the empty string has no useful information for the parser, so we ignore it (left production side)
-            continue;
-        }
-        if (rule.first == input){
-            result.emplace(rule.second[0]); //P -> A , A wordt meegegeven, format: {"P",{"A"}})
+    if (!table_made){
+        table_made = true;
+        for (const auto& rule : P){
+            first_table[rule.first].insert(rule.second[0]);
         }
     }
-    return result;
+
+    return first_table[input];
 }
 
 const vector<std::string> &CFG::getV() const {

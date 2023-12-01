@@ -20,6 +20,8 @@ using json = nlohmann::json;
 
 class CFG {
 private:
+    bool table_made = false;
+    std::map<string, std::set<string>> first_table;
     std::vector<std::string> V; //Variables
     std::vector<std::string> T;//Terminals
     std::vector<std::pair<std::string,std::vector<std::string>>> P; //Productions
