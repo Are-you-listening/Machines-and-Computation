@@ -13,8 +13,11 @@ void LALR::createStates() {
     state_counter = 0;
     I0->_stateName = 0;
     I0->_connections = {};
+    std::cout << "start createAugmented" << std::endl;
     I0->_productions = createAugmented(make_tuple<string, vector<string>, set<string>>((_cfg.getS() + "'"), {".", _cfg.getS()}, {"$"}));
+    std::cout << "end createAugmented" << std::endl;
     I0->createConnections(*this);
+    std::cout << "end createConnections" << std::endl;
     //cout << "debug" << endl;
 }
 
@@ -115,7 +118,9 @@ void LALR::mergeSimilar() {
 
 void LALR::createTable() {
     unordered_map<int, map<string, string>> createdTable;
+    std::cout << "start creating states" << std::endl;
     createStates();
+    std::cout << "end creating states" << std::endl;
 
     queue<state*> remaining;
     set<state*> visited;
@@ -123,6 +128,7 @@ void LALR::createTable() {
     visited.emplace(I0);
 
     while(not remaining.empty()){
+        std::cout << "in while loop" << std::endl;
         state* currentstate = remaining.front();
         remaining.pop();
 
@@ -160,7 +166,9 @@ void LALR::createTable() {
             }
         }
     }
+    std::cout << "end while loop" << std::endl;
     parseTable = createdTable;
+    std::cout << "start mergeSimilar()" << std::endl;
     mergeSimilar();
 }
 
@@ -217,6 +225,7 @@ augmentedrules LALR::createAugmented(const tuple<string, vector<string>, set<str
 }
 
 void state::createConnections(LALR &lalr) {
+    std::cout << "start createConections" << std::endl;
     for (const auto& rule : _productions){
         int dotIndex = 0;
         // create a new state where we move the dot one space to the right if this state doesn't exist already
@@ -262,7 +271,6 @@ void state::createConnections(LALR &lalr) {
                     }
                 }
             }
-
             newstate->createConnections(lalr);
         }
     }
