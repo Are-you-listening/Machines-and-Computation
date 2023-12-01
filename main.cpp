@@ -81,6 +81,7 @@ int main() { // Function names we create to replace nesting should have F or I i
     auto vec = tokenVector.getTokenVector();
     lalr.parse(vec);
     
+    /*
     //threading every function for now, will later be changed
     // I also assume that every function we create to replace nesting is only called upon once
     // result don't work for now, will be changed
@@ -199,7 +200,7 @@ int main() { // Function names we create to replace nesting should have F or I i
     }
     std::string c=ResultFileLocation +"tempresult.cc0";
     std::remove(c.c_str());
-    std::cout << "We do really love Tibo" << std::endl;
+    std::cout << "We do really love Tibo" << std::endl;*/
 
     return 0;
 }
