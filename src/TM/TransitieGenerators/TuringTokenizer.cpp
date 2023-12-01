@@ -157,6 +157,7 @@ IncompleteSet TuringTokenizer::tokenize_runner_productions() {
 
             bool is_spatie = j == 32;
             bool is_seperator = (find(seperators.begin(), seperators.end(), (char) j) != seperators.end());
+            bool is_less_symbol = j == 60;
 
             IncompleteTransition trans_prod;
             trans_prod.state = from;
@@ -185,7 +186,7 @@ IncompleteSet TuringTokenizer::tokenize_runner_productions() {
                 tools->push_on_sequence(spatie_pusher, {'n','a','m', 'e', 's', 'p', 'a', 'c', 'e', ' '}, 1, 'C');
 
                 //sets S on stack if no other S is before
-                tools->stack_replace(spatie_pusher, {'*'}, {'P'});
+                tools->stack_replace(spatie_pusher, {stack_symbol}, {'P'});
                 tools->stack_replace(spatie_pusher, {'A'}, {'P'});
 
                 trans_prod.to_state = spatie_pusher.state;
@@ -196,6 +197,20 @@ IncompleteSet TuringTokenizer::tokenize_runner_productions() {
                 go_back.def_move = 0;
                 tokenize_set.transitions.push_back(go_back);
                 tokenize_set.transitions.insert(tokenize_set.transitions.end(), spatie_pusher.transitions.begin(), spatie_pusher.transitions.end());
+            }
+
+            if (is_less_symbol){
+                IncompleteSet less_symbol_pusher("tokenize_less_symbol"+ to_string(i), "tokenize_less_symbol"+ to_string(i));
+                tools->push_on_sequence(less_symbol_pusher, {'t','e','m','p','l', 'a', 't', 'e', '<'}, 1, 'T');
+
+                trans_prod.to_state = less_symbol_pusher.state;
+
+                IncompleteTransition go_back;
+                go_back.state = less_symbol_pusher.to_state;
+                go_back.to_state = to.substr(0, to.size()-8);
+                go_back.def_move = 0;
+                tokenize_set.transitions.push_back(go_back);
+                tokenize_set.transitions.insert(tokenize_set.transitions.end(), less_symbol_pusher.transitions.begin(), less_symbol_pusher.transitions.end());
             }
 
             if (is_seperator){
@@ -220,7 +235,7 @@ IncompleteSet TuringTokenizer::tokenize_runner_productions() {
 
         tokenize_set.transitions.push_back(end_marker);
         //sets A to say here is a token
-        tools->stack_replace(tokenize_set, {'*'}, {'A'});
+        tools->stack_replace(tokenize_set, {stack_symbol}, {'A'});
         tools->stack_replace(tokenize_set, {'P'}, {'A'});
 
         tools->link(final_tokenize_set, tokenize_set);

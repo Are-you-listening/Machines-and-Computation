@@ -30,7 +30,7 @@ TMBuilder_output TMBuilder::generateTM() {
 
     IncompleteSet program("program_start", "program_start");
     tools->push(program, '#');
-    tools->push(program, '*');
+    tools->push(program, '-');
     tools->link_put(program, {'A', 'A'}, {0, 2});
 
     TuringTokenizer tokenizer{};
@@ -38,6 +38,9 @@ TMBuilder_output TMBuilder::generateTM() {
     //TODO: tokenize not completly correct for constructor/destructor/ new/delete/return
 
     tools->link(program, tokenize_program);
+
+    IncompleteSet breaker{"breaker", "breaker2"};
+    //tools->link(program, breaker);
 
     TuringVarDictionary vardict{};
 

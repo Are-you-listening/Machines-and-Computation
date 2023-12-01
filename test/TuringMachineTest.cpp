@@ -157,7 +157,7 @@ TEST(TuringMachineTest, TM_tools){
 
 TEST(TuringMachineTest, TM_tokenazation) {
 
-    ifstream test_file("../test/testFiles/TM_test_13.cpp");
+    ifstream test_file("../test/testFiles/TM_test_14.cpp");
     string test_string;
     cout << test_file.is_open() << endl;
     while (!test_file.eof()){
@@ -215,7 +215,7 @@ TEST(TuringMachineTest, TM_tokenazation) {
 }
 
 TEST(TuringMachineTest, TM_builder) {
-    for (int k=2; k<= 12; k++){
+    for (int k=2; k<= 13; k++){
         ifstream test_file("../test/testFiles/TM_test_"+ to_string(k)+".cpp");
         string test_string;
         cout << test_file.is_open() << endl;

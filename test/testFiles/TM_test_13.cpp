@@ -1,5 +1,5 @@
 namespace c{
-    int test(int& a){
+    int test(int* a){
         int b = 0;
         if (int f = 0){
             if (int d = 0){

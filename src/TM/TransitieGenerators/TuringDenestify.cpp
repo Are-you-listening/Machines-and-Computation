@@ -178,7 +178,7 @@ void TuringDenestify::createNewFunction(IncompleteSet &a) {
     tools->link_put(create_function, {'\u0000'}, {0});
 
     //go to start of stack variables
-    tools->go_to(create_function, {'*', '{'}, tapes-1, -1, {(int) tapes-1});
+    tools->go_to(create_function, {stack_symbol, '{'}, tapes-1, -1, {(int) tapes-1});
     tools->go_to(create_function, {'.'}, tapes-1, 1, {(int) tapes-1});
 
     //put start bracket

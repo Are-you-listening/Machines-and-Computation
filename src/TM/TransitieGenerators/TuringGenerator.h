@@ -17,6 +17,7 @@ protected:
     TuringTools* tools;
     vector<char> seperators;
     vector<char> special_sep;
+    char stack_symbol;
 
     vector<int> get_tuple_index();
 };

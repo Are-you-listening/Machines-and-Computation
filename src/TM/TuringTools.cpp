@@ -32,6 +32,7 @@ TuringTools::TuringTools(unsigned int stack_tape) {
     goto_counter = 0;
     counter = 0;
     branch_counter = 0;
+    stack_symbol = '-';
     this->stack_tape = stack_tape;
 }
 
@@ -664,7 +665,7 @@ void TuringTools::clear_stack(IncompleteSet &a) {
     arrived.state = "clear_stack_"+ to_string(goto_counter);
     arrived.to_state = "clear_stack_"+ to_string(goto_counter+1);
 
-    arrived.input = {'*'};
+    arrived.input = {stack_symbol};
     arrived.input_index = {(int) stack_tape};
     arrived.def_move = 0;
 
@@ -855,7 +856,7 @@ void TuringTools::heap_push_definer(IncompleteSet& a, const vector<int>&tuple_in
     go_to_move(object_hierarchy, {'\u0000'}, stack_tape, 1, {(int) stack_tape}, 1, 1, {0, 1});
     link_put(object_hierarchy, {'E'}, {0});
 
-    go_to(object_hierarchy, {'*'}, stack_tape, -1, {(int) stack_tape});
+    go_to(object_hierarchy, {stack_symbol}, stack_tape, -1, {(int) stack_tape});
     move(object_hierarchy, {(int) stack_tape}, 1);
 
     //but old markings
@@ -1469,7 +1470,7 @@ void TuringTools::set_heap_mode(IncompleteSet &a, bool to_heap) {
         }
         IncompleteSet to_heap_mode{"to_heap_mode_"+ to_string(counter), "to_heap_mode_"+ to_string(counter)};
         counter++;
-        go_to(to_heap_mode, {'*'}, stack_tape, -1, {(int) stack_tape});
+        go_to(to_heap_mode, {stack_symbol}, stack_tape, -1, {(int) stack_tape});
         go_to(to_heap_mode, {'#'}, stack_tape, -1, {(int) stack_tape});
         heap_mode = true;
         link(a, to_heap_mode);
@@ -1683,7 +1684,7 @@ void TuringTools::make_working_nesting(IncompleteSet &a, const vector<int> &tupl
     link_put(working_nesting, {'\u0000'}, {1});
 
     move(working_nesting, {(int) stack_tape}, -1);
-    go_to_move(working_nesting, {'*', '{', ':'}, stack_tape, -1, {(int) stack_tape}, 1, 1, {0,1});
+    go_to_move(working_nesting, {stack_symbol, '{', ':'}, stack_tape, -1, {(int) stack_tape}, 1, 1, {0,1});
     IncompleteSet replace_double_dot{"replace_double_dot_"+ to_string(counter), "replace_double_dot_"+ to_string(counter)};
     counter++;
     //replaces ':' on stack by '{' on working tape
@@ -1692,7 +1693,7 @@ void TuringTools::make_working_nesting(IncompleteSet &a, const vector<int> &tupl
     link_put(replace_double_dot, {'\u0000'}, {(int) stack_tape});
     move(replace_double_dot, {(int) stack_tape}, -1);
 
-    go_to_move(replace_double_dot, {'*', '{'}, stack_tape, -1, {(int) stack_tape}, 1, 1, {0,1});
+    go_to_move(replace_double_dot, {stack_symbol, '{'}, stack_tape, -1, {(int) stack_tape}, 1, 1, {0,1});
     move(replace_double_dot, {(int) stack_tape}, 1);
     push(replace_double_dot, 'O');
     move(replace_double_dot, {(int) stack_tape}, -1);
@@ -1738,7 +1739,7 @@ void TuringTools::add_nesting_working(IncompleteSet &a) {
 
 
     move(create_key, {(int) stack_tape}, -2);
-    go_to(create_key, {'*', '{', 'O'}, stack_tape, -1, {(int) stack_tape});
+    go_to(create_key, {stack_symbol, '{', 'O'}, stack_tape, -1, {(int) stack_tape});
     move(create_key, {(int) stack_tape}, 1);
     write_on(create_key, {'S'}, {0}, {'\u0000'}, {0});
     go_to_copy(create_key, {'{'}, stack_tape, 1, {(int) stack_tape}, 1, 1, {0, 1});
@@ -1771,7 +1772,7 @@ void TuringTools::remove_nesting_working(IncompleteSet &a) {
     //if top is '{' of stack -> POP
     IncompleteSet pop{"pop_curly_"+ to_string(counter), "pop_curly_"+ to_string(counter)};
     counter++;
-    go_to_clear(pop, {'{', 'O', '*'}, stack_tape, -1, {(int) stack_tape}, {(int) stack_tape});
+    go_to_clear(pop, {'{', 'O', stack_symbol}, stack_tape, -1, {(int) stack_tape}, {(int) stack_tape});
     write_on(pop, {'{'}, {(int) stack_tape}, {'\u0000'}, {(int) stack_tape});
     go_to_not(pop, {'\u0000'}, (int) stack_tape, -1, {(int) stack_tape});
 
@@ -1979,7 +1980,7 @@ void TuringTools::write_function_header(IncompleteSet &a, const vector<int>&tupl
     //add class specifier if needed
     //add start working tape is at end of function
     //and stack is at emd
-    go_to(write_function_header, {'*'}, stack_tape, -1, {(int) stack_tape});
+    go_to(write_function_header, {stack_symbol}, stack_tape, -1, {(int) stack_tape});
     move(write_function_header, {(int) stack_tape}, 1);
     IncompleteSet set_specifier{"set_specifier_"+ to_string(counter), "set_specifier_"+ to_string(counter)};
     counter++;
@@ -2117,8 +2118,8 @@ void TuringTools::write_function_header(IncompleteSet &a, const vector<int>&tupl
     go_to(copy_to_working, {'.'}, stack_tape, -1, {(int) stack_tape});
     move(copy_to_working, {(int) stack_tape}, -1);
 
-    go_to(copy_to_working, {'.', '*'}, stack_tape, -1, {(int) stack_tape});
-    string end_branch = branch_on(copy_to_working, {'*'}, {(int) stack_tape});
+    go_to(copy_to_working, {'.', stack_symbol}, stack_tape, -1, {(int) stack_tape});
+    string end_branch = branch_on(copy_to_working, {stack_symbol}, {(int) stack_tape});
     IncompleteSet copy_data{"copy_data_"+ to_string(counter), "copy_data_"+ to_string(counter)};
     counter++;
 
@@ -2130,8 +2131,20 @@ void TuringTools::write_function_header(IncompleteSet &a, const vector<int>&tupl
     move(copy_data, {(int) stack_tape}, 1);
 
     //add by refrence and space on working tape
-    link_put(copy_data, {'&'}, {1});
+    //if not already reference or ptr present
+    move(copy_data, {0,1}, -1);
+    IncompleteSet check1{"check_1_"+ to_string(counter), "check_1_"+ to_string(counter)};
+    counter++;
+    IncompleteSet check2{"check_2_"+ to_string(counter), "check_2_"+ to_string(counter)};
+    counter++;
+    move(check2, {0,1}, 1);
+    link_put(check2, {'&'}, {1});
+
+    link_on_not(check1, check2, {'*'}, {1});
+    link_on_not(copy_data, check1, {'&'}, {1});
+
     move(copy_data, {0,1}, 1);
+    //part of the check above
 
     link_put(copy_data, {' '}, {1});
     move(copy_data, {0,1}, 1);
@@ -2550,7 +2563,7 @@ void TuringTools::clear_heap(IncompleteSet &a) {
     go_to_clear(a, {'\u0000'}, stack_tape, -1, {(int) stack_tape}, {(int) stack_tape});
 
 
-    go_to(a, {'*'}, stack_tape, 1, {(int) stack_tape});
+    go_to(a, {stack_symbol}, stack_tape, 1, {(int) stack_tape});
     go_to(a, {'\u0000'}, stack_tape, 1, {(int) stack_tape});
     heap_mode = false;
 
