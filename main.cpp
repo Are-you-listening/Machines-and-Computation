@@ -39,7 +39,7 @@ int main() { // Function names we create to replace nesting should have F or I i
     cfg->print();
     cfg->toGNF(); // this still needs massive debugging.
     cfg->print();
-    cfg->toCNF();
+    //cfg->toCNF();
     cfg3->toCNF();
     
     //string permutatar found online
@@ -75,7 +75,7 @@ int main() { // Function names we create to replace nesting should have F or I i
     LALR lalr(a);
     lalr.createTable();
     
-    Tokenizer.join();
+    //Tokenizer.join();
     core_amount++;
     
     //create LARL parser with tokenvector
