@@ -254,6 +254,10 @@ TEST(TuringMachineTest, TM_builder) {
 
         cout << endl;
         cout << "halted time of " << to_string(k)<< ": " << halted_time << endl;
+
+        ofstream out{"../test/results/TM_test_"+ to_string(k)+".cpp"};
+        out << tm.exportTapeData(1);
+        out.close();
     }
 
 

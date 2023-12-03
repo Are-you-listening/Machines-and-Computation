@@ -27,6 +27,7 @@ public:
     void moveHead(int move_direction);
 
     void load(const string& input);
+    string exportTape();
 
 private:
     unsigned long tape_size;

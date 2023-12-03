@@ -156,7 +156,13 @@ IncompleteSet TuringTokenizer::tokenize_runner_productions() {
         for (int j =31; j<127; j++){
 
             bool is_spatie = j == 32;
-            bool is_seperator = (find(seperators.begin(), seperators.end(), (char) j) != seperators.end());
+
+            char c = (char) j;
+            if (j == 31){
+                c = '\n';
+            }
+
+            bool is_seperator = (find(seperators.begin(), seperators.end(), c) != seperators.end());
             bool is_less_symbol = j == 60;
 
             IncompleteTransition trans_prod;
@@ -164,10 +170,7 @@ IncompleteSet TuringTokenizer::tokenize_runner_productions() {
 
             trans_prod.to_state = to;
 
-            char c = (char) j;
-            if (j == 31){
-                c = '\n';
-            }
+
 
             trans_prod.input = {c};
             trans_prod.input_index = {1};
@@ -176,7 +179,7 @@ IncompleteSet TuringTokenizer::tokenize_runner_productions() {
             trans_prod.move = {1, 1, 0};
             trans_prod.def_move = 0;
 
-            if (is_spatie){
+            if (is_spatie || c == '\n'){
                 IncompleteSet spatie_pusher("tokenize_spatie"+ to_string(i), "tokenize_spatie"+ to_string(i));
 
                 tools->push_on_sequence(spatie_pusher, {'c','l','a','s','s', ' '}, 1, 'C');
@@ -201,7 +204,7 @@ IncompleteSet TuringTokenizer::tokenize_runner_productions() {
 
             if (is_less_symbol){
                 IncompleteSet less_symbol_pusher("tokenize_less_symbol"+ to_string(i), "tokenize_less_symbol"+ to_string(i));
-                tools->push_on_sequence(less_symbol_pusher, {'t','e','m','p','l', 'a', 't', 'e', '<'}, 1, 'T');
+                //tools->push_on_sequence(less_symbol_pusher, {'t','e','m','p','l', 'a', 't', 'e', '<'}, 1, 'T');
 
                 trans_prod.to_state = less_symbol_pusher.state;
 
@@ -214,9 +217,10 @@ IncompleteSet TuringTokenizer::tokenize_runner_productions() {
             }
 
             if (is_seperator){
-                bool is_special = (find(special_sep.begin(), special_sep.end(), (char) j) != special_sep.end());
+
+                bool is_special = (find(special_sep.begin(), special_sep.end(), c) != special_sep.end());
                 if (is_special){
-                    tools->push(trans_prod, (char) j);
+                    tools->push(trans_prod, c);
                 }else{
                     tools->push(trans_prod, 'S');
                 }

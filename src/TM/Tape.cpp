@@ -106,3 +106,17 @@ void Tape::load(const string &input) {
 Tape::~Tape() {
     free(tape_ptr);
 }
+
+string Tape::exportTape() {
+    string output = "";
+    char* tape_reader = tape_ptr;
+    for (int i=0; i<tape_size; i++){
+        char c = *tape_reader;
+        if (c != '\0'){
+            output += c;
+        }
+
+        tape_reader++;
+    }
+    return output;
+}

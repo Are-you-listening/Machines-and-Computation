@@ -177,3 +177,7 @@ const string &TuringMachine::getCurrentState() const {
     return current_state;
 }
 
+string TuringMachine::exportTapeData(unsigned int index) const {
+    return tapes[index]->exportTape();
+}
+

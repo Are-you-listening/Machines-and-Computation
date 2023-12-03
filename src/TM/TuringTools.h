@@ -84,7 +84,7 @@ public:
     void heap_push_definer(IncompleteSet& a, const vector<int>&tuple_indexes, bool function, bool has_bracket);
     void heap_push_working(IncompleteSet& a, bool function);
 
-    void copy_to_working(IncompleteSet& a, const vector<int>&tuple_indexes);
+    void copy_to_working(IncompleteSet& a, const vector<int>&tuple_indexes, bool output= false);
     void clear_working(IncompleteSet& a);
 
     static void reset();

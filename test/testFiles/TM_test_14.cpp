@@ -1,5 +1,4 @@
-template<typename A>
-void a(A a){
+template<typename A> void a(A a){
     if (true){
         if (true){
             if (true){

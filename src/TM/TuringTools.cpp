@@ -734,7 +734,7 @@ void TuringTools::write_on(IncompleteSet &a, const vector<char> &input, const ve
     a.transitions.push_back(do_not);
 }
 
-void TuringTools::copy_to_working(IncompleteSet &a, const vector<int> &tuple_indexes) {
+void TuringTools::copy_to_working(IncompleteSet &a, const vector<int> &tuple_indexes, bool output) {
     if (heap_mode){
         throw "heap mode is not allowed";
     }
@@ -762,6 +762,9 @@ void TuringTools::copy_to_working(IncompleteSet &a, const vector<int> &tuple_ind
         IncompleteSet copy_to_working_check{"copy_to_working_check_" + to_string(counter), "copy_to_working_check_" + to_string(counter)};
         counter++;
 
+        IncompleteSet copy_to_working_checkN{"copy_to_working_checkN_" + to_string(counter), "copy_to_working_checkN_" + to_string(counter)};
+        counter++;
+
         IncompleteSet copy_to_working("copy_to_working_" + to_string(counter), "copy_to_working_" + to_string(counter));
         counter++;
 
@@ -780,7 +783,15 @@ void TuringTools::copy_to_working(IncompleteSet &a, const vector<int> &tuple_ind
         link_on_not(copy_to_working_check, copy_to_working, {'P'}, {(int) stack_tape});
         go_to(copy_to_working_check, {'\u0000'},(int) stack_tape, 1, {(int) stack_tape});
 
-        link_on_not(copier_do_sub, copy_to_working_check, {'\u0000'}, {tuple_indexes[i]});
+        link_on_not(copy_to_working_checkN, copy_to_working_check, {'\n'}, {tuple_indexes[i]});
+
+        if (output){
+            //only copy '\n' to working for output
+            link_on_not(copier_do_sub, copy_to_working_check, {'\u0000'}, {tuple_indexes[i]});
+        } else{
+            link_on_not(copier_do_sub, copy_to_working_checkN, {'\u0000'}, {tuple_indexes[i]});
+        }
+
 
     }
 
@@ -2026,6 +2037,7 @@ void TuringTools::write_function_header(IncompleteSet &a, const vector<int>&tupl
     move(copy_to_working_stack, {0,1}, 1);
 
     link_on_sequence(find_class_loop, copy_to_working_stack, {'s', 's', 'a', 'l', 'c'}, stack_tape);
+    link_on_sequence(find_class_loop, copy_to_working_stack, {'s', 's', 'a', 'l', 'c', '\n'}, stack_tape);
 
     link(set_specifier, find_class_loop);
 
