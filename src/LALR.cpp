@@ -131,30 +131,41 @@ void LALR::createTable() {
 
         map<string, string> rowcontent;
 
-        // if otherstate is an endstate (1 rule with "." at the end of the body) place R{cfg rule number} in lookahead columns
-        if (currentstate->isendingstate){
-            for (string symbol : get<2>(*currentstate->_productions.begin())){
-                if (currentstate->cfgrulenumber == -1){
-                    rowcontent[symbol] = "accept";
+        // if currentstate is an endstate (1 rule with "." at the end of the body) place R{cfg rule number} in lookahead columns
+        for (const auto &endingpair: currentstate->endings) {
+            for (const string &lookahead: endingpair.second) {
+                if (endingpair.first == -1) {
+                    rowcontent[lookahead] = "accept";
                 } else {
-                    rowcontent[symbol] = "R" + to_string(currentstate->cfgrulenumber);
+                    rowcontent[lookahead] = "R" + to_string(endingpair.first);
                 }
             }
-            createdTable[currentstate->_stateName] = rowcontent;
-            continue;
         }
-        
-        if (createdTable.find(currentstate->_stateName) != createdTable.end()){
-            for (auto& element : createdTable[currentstate->_stateName]){
-                if (rowcontent.find(element.first) != rowcontent.end()){
-                    if (element.second.substr(0, 1) == "R" && rowcontent[element.first].substr(0,1) == "S"){
-                        element.second = rowcontent[element.first]; // the new row has a shift in the corresponding position while the original has a reduce
+
+        for (const auto &connection: currentstate->_connections) {
+            string inputsymbol = connection.first;
+            state *otherstate = connection.second;
+
+            if (std::find(_cfg.getV().begin(), _cfg.getV().end(), inputsymbol) != _cfg.getV().end()) {
+                rowcontent[inputsymbol] = to_string(otherstate->_stateName);
+            } else {
+                rowcontent[inputsymbol] = "S" + to_string(otherstate->_stateName);
+            }
+        }
+
+        // this if statement and the code in it might be unnecessary and could be removed without consequences
+        if (createdTable.find(currentstate->_stateName) != createdTable.end()) {
+            for (auto &element: createdTable[currentstate->_stateName]) {
+                if (rowcontent.find(element.first) != rowcontent.end()) {
+                    if (element.second.substr(0, 1) == "R" && rowcontent[element.first].substr(0, 1) == "S") {
+                        element.second = rowcontent[element.first];// the new row has a shift in the corresponding position while the original has a reduce
                     }
                 }
             }
-        } else {
-            createdTable[currentstate->_stateName] = rowcontent;
         }
+
+        createdTable[currentstate->_stateName] = rowcontent;
+
 
         for (const auto& connection : currentstate->_connections){
             if (visited.find(connection.second) == visited.end()){
@@ -218,7 +229,8 @@ augmentedrules LALR::createAugmented(const tuple<string, vector<string>, set<str
 }
 
 void state::createConnections(LALR &lalr) {
-    for (const auto& rule : _productions){
+    map<string, augmentedrules > transitionmap;
+    for (const auto& rule : _productions) {
         int dotIndex = 0;
         // create a new state where we move the dot one space to the right if this state doesn't exist already
         for (const string& c : get<1>(rule)){
@@ -235,39 +247,56 @@ void state::createConnections(LALR &lalr) {
         newvector[dotIndex] = readSymbol;
         newvector[dotIndex+1] = ".";
         tuple<string, vector<string>, set<string>> changedrule = make_tuple(get<0>(rule), newvector, get<2>(rule));
+        transitionmap[readSymbol].emplace(changedrule);
+    }
+    for (auto newstate_data: transitionmap) {
+        string readSymbol = newstate_data.first;
+        augmentedrules newrules;
 
-        augmentedrules newrules = lalr.createAugmented(changedrule);
-        state* tempstate = lalr.findstate(newrules);
-        if (tempstate != nullptr){
+        for (auto changedrule: newstate_data.second) {
+            augmentedrules temp = lalr.createAugmented(changedrule);
+            newrules.insert(temp.begin(), temp.end());
+        }
+
+        state *otherstate;
+        state *tempstate = lalr.findstate(newrules);
+        if (tempstate != nullptr) {
             _connections.emplace_back(readSymbol, tempstate);
+            otherstate = tempstate;
         } else {
             state *newstate = new state;
             lalr.state_counter++;
             newstate->_stateName = lalr.state_counter;
             newstate->_productions = newrules;
             _connections.emplace_back(readSymbol, newstate);
+            otherstate = newstate;
+            newstate->createConnections(lalr);
+        }
 
-            if (newstate->_productions.size() == 1 && *(get<1>(*newstate->_productions.begin()).end() - 1) == ".") {
-                newstate->isendingstate = true;
-                tuple<string, vector<string>, set<string>> newstaterule = *newstate->_productions.begin();
-                if (get<0>(newstaterule) == lalr._cfg.getS() + "'"){
-                    newstate->cfgrulenumber = -1;   // in this case we have the rule S' -> S. , $   and this will result in accept in the parse table. This is the only situation where we write accept in the parse table
+        for (const auto &state_rule: otherstate->_productions) {
+            if (get<1>(state_rule).back() ==
+                ".") {// if the state_rule has a dot at the end of the body it is an ending state_rule
+                if (get<0>(state_rule) == lalr._cfg.getS() + "'") {
+                    otherstate->endings.emplace(-1, get<2>(state_rule));
                 } else {
-                    get<1>(newstaterule).pop_back();// remove the "."
-                    int count = 0;
-                    for (auto rule: lalr._cfg.getP()) {
-                        if (rule.first == get<0>(newstaterule) && rule.second == get<1>(newstaterule)) {
-                            newstate->cfgrulenumber = count;// we need the rule number in the parse Table
+                    pair<string, vector<string>> temprule = {get<0>(state_rule),
+                                                             get<1>(state_rule)};// with this temprule we will find the cfg state_rule number
+                    temprule.second.pop_back();
+                    int index = 0;
+                    for (const auto &cfg_rule: lalr._cfg.getP()) {
+                        if (cfg_rule == temprule) {
+                            break;
                         }
-                        count++;
+                        index++;
                     }
+                    otherstate->endings.emplace(index, get<2>(state_rule));
                 }
             }
-            newstate->createConnections(lalr);
         }
     }
     //std::cout << "end createConections" <<std::endl;
 }
+
 state::~state() {
     for (auto& connection : _connections){
         delete connection.second;
@@ -308,6 +337,17 @@ void LALR::printstates() {
         remaining.pop();
 
         cout << current->_stateName << endl;
+        for (auto rule: current->_productions) {
+            cout << "\t" << get<0>(rule) << " --> ";
+            for (auto element: get<1>(rule)) {
+                cout << " " << element;
+            }
+            cout << " ,";
+            for (auto LA: get<2>(rule)) {
+                cout << " " << LA;
+            }
+            cout << endl;
+        }
 
         for (const auto& connection : current->_connections){
             if (visited.find(connection.second) == visited.end()){
@@ -321,10 +361,10 @@ void LALR::printstates() {
 void LALR::parse(std::vector<std::pair<std::string, std::string>> &input) {
     stack<int> s;
     s.push(0);
-    
+
     std::vector<std::pair<std::string, std::string>> remaininginputvector = input;
     remaininginputvector.push_back({"$","$"});
-    //string remaininginput = inputstring + "$";
+
     vector<parseTree*> treetops;
     while (true){
         if (remaininginputvector.empty()){
@@ -336,6 +376,8 @@ void LALR::parse(std::vector<std::pair<std::string, std::string>> &input) {
             remaininginputvector.erase(remaininginputvector.begin());
         }
         string operation = parseTable[stacksymbol][inputsymbol];
+
+        //cout << "stacksymbol: " << stacksymbol << ", inputsymbol: " << inputsymbol << " --> " << operation << endl;
 
         if (operation == "accept"){
             break;

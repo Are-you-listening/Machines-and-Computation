@@ -30,8 +30,12 @@ public:
     vector<pair<string, state*>> _connections; // outgoing _connections
     void createConnections(LALR &lalr);
     ~state();
-    bool isendingstate = false;
-    int cfgrulenumber = NULL;
+
+    /**
+     * <rule number in cfg, lookahead symbols>
+     * when an ending rule is found (dot at the end of body) add it to this set
+     */
+    set<pair<int, set<string>>> endings;
 };
 
 class parseTree {
