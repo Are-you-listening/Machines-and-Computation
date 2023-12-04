@@ -1,15 +1,17 @@
 class Base{
-    int test(int a){
-        if (true){
+    Base(int a);
+};
+
+Base::Base(int a){
+    if (true){
+        if(true){
             if(true){
                 if(true){
-                    if(true){
-
-                    }
 
                 }
 
             }
+
         }
     }
-};
+}

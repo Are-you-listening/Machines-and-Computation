@@ -297,6 +297,78 @@ void TuringTools::go_to_copy(IncompleteSet &a, const vector<char> &symbol, int t
 
 }
 
+void
+TuringTools::go_to_copy_multiple(IncompleteSet &a, const vector<vector<char>> &symbol, const vector<int> &tape_index,
+                                 int direction, const vector<int> &affected, int copy_to_tape, int copy_to_direction,
+                                 const vector<int> &copy_affected, int index) {
+    vector<int> affected_using = affected;
+    affected_using.insert(affected_using.end(), copy_affected.begin(), copy_affected.end());
+    sort(affected_using.begin(), affected_using.end());
+
+    IncompleteSet b("go_to_"+ to_string(goto_counter) ,"go_to_"+ to_string(goto_counter+1));
+    vector<IncompleteTransition> outputs;
+
+    IncompleteSet copy_linker{"go_to_copy_"+ to_string(goto_counter),"go_to_copy_"+ to_string(goto_counter)};
+    copy(copy_linker, index, copy_to_tape);
+
+    outputs = copy_linker.transitions;
+
+    IncompleteTransition copy_go_back;
+    copy_go_back.state = copy_linker.to_state;
+    copy_go_back.to_state = "go_to_"+ to_string(goto_counter);
+
+    copy_go_back.def_move = 0;
+
+    copy_go_back.output_index = affected_using;
+
+    for (int i =0; i<copy_go_back.output_index.size(); i++){
+        char c = '\u0001';
+        int move_direction = direction;
+
+        if (find(copy_affected.begin(), copy_affected.end(), copy_go_back.output_index[i]) != copy_affected.end()){
+            move_direction = copy_to_direction;
+        }
+
+        copy_go_back.output.push_back(c);
+        copy_go_back.move.push_back(move_direction);
+
+    }
+
+    outputs.push_back(copy_go_back);
+
+    IncompleteTransition moving;
+    moving.state = "go_to_"+ to_string(goto_counter);
+    moving.to_state = "go_to_copy_"+ to_string(goto_counter);
+
+    moving.def_move = 0;
+
+    outputs.push_back(moving);
+
+    for (int i=0; i<tape_index.size(); i++){
+        for (char sym: symbol[i]){
+            IncompleteTransition arrived;
+            arrived.state = "go_to_"+ to_string(goto_counter);
+            arrived.to_state = "go_to_"+ to_string(goto_counter+1);
+
+            arrived.input = {sym};
+            arrived.input_index = {tape_index[i]};
+            arrived.def_move = 0;
+
+
+            outputs.push_back(arrived);
+        }
+    }
+
+    goto_counter += 2;
+
+    b.transitions.insert(b.transitions.end(), outputs.begin(), outputs.end());
+
+    link(a, b);
+
+}
+
+
+
 void TuringTools::go_to_move(IncompleteSet &a, const vector<char> &symbol, int tape_index, int direction,
                              const vector<int> &affected, int copy_to_tape, int copy_to_direction,
                              const vector<int> &copy_affected) {
@@ -838,22 +910,38 @@ void TuringTools::heap_push_definer(IncompleteSet& a, const vector<int>&tuple_in
         go_to(push_heap_action, {'('}, 1, -1, {0,1});
     }
 
-    go_to(push_heap_action, {' '}, 1, -1, {0,1});
-    link_put(push_heap_action, {'P'}, {0});
+    go_to_multiple(push_heap_action, {{'S', 'A'}, {' '}}, {0, 1}, -1, {0,1});
+    write_on(push_heap_action, {'\u0000'}, {0}, {'P'}, {0});
+    //link_put(push_heap_action, {'P'}, {0});
 
     //manipulate hierarchy in case of object type
     //make sure class::func equals class{func}
     IncompleteSet object_hierarchy{"object_hierarchy_"+ to_string(counter), "object_hierarchy_"+ to_string(counter)};
     counter++;
     //copy class object to stack
-    move(object_hierarchy, {0,1}, 1);
+
+    IncompleteSet move_right_on_p{"move_right_on_p_"+ to_string(counter), "move_right_on_p_"+ to_string(counter)};
+    counter++;
+
+    move(move_right_on_p, {0,1}, 1);
+
+    link_on(object_hierarchy, move_right_on_p, {'P'}, {0});
+
     go_to_copy(object_hierarchy, {':'}, 1, 1, {0, 1}, stack_tape, 1, {(int) stack_tape});
     push(object_hierarchy, '{');
 
     //copy return type on stack
-    go_to(object_hierarchy, {'A', 'S'}, 0, -1, {0,1});
-    go_to_copy(object_hierarchy, {' '}, 1, 1, {0, 1}, stack_tape, 1, {(int) stack_tape});
-    push(object_hierarchy, ' ');
+    go_to(object_hierarchy, {'A', 'S', 'P'}, 0, -1, {0,1});
+
+    IncompleteSet move_right_on_p2{"move_right_on_p2_"+ to_string(counter), "move_right_on_p2_"+ to_string(counter)};
+    counter++;
+
+    go_to(move_right_on_p2, {'A', 'S'}, 0, -1, {0,1});
+    go_to_copy(move_right_on_p2, {' '}, 1, 1, {0, 1}, stack_tape, 1, {(int) stack_tape});
+    push(move_right_on_p2, ' ');
+
+    link_on(object_hierarchy, move_right_on_p2, {'P'}, {0});
+
     go_to(object_hierarchy, {'E'}, 0, 1, {0,1});
     go_to(object_hierarchy, {':'}, 1, -1, {0,1});
     move(object_hierarchy, {0,1}, 1);
@@ -870,9 +958,18 @@ void TuringTools::heap_push_definer(IncompleteSet& a, const vector<int>&tuple_in
     go_to(object_hierarchy, {stack_symbol}, stack_tape, -1, {(int) stack_tape});
     move(object_hierarchy, {(int) stack_tape}, 1);
 
-    //but old markings
-    go_to(object_hierarchy, {' '}, 1, -1, {0,1});
-    link_put(object_hierarchy, {'P'}, {0});
+    //put old markings
+    go_to_multiple(object_hierarchy, {{'S', 'A'}, {' ', ')'}}, {0, 1}, -1, {0,1});
+
+    IncompleteSet skip_brackets{"skip_brackets_"+ to_string(counter), "skip_brackets_"+ to_string(counter)};
+    skip_nesting(skip_brackets, stack_tape, 1, 1, -1, {0,1}, ')', '(');
+    link_on(object_hierarchy, skip_brackets, {')'}, {1});
+
+    go_to_multiple(object_hierarchy, {{'S', 'A'}, {' '}}, {0, 1}, -1, {0,1});
+    write_on(object_hierarchy, {'\u0000'}, {0}, {'P'}, {0});
+    go_to_multiple(object_hierarchy, {{'P'}, {'('}}, {0, 1}, 1, {0,1});
+    //go_to(object_hierarchy, {' '}, 1, -1, {0,1});
+    //link_put(object_hierarchy, {'P'}, {0});
     go_to(object_hierarchy, {'{'}, 1, -1, {0,1});
     move(object_hierarchy, {0,1}, 1);
     link_put(object_hierarchy, {'S'}, {0});
@@ -892,8 +989,6 @@ void TuringTools::heap_push_definer(IncompleteSet& a, const vector<int>&tuple_in
     //do entire copy to heap
     heap_push_working(push_heap_action, function);
 
-
-
     link_on_multiple(a, push_heap_action, {{'A'}, {'S'}}, {tuple_indexes[0]});
 }
 
@@ -907,6 +1002,7 @@ void TuringTools::clear_working(IncompleteSet &a) {
 
 void TuringTools::heap_push_working(IncompleteSet &push_heap_action, bool function) {
     //store part on heap after insert on working tape after new data
+
     IncompleteSet move_heap{"move_heap_"+ to_string(counter), "move_heap_"+ to_string(counter)};
     counter++;
 
@@ -928,11 +1024,19 @@ void TuringTools::heap_push_working(IncompleteSet &push_heap_action, bool functi
     link_put(move_heap, {'H'}, {0});
     go_to(move_heap, {'}'}, stack_tape, 1, {(int) stack_tape});
     //this to make sure we don't continue
-    go_to(move_heap, {'P'}, 0, -1, {0,1});
+    go_to(move_heap, {'P', 'S', 'A'}, 0, -1, {0,1});
 
     link_on(push_heap_action, move_heap, {'S'}, {0});
 
-    go_to(push_heap_action, {'P'}, 0, 1, {0,1});
+
+    go_to(push_heap_action, {'P', 'E'}, 0, 1, {0,1});
+    IncompleteSet on_E{"on_E_"+ to_string(counter), "on_E_"+ to_string(counter)};
+    counter++;
+    go_to(on_E, {'A', 'S'}, 0, -1, {0,1});
+    move(on_E, {0,1}, -1);
+
+    link_on(push_heap_action, on_E, {'E'}, {0});
+
     move(push_heap_action, {0,1}, 1);
 
 
@@ -1695,11 +1799,17 @@ void TuringTools::make_working_nesting(IncompleteSet &a, const vector<int> &tupl
     go_to_copy(working_nesting, {' ', ':'}, 1, -1, {0,1}, stack_tape, 1, {(int) stack_tape});
 
     IncompleteSet copy_object{"make_working_nesting_"+ to_string(counter), "make_working_nesting_"+ to_string(counter)};
+    counter++;
 
     push(copy_object, ':');
     go_to_not(copy_object, {':'}, 1, -1, {0, 1});
-    go_to_copy(copy_object, {' '}, 1, -1, {0, 1}, stack_tape, 1, {(int) stack_tape});
-    counter++;
+    go_to_copy_multiple(copy_object, {{'A', 'S'}, {' '}}, {0, 1}, -1, {0, 1}, stack_tape, 1, {(int) stack_tape}, 1);
+
+    IncompleteSet copy_last_char{"copy_last_char_"+ to_string(counter), "copy_last_char_"+ to_string(counter)};
+    copy(copy_last_char, 1, stack_tape);
+    move(copy_last_char, {(int) stack_tape}, 1);
+
+    link_on_multiple(copy_object, copy_last_char, {{'S'}, {'A'}}, {0});
 
     link_on(working_nesting, copy_object, {':'}, {1});
 
@@ -2043,6 +2153,7 @@ void TuringTools::write_function_header(IncompleteSet &a, const vector<int>&tupl
     //and stack is at emd
     go_to(write_function_header, {stack_symbol}, stack_tape, -1, {(int) stack_tape});
     move(write_function_header, {(int) stack_tape}, 1);
+
     IncompleteSet set_specifier{"set_specifier_"+ to_string(counter), "set_specifier_"+ to_string(counter)};
     counter++;
     go_to(set_specifier, {'\u0000'}, stack_tape, 1, {(int) stack_tape});
@@ -2059,17 +2170,18 @@ void TuringTools::write_function_header(IncompleteSet &a, const vector<int>&tupl
     set_heap_mode(find_class_loop, false);
     set_heap_mode(find_class_loop, true);
 
-    go_to(find_class_loop, {'A', 'T'}, 0, -1, {0,1});
-    write_on(find_class_loop, {'T'}, {0}, {'\u0000'}, {0});
+    go_to(find_class_loop, {'A', 'Q'}, 0, -1, {0,1});
+    write_on(find_class_loop, {'Q'}, {0}, {'\u0000'}, {0});
 
-    go_to(find_class_loop, {'{'}, 1, 1, {0,1});
+    go_to_multiple(find_class_loop, {{'S'},{'{'}}, {0, 1}, 1, {0,1});
     move(find_class_loop, {0,1}, 1);
-    write_on(find_class_loop, {'\u0000'}, {0}, {'T'}, {0});
+    string no_class = branch_on(find_class_loop, {'S'}, {0});
+    string no_class2 = branch_on(find_class_loop, {'A'}, {0});
+    write_on(find_class_loop, {'\u0000'}, {0}, {'Q'}, {0});
     go_to(find_class_loop, {'A'}, 0, -1, {0,1});
-    find_match_heap(find_class_loop, 'A', 'T', 0, 1);
+    find_match_heap(find_class_loop, 'A', 'Q', 0, 1);
 
-    //TODO: test loop more
-    make_loop_on(find_class_loop, '\u0000', stack_tape);
+    //make_loop_on(find_class_loop, '\u0000', stack_tape);
 
     go_to(find_class_loop, {':'}, stack_tape, 1, {(int) stack_tape});
 
@@ -2086,10 +2198,23 @@ void TuringTools::write_function_header(IncompleteSet &a, const vector<int>&tupl
     link_put(copy_to_working_stack, {':'}, {1});
     move(copy_to_working_stack, {0,1}, 1);
 
+    string end_copy = copy_to_working_stack.to_state;
+    copy_to_working_stack.to_state = "never_reached_" + to_string(counter-1);
+
     link_on_sequence(find_class_loop, copy_to_working_stack, {'s', 's', 'a', 'l', 'c'}, stack_tape);
-    link_on_sequence(find_class_loop, copy_to_working_stack, {'s', 's', 'a', 'l', 'c', '\n'}, stack_tape);
+
+    make_loop(find_class_loop);
+    find_class_loop.to_state = end_copy;
+
 
     link(set_specifier, find_class_loop);
+
+    //link no class found to here
+    IncompleteTransition no_class_found;
+    no_class_found.state = no_class;
+    no_class_found.to_state = set_specifier.to_state;
+    no_class_found.def_move = 0;
+    set_specifier.transitions.push_back(no_class_found);
 
     //cleanup
     set_heap_mode(set_specifier, false);
@@ -2098,8 +2223,13 @@ void TuringTools::write_function_header(IncompleteSet &a, const vector<int>&tupl
     go_to_clear(set_specifier, {'A'}, 0, -1, {0,1}, {0});
     go_to(set_specifier, {'\u0000'}, 1, 1, {0,1});
 
+    link(write_function_header, set_specifier);
 
-    link_on(write_function_header, set_specifier, {'O'}, {(int) stack_tape});
+    IncompleteSet breaker{"breaker", "breaker2"};
+    //link(write_function_header, breaker);
+
+
+    //link_on(write_function_header, set_specifier, {'O'}, {(int) stack_tape});
 
     move(write_function_header, {(int) stack_tape}, -1);
     go_to(write_function_header, {'\u0000'}, stack_tape, 1, {(int) stack_tape});

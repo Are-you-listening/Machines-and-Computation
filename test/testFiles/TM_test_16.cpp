@@ -1,5 +1,5 @@
 class Base{
-    int test(int a){
+    Base(int a){
         if (true){
             if(true){
                 if(true){

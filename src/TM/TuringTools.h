@@ -52,6 +52,8 @@ public:
                      const vector<int>& cleared);
     void go_to_copy(IncompleteSet& a, const vector<char>& symbol, int tape_index, int direction, const vector<int>& affected,
                     int copy_to_tape, int copy_to_direction, const vector<int>& copy_affected);
+    void go_to_copy_multiple(IncompleteSet& a, const vector<vector<char>>& symbol, const vector<int>& tape_index, int direction, const vector<int>& affected,
+                             int copy_to_tape, int copy_to_direction, const vector<int>& copy_affected, int index);
     void go_to_move(IncompleteSet& a, const vector<char>& symbol, int tape_index, int direction, const vector<int>& affected,
                     int copy_to_tape, int copy_to_direction, const vector<int>& copy_affected);
 
