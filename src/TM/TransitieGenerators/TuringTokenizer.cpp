@@ -204,7 +204,7 @@ IncompleteSet TuringTokenizer::tokenize_runner_productions() {
 
             if (is_less_symbol){
                 IncompleteSet less_symbol_pusher("tokenize_less_symbol"+ to_string(i), "tokenize_less_symbol"+ to_string(i));
-                //tools->push_on_sequence(less_symbol_pusher, {'t','e','m','p','l', 'a', 't', 'e', '<'}, 1, 'T');
+                tools->push_on_sequence(less_symbol_pusher, {'t','e','m','p','l', 'a', 't', 'e', '<'}, 1, 'T');
 
                 trans_prod.to_state = less_symbol_pusher.state;
 

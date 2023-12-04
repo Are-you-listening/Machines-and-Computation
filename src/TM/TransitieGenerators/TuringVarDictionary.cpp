@@ -16,7 +16,7 @@ IncompleteSet TuringVarDictionary::storeVar() {
     //TODO: functions with paramerters supporter in heap storage
     IncompleteSet result("store_var_start", "store_var_start");
     //tools->heap_push_function(result, get_tuple_index());
-    tools->go_to(result, {'C', 'U', 'O', '\u0000', '}', '{', 'O', 'D', ')', '('}, get_tuple_index()[1], 1, {get_tuple_index()});
+    tools->go_to(result, {'C', 'U', 'O', '\u0000', '}', '{', 'O', 'D', ')', '(', 'T'}, get_tuple_index()[1], 1, {get_tuple_index()});
     string branch = tools->branch_on(result, {'\u0000'}, {get_tuple_index()[1]});
 
     IncompleteSet store_call{"vardict_store_call",  "vardict_store_call"};
@@ -25,7 +25,7 @@ IncompleteSet TuringVarDictionary::storeVar() {
 
     IncompleteSet store_call_2{"vardict_store_call_2",  "vardict_store_call_2"};
     store_defined(store_call_2);
-    tools->link_on_multiple(result, store_call_2, {{'D'}}, {get_tuple_index()[1]});
+    tools->link_on_multiple(result, store_call_2, {{'D'}, {'T'}}, {get_tuple_index()[1]});
 
     IncompleteSet remove_nest{"vardict_remove_nesting", "vardict_remove_nesting"};
     tools->remove_nesting_working(remove_nest);
@@ -175,7 +175,7 @@ void TuringVarDictionary::store_defined(IncompleteSet &a) {
 
     tools->link_on(added, store_on_heap, {'E'}, {tuple_index[0]});
 
-    tools->link_on_multiple(a, added, {{'D'}}, {tuple_index[1]});
+    tools->link_on_multiple(a, added, {{'D'}, {'T'}}, {tuple_index[1]});
 
 }
 

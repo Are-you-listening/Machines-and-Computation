@@ -90,7 +90,7 @@ public:
     static void reset();
 
     //this needs to become private in future
-    void find_match_heap(IncompleteSet& a, char start_marker, char end_marker, int marker_tape, int data_tape);
+    void find_match_heap(IncompleteSet& a, char start_marker, char end_marker, int marker_tape, int data_tape, bool search_template=false);
     void find_match_heap_traverse(IncompleteSet& a, char start_marker, char end_marker, int marker_tape, int data_tape);
 
     //still needs to become private in future

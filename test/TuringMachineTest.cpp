@@ -212,6 +212,10 @@ TEST(TuringMachineTest, TM_tokenazation) {
 
     cout << endl;
     cout << "halted time " << halted_time << endl;
+
+    ofstream out{"../test/results/TM_test_"+ to_string(14)+".cpp"};
+    out << tm.exportTapeData(1);
+    out.close();
 }
 
 TEST(TuringMachineTest, TM_builder) {

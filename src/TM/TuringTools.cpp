@@ -883,7 +883,6 @@ void TuringTools::heap_push_definer(IncompleteSet& a, const vector<int>&tuple_in
     //string object_break = branch_on(object_hierarchy, {'O'}, {tuple_indexes[1]});
     link_on(push_heap_action, object_hierarchy, {'O'}, {tuple_indexes[1]});
 
-
     //go to heap mode
     set_heap_mode(push_heap_action, true);
 
@@ -1167,7 +1166,7 @@ void TuringTools::make_loop_on_sequence(IncompleteSet &a, const vector<char> &in
 
 }
 
-void TuringTools::find_match_heap(IncompleteSet &a, char start_marker, char end_marker, int marker_tape, int data_tape) {
+void TuringTools::find_match_heap(IncompleteSet &a, char start_marker, char end_marker, int marker_tape, int data_tape, bool search_template) {
     //precondition: in heap mode
     if (!heap_mode){
         throw "not in heap mode";
@@ -1217,8 +1216,23 @@ void TuringTools::find_match_heap(IncompleteSet &a, char start_marker, char end_
     link(searcher, check_match);
     move(searcher, {marker_tape, data_tape}, 1);
 
-
+    //branch on found
     string branch = branch_on(searcher, {end_marker}, {marker_tape});
+
+    //check if current not found is a template
+    if (search_template){
+        go_to(searcher, {':'}, stack_tape, -1, {(int) stack_tape});
+        IncompleteSet found_template{"found_template_"+ to_string(counter), "found_template_"+ to_string(counter)};
+        counter++;
+
+        IncompleteTransition to_end;
+        to_end.state = found_template.to_state;
+        to_end.to_state = branch;
+        to_end.def_move = 0;
+        add(found_template, to_end);
+
+        link_on_sequence(searcher, found_template, {'e','t','a','l','p','m','e','t'}, stack_tape);
+    }
 
     //on not found
     string end_tape = branch_on(searcher, {'\u0000'}, {(int) stack_tape});
@@ -1979,14 +1993,50 @@ void TuringTools::write_function_header(IncompleteSet &a, const vector<int>&tupl
     write_on(write_function_header, {'E'}, {0}, {'\u0000'}, {0});
     go_to(write_function_header, {'S'}, 0, -1, {0,1});
 
+    //check for templates on the path
+    //also copy template if found
+    go_to(write_function_header, {'A'}, 0, -1, {0,1});
+    set_heap_mode(write_function_header, true);
+
+    find_match_heap(write_function_header, 'A', 'S', 0, 1, true);
+    IncompleteSet found_template{"found_template_action_"+ to_string(counter), "found_template_action_"+ to_string(counter)};
+    counter++;
+    go_to(found_template, {'S'}, 0, 1, {0,1});
+
+    go_to(found_template, {'#'}, stack_tape, 1, {(int) stack_tape});
+    go_to(found_template, {':'}, stack_tape, 1, {(int) stack_tape});
+    move(found_template, {(int) stack_tape}, -1);
+    go_to_copy(found_template, {'#'}, stack_tape, -1, {(int) stack_tape}, 1, 1, {0,1});
+
+    link_put(found_template, {' '}, {1});
+    move(found_template, {0,1}, 1);
+
+    go_to(found_template, {':'}, stack_tape, 1, {(int) stack_tape});
+    go_to(found_template, {'#'}, stack_tape, 1, {(int) stack_tape});
+    move(found_template, {(int) stack_tape}, -1);
+    go_to_copy(found_template, {':'}, stack_tape, -1, {(int) stack_tape}, 1, 1, {0,1});
+    //add endsymbols after template
+    string template_end = "> ";
+    for (char v: template_end){
+        link_put(found_template, {v}, {1});
+        move(found_template, {0,1}, 1);
+    }
+
+    link_put(found_template, {'T'}, {0});
+
+    go_to(found_template, {'A'}, 0, -1, {0,1});
+
+    link_on_not(write_function_header, found_template, {'}'}, {(int) stack_tape});
+
+    set_heap_mode(write_function_header, false);
+    go_to(write_function_header, {'\u0000'}, 1, 1, {0,1});
+
     //add 'void ' on working tape
     string void_word = "void ";
     for (char v: void_word){
         link_put(write_function_header, {v}, {1});
         move(write_function_header, {0,1}, 1);
     }
-
-
 
     //add class specifier if needed
     //add start working tape is at end of function
@@ -2065,25 +2115,44 @@ void TuringTools::write_function_header(IncompleteSet &a, const vector<int>&tupl
     write_on(write_function_header, {'\u0000'}, {0}, {'E'}, {0});
     go_to(write_function_header, {'S'}, 0, -1, {0,1});
 
+
+    //make extra token if template
+    //check first if template present
+    go_to(write_function_header, {'T', 'E'}, 0, 1, {0,1});
+
+    IncompleteSet seperate_template_token{"seperate_template_token_"+ to_string(counter), "seperate_template_token_"+ to_string(counter)};
+    counter++;
+    //need to store last '>' as seperator
+    move(seperate_template_token, {0,1}, -2);
+
+    link_put(seperate_template_token, {'E'}, {0});
+    go_to(seperate_template_token, {'S'}, 0, -1, {0,1});
+    make_token(seperate_template_token, tuple_indexes, 'T');
+    go_to(seperate_template_token, {'E'}, 0, 1, {0,1});
+
+    //stores last '>' as seperator
+    write_on(seperate_template_token, {'E'}, {0}, {'T'}, {0});
+    move(seperate_template_token, {0,1}, 1);
+    link_put(seperate_template_token, {'E'}, {0});
+    move(seperate_template_token, {0,1}, -1);
+    make_token(seperate_template_token, tuple_indexes, 'S');
+    go_to(seperate_template_token, {'E'}, 0, 1, {0,1});
+    write_on(seperate_template_token, {'E'}, {0}, {'T'}, {0});
+
+    link_on(write_function_header, seperate_template_token, {'T'}, {0});
+
+    //go to S if no template
+    //else go to T
+    go_to(write_function_header, {'S', 'T'}, 0, -1, {0,1});
+
     //make function caller token
     make_token(write_function_header, tuple_indexes, 'U', 'C');
-
-
-    //check if it is an object, if so at the end add a token with the function definition to put later in the class
-    /*
-    go_to_multiple(write_function_header, {{'S'}, {':'}}, {0, 1}, -1, {0,1});
-
-    IncompleteSet store_obj_definer{"store_obj_definer_"+ to_string(counter), "store_obj_definer_"+ to_string(counter)};
-    move(store_obj_definer, {0,1}, 1);
-    make_token(store_obj_definer, tuple_indexes, 'U', 'O');
-    link_on(write_function_header, store_obj_definer, {':'}, {1});
-    go_to(write_function_header, {'E'}, 0, 1, {0,1});
-    */
 
     //clear first working tape
     go_to_clear(write_function_header, {'S'}, 0, -1, {0,1}, {0,1});
     link_put(write_function_header, {'\u0000'}, {1});
     push(write_function_header, '.');
+
 
     //store all parameters on stack
     go_to(write_function_header, {'N'}, tuple_indexes[0], -1, tuple_indexes);
