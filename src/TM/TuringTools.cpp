@@ -2142,7 +2142,7 @@ void TuringTools::write_function_header(IncompleteSet &a, const vector<int>&tupl
     go_to(write_function_header, {'\u0000'}, 1, 1, {0,1});
 
     //add 'void ' on working tape
-    string void_word = "void ";
+    string void_word = "\nvoid ";
     for (char v: void_word){
         link_put(write_function_header, {v}, {1});
         move(write_function_header, {0,1}, 1);
