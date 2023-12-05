@@ -39,13 +39,15 @@ TMBuilder_output TMBuilder::generateTM() {
 
     tools->link(program, tokenize_program);
 
+    IncompleteSet breaker{"breaker", "breaker2"};
+    //tools->link(program, breaker);
+
     TuringVarDictionary vardict{};
 
     IncompleteSet vardict_set = vardict.getTransitions();
     tools->link(program, vardict_set);
 
-    IncompleteSet breaker{"breaker", "breaker2"};
-    //tools->link(program, breaker);
+
 
     TuringDenestify denest{2, 4};
 

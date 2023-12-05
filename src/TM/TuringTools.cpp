@@ -34,6 +34,7 @@ TuringTools::TuringTools(unsigned int stack_tape) {
     branch_counter = 0;
     stack_symbol = '-';
     this->stack_tape = stack_tape;
+    nesting_tokens = {'F', '0', '1', '2'};
 }
 
 TuringTools* TuringTools::getInstance(unsigned int stack_tape) {
@@ -1853,7 +1854,9 @@ void TuringTools::mark_definer(IncompleteSet &a, const vector<int> &tuple_indexe
     write_on(working_nesting, {'S'}, {tuple_indexes[0]}, {'E'}, {tuple_indexes[0]});
 
     move(working_nesting, tuple_indexes, -1);
-    go_to(working_nesting, {'O','C','U','F','I'}, tuple_indexes[1], -1, tuple_indexes);
+    std::vector<char> declares = {'O','C','U','I'};
+    declares.insert(declares.end(), nesting_tokens.begin(), nesting_tokens.end());
+    go_to(working_nesting, declares, tuple_indexes[1], -1, tuple_indexes);
 
     write_on(working_nesting, {'\u0000'}, {tuple_indexes[0]}, {'S'}, {tuple_indexes[0]});
     write_on(working_nesting, {'E'}, {tuple_indexes[0]}, {'S'}, {tuple_indexes[0]});

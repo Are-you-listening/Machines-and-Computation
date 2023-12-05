@@ -18,5 +18,6 @@ TuringGenerator::TuringGenerator(int tuple_size): tuple_size{tuple_size} {
     seperators = {'=', ';', '{', '}', ')', '(', '\u0000', ':', '+', '>'};
     special_sep = {'{', '}', ':', '(', ')'};
     stack_symbol = '-';
+    nesting_tokens = {'F'};
 
 }

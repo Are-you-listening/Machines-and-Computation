@@ -18,6 +18,7 @@ protected:
     vector<char> seperators;
     vector<char> special_sep;
     char stack_symbol;
+    vector<char> nesting_tokens;
 
     vector<int> get_tuple_index();
 };
