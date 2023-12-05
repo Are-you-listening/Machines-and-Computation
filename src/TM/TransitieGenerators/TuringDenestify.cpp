@@ -344,10 +344,19 @@ void TuringDenestify::storeObjectDefinition(IncompleteSet &a) {
     tools->go_to_clear(store_object, {'B'}, 0, -1, {0,1}, {0,1});
     tools->link_put(store_object, {'\u0000',' '}, {0, 1});
     tools->move(store_object, {0,1}, 1);
+
     tools->go_to(store_object, {'.'}, tapes-1, -1, {(int) tapes-1});
+    tools->move(store_object, {0,1}, -1);
+    tools->move(store_object, {(int) tapes-1}, 1);
+    tools->go_to(store_object, {'\u0000'}, tapes-1, 1, {0, 1, (int) tapes-1});
+    tools->go_to(store_object, {'.'}, tapes-1, -1, {(int) tapes-1});
+
     tools->move(store_object, {(int) tapes-1}, 1);
 
     tools->go_to_move(store_object, {'\u0000'}, tapes-1, 1, {(int) tapes-1}, 1, -1, {0, 1});
+    tools->go_to(store_object, {'\u0000'}, 1, 1, {0,1});
+    tools->move(store_object, {0,1}, -2);
+
     tools->go_to(store_object, {'.'}, tapes-1, -1, {(int) tapes-1});
     tools->link_put(store_object, {'\u0000'}, {(int) tapes-1});
 
