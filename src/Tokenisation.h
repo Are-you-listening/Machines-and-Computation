@@ -9,6 +9,7 @@
 #include <string>
 #include <fstream>
 #include <set>
+#include <tuple>
 
 class Tokenisation {
 private:
@@ -18,7 +19,7 @@ private:
      * if you encounter other symbols those are initializations of variables or uses.
      */
     std::vector<std::pair<std::string, std::string>> tokenVector;
-
+    std::vector<std::tuple<std::string, std::string, std::set<std::string>>> tokenTupleVector;
 public:
     /**
      * Default Constructor
@@ -35,7 +36,8 @@ public:
      * Simple Getter
      * @return 
      */
-    const std::vector<std::pair<std::string, std::string>> &getTokenVector() const;
+
+    [[nodiscard]] const std::vector<std::tuple<std::string, std::string, std::set<std::string>>> &getTokenVector() const;
 };
 
 #endif //TOG_TOKENISATION_H

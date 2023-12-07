@@ -75,12 +75,12 @@ int main() { // Function names we create to replace nesting should have F or I i
     LALR lalr(a);
     lalr.createTable();
     
-    //Tokenizer.join();
+    Tokenizer.join();
     core_amount++;
     
     //create LARL parser with tokenvector
     auto vec = tokenVector.getTokenVector();
-    lalr.parse(vec);
+    //lalr.parse(vec); this should be changed to new vector
     //cleanup
     //if-else antinesting
     //move
