@@ -213,7 +213,7 @@ void CFG::toCNF(){
     sort(P);
 
     //comment made by Tibo
-    //na epsilon elim blijven er nog de volgende tranisties over B -> ''
+    //na epsilon eliminatie blijven er nog de volgende transities over B ->''
     //dit komt doordat nullable variables weggehaald worden en er geen extra check is
     std::vector<std::pair<std::string, std::vector<std::string>>> new_P;
     for (auto& prod: P){
@@ -826,7 +826,7 @@ void CFG::toGNF() { // I used the algorithm described by https://www.geeksforgee
     }
     */
     
-    //step 3, I replace A3 also, on the website this isn't done for some reason. A4 → b | A2A3A4 | A4A4A4
+    //Step 3, I replace A3 also, on the website this isn't done for some reason. A4 → b | A2A3A4 | A4A4A4
     std::cout << "step 3" <<std::endl;
     for(unsigned long int ordern=1; ordern<=V.size();ordern++){
         for(unsigned long int m=0; m<P.size(); m++){ //Step 3.1 , replace j>i
@@ -841,7 +841,7 @@ void CFG::toGNF() { // I used the algorithm described by https://www.geeksforgee
                 }
                 unsigned long int j=stoi((*it).substr(1, std::string::npos));
                 unsigned long int j1=stoi(P[m].second[0].substr(1, std::string::npos));
-                if(i>j&&i==ordern){ // A4 -> A1A4 , replace A1 met alle rules of A1
+                if(i>j&&i==ordern){ // A4 -> A1A4, replace A1 met alle rules of A1
                     //Find rules of A1
                     vector<vector<string>> RHS; //{ {"A2","A3"} , {A4,A4} }
                     for(const auto &rule :P){
@@ -854,10 +854,10 @@ void CFG::toGNF() { // I used the algorithm described by https://www.geeksforgee
                             for(const auto & it2: rule.second){ //Add RHS in between
                                 firsthalf.push_back(it2);
                             }
-                            for(const auto & it2: secondhalf){ //Add secondhalf
+                            for(const auto & it2: secondhalf){ //Add second half
                                 firsthalf.push_back(it2);
                             }
-                            RHS.push_back(firsthalf); //Firshalf is now complete, add it to RHS
+                            RHS.push_back(firsthalf); //First half is now complete, add it to RHS
                         }
                     }
                     //Replace A1 met RHS

@@ -84,16 +84,40 @@ public:
      */
     set<string> First(const string& input);
 
+    /**
+     * Simple getter
+     * @return
+     */
     const vector<std::string> &getV() const;
 
+    /**
+     * Simple getter
+     * @return
+     */
     const vector<std::string> &getT() const;
 
+    /**
+     * Simple setter
+     * @param t
+     */
     void setT(const vector<std::string> &t);
 
+    /**
+     * Simple getter
+     * @return
+     */
     const vector<std::pair<std::string, std::vector<std::string>>> &getP() const;
 
+    /**
+     * Simple getter
+     * @return
+     */
     const string &getS() const;
-    
+
+    /**
+     * Simple setter
+     * @param cnf
+     */
     void setCnf(bool cnf);
 };
 
