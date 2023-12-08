@@ -48,7 +48,7 @@ public:
     parseTree();
     parseTree( vector<parseTree *> children,  string symbol);
 
-    void traverse(const std::vector<std::string> &T , parseTree* _root);
+    void traverse(const std::vector<std::string> &T , parseTree* _root, bool &V_root);
 };
 
 /*
