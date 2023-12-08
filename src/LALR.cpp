@@ -390,7 +390,7 @@ void LALR::parse(std::vector<std::tuple<std::string, std::string, std::set<std::
         }
         string operation = parseTable[stacksymbol][inputsymbol];
 
-        //cout << "stacksymbol: " << stacksymbol << ", inputsymbol: " << inputsymbol << " --> " << operation << endl;
+        cout << "stacksymbol: " << stacksymbol << ", inputsymbol: " << inputsymbol << " --> " << operation << endl;
 
         if (operation == "accept"){
             break;
@@ -439,7 +439,6 @@ void LALR::parse(std::vector<std::tuple<std::string, std::string, std::set<std::
                 }
                 s.pop();
             }
-            treetops.push_back(newparent);
         } else {
             s.push(stoi(operation));
         }
@@ -469,10 +468,6 @@ parseTree::~parseTree() {
 void parseTree::traverse(const std::vector<std::string> &T, parseTree* _root, bool &V_root) {
     bool V = false;
 
-    if(this->symbol=="{" || this->symbol=="}"){
-        return;
-    }
-
     for(long unsigned int i = 0;  i<children.size(); ++i){
         auto child = children[i];
         if(child->symbol=="{" || child->symbol=="}"){ //Stop cleanup if bracket reach; we may not modify this
@@ -481,7 +476,7 @@ void parseTree::traverse(const std::vector<std::string> &T, parseTree* _root, bo
             V = true;
             child->traverse(T,this,V); //Traverse the child
             //Reloop
-            if(!V){
+            if(!V){ //Reloop incase the child made a change
                 i = -1;
             }
         }
@@ -489,7 +484,7 @@ void parseTree::traverse(const std::vector<std::string> &T, parseTree* _root, bo
 
     std::vector<parseTree*> temp;
     if(!V){ //No Variables found: Cleanup this one
-        for(auto &it: _root->children){
+        for(auto &it: _root->children){ //Collect the "new children"
             if(it==this){
                 for(auto &k: this->children){ //Add children of this
                     temp.push_back(k);
@@ -498,10 +493,10 @@ void parseTree::traverse(const std::vector<std::string> &T, parseTree* _root, bo
                 temp.push_back(it);
             }
         }
-        V_root = false;
-        _root->children=temp;
-        this->children.clear();
-        delete this;
+        V_root = false; //Signal a change
+        _root->children=temp; //Replace new children
+        this->children.clear(); //Clear old one
+        delete this; //Delete old one
     }
 }
 
