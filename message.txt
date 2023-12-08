@@ -1,0 +1,457 @@
+S' -> A1
+A4 -> C
+   A4 -> D
+   A4 -> E
+   A4 -> F
+   A4 -> I
+   A4 -> C A4
+   A4 -> V
+   A4 -> e
+   A2 -> C
+   A2 -> D
+   A2 -> E
+   A2 -> F
+   A2 -> I
+   A2 -> V
+   A2 -> e
+   A8 -> C
+   A8 -> D
+   A8 -> E
+   A8 -> F
+   A8 -> I
+   A8 -> C A4
+   A8 -> V
+   A8 -> { A9
+   A8 -> { A7
+   A8 -> e
+   A9 -> }
+   A10 -> C
+   A10 -> D
+   A10 -> E
+   A10 -> F
+   A10 -> I
+   A10 -> C A4
+   A10 -> V
+   A10 -> { A11
+   A10 -> { A7
+   A10 -> e
+   A11 -> C A7
+   A1 -> C
+   A1 -> D
+   A1 -> E
+   A1 -> F
+   A1 -> I
+   A1 -> V
+   A1 -> e
+   A12 -> C A7
+   A3 -> C
+   A3 -> D
+   A3 -> E
+   A3 -> F
+   A3 -> I
+   A3 -> V
+   A3 -> e
+   A5 -> {
+   A7 -> }
+   A2 -> C Z
+   A2 -> D Z
+   A2 -> E Z
+   A2 -> F Z
+   A2 -> I Z
+   A2 -> V Z
+   A2 -> e Z
+   A4 -> D A4
+   A4 -> E A4
+   A4 -> F A4
+   A4 -> I A4
+   A4 -> V A4
+   A4 -> e A4
+   A8 -> C Z
+   A8 -> D Z
+   A8 -> E Z
+   A8 -> F Z
+   A8 -> I Z
+   A8 -> C A4 Z
+   A8 -> V Z
+   A8 -> { A9 Z
+   A8 -> { A7 Z
+   A8 -> e Z
+   A8 -> D A4
+   A8 -> E A4
+   A8 -> F A4
+   A8 -> I A4
+   A8 -> V A4
+   A8 -> e A4
+   A8 -> D A4 Z
+   A8 -> E A4 Z
+   A8 -> F A4 Z
+   A8 -> I A4 Z
+   A8 -> V A4 Z
+   A8 -> e A4 Z
+   A10 -> C Z
+   A10 -> D Z
+   A10 -> E Z
+   A10 -> F Z
+   A10 -> I Z
+   A10 -> C A4 Z
+   A10 -> V Z
+   A10 -> { A11 Z
+   A10 -> { A7 Z
+   A10 -> e Z
+   A10 -> D A4
+   A10 -> E A4
+   A10 -> F A4
+   A10 -> I A4
+   A10 -> V A4
+   A10 -> e A4
+   A10 -> D A4 Z
+   A10 -> E A4 Z
+   A10 -> F A4 Z
+   A10 -> I A4 Z
+   A10 -> V A4 Z
+   A10 -> e A4 Z
+   A11 -> D A7
+   A11 -> E A7
+   A11 -> F A7
+   A11 -> I A7
+   A11 -> C A4 A7
+   A11 -> V A7
+   A11 -> { A9 A7
+   A11 -> { A7 A7
+   A11 -> e A7
+   A11 -> C Z A7
+   A11 -> D Z A7
+   A11 -> E Z A7
+   A11 -> F Z A7
+   A11 -> I Z A7
+   A11 -> C A4 Z A7
+   A11 -> V Z A7
+   A11 -> { A9 Z A7
+   A11 -> { A7 Z A7
+   A11 -> e Z A7
+   A11 -> D A4 A7
+   A11 -> E A4 A7
+   A11 -> F A4 A7
+   A11 -> I A4 A7
+   A11 -> V A4 A7
+   A11 -> e A4 A7
+   A11 -> D A4 Z A7
+   A11 -> E A4 Z A7
+   A11 -> F A4 Z A7
+   A11 -> I A4 Z A7
+   A11 -> V A4 Z A7
+   A11 -> e A4 Z A7
+   A12 -> D A7
+   A12 -> E A7
+   A12 -> F A7
+   A12 -> I A7
+   A12 -> C A4 A7
+   A12 -> V A7
+   A12 -> { A9 A7
+   A12 -> { A7 A7
+   A12 -> e A7
+   A12 -> C Z A7
+   A12 -> D Z A7
+   A12 -> E Z A7
+   A12 -> F Z A7
+   A12 -> I Z A7
+   A12 -> C A4 Z A7
+   A12 -> V Z A7
+   A12 -> { A9 Z A7
+   A12 -> { A7 Z A7
+   A12 -> e Z A7
+   A12 -> D A4 A7
+   A12 -> E A4 A7
+   A12 -> F A4 A7
+   A12 -> I A4 A7
+   A12 -> V A4 A7
+   A12 -> e A4 A7
+   A12 -> D A4 Z A7
+   A12 -> E A4 Z A7
+   A12 -> F A4 Z A7
+   A12 -> I A4 Z A7
+   A12 -> V A4 Z A7
+   A12 -> e A4 Z A7
+   A2 -> C A4
+   A2 -> D A4
+   A2 -> E A4
+   A2 -> F A4
+   A2 -> I A4
+   A2 -> V A4
+   A2 -> e A4
+   A2 -> { A6
+   A2 -> { A7
+   A6 -> C A7
+   A6 -> D A7
+   A6 -> E A7
+   A6 -> F A7
+   A6 -> I A7
+   A6 -> C A4 A7
+   A6 -> V A7
+   A6 -> { A9 A7
+   A6 -> { A7 A7
+   A6 -> e A7
+   A6 -> C Z A7
+   A6 -> D Z A7
+   A6 -> E Z A7
+   A6 -> F Z A7
+   A6 -> I Z A7
+   A6 -> C A4 Z A7
+   A6 -> V Z A7
+   A6 -> { A9 Z A7
+   A6 -> { A7 Z A7
+   A6 -> e Z A7
+   A6 -> D A4 A7
+   A6 -> E A4 A7
+   A6 -> F A4 A7
+   A6 -> I A4 A7
+   A6 -> V A4 A7
+   A6 -> e A4 A7
+   A6 -> D A4 Z A7
+   A6 -> E A4 Z A7
+   A6 -> F A4 Z A7
+   A6 -> I A4 Z A7
+   A6 -> V A4 Z A7
+   A6 -> e A4 Z A7
+   A1 -> C A2
+   A1 -> D A2
+   A1 -> E A2
+   A1 -> F A2
+   A1 -> I A2
+   A1 -> V A2
+   A1 -> e A2
+   A1 -> C Z A2
+   A1 -> D Z A2
+   A1 -> E Z A2
+   A1 -> F Z A2
+   A1 -> I Z A2
+   A1 -> V Z A2
+   A1 -> e Z A2
+   A1 -> C A4 A2
+   A1 -> D A4 A2
+   A1 -> E A4 A2
+   A1 -> F A4 A2
+   A1 -> I A4 A2
+   A1 -> V A4 A2
+   A1 -> e A4 A2
+   A1 -> { A6 A2
+   A1 -> { A7 A2
+   A1 -> C A4
+   A1 -> D A4
+   A1 -> E A4
+   A1 -> F A4
+   A1 -> I A4
+   A1 -> V A4
+   A1 -> e A4
+   A1 -> { A12
+   A1 -> { A7
+   Z -> C
+   Z -> D
+   Z -> E
+   Z -> F
+   Z -> I
+   Z -> V
+   Z -> e
+   Z -> C Z
+   Z -> D Z
+   Z -> E Z
+   Z -> F Z
+   Z -> I Z
+   Z -> V Z
+   Z -> e Z
+   Z -> C A4
+   Z -> D A4
+   Z -> E A4
+   Z -> F A4
+   Z -> I A4
+   Z -> V A4
+   Z -> e A4
+   Z -> { A6
+   Z -> { A7
+   Z -> C Z
+   Z -> D Z
+   Z -> E Z
+   Z -> F Z
+   Z -> I Z
+   Z -> V Z
+   Z -> e Z
+   Z -> C Z Z
+   Z -> D Z Z
+   Z -> E Z Z
+   Z -> F Z Z
+   Z -> I Z Z
+   Z -> V Z Z
+   Z -> e Z Z
+   Z -> C A4 Z
+   Z -> D A4 Z
+   Z -> E A4 Z
+   Z -> F A4 Z
+   Z -> I A4 Z
+   Z -> V A4 Z
+   Z -> e A4 Z
+   Z -> { A6 Z
+   Z -> { A7 Z
+   A2 -> C A4 Z
+   A2 -> D A4 Z
+   A2 -> E A4 Z
+   A2 -> F A4 Z
+   A2 -> I A4 Z
+   A2 -> V A4 Z
+   A2 -> e A4 Z
+   A2 -> { A6 Z
+   A2 -> { A7 Z
+   Z -> C
+   Z -> D
+   Z -> E
+   Z -> F
+   Z -> I
+   Z -> C A4
+   Z -> V
+   Z -> { A9
+   Z -> { A7
+   Z -> e
+   Z -> C Z
+   Z -> D Z
+   Z -> E Z
+   Z -> F Z
+   Z -> I Z
+   Z -> C A4 Z
+   Z -> V Z
+   Z -> { A9 Z
+   Z -> { A7 Z
+   Z -> e Z
+   Z -> D A4
+   Z -> E A4
+   Z -> F A4
+   Z -> I A4
+   Z -> V A4
+   Z -> e A4
+   Z -> D A4 Z
+   Z -> E A4 Z
+   Z -> F A4 Z
+   Z -> I A4 Z
+   Z -> V A4 Z
+   Z -> e A4 Z
+   Z -> C Z
+   Z -> D Z
+   Z -> E Z
+   Z -> F Z
+   Z -> I Z
+   Z -> C A4 Z
+   Z -> V Z
+   Z -> { A9 Z
+   Z -> { A7 Z
+   Z -> e Z
+   Z -> C Z Z
+   Z -> D Z Z
+   Z -> E Z Z
+   Z -> F Z Z
+   Z -> I Z Z
+   Z -> C A4 Z Z
+   Z -> V Z Z
+   Z -> { A9 Z Z
+   Z -> { A7 Z Z
+   Z -> e Z Z
+   Z -> D A4 Z
+   Z -> E A4 Z
+   Z -> F A4 Z
+   Z -> I A4 Z
+   Z -> V A4 Z
+   Z -> e A4 Z
+   Z -> D A4 Z Z
+   Z -> E A4 Z Z
+   Z -> F A4 Z Z
+   Z -> I A4 Z Z
+   Z -> V A4 Z Z
+   Z -> e A4 Z Z
+   Z -> C
+   Z -> D
+   Z -> E
+   Z -> F
+   Z -> I
+   Z -> C A4
+   Z -> V
+   Z -> { A11
+   Z -> { A7
+   Z -> e
+   Z -> C Z
+   Z -> D Z
+   Z -> E Z
+   Z -> F Z
+   Z -> I Z
+   Z -> C A4 Z
+   Z -> V Z
+   Z -> { A11 Z
+   Z -> { A7 Z
+   Z -> e Z
+   Z -> D A4
+   Z -> E A4
+   Z -> F A4
+   Z -> I A4
+   Z -> V A4
+   Z -> e A4
+   Z -> D A4 Z
+   Z -> E A4 Z
+   Z -> F A4 Z
+   Z -> I A4 Z
+   Z -> V A4 Z
+   Z -> e A4 Z
+   Z -> C Z
+   Z -> D Z
+   Z -> E Z
+   Z -> F Z
+   Z -> I Z
+   Z -> C A4 Z
+   Z -> V Z
+   Z -> { A11 Z
+   Z -> { A7 Z
+   Z -> e Z
+   Z -> C Z Z
+   Z -> D Z Z
+   Z -> E Z Z
+   Z -> F Z Z
+   Z -> I Z Z
+   Z -> C A4 Z Z
+   Z -> V Z Z
+   Z -> { A11 Z Z
+   Z -> { A7 Z Z
+   Z -> e Z Z
+   Z -> D A4 Z
+   Z -> E A4 Z
+   Z -> F A4 Z
+   Z -> I A4 Z
+   Z -> V A4 Z
+   Z -> e A4 Z
+   Z -> D A4 Z Z
+   Z -> E A4 Z Z
+   Z -> F A4 Z Z
+   Z -> I A4 Z Z
+   Z -> V A4 Z Z
+   Z -> e A4 Z Z
+   A1 -> C A4 Z A2
+   A1 -> D A4 Z A2
+   A1 -> E A4 Z A2
+   A1 -> F A4 Z A2
+   A1 -> I A4 Z A2
+   A1 -> V A4 Z A2
+   A1 -> e A4 Z A2
+   A1 -> { A6 Z A2
+   A1 -> { A7 Z A2
+   Z -> C A4 Z
+   Z -> D A4 Z
+   Z -> E A4 Z
+   Z -> F A4 Z
+   Z -> I A4 Z
+   Z -> V A4 Z
+   Z -> e A4 Z
+   Z -> { A6 Z
+   Z -> { A7 Z
+   Z -> C A4 Z Z
+   Z -> D A4 Z Z
+   Z -> E A4 Z Z
+   Z -> F A4 Z Z
+   Z -> I A4 Z Z
+   Z -> V A4 Z Z
+   Z -> e A4 Z Z
+   Z -> { A6 Z Z
+   Z -> { A7 Z Z
