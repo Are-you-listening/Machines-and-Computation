@@ -26,10 +26,10 @@ int main() { // Function names we create to replace nesting should have F or I i
     std::string Filelocation="input/nestedExamples/engine.cc"; // for now, doesn't support double declarations like int a,d;
     std::thread Tokenizer(&Tokenisation::Tokenize, &tokenVector, Filelocation); // i ignore rvalues in function calls
     core_amount--;
-    Tokenizer.join();
-    
+    //Tokenizer.join();
+
     Orchestrator();
-    
+
     auto cfg = createCFG();
     auto cfg3 = createCFG();
     CFG cfg2("input/CFG/testGNF.json");
@@ -41,12 +41,12 @@ int main() { // Function names we create to replace nesting should have F or I i
     cfg->print();
     //cfg->toCNF();
     cfg3->toCNF();
-    
+
     //string permutatar found online
     /*std::string str="{}FCIEeDV";
     unsigned int n = str.length();
     unsigned long int opsize = pow(2, n);
-    
+
     for (int counter = 1; counter < opsize; counter++)
     {
         string subs;
@@ -55,7 +55,7 @@ int main() { // Function names we create to replace nesting should have F or I i
             if (counter & (1<<j))
                 subs.push_back(str[j]);
         }
-        
+
         do
         {
             cout << std::endl;
@@ -70,14 +70,14 @@ int main() { // Function names we create to replace nesting should have F or I i
         while (next_permutation(subs.begin(), subs.end()));
     }*/
     //
-    
+
     const CFG a = *cfg;
     LALR lalr(a);
     lalr.createTable();
-    
+
     Tokenizer.join();
     core_amount++;
-    
+
     //create LARL parser with tokenvector
     auto vec = tokenVector.getTokenVector();
     //lalr.parse(vec); this should be changed to new vector
@@ -85,8 +85,8 @@ int main() { // Function names we create to replace nesting should have F or I i
     //if-else antinesting
     //move
     //naam wijzinging states, zie cleanup.
-    
-    
+
+
     /*
     //threading every function for now, will later be changed
     // I also assume that every function we create to replace nesting is only called upon once

@@ -93,11 +93,23 @@ void LALR::mergeSimilar() {
             stateiter++;
         }
         // go over whole table and replace othernames with mainname
-        for (auto row : parseTable){
-            for (auto element : row.second){
+        for (auto &row : parseTable){
+            for (auto& element : row.second){
                 for (auto othername : othernames){
-                    string temp = to_string(othername);
-                    replace(element.second.begin(), element.second.end(), to_string(othername)[0], to_string(mainname)[0]);
+
+                    string prefix = element.second.substr(0,1);
+                    string remainder;
+                    if (prefix != "S" && prefix != "R"){
+                        prefix = "e";
+                    } else {
+                        remainder = element.second.substr(1, element.second.length()-1);
+                    }
+
+                    if (prefix == "e" && remainder == to_string(othername)){
+                        element.second = to_string(mainname);
+                    } else if (prefix != "e" && remainder == to_string(othername)) {
+                        element.second = prefix + to_string(mainname);
+                    }
                 }
             }
         }
@@ -358,12 +370,12 @@ void LALR::printstates() {
     }
 }
 
-void LALR::parse(std::vector<std::pair<std::string, std::string>> &input) {
+void LALR::parse(std::vector<std::tuple<std::string, std::string, std::set<std::string>>> &input) {
     stack<int> s;
     s.push(0);
-
-    std::vector<std::pair<std::string, std::string>> remaininginputvector = input;
-    remaininginputvector.push_back({"$","$"});
+    std::set<std::string> S={};
+    auto remaininginputvector = input;
+    remaininginputvector.push_back({"$","$", S});
 
     vector<parseTree*> treetops;
     while (true){
@@ -371,7 +383,8 @@ void LALR::parse(std::vector<std::pair<std::string, std::string>> &input) {
             break;
         }
         int stacksymbol = s.top();
-        string inputsymbol = remaininginputvector.begin()->first;
+        string inputsymbol = get<0>(*remaininginputvector.begin());
+        auto inputtuple = *remaininginputvector.begin();
         if (inputsymbol != "$") {
             remaininginputvector.erase(remaininginputvector.begin());
         }
@@ -390,7 +403,15 @@ void LALR::parse(std::vector<std::pair<std::string, std::string>> &input) {
                 rule++;
                 count++;
             }
-            remaininginputvector.insert(remaininginputvector.begin(), make_pair(rule->first, ""));
+
+            if (inputsymbol != "$"){
+                remaininginputvector.insert(remaininginputvector.begin(), inputtuple);
+                remaininginputvector.insert(remaininginputvector.begin(), std::make_tuple(rule->first, "", S));
+            } else {
+                remaininginputvector.insert(remaininginputvector.begin(), std::make_tuple(rule->first, "", S));
+
+            }
+
             parseTree* newparent = new parseTree;
             treetops.push_back(newparent);
             newparent->symbol = rule->first;
