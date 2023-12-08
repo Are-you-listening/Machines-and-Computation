@@ -92,7 +92,7 @@ void LALR::mergeSimilar() {
             othernames.emplace((*stateiter)->_stateName);
             stateiter++;
         }
-        // go over whole table and replace othernames with mainname
+        // go over the whole table and replace othernames with mainname
         for (auto &row : parseTable){
             for (auto& element : row.second){
                 for (auto othername : othernames){
@@ -113,7 +113,7 @@ void LALR::mergeSimilar() {
                 }
             }
         }
-        // merge other row contents into main row
+        // merge other row contents into the main row
         for (auto stateiter = next(sstates.begin()); stateiter != sstates.end(); stateiter++){
             for (auto row : parseTable){
                 if (row.first == (*stateiter)->_stateName){
@@ -170,7 +170,7 @@ void LALR::createTable() {
             for (auto &element: createdTable[currentstate->_stateName]) {
                 if (rowcontent.find(element.first) != rowcontent.end()) {
                     if (element.second.substr(0, 1) == "R" && rowcontent[element.first].substr(0, 1) == "S") {
-                        element.second = rowcontent[element.first];// the new row has a shift in the corresponding position while the original has a reduce
+                        element.second = rowcontent[element.first];// the new row has a shift in the corresponding position while the original has a reduction
                     }
                 }
             }
@@ -287,7 +287,7 @@ void State::createConnections(LALR &lalr) {
 
         for (const auto &state_rule: otherstate->_productions) {
             if (get<1>(state_rule).back() ==
-                ".") {// if the state_rule has a dot at the end of the body it is an ending state_rule
+                ".") {// if the state_rule has a dot at the end of the body, it is an ending state_rule
                 if (get<0>(state_rule) == lalr._cfg.getS() + "'") {
                     otherstate->endings.emplace(-1, get<2>(state_rule));
                 } else {
@@ -306,7 +306,6 @@ void State::createConnections(LALR &lalr) {
             }
         }
     }
-    //std::cout << "end createConections" <<std::endl;
 }
 
 State::~State() {
@@ -316,7 +315,7 @@ State::~State() {
 }
 
 State *LALR::findstate(const set<tuple<string, vector<string>, set<string>>>& rules) {
-    // search for a state that has the given rules using breadth-first search pattern
+    // search for a state that has the given rules using a breadth-first search pattern
     queue<State*> remaining;
     set<State*> visited;
     remaining.push(I0);
@@ -473,13 +472,12 @@ void ParseTree::traverse(const std::vector<std::string> &T, ParseTree* _root, bo
 
     for(long unsigned int i = 0;  i<children.size(); ++i){
         auto child = children[i];
-        if(child->symbol=="{" || child->symbol=="}"){ //Stop cleanup if bracket reach; we may not modify this
+        if(child->symbol=="{" || child->symbol=="}"){ //Stop cleanup if a bracket is reached; we may not modify this
             V=true;
         }else if( std::find(T.begin(), T.end(),child->symbol)==T.end() ){ //We found a variable
             V = true;
             child->traverse(T,this,V); //Traverse the child
-            //Reloop
-            if(!V){ //Reloop incase the child made a change
+            if(!V){ //Reloop in case the child made a change
                 i = -1;
             }
         }
