@@ -965,3 +965,7 @@ void CFG::setCnf(bool cnf) {
     CNF = cnf;
 }
 
+void CFG::setT(const vector<std::string> &t) {
+    T = t;
+}
+

@@ -16,6 +16,7 @@
 
 #include <queue>
 #include <stack>
+#include <algorithm>
 
 #include "src/CFG.h"
 
@@ -43,6 +44,11 @@ public:
     vector<parseTree*> children;
     string symbol;
     ~parseTree();
+
+    parseTree();
+    parseTree( vector<parseTree *> children,  string symbol);
+
+    void traverse(const std::vector<std::string> &T , parseTree* _root);
 };
 
 /*
@@ -77,6 +83,11 @@ public:
     void printstates();
     
     void parse(std::vector<std::pair<std::string, std::string>> &input);
+
+    /**
+     * Clean up the parsetree so it has a usable format
+     */
+    void cleanUp();
 };
 
 #endif//CFG_LALR_H

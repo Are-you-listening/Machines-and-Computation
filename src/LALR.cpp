@@ -436,8 +436,50 @@ void LALR::printTable() {
     }
 }
 
+void LALR::cleanUp() {
+    _root->traverse(_cfg.getT(),_root);
+}
+
 parseTree::~parseTree() {
     for (const auto& child : children){
         delete child;
     }
+}
+
+void parseTree::traverse(const std::vector<std::string> &T, parseTree* _root) {
+    bool V = false;
+
+    if(this->symbol=="{" || this->symbol=="}"){
+        return;
+    }
+
+    for(auto &child: children){
+        if(child->symbol=="{" || child->symbol=="}"){ //Stop cleanup if bracket reach; we may not modify this
+            continue;
+        }else if( std::find(T.begin(), T.end(),child->symbol)==T.end() ){ //We found a variable
+            V = true;
+            child->traverse(T,this); //Traverse the child
+        }
+    }
+
+    std::vector<parseTree*> temp;
+    if(!V){ //No Variables found: Cleanup this one
+        for(auto &it: _root->children){
+            if(it==this){
+                for(auto &k: this->children){ //Add children of this
+                    temp.push_back(k);
+                }
+            }else{ //Add the already added child to keep the correct order
+                temp.push_back(it);
+            }
+        }
+        _root->children=temp;
+        delete this;
+    }
+}
+
+parseTree::parseTree( vector<parseTree *> children,  string symbol) : children(children), symbol(symbol) {}
+
+parseTree::parseTree() {
+
 }
