@@ -10,22 +10,22 @@ auto cfg = createCFG();
     //cfg->toCNF();
     cfg3->toCNF();
 
-    parseTree* b = new parseTree({},"b");
-    parseTree* CL  = new parseTree({},"{");
-    parseTree* c  = new parseTree({},"c");
-    parseTree* d  = new parseTree({},"d");
-    parseTree* CR  = new parseTree({},"}");
-    parseTree* s  = new parseTree({},"s");
-    parseTree* k  = new parseTree({},"k");
-    parseTree* e  = new parseTree({},"e");
+    ParseTree* b = new ParseTree({},"b");
+    ParseTree* CL  = new ParseTree({},"{");
+    ParseTree* c  = new ParseTree({},"c");
+    ParseTree* d  = new ParseTree({},"d");
+    ParseTree* CR  = new ParseTree({},"}");
+    ParseTree* s  = new ParseTree({},"s");
+    ParseTree* k  = new ParseTree({},"k");
+    ParseTree* e  = new ParseTree({},"e");
 
-    parseTree* S = new parseTree({s},"S");
-    parseTree* K = new parseTree({k,S},"K");
-    parseTree* E = new parseTree({e,K,CR},"E");
-    parseTree* D = new parseTree({d},"D");
-    parseTree* C = new parseTree({c,D},"C");
-    parseTree* B = new parseTree({CL,C,E},"B");
-    parseTree* A = new parseTree( {b,B}, "A" );
+    ParseTree* S = new ParseTree({s},"S");
+    ParseTree* K = new ParseTree({k,S},"K");
+    ParseTree* E = new ParseTree({e,K,CR},"E");
+    ParseTree* D = new ParseTree({d},"D");
+    ParseTree* C = new ParseTree({c,D},"C");
+    ParseTree* B = new ParseTree({CL,C,E},"B");
+    ParseTree* A = new ParseTree( {b,B}, "A" );
 
     CFG a = *cfg;
     LALR lalr(a);
