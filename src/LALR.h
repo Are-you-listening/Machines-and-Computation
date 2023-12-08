@@ -31,7 +31,9 @@ public:
     int _stateName;
     augmentedrules _productions;
     vector<pair<string, State*>> _connections; // outgoing _connections
+
     void createConnections(LALR &lalr);
+
     /**
      * Destructor to free used memory
      */
@@ -48,6 +50,10 @@ class ParseTree {
 public:
     vector<ParseTree*> children;
     string symbol;
+
+    /**
+     * Destructor to free used memory
+     */
     ~ParseTree();
 
     /**
@@ -96,6 +102,9 @@ public:
      */
     explicit LALR(const CFG &cfg);
 
+    /**
+     * Setup the parse table
+     */
     void createTable();
 
     State* findstate(const augmentedrules& rules);
