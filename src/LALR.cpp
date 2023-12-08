@@ -420,16 +420,14 @@ void LALR::parse(std::vector<std::tuple<std::string, std::string, std::set<std::
             }
             for (string symbol : rule->second){
                 bool found = false;
-                auto it = treetops.begin();
                 set<vector<parseTree*>::iterator> toRemove;
-                while(it != treetops.end()){
+                for(auto it = treetops.begin(); it != treetops.end();it++){
                     if ((*it)->symbol == symbol){
                         parseTree* temp = *it;
                         newparent->children.push_back(temp);
                         found = true;
                         toRemove.insert(it);
                     }
-                    it++;
                 }
                 for (auto temp : toRemove){
                     treetops.erase(temp);
