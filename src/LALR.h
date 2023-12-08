@@ -59,14 +59,14 @@ public:
     /**
      * Simple Constructor
      */
-    ParseTree();
+    ParseTree() = default;
 
     /**
      * Full Constructor
      * @param children
      * @param symbol
      */
-    ParseTree(vector<ParseTree *> children, string symbol);
+    ParseTree(const vector<ParseTree *> &children, string symbol);
 
     /**
      * Traverse the parse tree & cleanup
@@ -107,9 +107,9 @@ public:
      */
     void createTable();
 
-    State* findstate(const augmentedrules& rules);
+    State* findState(const augmentedrules& rules);
 
-    void printstates();
+    void printStates();
 
     void parse(std::vector<std::tuple<std::string, std::string, std::set<std::string>>> &input);
 
