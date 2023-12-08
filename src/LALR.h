@@ -22,17 +22,20 @@
 
 #include "src/CFG.h"
 
-#define augmentedrules set<tuple<string, vector<string>, set<string>>>
+typedef set<tuple<string, vector<string>, set<string>>> augmentedrules; //Use typedef to simplify usage
 
 class LALR;
 
-class state {
+class State {
 public:
     int _stateName;
     augmentedrules _productions;
-    vector<pair<string, state*>> _connections; // outgoing _connections
+    vector<pair<string, State*>> _connections; // outgoing _connections
     void createConnections(LALR &lalr);
-    ~state();
+    /**
+     * Destructor to free used memory
+     */
+    ~State();
 
     /**
      * <rule number in cfg, lookahead symbols>
@@ -41,23 +44,23 @@ public:
     set<pair<int, set<string>>> endings;
 };
 
-class parseTree {
+class ParseTree {
 public:
-    vector<parseTree*> children;
+    vector<ParseTree*> children;
     string symbol;
-    ~parseTree();
+    ~ParseTree();
 
     /**
      * Simple Constructor
      */
-    parseTree();
+    ParseTree();
 
     /**
      * Full Constructor
      * @param children
      * @param symbol
      */
-    parseTree( vector<parseTree *> children,  string symbol);
+    ParseTree(vector<ParseTree *> children, string symbol);
 
     /**
      * Traverse the parse tree & cleanup
@@ -65,23 +68,23 @@ public:
      * @param _root
      * @param V_root
      */
-    void traverse(const std::vector<std::string> &T , parseTree* _root, bool &V_root);
+    void traverse(const std::vector<std::string> &T , ParseTree* _root, bool &V_root);
 };
 
-/*
+/**
  * For the whole LALR process we assume the given cfg is in Greibach normal form
- */
+ **/
 class LALR {
-    state* I0;
+    State* I0;
     void createStates();   // creates I0, I1, ...
-    set<state *> findSimilar(const set<tuple<string, vector<string>, set<string>>> &rules);
+    set<State *> findSimilar(const set<tuple<string, vector<string>, set<string>>> &rules);
     void mergeSimilar();
 
 public:
     unordered_map<int, map<string, string>> parseTable;
     CFG _cfg;
     int state_counter = 0;
-    parseTree* _root;
+    ParseTree* _root;
 
     void printTable();  // this function is mainly for debugging and is not needed for LALR parsing
 
@@ -91,11 +94,11 @@ public:
      * Constructor
      * @param cfg , in GNF
      */
-    LALR(const CFG &cfg);
+    explicit LALR(const CFG &cfg);
 
     void createTable();
 
-    state* findstate(const augmentedrules& rules);
+    State* findstate(const augmentedrules& rules);
 
     void printstates();
 

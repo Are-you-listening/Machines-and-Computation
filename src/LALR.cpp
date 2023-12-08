@@ -8,7 +8,7 @@ LALR::LALR(const CFG &cfg) : _cfg(cfg) {}
 
 void LALR::createStates() {
     // manually create I0
-    state* I0 = new state;
+    State* I0 = new State;
     this->I0 = I0;
     state_counter = 0;
     I0->_stateName = 0;
@@ -21,15 +21,15 @@ void LALR::createStates() {
     //cout << "debug" << endl;
 }
 
-set<state *> LALR::findSimilar(const set<tuple<string, vector<string>, set<string>>> &rules) {
-    queue<state*> remaining;
-    set<state*> visited;
+set<State *> LALR::findSimilar(const set<tuple<string, vector<string>, set<string>>> &rules) {
+    queue<State*> remaining;
+    set<State*> visited;
     remaining.push(I0);
     visited.emplace(I0);
-    set<state*> similarstates;
+    set<State*> similarstates;
 
     while(not remaining.empty()){
-        state* currentstate = remaining.front();
+        State* currentstate = remaining.front();
         remaining.pop();
 
         bool similar = true;
@@ -60,17 +60,17 @@ set<state *> LALR::findSimilar(const set<tuple<string, vector<string>, set<strin
 
 void LALR::mergeSimilar() {
     // find all the similar states
-    set<set<state*>> similarsets;
-    queue<state*> remaining;
-    set<state*> visited;
+    set<set<State*>> similarsets;
+    queue<State*> remaining;
+    set<State*> visited;
     remaining.push(I0);
     visited.emplace(I0);
 
     while (not remaining.empty()){
-        state* currentstate = remaining.front();
+        State* currentstate = remaining.front();
         remaining.pop();
 
-        set<state*> similarstates = findSimilar(currentstate->_productions);
+        set<State*> similarstates = findSimilar(currentstate->_productions);
         if (similarstates.size() > 1){
             similarsets.emplace(similarstates);
             visited.insert(similarstates.begin(), similarstates.end());
@@ -132,13 +132,13 @@ void LALR::createTable() {
     unordered_map<int, map<string, string>> createdTable;
     createStates();
 
-    queue<state*> remaining;
-    set<state*> visited;
+    queue<State*> remaining;
+    set<State*> visited;
     remaining.push(I0);
     visited.emplace(I0);
 
     while(not remaining.empty()){
-        state* currentstate = remaining.front();
+        State* currentstate = remaining.front();
         remaining.pop();
 
         map<string, string> rowcontent;
@@ -156,7 +156,7 @@ void LALR::createTable() {
 
         for (const auto &connection: currentstate->_connections) {
             string inputsymbol = connection.first;
-            state *otherstate = connection.second;
+            State *otherstate = connection.second;
 
             if (std::find(_cfg.getV().begin(), _cfg.getV().end(), inputsymbol) != _cfg.getV().end()) {
                 rowcontent[inputsymbol] = to_string(otherstate->_stateName);
@@ -240,7 +240,7 @@ augmentedrules LALR::createAugmented(const tuple<string, vector<string>, set<str
     return result;
 }
 
-void state::createConnections(LALR &lalr) {
+void State::createConnections(LALR &lalr) {
     map<string, augmentedrules > transitionmap;
     for (const auto& rule : _productions) {
         int dotIndex = 0;
@@ -270,13 +270,13 @@ void state::createConnections(LALR &lalr) {
             newrules.insert(temp.begin(), temp.end());
         }
 
-        state *otherstate;
-        state *tempstate = lalr.findstate(newrules);
+        State *otherstate;
+        State *tempstate = lalr.findstate(newrules);
         if (tempstate != nullptr) {
             _connections.emplace_back(readSymbol, tempstate);
             otherstate = tempstate;
         } else {
-            state *newstate = new state;
+            State *newstate = new State;
             lalr.state_counter++;
             newstate->_stateName = lalr.state_counter;
             newstate->_productions = newrules;
@@ -309,21 +309,21 @@ void state::createConnections(LALR &lalr) {
     //std::cout << "end createConections" <<std::endl;
 }
 
-state::~state() {
+State::~State() {
     for (auto& connection : _connections){
         delete connection.second;
     }
 }
 
-state *LALR::findstate(const set<tuple<string, vector<string>, set<string>>>& rules) {
+State *LALR::findstate(const set<tuple<string, vector<string>, set<string>>>& rules) {
     // search for a state that has the given rules using breadth-first search pattern
-    queue<state*> remaining;
-    set<state*> visited;
+    queue<State*> remaining;
+    set<State*> visited;
     remaining.push(I0);
     visited.emplace(I0);
 
     while(not remaining.empty()){
-        state* current = remaining.front();
+        State* current = remaining.front();
         remaining.pop();
 
         if (current->_productions == rules){
@@ -340,12 +340,12 @@ state *LALR::findstate(const set<tuple<string, vector<string>, set<string>>>& ru
 }
 
 void LALR::printstates() {
-    queue<state*> remaining;
-    set<state*> visited;
+    queue<State*> remaining;
+    set<State*> visited;
     remaining.push(I0);
 
     while (not remaining.empty()){
-        state* current = remaining.front();
+        State* current = remaining.front();
         remaining.pop();
 
         cout << current->_stateName << endl;
@@ -377,7 +377,7 @@ void LALR::parse(std::vector<std::tuple<std::string, std::string, std::set<std::
     auto remaininginputvector = input;
     remaininginputvector.push_back({"$","$", S});
 
-    vector<parseTree*> treetops;
+    vector<ParseTree*> treetops;
     while (true){
         if (remaininginputvector.empty()){
             break;
@@ -412,7 +412,7 @@ void LALR::parse(std::vector<std::tuple<std::string, std::string, std::set<std::
 
             }
 
-            parseTree* newparent = new parseTree;
+            ParseTree* newparent = new ParseTree;
             treetops.push_back(newparent);
             newparent->symbol = rule->first;
             if (rule->first == _cfg.getS()){
@@ -421,10 +421,10 @@ void LALR::parse(std::vector<std::tuple<std::string, std::string, std::set<std::
             for (string symbol : rule->second){
                 bool found = false;
                 auto it = treetops.begin();
-                set<vector<parseTree*>::iterator> toRemove;
+                set<vector<ParseTree*>::iterator> toRemove;
                 while(it != treetops.end()){
                     if ((*it)->symbol == symbol){
-                        parseTree* temp = *it;
+                        ParseTree* temp = *it;
                         newparent->children.push_back(temp);
                         found = true;
                         toRemove.insert(it);
@@ -435,7 +435,7 @@ void LALR::parse(std::vector<std::tuple<std::string, std::string, std::set<std::
                     treetops.erase(temp);
                 }
                 if (not found) {
-                    parseTree *newchild = new parseTree;
+                    ParseTree *newchild = new ParseTree;
                     newchild->symbol = symbol;
                     newparent->children.push_back(newchild);
                 }
@@ -462,13 +462,13 @@ void LALR::cleanUp() {
     _root->traverse(_cfg.getT(),_root,V);
 }
 
-parseTree::~parseTree() {
+ParseTree::~ParseTree() {
     for (const auto& child : children){
         delete child;
     }
 }
 
-void parseTree::traverse(const std::vector<std::string> &T, parseTree* _root, bool &V_root) {
+void ParseTree::traverse(const std::vector<std::string> &T, ParseTree* _root, bool &V_root) {
     bool V = false;
 
     for(long unsigned int i = 0;  i<children.size(); ++i){
@@ -485,7 +485,7 @@ void parseTree::traverse(const std::vector<std::string> &T, parseTree* _root, bo
         }
     }
 
-    std::vector<parseTree*> temp;
+    std::vector<ParseTree*> temp;
     if(!V){ //No Variables found: Cleanup this one
         for(auto &it: _root->children){ //Collect the "new children"
             if(it==this){
@@ -503,8 +503,8 @@ void parseTree::traverse(const std::vector<std::string> &T, parseTree* _root, bo
     }
 }
 
-parseTree::parseTree( vector<parseTree *> children,  string symbol) : children(children), symbol(symbol) {}
+ParseTree::ParseTree(vector<ParseTree *> children, string symbol) : children(children), symbol(symbol) {}
 
-parseTree::parseTree() {
+ParseTree::ParseTree() {
 
 }
