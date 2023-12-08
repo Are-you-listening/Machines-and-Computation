@@ -23,7 +23,7 @@ set(TestCaseFiles
         test/TuringMachineTest.cpp
         test/ThreadingTest.cpp
         test/CFGTokenTest.cpp
-)
+        )
 
 set(TuringCode
         src/TM/TuringMachine.cpp
@@ -46,7 +46,7 @@ set(TuringCode
         src/TM/TransitieGenerators/TuringDenestify.h
         src/TM/TransitieGenerators/TuringIfElseAntiNesting.cpp
         src/TM/TransitieGenerators/TuringIfElseAntiNesting.h
-)
+        )
 
 set(CodeFiles
         lib/DesignByContract.h
@@ -73,15 +73,15 @@ set(CodeFiles
         ${TuringCode}
         src/CFGConstructor.cpp
         src/CFGConstructor.h
-        
+
         src/LALR.cpp
         src/LALR.h
-)
+        )
 
 add_executable(TESTS
         ${CodeFiles}
         ${TestCaseFiles}
-)
+        )
 
 target_link_libraries(
         TESTS
@@ -99,8 +99,8 @@ add_executable(Tog
 set(CMAKE_INSTALL_PREFIX testing)
 install(TARGETS TESTS
         DESTINATION ${CMAKE_INSTALL_PREFIX}
-)
+        )
 
 install(TARGETS Tog
         DESTINATION ${CMAKE_INSTALL_PREFIX}
-)
+        )

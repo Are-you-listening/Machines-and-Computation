@@ -181,3 +181,7 @@ string TuringMachine::exportTapeData(unsigned int index) const {
     return tapes[index]->exportTape();
 }
 
+int TuringMachine::getTuringIndex(int index) {
+    return tapes[index]->getTapeHeadIndex();
+}
+

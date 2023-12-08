@@ -29,7 +29,7 @@ int main() { // Function names we create to replace nesting should have F or I i
     Tokenizer.join();
     
     Orchestrator();
-    
+
     auto cfg = createCFG();
     auto cfg3 = createCFG();
     CFG cfg2("input/CFG/testGNF.json");

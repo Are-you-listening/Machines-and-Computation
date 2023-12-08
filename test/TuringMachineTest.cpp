@@ -156,7 +156,7 @@ TEST(TuringMachineTest, TM_tools){
 }
 
 TEST(TuringMachineTest, TM_tokenazation) {
-    int index = 20;
+    int index = 23;
     ifstream test_file("../test/testFiles/TM_test_"+ to_string(index)+".cpp");
     string test_string;
     cout << test_file.is_open() << endl;
@@ -179,7 +179,7 @@ TEST(TuringMachineTest, TM_tokenazation) {
     tm.load_input(test_string, 1);
 
     int halted_time = -1;
-    for (int i = 0; i<20000; i++){
+    for (int i = 0; i<200000; i++){
 
 
         if (tm.isHalted()){
@@ -200,8 +200,7 @@ TEST(TuringMachineTest, TM_tokenazation) {
         }
 
 
-
-        if (i >= 94750){
+        if (i >= 15755000){
             int j = 0;
 
             for (int i = 0; i < tm.getTapeAmount(); i++){
@@ -215,8 +214,13 @@ TEST(TuringMachineTest, TM_tokenazation) {
         cout << tm.getTapeData(i) << endl;
     }
 
+    for (int i = 0; i < tm.getTapeAmount(); i++){
+        cout << "i " << tm.getTuringIndex(i) << endl;
+    }
+
     cout << endl;
     cout << "halted time " << halted_time << endl;
+
 
     ofstream out{"../test/results/TM_test_"+ to_string(index)+".cpp"};
     out << tm.exportTapeData(1);
@@ -224,7 +228,7 @@ TEST(TuringMachineTest, TM_tokenazation) {
 }
 
 TEST(TuringMachineTest, TM_builder) {
-    for (int k=2; k<= 19; k++){
+    for (int k=1; k<= 21; k++){
         ifstream test_file("../test/testFiles/TM_test_"+ to_string(k)+".cpp");
         string test_string;
         cout << test_file.is_open() << endl;

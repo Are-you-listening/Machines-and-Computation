@@ -29,6 +29,8 @@ public:
     void load(const string& input);
     string exportTape();
 
+    long getTapeHeadIndex() const;
+
 private:
     unsigned long tape_size;
     char* tape_ptr;
