@@ -20,6 +20,7 @@ private:
      **/
     std::vector<std::pair<std::string, std::string>> tokenVector;
     std::vector<std::tuple<std::string, std::string, std::set<std::string>>> tokenTupleVector;
+
 public:
     /**
      * Default Constructor
@@ -33,10 +34,9 @@ public:
     void Tokenize(const std::string &FileLocation);
     
     /**
-     * Simple Getter
+     * Getter
      * @return 
      */
-
     [[nodiscard]] const std::vector<std::tuple<std::string, std::string, std::set<std::string>>> &getTokenVector() const;
 };
 
