@@ -95,6 +95,8 @@ IncompleteSet TuringVarDictionary::storeVar() {
     tools->link_on(result, add_nest, {'{'}, {get_tuple_index()[1]});
 
     IncompleteSet skip_bracket{"skip_bracket", "skip_bracket"};
+
+
     tools->skip_nesting(skip_bracket, tapes-1, 1, get_tuple_index()[1], 1, get_tuple_index(), '(', ')');
     tools->move(skip_bracket, get_tuple_index(), 1);
     tools->link_on(result, skip_bracket, {'('}, {get_tuple_index()[1]});

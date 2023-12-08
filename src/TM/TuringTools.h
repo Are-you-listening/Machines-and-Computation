@@ -100,8 +100,9 @@ public:
     void makeAntiNesting(IncompleteSet& a, const vector<int>&tuple_indexes);
     void makeAntiNestingElse(IncompleteSet& a, const vector<int>&tuple_indexes);
     void makeAntiNestingIf(IncompleteSet& a, const vector<int>&tuple_indexes);
+    void makeAntiNestingIfSolo(IncompleteSet& a, const vector<int>&tuple_indexes);
     void copyTupleRight(IncompleteSet& a, const vector<int>&tuple_indexes, char start_token, char end_token);
-    void addToken(IncompleteSet& a, const vector<int>&tuple_indexes, const string& s, char ch);
+    void addToken(IncompleteSet& a, const vector<int>&tuple_indexes, const string& s, char ch, char replace='\u0000');
 
     void push_on_sequence(IncompleteSet& a, const vector<char>&input_sequence, int input_index, char push_char);
     void set_heap_mode(IncompleteSet& a, bool to_heap);

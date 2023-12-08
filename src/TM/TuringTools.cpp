@@ -3186,6 +3186,20 @@ void TuringTools::makeAntiNestingIf(IncompleteSet &a, const vector<int> &tuple_i
     go_to(if_anti_nesting, {'M'}, tuple_indexes[0], 1, tuple_indexes);
     //copyTupleRight(if_anti_nesting, tuple_indexes, 'M', 'H');
 
+    //check if we need to add a token before
+    go_to_multiple(if_anti_nesting, {{'E'},{'R'}}, {tuple_indexes[0], tuple_indexes[1]}, 1, {tuple_indexes});
+
+    IncompleteSet add_empty_return{"add_empty_return_"+ to_string(counter), "add_empty_return_"+ to_string(counter)};
+    counter++;
+    //push empty return
+    addToken(add_empty_return, tuple_indexes, "return", 'R', 'O');
+    addToken(add_empty_return, tuple_indexes, ";", 'S');
+    go_to(add_empty_return, {'M'}, tuple_indexes[0], -1, tuple_indexes);
+
+    link_on(if_anti_nesting, add_empty_return, {'E'}, {tuple_indexes[0]});
+    go_to(if_anti_nesting, {'M'}, tuple_indexes[0], -1, tuple_indexes);
+
+
     auto temp = tuple_indexes;
     temp.push_back(0);
     temp.push_back(1);
@@ -3193,6 +3207,12 @@ void TuringTools::makeAntiNestingIf(IncompleteSet &a, const vector<int> &tuple_i
 
     for (int i=1; i<tuple_indexes.size(); i++){
         int index = tuple_indexes[i];
+        go_to(if_anti_nesting, {'O', 'H'}, tuple_indexes[0], 1, tuple_indexes);
+        IncompleteSet onO{"onO_"+ to_string(counter), "onO_"+ to_string(counter)};
+        copy_till(onO, {'H'}, tuple_indexes[0], index, 1, 1, temp);
+        link_on(if_anti_nesting, onO, {'O'}, {tuple_indexes[0]});
+        go_to(if_anti_nesting, {'M'}, tuple_indexes[0], -1, tuple_indexes);
+
         copy_till(if_anti_nesting, {'E'}, tuple_indexes[0], index, 1, 1, temp);
         go_to(if_anti_nesting, {'K'}, tuple_indexes[0], -1, tuple_indexes);
         copy_till(if_anti_nesting, {'N'}, tuple_indexes[0], index, 1, 1, temp);
@@ -3216,7 +3236,7 @@ void TuringTools::makeAntiNestingIf(IncompleteSet &a, const vector<int> &tuple_i
 
 
         go_to(if_anti_nesting, {'A'}, tuple_indexes[0], -1, tuple_indexes);
-        go_to(if_anti_nesting, {'H'}, tuple_indexes[0], 1, tuple_indexes);
+        go_to(if_anti_nesting, {'O', 'H'}, tuple_indexes[0], 1, tuple_indexes);
 
         go_to(if_anti_nesting, {'M'}, tuple_indexes[0], -1, tuple_indexes);
 
@@ -3226,13 +3246,23 @@ void TuringTools::makeAntiNestingIf(IncompleteSet &a, const vector<int> &tuple_i
 
     }
 
+
+    //clear everything after O
+    go_to(if_anti_nesting, {'O','H'}, tuple_indexes[0], 1, tuple_indexes);
+    IncompleteSet onO2{"onO2_"+ to_string(counter), "onO2_"+ to_string(counter)};
+    counter++;
+    move(onO2, tuple_indexes, 1);
+    go_to_clear(onO2, {'H'}, tuple_indexes[0], 1, tuple_indexes, tuple_indexes);
+
+    link_on(if_anti_nesting, onO2, {'O'}, {tuple_indexes[0]});
+
     go_to(if_anti_nesting, {'H'}, tuple_indexes[0], 1, tuple_indexes);
     go_to_clear(if_anti_nesting, {'A'}, tuple_indexes[0], -1, tuple_indexes, {tuple_indexes[0]});
 
     link(a, if_anti_nesting);
 }
 
-void TuringTools::addToken(IncompleteSet& a, const vector<int>&tuple_indexes, const string& s, char ch) {
+void TuringTools::addToken(IncompleteSet& a, const vector<int>&tuple_indexes, const string& s, char ch, char replace) {
     for (char c: s){
         link_put(a, {c}, {1});
         move(a, {0,1}, 1);
@@ -3241,10 +3271,107 @@ void TuringTools::addToken(IncompleteSet& a, const vector<int>&tuple_indexes, co
 
     go_to(a, {'H'}, tuple_indexes[0], 1, tuple_indexes);
     go_to(a, {'A'}, 0, -1, {0,1});
-    make_token(a, tuple_indexes, 'R');
+    make_token(a, tuple_indexes, ch, replace);
 
     go_to_clear(a, {'A'}, 0, -1, {0,1}, {0, 1});
     link_put(a, {'\u0000'}, {1});
+}
+
+void TuringTools::makeAntiNestingIfSolo(IncompleteSet &a, const vector<int> &tuple_indexes) {
+    IncompleteSet solo_anti_nesting{"solo_anti_nesting_"+ to_string(counter), "solo_anti_nesting_"+ to_string(counter)};
+    counter++;
+
+    go_to(solo_anti_nesting, {'\u0000'}, tuple_indexes[1], 1, tuple_indexes);
+    link_put(solo_anti_nesting, {'H'}, {tuple_indexes[0]});
+
+    addToken(solo_anti_nesting, tuple_indexes, "\nif", '0', 'F');
+    addToken(solo_anti_nesting, tuple_indexes, "(!", '(');
+
+    go_to(solo_anti_nesting, {'H'}, tuple_indexes[0], 1, tuple_indexes);
+
+    go_to(solo_anti_nesting, {'V'}, tuple_indexes[0], -1, tuple_indexes);
+    move(solo_anti_nesting, tuple_indexes, -1);
+    link_put(solo_anti_nesting, {'C'}, {tuple_indexes[0]});
+    skip_nesting(solo_anti_nesting, stack_tape, 1, tuple_indexes[1], -1, tuple_indexes, ')', '(');
+    link_put(solo_anti_nesting, {'B'}, {tuple_indexes[0]});
+    copyTupleRight(solo_anti_nesting, tuple_indexes, 'B', 'C');
+
+    addToken(solo_anti_nesting, tuple_indexes, ")", ')');
+    addToken(solo_anti_nesting, tuple_indexes, ")", ')');
+
+    //clear B and C marker
+    go_to(solo_anti_nesting, {'B'}, tuple_indexes[0], -1, tuple_indexes);
+    link_put(solo_anti_nesting, {'\u0000'}, {tuple_indexes[0]});
+    go_to(solo_anti_nesting, {'C'}, tuple_indexes[0], 1, tuple_indexes);
+    link_put(solo_anti_nesting, {'\u0000'}, {tuple_indexes[0]});
+
+    go_to(solo_anti_nesting, {'V'}, tuple_indexes[0], 1, tuple_indexes);
+    skip_nesting(solo_anti_nesting, stack_tape, 1, tuple_indexes[1], 1, tuple_indexes);
+    link_put(solo_anti_nesting, {'B'}, {tuple_indexes[0]});
+    move(solo_anti_nesting, tuple_indexes, 1);
+    link_put(solo_anti_nesting, {'C'}, {tuple_indexes[0]});
+    go_to(solo_anti_nesting, {'}'}, tuple_indexes[1], 1, tuple_indexes);
+    link_put(solo_anti_nesting, {'D'}, {tuple_indexes[0]});
+
+    addToken(solo_anti_nesting, tuple_indexes, "{", '{');
+
+    go_to(solo_anti_nesting, {'H'}, tuple_indexes[0], 1, tuple_indexes);
+
+    go_to(solo_anti_nesting, {'C'}, tuple_indexes[0], -1, tuple_indexes);
+
+    go_to_multiple(solo_anti_nesting, {{'D'},{'R'}}, {tuple_indexes[0], tuple_indexes[1]}, 1, {tuple_indexes});
+    IncompleteSet add_empty_return{"add_empty_return_"+ to_string(counter), "add_empty_return_"+ to_string(counter)};
+    counter++;
+    //push empty return
+    addToken(add_empty_return, tuple_indexes, "return", 'R', 'O');
+    addToken(add_empty_return, tuple_indexes, ";", 'S');
+    go_to(add_empty_return, {'C'}, tuple_indexes[0], -1, tuple_indexes);
+
+    link_on(solo_anti_nesting, add_empty_return, {'D'}, {tuple_indexes[0]});
+
+
+    go_to(solo_anti_nesting, {'C'}, tuple_indexes[0], -1, tuple_indexes);
+    copyTupleRight(solo_anti_nesting, tuple_indexes, 'C', 'D');
+
+    addToken(solo_anti_nesting, tuple_indexes, "}", '}');
+
+    go_to(solo_anti_nesting, {'V'}, tuple_indexes[0], -1, tuple_indexes);
+    move(solo_anti_nesting, tuple_indexes, 1);
+    link_put(solo_anti_nesting, {'E'}, {tuple_indexes[0]});
+    copyTupleRight(solo_anti_nesting, tuple_indexes, 'E', 'B');
+
+    go_to(solo_anti_nesting, {'H'}, tuple_indexes[0], 1, tuple_indexes);
+    go_to(solo_anti_nesting, {'F'}, tuple_indexes[0], -1, tuple_indexes);
+
+    //first copy F-H than D-F
+    auto temp = tuple_indexes;
+    temp.push_back(0);
+    temp.push_back(1);
+
+
+    for (int i=1; i<tuple_indexes.size(); i++){
+        int index = tuple_indexes[i];
+
+        copy_till(solo_anti_nesting, {'H'}, tuple_indexes[0], index, 1, 1, temp);
+        go_to(solo_anti_nesting, {'D'}, tuple_indexes[0], -1, tuple_indexes);
+        copy_till(solo_anti_nesting, {'F'}, tuple_indexes[0], index, 1, 1, temp);
+
+        go_to(solo_anti_nesting, {'S'}, tuple_indexes[0], -1, tuple_indexes);
+
+        link_put(solo_anti_nesting, {'E'}, {0});
+        go_to(solo_anti_nesting, {'A'}, 0, -1, {0, 1});
+
+        copy_till(solo_anti_nesting, {'H'}, tuple_indexes[0], 1, index, 1, temp);
+
+        go_to(solo_anti_nesting, {'H'}, tuple_indexes[0], 1, tuple_indexes);
+        go_to(solo_anti_nesting, {'F'}, tuple_indexes[0], -1, tuple_indexes);
+
+        go_to_clear(solo_anti_nesting, {'A'}, 0, -1, {0,1}, {0,1});
+
+    }
+    go_to(solo_anti_nesting, {'H'}, tuple_indexes[0], 1, tuple_indexes);
+    go_to_clear(solo_anti_nesting, {'A'}, tuple_indexes[0], -1, tuple_indexes, {tuple_indexes[0]});
+    link(a, solo_anti_nesting);
 }
 
 

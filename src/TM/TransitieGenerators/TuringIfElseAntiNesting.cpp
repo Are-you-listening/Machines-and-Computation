@@ -49,9 +49,19 @@ IncompleteSet TuringIfElseAntiNesting::doAction() {
 
     tools->link_on(result, notViableFirst, {'{'}, {get_tuple_index()[1]});
 
+
     tools->move(result, get_tuple_index(), 1);
 
     string on_else = tools->branch_on(result, {'1'}, {get_tuple_index()[1]});
+
+
+    IncompleteSet check_not_2{"check_not_2", "check_not_2"};
+    tools->go_to_not(check_not_2, {'R', 'P', 'E'}, get_tuple_index()[1], 1, get_tuple_index());
+
+    string solo_branch = tools->branch_on(check_not_2, {'}'}, {get_tuple_index()[1]});
+    check_not_2.to_state = "check_not_2_never_reached";
+    tools->link_on_not(result, check_not_2, {'2'}, {get_tuple_index()[1]});
+
     tools->make_loop(result);
     result.to_state = on_else;
 
@@ -105,6 +115,34 @@ IncompleteSet TuringIfElseAntiNesting::doAction() {
     result.transitions.push_back(skip);
 
     tools->go_to_clear(result, {'A'}, get_tuple_index()[0], -1, get_tuple_index(), {get_tuple_index()[0]});
+    string final_place = result.to_state;
+
+    result.to_state = solo_branch;
+    tools->link_put(result, {'T'}, {get_tuple_index()[0]});
+    tools->go_to(result, {'S', 'V'}, get_tuple_index()[0], -1, get_tuple_index());
+
+    string sub_branch = tools->branch_on(result, {'V'}, {get_tuple_index()[0]});
+    tools->go_to(result, {'T'}, get_tuple_index()[0], 1, get_tuple_index());
+    tools->link_put(result, {'\u0000'}, {get_tuple_index()[0]});
+    tools->make_loop(result);
+    result.to_state = sub_branch;
+    tools->go_to(result, {'T'}, get_tuple_index()[0], 1, get_tuple_index());
+    tools->link_put(result, {'\u0000'}, {get_tuple_index()[0]});
+
+    tools->go_to(result, {'S'}, get_tuple_index()[0], -1, get_tuple_index());
+    tools->go_to(result, {'S'}, get_tuple_index()[0], 1, get_tuple_index());
+    tools->makeAntiNestingIfSolo(result, get_tuple_index());
+
+    string jumper = result.to_state;
+    result.to_state = final_place;
+
+    IncompleteTransition jumping;
+    jumping.state = jumper;
+    jumping.to_state = result.to_state;
+    jumping.def_move = 0;
+
+    result.transitions.push_back(jumping);
+
 
     return result;
 }
