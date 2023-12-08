@@ -6,7 +6,7 @@
 
 CFG* createCFG(){
     //Declare used variables
-    vector<string> V{"S","B", "N"+to_string(Config::getConfig()->getMaxNesting()), "T"}; //S is StartSymbol, B off Bullshit in Between, Last variable Nx
+    vector<string> V{"S","B", "N"+to_string(Config::getConfig()->getMaxNesting()), "T"}; //S is StartSymbol, B off inBetween, Last variable Nx
     vector<pair< string, vector<string>>> P{ {"S", {"N0"} },  {"B",{}} , {"N"+to_string(Config::getConfig()->getMaxNesting()), {"{", "N1", "}"} }}; //Already define the simplest rule, epsilon rule, rule back to start
 
     //Define V names
@@ -20,13 +20,13 @@ CFG* createCFG(){
 
     P.push_back( {"N"+to_string(Config::getConfig()->getMaxNesting()), {"N"+to_string(Config::getConfig()->getMaxNesting()), "N"+to_string(Config::getConfig()->getMaxNesting())} } );
     P.push_back( {"N"+to_string(Config::getConfig()->getMaxNesting()), {"B"} } );
+
     //Create other Productions
     for(auto &k: T){ //"Generic Programming"
         if (k == "{" || k == "}"){
             continue;
         }
-
-        P.push_back( {"T",{k}}); //B van Bullshit // B -> B Terminal B
+        P.push_back( {"T",{k}});
     }
     P.push_back({"B", {"T", "B"}});
 
