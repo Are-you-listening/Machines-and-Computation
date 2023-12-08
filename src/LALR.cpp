@@ -456,7 +456,7 @@ void LALR::printTable() {
     }
 }
 
-void LALR::cleanUp() {
+void LALR::cleanUp() const {
     bool V = false;
     _root->traverse(_cfg.getT(),_root,V);
 }

@@ -118,7 +118,7 @@ public:
     /**
      * Clean up the parse tree so it has a usable format
      */
-    void cleanUp();
+    void cleanUp() const;
 };
 
 #endif//CFG_LALR_H
