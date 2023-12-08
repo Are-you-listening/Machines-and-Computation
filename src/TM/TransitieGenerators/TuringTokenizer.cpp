@@ -78,6 +78,7 @@ IncompleteSet TuringTokenizer::tokenize() {
     tools->move(result, {0,1}, 1);
     tools->push_on_sequence(result, {'i', 'f'}, 1, '0');
     tools->push_on_sequence(result, {'e', 'l', 's', 'e'}, 1, '1');
+    tools->push_on_sequence(result, {'e', 'l', 's', 'e', ' ', 'i', 'f'}, 1, '2');
     tools->go_to_not(result, {' '}, 1, 1, {0,1});
 
     //before here, tokenize of 1 token without classier symbol
@@ -194,7 +195,7 @@ IncompleteSet TuringTokenizer::tokenize_runner_productions() {
                 tools->push_on_sequence(spatie_pusher, {'c','l','a','s','s', ' '}, 1, 'C');
                 tools->push_on_sequence(spatie_pusher, {'n','e','w', ' '}, 1, 'X');
                 tools->push_on_sequence(spatie_pusher, {'d','e','l', 'e', 't', 'e', ' '}, 1, 'X');
-                tools->push_on_sequence(spatie_pusher, {'r','e','t', 'u', 'r', 'n', ' '}, 1, 'X');
+                tools->push_on_sequence(spatie_pusher, {'r','e','t', 'u', 'r', 'n', ' '}, 1, 'R');
                 tools->push_on_sequence(spatie_pusher, {'n','a','m', 'e', 's', 'p', 'a', 'c', 'e', ' '}, 1, 'C');
 
                 //sets S on stack if no other S is before

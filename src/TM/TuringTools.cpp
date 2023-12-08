@@ -1553,6 +1553,7 @@ stack_direction, int skip_tape, int skip_direction, const vector<int>& affected,
     IncompleteSet case_handler_2{"skip_nesting_"+ to_string(counter+5), "skip_nesting_"+ to_string(counter+5)};
     counter+=6;
 
+
     link_put(case_1, {'\u0000'}, {new_stack_tape});
     move(case_1, {new_stack_tape}, -1*stack_direction);
     write_on(case_1, {'#'}, {new_stack_tape}, {'\u0000'}, {new_stack_tape});
@@ -2907,6 +2908,202 @@ TuringTools::compare_single_tape(IncompleteSet &a, char s1, char e1, char s2, ch
     compare.transitions.insert(compare.transitions.end(), compare_fine.transitions.begin(), compare_fine.transitions.end());
 
     link(a, compare);
+
+}
+
+void TuringTools::makeAntiNesting(IncompleteSet &a, const vector<int>&tuple_indexes) {
+    //requirements
+    //current unique marker 'V'
+    //on left 'S' marker
+    //on right 'E' marker
+
+    //first check if are new top code will be from the if statement or the else statement
+    go_to(a, {'0', '1'}, tuple_indexes[1], -1, tuple_indexes);
+
+    IncompleteSet do_else{"do_else_"+ to_string(counter), "do_else_"+ to_string(counter)};
+    counter++;
+    go_to(do_else, {'V'}, tuple_indexes[0], 1, tuple_indexes);
+    makeAntiNestingElse(do_else, tuple_indexes);
+
+    link_on(a, do_else, {'1'}, {tuple_indexes[1]});
+
+}
+
+void TuringTools::makeAntiNestingElse(IncompleteSet &a, const vector<int> &tuple_indexes) {
+    IncompleteSet else_anti_nesting{"else_anti_nesting_"+ to_string(counter), "else_anti_nesting_"+ to_string(counter)};
+    counter++;
+    //put some default stuff on working tape
+    string s = "if(!";
+    for (char c: s){
+        link_put(else_anti_nesting, {c}, {1});
+        move(else_anti_nesting, {0,1}, 1);
+    }
+
+    go_to(else_anti_nesting, {'S'}, tuple_indexes[0], -1, tuple_indexes);
+
+    //first we are going to take the condition
+    go_to(else_anti_nesting, {'('}, tuple_indexes[1], 1, tuple_indexes);
+    link_put(else_anti_nesting, {'S'}, {tuple_indexes[0]});
+    skip_nesting(else_anti_nesting, stack_tape, 1, tuple_indexes[1], 1, tuple_indexes, '(', ')');
+    move(else_anti_nesting, tuple_indexes, 1);
+    link_put(else_anti_nesting, {'E'}, {tuple_indexes[0]});
+    go_to(else_anti_nesting, {'S'}, tuple_indexes[0], -1, tuple_indexes);
+    copy_to_working(else_anti_nesting, tuple_indexes);
+
+    //clear old copy markers
+    write_on(else_anti_nesting, {'S'}, {tuple_indexes[0]}, {'\u0000'}, {tuple_indexes[0]});
+    go_to(else_anti_nesting, {'E'}, tuple_indexes[0], 1, tuple_indexes);
+    write_on(else_anti_nesting, {'E'}, {tuple_indexes[0]}, {'\u0000'}, {tuple_indexes[0]});
+
+    s = ")";
+    for (char c: s){
+        link_put(else_anti_nesting, {c}, {1});
+        move(else_anti_nesting, {0,1}, 1);
+    }
+
+    //we are going to make new tokens from now on
+    //first new token will be the augmented if statement
+    go_to(else_anti_nesting, {'\u0000'}, tuple_indexes[1], 1, tuple_indexes);
+    link_put(else_anti_nesting, {'H'}, {tuple_indexes[0]});
+    go_to(else_anti_nesting, {'A'}, 0, -1, {0,1});
+
+    make_token(else_anti_nesting, tuple_indexes, '0', 'I');
+
+    //clear working tape and store everything in else statement on working
+    //.but first make token for curtly bracket
+    go_to_clear(else_anti_nesting, {'A'}, 0, -1, {0,1}, {0, 1});
+    link_put(else_anti_nesting, {'\u0000'}, {1});
+
+    link_put(else_anti_nesting, {'{'}, {1});
+    move(else_anti_nesting, {0,1}, 1);
+    link_put(else_anti_nesting, {'E'}, {0});
+    move(else_anti_nesting, {0,1}, -1);
+    make_token(else_anti_nesting, tuple_indexes, '{');
+
+    go_to_clear(else_anti_nesting, {'A'}, 0, -1, {0,1}, {0, 1});
+    link_put(else_anti_nesting, {'\u0000'}, {1});
+
+    go_to(else_anti_nesting, {'V'}, tuple_indexes[0], -1, tuple_indexes);
+    go_to(else_anti_nesting, {'}'}, tuple_indexes[1], 1, tuple_indexes);
+    link_put(else_anti_nesting, {'C'}, {tuple_indexes[0]});
+    go_to(else_anti_nesting, {'V'}, tuple_indexes[0], -1, tuple_indexes);
+    move(else_anti_nesting, tuple_indexes, 1);
+    link_put(else_anti_nesting, {'B'}, {tuple_indexes[0]});
+
+    go_to(else_anti_nesting, {'B'}, tuple_indexes[0], -1, tuple_indexes);
+    copyTupleRight(else_anti_nesting, tuple_indexes, 'B', 'C');
+
+    //removes B and C
+    link_put(else_anti_nesting, {'\u0000'}, {tuple_indexes[0]});
+    go_to(else_anti_nesting, {'C'}, tuple_indexes[0], 1, tuple_indexes);
+    link_put(else_anti_nesting, {'\u0000'}, {tuple_indexes[0]});
+
+    move(else_anti_nesting, tuple_indexes, 1);
+
+    IncompleteSet on_not_end{"on_not_end_"+ to_string(counter), "on_not_end_"+ to_string(counter)};
+    counter++;
+    link_put(on_not_end, {'B'}, {tuple_indexes[0]});
+    copyTupleRight(on_not_end, tuple_indexes, 'B', 'E');
+    link_put(on_not_end, {'\u0000'}, {tuple_indexes[0]});
+    go_to(on_not_end, {'E'}, tuple_indexes[0], 1, tuple_indexes);
+
+    link_on_not(else_anti_nesting, on_not_end, {'E'}, {tuple_indexes[0]});
+
+    //add '}' token
+    go_to(else_anti_nesting, {'H'},  tuple_indexes[0], 1, tuple_indexes);
+    link_put(else_anti_nesting, {'}'}, {1});
+    move(else_anti_nesting, {0,1}, 1);
+    link_put(else_anti_nesting, {'E'}, {0});
+    move(else_anti_nesting, {0,1}, -1);
+    make_token(else_anti_nesting, tuple_indexes, '}');
+
+    //clear working tape
+    go_to_clear(else_anti_nesting, {'A'}, 0, -1, {0,1}, {0,1});
+    link_put(else_anti_nesting, {'\u0000'}, {1});
+
+    //from here but everything inside if statement after old else statement
+    go_to(else_anti_nesting, {'V'}, tuple_indexes[0], -1, tuple_indexes);
+    go_to(else_anti_nesting, {'}'}, tuple_indexes[1], -1, tuple_indexes);
+    link_put(else_anti_nesting, {'C'}, {tuple_indexes[0]});
+    skip_nesting(else_anti_nesting, stack_tape, 1, tuple_indexes[1], -1, tuple_indexes);
+    move(else_anti_nesting, tuple_indexes, 1);
+    link_put(else_anti_nesting, {'B'}, {tuple_indexes[0]});
+    copyTupleRight(else_anti_nesting, tuple_indexes, 'B', 'C');
+    link_put(else_anti_nesting, {'\u0000'}, {tuple_indexes[0]});
+    go_to(else_anti_nesting, {'C'}, tuple_indexes[0], 1, tuple_indexes);
+    link_put(else_anti_nesting, {'\u0000'}, {tuple_indexes[0]});
+    go_to(else_anti_nesting, {'V'}, tuple_indexes[0], 1, tuple_indexes);
+    skip_nesting(else_anti_nesting, stack_tape, 1, tuple_indexes[1], 1, tuple_indexes);
+    move(else_anti_nesting, tuple_indexes, 1);
+    IncompleteSet on_not_end2{"on_not_end_"+ to_string(counter), "on_not_end_"+ to_string(counter)};
+    counter++;
+    link_put(on_not_end2, {'B'}, {tuple_indexes[0]});
+    copyTupleRight(on_not_end2, tuple_indexes, 'B', 'E');
+    link_put(on_not_end2, {'\u0000'}, {tuple_indexes[0]});
+    go_to(on_not_end, {'E'}, tuple_indexes[0], 1, tuple_indexes);
+
+    link_on_not(else_anti_nesting, on_not_end2, {'E'}, {tuple_indexes[0]});
+
+    //from now on
+    //clear everythin from S till E
+    //but everyting from I till H between
+    //copy tup from I till H on working
+    //copy from E till I on working
+    //clear from S till H
+    //go to S
+    //paste from working
+    go_to(else_anti_nesting, {'I'}, tuple_indexes[0], 1, tuple_indexes);
+
+    auto temp = tuple_indexes;
+    temp.push_back(0);
+    temp.push_back(1);
+
+    for (int i=1; i<tuple_indexes.size(); i++){
+
+        int index = tuple_indexes[i];
+        copy_till(else_anti_nesting, {'H'}, tuple_indexes[0], index, 1, 1, temp);
+        go_to(else_anti_nesting, {'E'}, tuple_indexes[0], -1, tuple_indexes);
+        copy_till(else_anti_nesting, {'I'}, tuple_indexes[0], index, 1, 1, temp);
+        link_put(else_anti_nesting, {'E'}, {0});
+        go_to(else_anti_nesting, {'A'}, 0, -1, {0, 1});
+        go_to(else_anti_nesting, {'H'}, tuple_indexes[0], 1, tuple_indexes);
+        go_to_clear(else_anti_nesting, {'S'}, tuple_indexes[0], -1, tuple_indexes, {index});
+        copy_till(else_anti_nesting, {'E'}, 0, 1, index, 1, temp);
+        go_to(else_anti_nesting, {'S'}, tuple_indexes[0], -1, tuple_indexes);
+        go_to(else_anti_nesting, {'I'}, tuple_indexes[0], 1, tuple_indexes);
+
+        //clear working tape
+        go_to_clear(else_anti_nesting, {'A'}, 0, -1, {0,1}, {0,1});
+        link_put(else_anti_nesting, {'\u0000'}, {1});
+    }
+    go_to(else_anti_nesting, {'H'}, tuple_indexes[0], 1, tuple_indexes);
+    go_to_clear(else_anti_nesting, {'A'}, tuple_indexes[0], -1, tuple_indexes, {tuple_indexes[0]});
+    link(a, else_anti_nesting);
+
+}
+
+void TuringTools::copyTupleRight(IncompleteSet &a, const vector<int> &tuple_indexes, char start_token, char end_token) {
+    auto temp = tuple_indexes;
+    temp.push_back(0);
+    temp.push_back(1);
+
+    for (int i=1; i<tuple_indexes.size(); i++){
+        int index = tuple_indexes[i];
+        copy_till(a, {end_token}, tuple_indexes[0], index, 1, 1, temp);
+        link_put(a, {'E'}, {0});
+        go_to(a, {'H'}, tuple_indexes[0], 1, tuple_indexes);
+        go_to(a, {'A'}, 0, -1, {0,1});
+        copy_till(a, {'E'}, 0, 1, index, 1, temp);
+        go_to(a, {start_token}, tuple_indexes[0], -1, tuple_indexes);
+        go_to_clear(a, {'A'}, 0, -1, {0,1}, {0,1});
+        link_put(a, {'\u0000'}, {1});
+
+    }
+    go_to(a, {'H'}, tuple_indexes[0], 1, tuple_indexes);
+    link_put(a, {'\u0000'}, {tuple_indexes[0]});
+    go_to(a, {'\u0000'}, tuple_indexes[1], 1, tuple_indexes);
+    link_put(a, {'H'}, {tuple_indexes[0]});
+    go_to(a, {start_token}, tuple_indexes[0], -1, tuple_indexes);
 
 }
 
