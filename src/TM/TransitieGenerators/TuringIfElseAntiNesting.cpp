@@ -20,12 +20,16 @@ IncompleteSet TuringIfElseAntiNesting::doAction() {
     string nothing_todo = tools->branch_on(result, {'\u0000'}, {get_tuple_index()[1]});
 
     //check if the function found starts with an if statement
-    tools->go_to(result, {'{'}, get_tuple_index()[1], 1, get_tuple_index());
+    tools->go_to(result, {'{', 'S'}, get_tuple_index()[1], 1, get_tuple_index());
+
+    tools->make_loop_on(result, 'S', get_tuple_index()[1]);
+
     tools->move(result, get_tuple_index(), 1);
-    tools->go_to(result, {'0','{'}, get_tuple_index()[1], 1, get_tuple_index());
+    tools->go_to(result, {'0','{', '}'}, get_tuple_index()[1], 1, get_tuple_index());
 
     //makes loop if function not starting with 'if'
     tools->make_loop_on(result, '{', get_tuple_index()[1]);
+    tools->make_loop_on(result, '}', get_tuple_index()[1]);
 
     //in case starting with an if
     tools->link_put(result, {'S'}, {get_tuple_index()[0]});
@@ -79,7 +83,6 @@ IncompleteSet TuringIfElseAntiNesting::doAction() {
 
     tools->go_to(result, {'S', 'V'}, get_tuple_index()[0], -1, get_tuple_index());
 
-
     IncompleteSet onViable{"onViable", "onViable"};
     //clear all other viable
     tools->move(onViable, get_tuple_index(), -1);
@@ -87,8 +90,21 @@ IncompleteSet TuringIfElseAntiNesting::doAction() {
     tools->go_to(onViable, {'V'}, get_tuple_index()[0], 1, get_tuple_index());
     tools->makeAntiNesting(onViable, get_tuple_index());
 
+    tools->write_on(onViable, {'S'}, {get_tuple_index()[0]}, {'\u0000'}, {get_tuple_index()[0]});
+    tools->go_to(onViable, {'A'}, get_tuple_index()[0], -1, get_tuple_index());
     //on viable
     tools->link_on(result, onViable, {'V'}, {get_tuple_index()[0]});
+
+    //tools->write_on(result, {'S'}, {get_tuple_index()[0]}, {'\u0000'}, {get_tuple_index()[0]});
+
+    IncompleteTransition skip;
+    skip.state = nothing_todo;
+    skip.to_state = result.to_state;
+    skip.def_move = 0;
+
+    result.transitions.push_back(skip);
+
+    tools->go_to_clear(result, {'A'}, get_tuple_index()[0], -1, get_tuple_index(), {get_tuple_index()[0]});
 
     return result;
 }

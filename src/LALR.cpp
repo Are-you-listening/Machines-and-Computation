@@ -8,7 +8,7 @@ LALR::LALR(const CFG &cfg) : _cfg(cfg) {}
 
 void LALR::createStates() {
     // manually create I0
-    auto* I0 = new State;
+    state* I0 = new state;
     this->I0 = I0;
     state_counter = 0;
     I0->_stateName = 0;
@@ -21,15 +21,15 @@ void LALR::createStates() {
     //cout << "debug" << endl;
 }
 
-set<State *> LALR::findSimilar(const set<tuple<string, vector<string>, set<string>>> &rules) {
-    queue<State*> remaining;
-    set<State*> visited;
+set<state *> LALR::findSimilar(const set<tuple<string, vector<string>, set<string>>> &rules) {
+    queue<state*> remaining;
+    set<state*> visited;
     remaining.push(I0);
     visited.emplace(I0);
-    set<State*> similarstates;
+    set<state*> similarstates;
 
     while(not remaining.empty()){
-        State* currentstate = remaining.front();
+        state* currentstate = remaining.front();
         remaining.pop();
 
         bool similar = true;
@@ -60,17 +60,17 @@ set<State *> LALR::findSimilar(const set<tuple<string, vector<string>, set<strin
 
 void LALR::mergeSimilar() {
     // find all the similar states
-    set<set<State*>> similarsets;
-    queue<State*> remaining;
-    set<State*> visited;
+    set<set<state*>> similarsets;
+    queue<state*> remaining;
+    set<state*> visited;
     remaining.push(I0);
     visited.emplace(I0);
 
     while (not remaining.empty()){
-        State* currentstate = remaining.front();
+        state* currentstate = remaining.front();
         remaining.pop();
 
-        set<State*> similarstates = findSimilar(currentstate->_productions);
+        set<state*> similarstates = findSimilar(currentstate->_productions);
         if (similarstates.size() > 1){
             similarsets.emplace(similarstates);
             visited.insert(similarstates.begin(), similarstates.end());
@@ -84,7 +84,7 @@ void LALR::mergeSimilar() {
         }
     }
 
-    for (const auto& sstates: similarsets){
+    for (auto sstates: similarsets){
         int mainname = (*sstates.begin())->_stateName;
         set<int> othernames;
         auto stateiter = next(sstates.begin());
@@ -92,7 +92,7 @@ void LALR::mergeSimilar() {
             othernames.emplace((*stateiter)->_stateName);
             stateiter++;
         }
-        // go over the whole table and replace othernames with mainname
+        // go over whole table and replace othernames with mainname
         for (auto &row : parseTable){
             for (auto& element : row.second){
                 for (auto othername : othernames){
@@ -113,7 +113,7 @@ void LALR::mergeSimilar() {
                 }
             }
         }
-        // merge other row contents into the main row
+        // merge other row contents into main row
         for (auto stateiter = next(sstates.begin()); stateiter != sstates.end(); stateiter++){
             for (auto row : parseTable){
                 if (row.first == (*stateiter)->_stateName){
@@ -132,13 +132,13 @@ void LALR::createTable() {
     unordered_map<int, map<string, string>> createdTable;
     createStates();
 
-    queue<State*> remaining;
-    set<State*> visited;
+    queue<state*> remaining;
+    set<state*> visited;
     remaining.push(I0);
     visited.emplace(I0);
 
     while(not remaining.empty()){
-        State* currentstate = remaining.front();
+        state* currentstate = remaining.front();
         remaining.pop();
 
         map<string, string> rowcontent;
@@ -156,7 +156,7 @@ void LALR::createTable() {
 
         for (const auto &connection: currentstate->_connections) {
             string inputsymbol = connection.first;
-            State *otherstate = connection.second;
+            state *otherstate = connection.second;
 
             if (std::find(_cfg.getV().begin(), _cfg.getV().end(), inputsymbol) != _cfg.getV().end()) {
                 rowcontent[inputsymbol] = to_string(otherstate->_stateName);
@@ -170,7 +170,7 @@ void LALR::createTable() {
             for (auto &element: createdTable[currentstate->_stateName]) {
                 if (rowcontent.find(element.first) != rowcontent.end()) {
                     if (element.second.substr(0, 1) == "R" && rowcontent[element.first].substr(0, 1) == "S") {
-                        element.second = rowcontent[element.first];// the new row has a shift in the corresponding position while the original has a reduction
+                        element.second = rowcontent[element.first];// the new row has a shift in the corresponding position while the original has a reduce
                     }
                 }
             }
@@ -240,7 +240,7 @@ augmentedrules LALR::createAugmented(const tuple<string, vector<string>, set<str
     return result;
 }
 
-void State::createConnections(LALR &lalr) {
+void state::createConnections(LALR &lalr) {
     map<string, augmentedrules > transitionmap;
     for (const auto& rule : _productions) {
         int dotIndex = 0;
@@ -261,22 +261,22 @@ void State::createConnections(LALR &lalr) {
         tuple<string, vector<string>, set<string>> changedrule = make_tuple(get<0>(rule), newvector, get<2>(rule));
         transitionmap[readSymbol].emplace(changedrule);
     }
-    for (const auto& newstate_data: transitionmap) {
+    for (auto newstate_data: transitionmap) {
         string readSymbol = newstate_data.first;
         augmentedrules newrules;
 
-        for (const auto& changedrule: newstate_data.second) {
+        for (auto changedrule: newstate_data.second) {
             augmentedrules temp = lalr.createAugmented(changedrule);
             newrules.insert(temp.begin(), temp.end());
         }
 
-        State *otherstate;
-        State *tempstate = lalr.findState(newrules);
+        state *otherstate;
+        state *tempstate = lalr.findstate(newrules);
         if (tempstate != nullptr) {
             _connections.emplace_back(readSymbol, tempstate);
             otherstate = tempstate;
         } else {
-            auto *newstate = new State;
+            state *newstate = new state;
             lalr.state_counter++;
             newstate->_stateName = lalr.state_counter;
             newstate->_productions = newrules;
@@ -287,7 +287,7 @@ void State::createConnections(LALR &lalr) {
 
         for (const auto &state_rule: otherstate->_productions) {
             if (get<1>(state_rule).back() ==
-                ".") {// if the state_rule has a dot at the end of the body, it is an ending state_rule
+                ".") {// if the state_rule has a dot at the end of the body it is an ending state_rule
                 if (get<0>(state_rule) == lalr._cfg.getS() + "'") {
                     otherstate->endings.emplace(-1, get<2>(state_rule));
                 } else {
@@ -306,23 +306,24 @@ void State::createConnections(LALR &lalr) {
             }
         }
     }
+    //std::cout << "end createConections" <<std::endl;
 }
 
-State::~State() {
+state::~state() {
     for (auto& connection : _connections){
         delete connection.second;
     }
 }
 
-State *LALR::findState(const set<tuple<string, vector<string>, set<string>>>& rules) {
-    // search for a state that has the given rules using a breadth-first search pattern
-    queue<State*> remaining;
-    set<State*> visited;
+state *LALR::findstate(const set<tuple<string, vector<string>, set<string>>>& rules) {
+    // search for a state that has the given rules using breadth-first search pattern
+    queue<state*> remaining;
+    set<state*> visited;
     remaining.push(I0);
     visited.emplace(I0);
 
     while(not remaining.empty()){
-        State* current = remaining.front();
+        state* current = remaining.front();
         remaining.pop();
 
         if (current->_productions == rules){
@@ -338,23 +339,23 @@ State *LALR::findState(const set<tuple<string, vector<string>, set<string>>>& ru
     return nullptr;
 }
 
-void LALR::printStates() {
-    queue<State*> remaining;
-    set<State*> visited;
+void LALR::printstates() {
+    queue<state*> remaining;
+    set<state*> visited;
     remaining.push(I0);
 
     while (not remaining.empty()){
-        State* current = remaining.front();
+        state* current = remaining.front();
         remaining.pop();
 
         cout << current->_stateName << endl;
         for (auto rule: current->_productions) {
             cout << "\t" << get<0>(rule) << " --> ";
-            for (const auto& element: get<1>(rule)) {
+            for (auto element: get<1>(rule)) {
                 cout << " " << element;
             }
             cout << " ,";
-            for (const auto& LA: get<2>(rule)) {
+            for (auto LA: get<2>(rule)) {
                 cout << " " << LA;
             }
             cout << endl;
@@ -374,9 +375,9 @@ void LALR::parse(std::vector<std::tuple<std::string, std::string, std::set<std::
     s.push(0);
     std::set<std::string> S={};
     auto remaininginputvector = input;
-    remaininginputvector.emplace_back("$","$", S);
+    remaininginputvector.push_back({"$","$", S});
 
-    vector<ParseTree*> treetops;
+    vector<parseTree*> treetops;
     while (true){
         if (remaininginputvector.empty()){
             break;
@@ -389,7 +390,7 @@ void LALR::parse(std::vector<std::tuple<std::string, std::string, std::set<std::
         }
         string operation = parseTable[stacksymbol][inputsymbol];
 
-        //cout << "stacksymbol: " << stacksymbol << ", inputsymbol: " << inputsymbol << " --> " << operation << endl;
+        cout << "stacksymbol: " << stacksymbol << ", inputsymbol: " << inputsymbol << " --> " << operation << endl;
 
         if (operation == "accept"){
             break;
@@ -411,36 +412,33 @@ void LALR::parse(std::vector<std::tuple<std::string, std::string, std::set<std::
 
             }
 
-            auto* newparent = new ParseTree;
+            parseTree* newparent = new parseTree;
             treetops.push_back(newparent);
             newparent->symbol = rule->first;
             if (rule->first == _cfg.getS()){
                 _root = newparent;
             }
-            for (const string &symbol : rule->second){
+            for (string symbol : rule->second){
                 bool found = false;
-                auto it = treetops.begin();
-                set<vector<ParseTree*>::iterator> toRemove;
-                while(it != treetops.end()){
+                set<vector<parseTree*>::iterator> toRemove;
+                for(auto it = treetops.begin(); it != treetops.end();it++){
                     if ((*it)->symbol == symbol){
-                        ParseTree* temp = *it;
+                        parseTree* temp = *it;
                         newparent->children.push_back(temp);
                         found = true;
                         toRemove.insert(it);
                     }
-                    it++;
                 }
                 for (auto temp : toRemove){
                     treetops.erase(temp);
                 }
                 if (not found) {
-                    auto *newchild = new ParseTree;
+                    parseTree *newchild = new parseTree;
                     newchild->symbol = symbol;
                     newparent->children.push_back(newchild);
                 }
                 s.pop();
             }
-            treetops.push_back(newparent);
         } else {
             s.push(stoi(operation));
         }
@@ -456,34 +454,35 @@ void LALR::printTable() {
     }
 }
 
-void LALR::cleanUp() const {
+void LALR::cleanUp() {
     bool V = false;
     _root->traverse(_cfg.getT(),_root,V);
 }
 
-ParseTree::~ParseTree() {
+parseTree::~parseTree() {
     for (const auto& child : children){
         delete child;
     }
 }
 
-void ParseTree::traverse(const std::vector<std::string> &T, ParseTree* _root, bool &V_root) {
+void parseTree::traverse(const std::vector<std::string> &T, parseTree* _root, bool &V_root) {
     bool V = false;
 
     for(long unsigned int i = 0;  i<children.size(); ++i){
         auto child = children[i];
-        if(child->symbol=="{" || child->symbol=="}"){ //Stop cleanup if a bracket is reached; we may not modify this
+        if(child->symbol=="{" || child->symbol=="}"){ //Stop cleanup if bracket reach; we may not modify this
             V=true;
         }else if( std::find(T.begin(), T.end(),child->symbol)==T.end() ){ //We found a variable
             V = true;
             child->traverse(T,this,V); //Traverse the child
-            if(!V){ //Reloop in case the child made a change
+            //Reloop
+            if(!V){ //Reloop incase the child made a change
                 i = -1;
             }
         }
     }
 
-    std::vector<ParseTree*> temp;
+    std::vector<parseTree*> temp;
     if(!V){ //No Variables found: Cleanup this one
         for(auto &it: _root->children){ //Collect the "new children"
             if(it==this){
@@ -501,4 +500,8 @@ void ParseTree::traverse(const std::vector<std::string> &T, ParseTree* _root, bo
     }
 }
 
-ParseTree::ParseTree(const vector<ParseTree *> &children, string symbol) : children(children), symbol(std::move(symbol)) {}
+parseTree::parseTree( vector<parseTree *> children,  string symbol) : children(children), symbol(symbol) {}
+
+parseTree::parseTree() {
+
+}
