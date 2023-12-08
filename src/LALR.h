@@ -47,9 +47,24 @@ public:
     string symbol;
     ~parseTree();
 
+    /**
+     * Simple Constructor
+     */
     parseTree();
+
+    /**
+     * Full Constructor
+     * @param children
+     * @param symbol
+     */
     parseTree( vector<parseTree *> children,  string symbol);
 
+    /**
+     * Traverse the parse tree & cleanup
+     * @param T
+     * @param _root
+     * @param V_root
+     */
     void traverse(const std::vector<std::string> &T , parseTree* _root, bool &V_root);
 };
 
@@ -89,7 +104,7 @@ public:
     void parse(std::vector<std::pair<std::string, std::string>> &input);
 
     /**
-     * Clean up the parsetree so it has a usable format
+     * Clean up the parse tree so it has a usable format
      */
     void cleanUp();
 };

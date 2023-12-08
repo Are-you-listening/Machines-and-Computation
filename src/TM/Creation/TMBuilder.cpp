@@ -44,7 +44,7 @@ TMBuilder_output TMBuilder::generateTM() {
     tools->link(program, ifElse.getTransitions());
 
     IncompleteSet breaker{"breaker", "breaker2"};
-    //tools->link(program, breaker);
+    tools->link(program, breaker);
 
 
     TuringVarDictionary vardict{};

@@ -120,3 +120,7 @@ string Tape::exportTape() {
     }
     return output;
 }
+
+long Tape::getTapeHeadIndex() const {
+    return tape_head_index;
+}
