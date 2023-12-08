@@ -1,0 +1,38 @@
+auto cfg = createCFG();
+    auto cfg3 = createCFG();
+    CFG cfg2("input/CFG/testGNF.json");
+    cfg2.setCnf(true);
+    cfg2.toGNF();
+    cfg2.print();
+    cfg->print();
+    cfg->toGNF(); // this still needs massive debugging.
+    cfg->print();
+    //cfg->toCNF();
+    cfg3->toCNF();
+
+    parseTree* b = new parseTree({},"b");
+    parseTree* CL  = new parseTree({},"{");
+    parseTree* c  = new parseTree({},"c");
+    parseTree* d  = new parseTree({},"d");
+    parseTree* CR  = new parseTree({},"}");
+    parseTree* s  = new parseTree({},"s");
+    parseTree* k  = new parseTree({},"k");
+    parseTree* e  = new parseTree({},"e");
+
+    parseTree* S = new parseTree({s},"S");
+    parseTree* K = new parseTree({k,S},"K");
+    parseTree* E = new parseTree({e,K,CR},"E");
+    parseTree* D = new parseTree({d},"D");
+    parseTree* C = new parseTree({c,D},"C");
+    parseTree* B = new parseTree({CL,C,E},"B");
+    parseTree* A = new parseTree( {b,B}, "A" );
+
+    CFG a = *cfg;
+    LALR lalr(a);
+    const std::vector<std::string> t = {"{","}","b","c","d","e","s","k"};
+    a.setT(t);
+    lalr._root = A;
+    lalr._cfg.setT(t);
+    std::cout << std::endl;
+    lalr.cleanUp();
+    std::cout << "y" << std::endl;

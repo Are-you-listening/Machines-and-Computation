@@ -88,6 +88,8 @@ public:
 
     const vector<std::string> &getT() const;
 
+    void setT(const vector<std::string> &t);
+
     const vector<std::pair<std::string, std::vector<std::string>>> &getP() const;
 
     const string &getS() const;

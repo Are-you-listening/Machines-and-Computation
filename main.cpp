@@ -26,7 +26,7 @@ int main() { // Function names we create to replace nesting should have F or I i
     std::string Filelocation="input/nestedExamples/engine.cc"; // for now, doesn't support double declarations like int a,d;
     std::thread Tokenizer(&Tokenisation::Tokenize, &tokenVector, Filelocation); // i ignore rvalues in function calls
     core_amount--;
-    Tokenizer.join();
+    //Tokenizer.join();
     
     Orchestrator();
 
@@ -80,7 +80,7 @@ int main() { // Function names we create to replace nesting should have F or I i
     
     //create LARL parser with tokenvector
     auto vec = tokenVector.getTokenVector();
-    //lalr.parse(vec); this should be changed to new vector
+    lalr.parse(vec);
     //cleanup
     //if-else antinesting
     //move

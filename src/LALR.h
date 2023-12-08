@@ -16,6 +16,9 @@
 
 #include <queue>
 #include <stack>
+#include <algorithm>
+#include <tuple>
+#include <set>
 
 #include "src/CFG.h"
 
@@ -43,6 +46,26 @@ public:
     vector<parseTree*> children;
     string symbol;
     ~parseTree();
+
+    /**
+     * Simple Constructor
+     */
+    parseTree();
+
+    /**
+     * Full Constructor
+     * @param children
+     * @param symbol
+     */
+    parseTree( vector<parseTree *> children,  string symbol);
+
+    /**
+     * Traverse the parse tree & cleanup
+     * @param T
+     * @param _root
+     * @param V_root
+     */
+    void traverse(const std::vector<std::string> &T , parseTree* _root, bool &V_root);
 };
 
 /*
@@ -53,7 +76,7 @@ class LALR {
     void createStates();   // creates I0, I1, ...
     set<state *> findSimilar(const set<tuple<string, vector<string>, set<string>>> &rules);
     void mergeSimilar();
-    
+
 public:
     unordered_map<int, map<string, string>> parseTable;
     CFG _cfg;
@@ -61,22 +84,29 @@ public:
     parseTree* _root;
 
     void printTable();  // this function is mainly for debugging and is not needed for LALR parsing
-    
+
     augmentedrules createAugmented(const tuple<string, vector<string>, set<string>> &inputrule);
-    
+
     /**
      * Constructor
      * @param cfg , in GNF
      */
     LALR(const CFG &cfg);
-    
+
     void createTable();
-    
+
     state* findstate(const augmentedrules& rules);
-    
+
     void printstates();
-    
+
+    void parse(std::vector<std::tuple<std::string, std::string, std::set<std::string>>> &input);
+
     void parse(std::vector<std::pair<std::string, std::string>> &input);
+
+    /**
+     * Clean up the parse tree so it has a usable format
+     */
+    void cleanUp();
 };
 
 #endif//CFG_LALR_H
