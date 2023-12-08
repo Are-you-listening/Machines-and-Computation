@@ -210,6 +210,7 @@ TEST(TuringMachineTest, TM_tokenazation) {
         }
     }
 
+    cout << endl;
     for (int i = 0; i < tm.getTapeAmount(); i++){
         cout << tm.getTapeData(i) << endl;
     }
@@ -218,7 +219,8 @@ TEST(TuringMachineTest, TM_tokenazation) {
         cout << "i " << tm.getTuringIndex(i) << endl;
     }
 
-    cout << endl;
+    cout << tm.getCurrentState() << std::endl;
+
     cout << "halted time " << halted_time << endl;
 
 

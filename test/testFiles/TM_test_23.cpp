@@ -3,5 +3,6 @@ void test(){
     }else{
         {}
         int a = 0;
+        return;
     }
 }
