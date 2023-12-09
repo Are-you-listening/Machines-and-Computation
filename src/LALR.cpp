@@ -468,11 +468,14 @@ void LALR::cleanUp() {
 
 void LALR::matchBrackets(ParseTree* root) {
     std::tuple<ParseTree *, ParseTree *, unsigned long,bool> lb = {nullptr, nullptr,0,false};
+    stack<ParseTree*> Lrootstack;
     std::tuple<ParseTree *, ParseTree *, unsigned long,bool> rb = {nullptr, nullptr,0,false};
+    stack<ParseTree*> Rrootstack;
     vector<ParseTree*> tempchilds;
     bool found;
-    root->findBracket(true,lb,_cfg.getT());
-    root->findBracket(false,rb,_cfg.getT());
+
+    root->findBracket(true,lb,_cfg.getT(),Lrootstack);
+    root->findBracket(false,rb,_cfg.getT(),Rrootstack);
 
     if(!get<3>(lb) || !get<3>(rb)){ //No more bracket found
         return;
@@ -608,10 +611,6 @@ void LALR::matchBrackets(ParseTree* root) {
     }
 
 
-    //Make Consistent
-
-
-
     //Check all the subvariables
     for(auto &child: root->children){
         if(std::find(T.begin(), T.end(),child->symbol)==T.end() ) { //We found a variable
@@ -669,7 +668,7 @@ void ParseTree::clean(const std::vector<std::string> &T, ParseTree* _root, bool 
 
 ParseTree::ParseTree(const vector<ParseTree *> &children, string symbol): children(children),symbol(std::move(symbol)) {}
 
-void ParseTree::findBracket(bool left, std::tuple<ParseTree *, ParseTree *, unsigned long, bool> &data,const std::vector<std::string> &T) { // { _root, bracket , depth }
+void ParseTree::findBracket(bool left, std::tuple<ParseTree *, ParseTree *, unsigned long, bool> &data,const std::vector<std::string> &T,stack<ParseTree*> &rootstack) { // { _root, bracket , depth }
     long unsigned int i;
     int adjust;
     long unsigned int extreme;
@@ -694,6 +693,8 @@ void ParseTree::findBracket(bool left, std::tuple<ParseTree *, ParseTree *, unsi
         }
     }
 
+    rootstack.push(this); //Add itsself to the stack
+
     for(long unsigned int j=i ; j!=extreme; j+=adjust){
         if(std::get<3>(data)){ //In case found
             return;
@@ -707,7 +708,7 @@ void ParseTree::findBracket(bool left, std::tuple<ParseTree *, ParseTree *, unsi
             return;
         }else if( std::find(T.begin(), T.end(),children[j]->symbol)==T.end() ){ //If Variable: search the left most "{" in this tree
             std::get<2>(data) = ++std::get<2>(data); //Increase depth
-            children[j]->findBracket(left,data,T);
+            children[j]->findBracket(left,data,T,rootstack);
         }
     }
 

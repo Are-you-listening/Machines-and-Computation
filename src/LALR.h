@@ -77,13 +77,15 @@ public:
      */
     void clean(const std::vector<std::string> &T , ParseTree* _root, bool &V_root);
 
-    void findBracket(bool left, std::tuple<ParseTree *, ParseTree *, unsigned long,bool> &data, const std::vector<std::string> &T); // { _root, bracket  , depth }
+    void findBracket(bool left, std::tuple<ParseTree *, ParseTree *, unsigned long,bool> &data, const std::vector<std::string> &T,stack<ParseTree*> &rootstack); // { _root, bracket  , depth }
 
     /**
      * Apply on the UpperRoot
      * @return
      */
     void sameUpperRoot(ParseTree* lostChild, bool &found);
+
+    void shift();
 
     void consisten();
 };
