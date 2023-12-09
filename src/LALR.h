@@ -20,6 +20,7 @@
 #include <tuple>
 #include <set>
 
+#include "Config.h"
 #include "src/CFG.h"
 
 typedef set<tuple<string, vector<string>, set<string>>> augmentedrules; //Use typedef to simplify usage
@@ -75,6 +76,8 @@ public:
      * @param V_root
      */
     void traverse(const std::vector<std::string> &T , ParseTree* _root, bool &V_root);
+
+    void findBracket(bool left,std::tuple<ParseTree *, ParseTree *, unsigned long,bool> &data); // { _root, bracket  , depth }
 };
 
 /**
@@ -119,6 +122,8 @@ public:
      * Clean up the parse tree so it has a usable format
      */
     void cleanUp() const;
+
+    void move();
 };
 
 #endif//CFG_LALR_H
