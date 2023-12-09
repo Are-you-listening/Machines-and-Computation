@@ -459,6 +459,15 @@ void LALR::cleanUp() const {
     _root->traverse(_cfg.getT(),_root,V);
 }
 
+void LALR::move() {
+    unsigned long max = Config::getConfig()->getMaxNesting();
+
+    std::tuple<ParseTree *, ParseTree *, unsigned long,bool> lb = {nullptr, nullptr,0,false};
+    std::tuple<ParseTree *, ParseTree *, unsigned long,bool> rb = {nullptr, nullptr,0,false};
+    _root->findBracket(true,lb);
+    //_root->findBracket(false,rb);
+}
+
 ParseTree::~ParseTree() {
     for (const auto& child : children){
         delete child;
@@ -501,3 +510,42 @@ void ParseTree::traverse(const std::vector<std::string> &T, ParseTree* _root, bo
 }
 
 ParseTree::ParseTree(const vector<ParseTree *> &children, string symbol): children(children),symbol(std::move(symbol)) {}
+
+void ParseTree::findBracket(bool left, std::tuple<ParseTree *, ParseTree *, unsigned long, bool> &data) { // { _root, bracket , depth }
+    long unsigned int i;
+    int adjust;
+    long unsigned int extreme;
+    long unsigned int reset;
+
+    if(left){
+        i = 0;
+        extreme = children.size()-1;
+        adjust = 1;
+        reset = -1;
+    }else{
+        i = children.size()-1;
+        extreme = 0;
+        adjust = -1;
+        reset = children.size();
+    }
+
+    for(long unsigned int j=i ; j!=extreme; j+=adjust){
+        if(std::get<3>(data)){ //In case found
+            return;
+        }
+
+        if(children[j]->symbol=="{"){ //If bracket found
+            std::get<0>(data) = this; //Set root
+            std::get<1>(data) = children[j]; //Set child
+            std::get<3>(data) = true; //Set found
+            j = reset;
+            return;
+        }else if( std::find(T.begin(), T.end(),children[j]->symbol)==T.end() ){ //If Variable: search the left most "{" in this tree
+            std::get<2>(data) = ++std::get<2>(data); //Increase depth
+            findBracket(left,data);
+        }
+    }
+
+    //Nothing found in this subtree
+    return; //Give root: so we can go "back"
+}
