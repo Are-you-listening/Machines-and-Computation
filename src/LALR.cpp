@@ -455,14 +455,7 @@ void LALR::printTable() {
 }
 
 void LALR::cleanUp() {
-    bool V = false;
-    _root->clean(_cfg.getT(), _root, V);
-
-    /**
-     * Make sure every parenthese is matched at the same level
-     **/
      matchBrackets(_root);
-     _root->consistent(); //Remove left over deleted ptrs in tree
 }
 
 void LALR::matchBrackets(ParseTree* root) {
@@ -471,6 +464,12 @@ void LALR::matchBrackets(ParseTree* root) {
 
     root->findBracket(true,lb,_cfg.getT());
     root->findBracket(false,rb,_cfg.getT());
+
+    if(!std::get<3>(lb) || !std::get<3>(rb)){ //No bracket found
+        bool V = false;
+        root->clean(_cfg.getT(), _root, V); //Make it clean
+        return;
+    }
 
     ParseTree* LB = std::get<1>(lb);
     vector<ParseTree*> lStack = std::get<4>(lb);
@@ -514,6 +513,9 @@ void LALR::matchBrackets(ParseTree* root) {
     ParseTree* b2 = new ParseTree(B2,"");
 
     Uroot->children = {b1, LB, s , RB , b2};
+
+    //Go Recursively
+    matchBrackets(s);
 }
 /*
 void LALR::matchBrackets(ParseTree* root) {
