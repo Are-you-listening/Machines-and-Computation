@@ -456,7 +456,7 @@ void LALR::printTable() {
 
 void LALR::cleanUp() const {
     bool V = false;
-    _root->traverse(_cfg.getT(),_root,V);
+    _root->clean(_cfg.getT(), _root, V);
 
     /**
      * Make sure every parenthese is matched at the same level
@@ -567,7 +567,7 @@ ParseTree::~ParseTree() {
     }
 }
 
-void ParseTree::traverse(const std::vector<std::string> &T, ParseTree* _root, bool &V_root) {
+void ParseTree::clean(const std::vector<std::string> &T, ParseTree* _root, bool &V_root) {
     bool V = false;
 
     for(long unsigned int i = 0;  i<children.size(); ++i){
@@ -576,7 +576,7 @@ void ParseTree::traverse(const std::vector<std::string> &T, ParseTree* _root, bo
             V=true;
         }else if( std::find(T.begin(), T.end(),child->symbol)==T.end() ){ //We found a variable
             V = true;
-            child->traverse(T,this,V); //Traverse the child
+            child->clean(T, this, V); //Traverse the child
             //Reloop
             if(!V){ //Reloop in case the child made a change
                 i = -1;

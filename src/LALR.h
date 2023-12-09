@@ -75,7 +75,7 @@ public:
      * @param _root
      * @param V_root
      */
-    void traverse(const std::vector<std::string> &T , ParseTree* _root, bool &V_root);
+    void clean(const std::vector<std::string> &T , ParseTree* _root, bool &V_root);
 
     void findBracket(bool left, std::tuple<ParseTree *, ParseTree *, unsigned long,bool> &data, const std::vector<std::string> &T); // { _root, bracket  , depth }
 
