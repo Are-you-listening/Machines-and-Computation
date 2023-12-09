@@ -457,39 +457,95 @@ void LALR::printTable() {
 void LALR::cleanUp() const {
     bool V = false;
     _root->traverse(_cfg.getT(),_root,V);
-}
 
-void LALR::move() {
-    unsigned long max = Config::getConfig()->getMaxNesting();
-
+    /**
+     * Make sure every parenthese is matched at the same level
+     **/
     std::tuple<ParseTree *, ParseTree *, unsigned long,bool> lb = {nullptr, nullptr,0,false};
     std::tuple<ParseTree *, ParseTree *, unsigned long,bool> rb = {nullptr, nullptr,0,false};
     vector<ParseTree*> tempchilds;
+    bool found;
     _root->findBracket(true,lb,_cfg.getT());
     _root->findBracket(false,rb,_cfg.getT());
 
-    //Bracket with highet depth needs to be placed on the equal level
+    //Bracket with highest depth needs to be placed on the equal level
     if( get<2>(lb) > get<2>(rb) ) { //Left is deeper and needs to be replaced
-        tempchilds = {get<1>(lb)};
+        get<0>(rb)->sameUpperRoot(get<1>(lb),found); //Check if the root of RB contains LB
+        if(found){ //sameUpperRoot: respect index/child order;
+            // index after which the bracket needs to be inserted:
+            // for(child: children){ IF(child.sameUpperRoot) } === index
+            found = false; //Reset found
+            long unsigned int i;
 
-        for(auto &child: get<0>(rb)->children ){ //Make 1 new vector with all the children including LeftBracket for the parent
-            tempchilds.push_back(child);
+            for(i = 0; i<get<0>(rb)->children.size(); ++i ){
+                get<0>(rb)->children[i]->sameUpperRoot(get<1>(lb),found);
+
+                if(found){
+                    tempchilds.push_back(get<0>(rb)->children[i]);
+                    tempchilds.push_back(get<1>(lb));
+                }else{
+                    tempchilds.push_back(get<0>(rb)->children[i]);
+                }
+            }
+
+            for(i = 0; i<get<0>(rb)->children.size(); ++i ){ //Add the rest of the children
+                tempchilds.push_back(get<0>(rb)->children[i]);
+            }
+
+            get<0>(rb)->children = tempchilds; //Replace
+            tempchilds.clear();
+
+        }else{ //Just regular move
+
+            //Make 1 new vector with all the children including LeftBracket
+            tempchilds = {get<1>(lb)};
+            for(auto &child: get<0>(rb)->children ){
+                tempchilds.push_back(child);
+            }
+            get<0>(rb)->children = tempchilds; //Replace
+            tempchilds.clear();
         }
-        get<0>(rb)->children = tempchilds; //Replace
-        tempchilds.clear();
 
-        for(auto &child: get<0>(lb)->children ){ //Make 1 new vector with all the children excluding LeftBracket for the parent
+        //Erase LB from lb_root
+        for(auto &child: get<0>(lb)->children ){
             if(child!=get<1>(lb)){ //Add everything except the bracket itsself
                 tempchilds.push_back(child);
             }
         }
         get<0>(lb)->children = tempchilds; //Replace lb _root
-        tempchilds.clear(); //Free useless memory
+        tempchilds.clear(); //Free useless used memory
+
+
     }else if( get<2>(lb) == get<2>(rb) ){
         //Might be equal; don't change a thing
     }else{ //Right is deeper, add right bracket to leftbracket-parents and remove rightbracket from its own parent
-        get<0>(lb)->children.push_back(get<1>(rb)); //Add rightbracket
+        get<0>(lb)->sameUpperRoot(get<1>(rb),found); //Check if the root of RB contains LB
+        if(found){
+            found = false; //Reset found
+            long unsigned int i;
 
+            for(i = 0; i<get<0>(lb)->children.size(); ++i ){ //For every child of LB Root
+                get<0>(lb)->children[i]->sameUpperRoot(get<1>(rb),found); //Check if this is the upperRoot of the node we want to replace
+
+                if(found){ //If yes
+                    tempchilds.push_back(get<1>(rb)); //Add the LB
+                    tempchilds.push_back(get<0>(lb)->children[i]); //Add the child
+                }else{
+                    tempchilds.push_back(get<0>(lb)->children[i]); //Just add the child to keep the order
+                }
+            }
+
+            //Add the rest of the children
+            for(i = 0; i<get<0>(lb)->children.size(); ++i ){
+                tempchilds.push_back(get<0>(lb)->children[i]);
+            }
+            get<0>(lb)->children = tempchilds; //Replace
+            tempchilds.clear();
+        }else{ //Nothing special required
+            get<0>(lb)->children.push_back(get<1>(rb)); //Add rightbracket at the end
+        }
+
+        //Erase from other one
         for(auto &child: get<0>(rb)->children ){
             if(child!=get<1>(rb)){
                 tempchilds.push_back(child);
@@ -498,7 +554,10 @@ void LALR::move() {
         get<0>(rb)->children = tempchilds; //Replace rb _root
         tempchilds.clear(); //Free useless memory
     }
+}
 
+void LALR::move() {
+    unsigned long max = Config::getConfig()->getMaxNesting();
     std::cout << std::endl;
 }
 
@@ -584,4 +643,16 @@ void ParseTree::findBracket(bool left, std::tuple<ParseTree *, ParseTree *, unsi
     }
 
     //Nothing found in this subtree; return
+}
+
+void ParseTree::sameUpperRoot(ParseTree* lostChild, bool &found) {
+    for(long unsigned int i = 0; i<children.size(); ++i){
+        if(children[i]==lostChild){
+            found = true;
+            return;
+        }else{
+            children[i]->sameUpperRoot(lostChild,found);
+            if(found){return;}
+        }
+    }
 }
