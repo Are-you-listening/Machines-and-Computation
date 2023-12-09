@@ -464,8 +464,42 @@ void LALR::move() {
 
     std::tuple<ParseTree *, ParseTree *, unsigned long,bool> lb = {nullptr, nullptr,0,false};
     std::tuple<ParseTree *, ParseTree *, unsigned long,bool> rb = {nullptr, nullptr,0,false};
-    _root->findBracket(true,lb);
-    //_root->findBracket(false,rb);
+    vector<ParseTree*> tempchilds;
+    _root->findBracket(true,lb,_cfg.getT());
+    _root->findBracket(false,rb,_cfg.getT());
+
+    //Bracket with highet depth needs to be placed on the equal level
+    if( get<2>(lb) > get<2>(rb) ) { //Left is deeper and needs to be replaced
+        tempchilds = {get<1>(lb)};
+
+        for(auto &child: get<0>(rb)->children ){ //Make 1 new vector with all the children including LeftBracket for the parent
+            tempchilds.push_back(child);
+        }
+        get<0>(rb)->children = tempchilds; //Replace
+        tempchilds.clear();
+
+        for(auto &child: get<0>(lb)->children ){ //Make 1 new vector with all the children excluding LeftBracket for the parent
+            if(child!=get<1>(lb)){ //Add everything except the bracket itsself
+                tempchilds.push_back(child);
+            }
+        }
+        get<0>(lb)->children = tempchilds; //Replace lb _root
+        tempchilds.clear(); //Free useless memory
+    }else if( get<2>(lb) == get<2>(rb) ){
+        //Might be equal; don't change a thing
+    }else{ //Right is deeper, add right bracket to leftbracket-parents and remove rightbracket from its own parent
+        get<0>(lb)->children.push_back(get<1>(rb)); //Add rightbracket
+
+        for(auto &child: get<0>(rb)->children ){
+            if(child!=get<1>(rb)){
+                tempchilds.push_back(child);
+            }
+        }
+        get<0>(rb)->children = tempchilds; //Replace rb _root
+        tempchilds.clear(); //Free useless memory
+    }
+
+    std::cout << std::endl;
 }
 
 ParseTree::~ParseTree() {
@@ -511,22 +545,25 @@ void ParseTree::traverse(const std::vector<std::string> &T, ParseTree* _root, bo
 
 ParseTree::ParseTree(const vector<ParseTree *> &children, string symbol): children(children),symbol(std::move(symbol)) {}
 
-void ParseTree::findBracket(bool left, std::tuple<ParseTree *, ParseTree *, unsigned long, bool> &data) { // { _root, bracket , depth }
+void ParseTree::findBracket(bool left, std::tuple<ParseTree *, ParseTree *, unsigned long, bool> &data,const std::vector<std::string> &T) { // { _root, bracket , depth }
     long unsigned int i;
     int adjust;
     long unsigned int extreme;
     long unsigned int reset;
+    std::string bracket;
 
     if(left){
         i = 0;
-        extreme = children.size()-1;
+        extreme = children.size();
         adjust = 1;
         reset = -1;
+        bracket="{";
     }else{
         i = children.size()-1;
         extreme = 0;
         adjust = -1;
-        reset = children.size();
+        reset = children.size()-1;
+        bracket="}";
     }
 
     for(long unsigned int j=i ; j!=extreme; j+=adjust){
@@ -534,7 +571,7 @@ void ParseTree::findBracket(bool left, std::tuple<ParseTree *, ParseTree *, unsi
             return;
         }
 
-        if(children[j]->symbol=="{"){ //If bracket found
+        if(children[j]->symbol==bracket){ //If bracket found
             std::get<0>(data) = this; //Set root
             std::get<1>(data) = children[j]; //Set child
             std::get<3>(data) = true; //Set found
@@ -542,10 +579,9 @@ void ParseTree::findBracket(bool left, std::tuple<ParseTree *, ParseTree *, unsi
             return;
         }else if( std::find(T.begin(), T.end(),children[j]->symbol)==T.end() ){ //If Variable: search the left most "{" in this tree
             std::get<2>(data) = ++std::get<2>(data); //Increase depth
-            findBracket(left,data);
+            children[j]->findBracket(left,data,T);
         }
     }
 
-    //Nothing found in this subtree
-    return; //Give root: so we can go "back"
+    //Nothing found in this subtree; return
 }
