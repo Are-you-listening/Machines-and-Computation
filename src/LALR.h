@@ -79,15 +79,7 @@ public:
 
     void findBracket(bool left, std::tuple<ParseTree *, ParseTree *, unsigned long,bool, vector<ParseTree*>> &data, const std::vector<std::string> &T); // { _root, bracket  , depth, found, rootstack }
 
-    /**
-     * Apply on the UpperRoot
-     * @return
-     */
-    void sameUpperRoot(ParseTree* lostChild, bool &found);
-
     void shift(std::vector<ParseTree*> &stack, ParseTree* Uroot);
-
-    void consistent();
 };
 
 /**
@@ -128,16 +120,11 @@ public:
 
     void parse(std::vector<std::pair<std::string, std::string>> &input);
 
-    /**
-     * Clean up the parse tree so it has a usable format
-     */
-    void cleanUp();
-
-    void matchBrackets(ParseTree* root);
+    void matchBrackets(ParseTree* root) const;
 
     ParseTree* findUpperRoot(vector<ParseTree*> &lStack, vector<ParseTree*> &rStack) const;
 
-    void move();
+    void move() const;
 };
 
 #endif//CFG_LALR_H
