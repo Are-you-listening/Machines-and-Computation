@@ -488,7 +488,7 @@ void LALR::cleanUp() const {
                 }
             }
 
-            for(i = 0; i<get<0>(rb)->children.size(); ++i ){ //Add the rest of the children
+            for(i = i; i<get<0>(rb)->children.size(); ++i ){ //Add the rest of the children
                 tempchilds.push_back(get<0>(rb)->children[i]);
             }
 
@@ -536,7 +536,7 @@ void LALR::cleanUp() const {
             }
 
             //Add the rest of the children
-            for(i = 0; i<get<0>(lb)->children.size(); ++i ){
+            for(i = i; i<get<0>(lb)->children.size(); ++i ){
                 tempchilds.push_back(get<0>(lb)->children[i]);
             }
             get<0>(lb)->children = tempchilds; //Replace
