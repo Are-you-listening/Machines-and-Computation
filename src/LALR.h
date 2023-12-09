@@ -77,8 +77,19 @@ public:
      */
     void clean(const std::vector<std::string> &T , ParseTree* _root, bool &V_root);
 
+    /**
+     * Find the leftmost or rightmost bracket
+     * @param left
+     * @param data
+     * @param T
+     */
     void findBracket(bool left, std::tuple<ParseTree *, ParseTree *, unsigned long,bool, vector<ParseTree*>> &data, const std::vector<std::string> &T); // { _root, bracket  , depth, found, rootstack }
 
+    /**
+     * Helper Function, Shifts towards a usable format
+     * @param stack
+     * @param Uroot
+     */
     void shift(std::vector<ParseTree*> &stack, ParseTree* Uroot);
 };
 
@@ -90,6 +101,20 @@ class LALR {
     void createStates();   // creates I0, I1, ...
     set<State *> findSimilar(const set<tuple<string, vector<string>, set<string>>> &rules);
     void mergeSimilar();
+
+    /**
+     * General Cleanup Function to Call
+     * @param root
+     */
+    void matchBrackets(ParseTree* root) const;
+
+    /**
+     * Helper function to find a shared root of ParseTree members
+     * @param lStack
+     * @param rStack
+     * @return
+     */
+    ParseTree* findUpperRoot(vector<ParseTree*> &lStack, vector<ParseTree*> &rStack) const;
 
 public:
     unordered_map<int, map<string, string>> parseTable;
@@ -120,10 +145,9 @@ public:
 
     void parse(std::vector<std::pair<std::string, std::string>> &input);
 
-    void matchBrackets(ParseTree* root) const;
-
-    ParseTree* findUpperRoot(vector<ParseTree*> &lStack, vector<ParseTree*> &rStack) const;
-
+    /**
+     * Manipulates the parsetree to decrease the amount of nesting
+     */
     void move() const;
 };
 

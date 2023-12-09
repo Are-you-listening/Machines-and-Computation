@@ -516,6 +516,7 @@ void LALR::matchBrackets(ParseTree* root) const {
 
 void LALR::move() const {
     unsigned long max = Config::getConfig()->getMaxNesting();
+    matchBrackets(_root);
     std::cout << std::endl;
 }
 
