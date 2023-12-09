@@ -462,10 +462,11 @@ void LALR::cleanUp() {
      * Make sure every parenthese is matched at the same level
      **/
      matchBrackets(_root);
+     _root->consisten(); //Remove left over deleted ptrs in tree
 }
 
 
-void LALR::matchBrackets(ParseTree* &root) {
+void LALR::matchBrackets(ParseTree* root) {
     std::tuple<ParseTree *, ParseTree *, unsigned long,bool> lb = {nullptr, nullptr,0,false};
     std::tuple<ParseTree *, ParseTree *, unsigned long,bool> rb = {nullptr, nullptr,0,false};
     vector<ParseTree*> tempchilds;
@@ -479,6 +480,9 @@ void LALR::matchBrackets(ParseTree* &root) {
 
     //Bracket with highest depth needs to be placed on the equal level
     if( get<2>(lb) > get<2>(rb) ) { //Left is deeper and needs to be replaced
+        //This is a harder case! - Ask Kars
+        //Manipulate the tree so the Left one gets higher
+
         get<0>(rb)->sameUpperRoot(get<1>(lb),found); //Check if the root of RB contains LB
         if(found){ //sameUpperRoot: respect index/child order;
             // index after which the bracket needs to be inserted:
@@ -490,52 +494,66 @@ void LALR::matchBrackets(ParseTree* &root) {
                 get<0>(rb)->children[i]->sameUpperRoot(get<1>(lb),found);
 
                 if(found){
-                    tempchilds.push_back(get<0>(rb)->children[i]);
-                    tempchilds.push_back(get<1>(lb));
+                    if(get<0>(rb)->children[i]!=get<0>(lb)) { //Special Case
+                        tempchilds.push_back(get<0>(rb)->children[i]);
+                    }
+
+
+                    //Add all the other children from the parent to be deleted (incl. de deeper bracket)
+                    for(auto& child: get<0>(lb)->children){
+                        if(child!=get<0>(lb)) { //Special Case
+                            tempchilds.push_back(child);
+                        }
+                    }
+                    //Delete the old parents
+                    get<0>(lb)->children.clear();
+                    get<0>(lb)->symbol.clear();
+                    delete get<0>(lb);
+                    break;
                 }else{
-                    tempchilds.push_back(get<0>(rb)->children[i]);
+                    if(get<0>(rb)->children[i]!=get<0>(lb)) { //Special Case
+                        tempchilds.push_back(get<0>(rb)->children[i]);
+                    }
                 }
             }
 
-            for(i = i; i<get<0>(rb)->children.size(); ++i ){ //Add the rest of the children
-                tempchilds.push_back(get<0>(rb)->children[i]);
+            for(i = i; i<get<0>(rb)->children.size(); ++i ){ //Add the rest of its own children
+                if(get<0>(rb)->children[i]!=get<0>(lb)) { //Special Case
+                    tempchilds.push_back(get<0>(rb)->children[i]);
+                }
             }
 
             get<0>(rb)->children = tempchilds; //Replace
             tempchilds.clear();
 
         }else{ //Just regular move
-
             //Make 1 new vector with all the children including LeftBracket
-            tempchilds = {get<1>(lb)};
+            tempchilds = get<0>(lb)->children;
             for(auto &child: get<0>(rb)->children ){
-                tempchilds.push_back(child);
+                    tempchilds.push_back(child);
             }
             get<0>(rb)->children = tempchilds; //Replace
             tempchilds.clear();
-        }
 
-        //Erase LB from lb_root
-        for(auto &child: get<0>(lb)->children ){
-            if(child!=get<1>(lb)){ //Add everything except the bracket itsself
-                tempchilds.push_back(child);
-            }
+            //Delete lb_root
+            get<0>(lb)->children.clear();
+            get<0>(lb)->symbol.clear();
+            delete get<0>(lb);
         }
-        get<0>(lb)->children = tempchilds; //Replace lb _root
-        tempchilds.clear(); //Free useless used memory
-
         root = get<0>(rb); //Set root to go recursively
     }else if( get<2>(lb) == get<2>(rb) ){ //Sitting on the same depth; don't change a thing
 
-
+        /*
         root = get<0>(lb); //Set root to go recursively
         for(auto &child: root->children){
             if(std::find(T.begin(), T.end(),child->symbol)==T.end() ) { //We found a variable
                 matchBrackets(child); //Go recursively
             }
         }
+        root = get<0>(rb); //Set root to go recursively after statement*/
+        std::cout << "Idk what todo here yet?, Maybe this never occurs? :cry:" << std::endl;
+        return; //TODO Idk what todo here yet?
 
-        root = get<0>(rb); //Set root to go recursively after statement
     }else{ //Right is deeper, add right bracket to leftbracket-parents and remove rightbracket from its own parent
         get<0>(lb)->sameUpperRoot(get<1>(rb),found); //Check if the root of RB contains LB
         if(found){
@@ -546,34 +564,53 @@ void LALR::matchBrackets(ParseTree* &root) {
                 get<0>(lb)->children[i]->sameUpperRoot(get<1>(rb),found); //Check if this is the upperRoot of the node we want to replace
 
                 if(found){ //If yes
-                    tempchilds.push_back(get<0>(lb)->children[i]); //Add the child
-                    tempchilds.push_back(get<1>(rb)); //Add the RB
+                    if(get<0>(lb)->children[i]!=get<0>(rb)){ //Special Case
+                        tempchilds.push_back(get<0>(lb)->children[i]); //Add the child;
+                    }
+
+                    //Add all the other children from the parent to be deleted (incl. de deeper bracket)
+                    for(auto& child: get<0>(rb)->children){
+                        if(child!=get<0>(rb)){ //Special Case: Child to be deleted is child of this parent; make sure it is not added
+                            tempchilds.push_back(child);;
+                        }
+                    }
+                    //Delete the old parent
+                    get<0>(rb)->children.clear();
+                    get<0>(rb)->symbol.clear();
+                    delete get<0>(rb);
+                    break;
                 }else{
-                    tempchilds.push_back(get<0>(lb)->children[i]); //Just add the child to keep the order
+                    if(get<0>(lb)->children[i]!=get<0>(rb)){ //Special Case
+                        tempchilds.push_back(get<0>(lb)->children[i]); //Just add the child to keep the order
+                    }
                 }
             }
 
             //Add the rest of the children
             for(i = i; i<get<0>(lb)->children.size(); ++i ){
+                if(get<0>(lb)->children[i]!=get<0>(rb)){ //Special Case
                 tempchilds.push_back(get<0>(lb)->children[i]);
+                }
             }
             get<0>(lb)->children = tempchilds; //Replace
             tempchilds.clear();
-        }else{ //Nothing special required
-            get<0>(lb)->children.push_back(get<1>(rb)); //Add rightbracket at the end
-        }
-
-        //Erase from other one
-        for(auto &child: get<0>(rb)->children ){
-            if(child!=get<1>(rb)){
-                tempchilds.push_back(child);
+        }else{ //Not found; Nothing special required
+            //Add all the children to the other node
+            for(auto &child: get<0>(rb)->children ){
+                get<0>(lb)->children.push_back(child);
             }
+            //Free memory
+            get<0>(lb)->children.clear();
+            get<0>(rb)->symbol.clear();
+            delete get<0>(rb);
         }
-        get<0>(rb)->children = tempchilds; //Replace rb _root
-        tempchilds.clear(); //Free useless memory
-
         root = get<0>(lb); //Set root to go recursively
     }
+
+
+    //Make Consistent
+
+
 
     //Check all the subvariables
     for(auto &child: root->children){
@@ -651,6 +688,10 @@ void ParseTree::findBracket(bool left, std::tuple<ParseTree *, ParseTree *, unsi
         adjust = -1;
         reset = children.size()-1;
         bracket="}";
+        if(children.empty()){
+            reset = 0;
+            i = 0;
+        }
     }
 
     for(long unsigned int j=i ; j!=extreme; j+=adjust){
@@ -683,4 +724,16 @@ void ParseTree::sameUpperRoot(ParseTree* lostChild, bool &found) {
             if(found){return;}
         }
     }
+}
+
+void ParseTree::consisten() {
+    bool inconsistent = false;
+    vector<ParseTree*> temp;
+    for(auto child: children){
+        if(!child->symbol.empty()){
+            temp.push_back(child);
+            child->consisten();
+        }
+    }
+    this->children=temp;
 }

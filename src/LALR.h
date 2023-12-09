@@ -84,6 +84,8 @@ public:
      * @return
      */
     void sameUpperRoot(ParseTree* lostChild, bool &found);
+
+    void consisten();
 };
 
 /**
@@ -129,7 +131,7 @@ public:
      */
     void cleanUp();
 
-    void matchBrackets(ParseTree* &root);
+    void matchBrackets(ParseTree* root);
 
     void move();
 };
