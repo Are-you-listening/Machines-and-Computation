@@ -77,7 +77,7 @@ public:
      */
     void clean(const std::vector<std::string> &T , ParseTree* _root, bool &V_root);
 
-    void findBracket(bool left, std::tuple<ParseTree *, ParseTree *, unsigned long,bool> &data, const std::vector<std::string> &T,stack<ParseTree*> &rootstack); // { _root, bracket  , depth }
+    void findBracket(bool left, std::tuple<ParseTree *, ParseTree *, unsigned long,bool, vector<ParseTree*>> &data, const std::vector<std::string> &T); // { _root, bracket  , depth, found, rootstack }
 
     /**
      * Apply on the UpperRoot
@@ -85,9 +85,9 @@ public:
      */
     void sameUpperRoot(ParseTree* lostChild, bool &found);
 
-    void shift();
+    void shift(std::vector<ParseTree*> &stack, ParseTree* Uroot);
 
-    void consisten();
+    void consistent();
 };
 
 /**
@@ -134,6 +134,8 @@ public:
     void cleanUp();
 
     void matchBrackets(ParseTree* root);
+
+    ParseTree* findUpperRoot(vector<ParseTree*> &lStack, vector<ParseTree*> &rStack) const;
 
     void move();
 };
