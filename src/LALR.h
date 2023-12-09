@@ -129,6 +129,8 @@ public:
      */
     void cleanUp() const;
 
+    void matchBrackets(ParseTree* &root);
+
     void move();
 };
 

@@ -461,12 +461,21 @@ void LALR::cleanUp() const {
     /**
      * Make sure every parenthese is matched at the same level
      **/
+     matchBrackets(_root);
+}
+
+
+void LALR::matchBrackets(ParseTree* &root) {
     std::tuple<ParseTree *, ParseTree *, unsigned long,bool> lb = {nullptr, nullptr,0,false};
     std::tuple<ParseTree *, ParseTree *, unsigned long,bool> rb = {nullptr, nullptr,0,false};
     vector<ParseTree*> tempchilds;
     bool found;
-    _root->findBracket(true,lb,_cfg.getT());
-    _root->findBracket(false,rb,_cfg.getT());
+    root->findBracket(true,lb,_cfg.getT());
+    root->findBracket(false,rb,_cfg.getT());
+
+    if(!get<3>(lb) || !get<3>(rb)){ //No more bracket found
+        return;
+    }
 
     //Bracket with highest depth needs to be placed on the equal level
     if( get<2>(lb) > get<2>(rb) ) { //Left is deeper and needs to be replaced
@@ -515,9 +524,13 @@ void LALR::cleanUp() const {
         get<0>(lb)->children = tempchilds; //Replace lb _root
         tempchilds.clear(); //Free useless used memory
 
-
+        root = get<0>(rb); //Set root to go recursively
     }else if( get<2>(lb) == get<2>(rb) ){
         //Might be equal; don't change a thing
+
+        //TODO What do we do with the equal ones?, what do we do with the equals ones? tudududuuuu du
+
+
     }else{ //Right is deeper, add right bracket to leftbracket-parents and remove rightbracket from its own parent
         get<0>(lb)->sameUpperRoot(get<1>(rb),found); //Check if the root of RB contains LB
         if(found){
@@ -528,8 +541,8 @@ void LALR::cleanUp() const {
                 get<0>(lb)->children[i]->sameUpperRoot(get<1>(rb),found); //Check if this is the upperRoot of the node we want to replace
 
                 if(found){ //If yes
-                    tempchilds.push_back(get<1>(rb)); //Add the LB
                     tempchilds.push_back(get<0>(lb)->children[i]); //Add the child
+                    tempchilds.push_back(get<1>(rb)); //Add the RB
                 }else{
                     tempchilds.push_back(get<0>(lb)->children[i]); //Just add the child to keep the order
                 }
@@ -553,13 +566,23 @@ void LALR::cleanUp() const {
         }
         get<0>(rb)->children = tempchilds; //Replace rb _root
         tempchilds.clear(); //Free useless memory
+
+        root = get<0>(lb); //Set root to go recursively
+    }
+
+    //Check all the subvariables
+    for(auto &child: root->children){
+        if(std::find(T.begin(), T.end(),child->symbol)==T.end() ) { //We found a variable
+            matchBrackets(child); //Go recursively
+        }
     }
 }
-
 void LALR::move() {
     unsigned long max = Config::getConfig()->getMaxNesting();
     std::cout << std::endl;
 }
+
+
 
 ParseTree::~ParseTree() {
     for (const auto& child : children){
