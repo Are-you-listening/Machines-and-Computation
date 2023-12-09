@@ -127,7 +127,7 @@ public:
     /**
      * Clean up the parse tree so it has a usable format
      */
-    void cleanUp() const;
+    void cleanUp();
 
     void matchBrackets(ParseTree* &root);
 

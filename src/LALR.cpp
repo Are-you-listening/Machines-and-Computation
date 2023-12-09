@@ -454,7 +454,7 @@ void LALR::printTable() {
     }
 }
 
-void LALR::cleanUp() const {
+void LALR::cleanUp() {
     bool V = false;
     _root->clean(_cfg.getT(), _root, V);
 
@@ -525,12 +525,17 @@ void LALR::matchBrackets(ParseTree* &root) {
         tempchilds.clear(); //Free useless used memory
 
         root = get<0>(rb); //Set root to go recursively
-    }else if( get<2>(lb) == get<2>(rb) ){
-        //Might be equal; don't change a thing
-
-        //TODO What do we do with the equal ones?, what do we do with the equals ones? tudududuuuu du
+    }else if( get<2>(lb) == get<2>(rb) ){ //Sitting on the same depth; don't change a thing
 
 
+        root = get<0>(lb); //Set root to go recursively
+        for(auto &child: root->children){
+            if(std::find(T.begin(), T.end(),child->symbol)==T.end() ) { //We found a variable
+                matchBrackets(child); //Go recursively
+            }
+        }
+
+        root = get<0>(rb); //Set root to go recursively after statement
     }else{ //Right is deeper, add right bracket to leftbracket-parents and remove rightbracket from its own parent
         get<0>(lb)->sameUpperRoot(get<1>(rb),found); //Check if the root of RB contains LB
         if(found){
