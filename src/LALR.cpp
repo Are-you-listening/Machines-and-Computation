@@ -478,7 +478,7 @@ void LALR::matchBrackets(ParseTree* root) const {
 
     if(!std::get<3>(lb) || !std::get<3>(rb)){ //No bracket found
         bool V = false;
-        root->clean(_cfg.getT(), _root, V); //Make it clean
+        root->clean(_cfg.getT(), root, V); //Make it clean
         return;
     }
 
@@ -506,7 +506,7 @@ void LALR::matchBrackets(ParseTree* root) const {
         B1.push_back(child);
     }
 
-    for(i = i; i<Uroot->children.size(); ++i){ //Create S
+    for(i = i+1; i<Uroot->children.size(); ++i){ //Create S
         auto child = Uroot->children[i];
         if(child->symbol=="}"){
             break;
@@ -514,24 +514,47 @@ void LALR::matchBrackets(ParseTree* root) const {
         S.push_back(child);
     }
 
-    for(i = i; i<Uroot->children.size(); ++i){ //Create B2
+    for(i = i+1; i<Uroot->children.size(); ++i){ //Create B2
         auto child = Uroot->children[i];
         B2.push_back(child);
     }
 
-    ParseTree* b1 = new ParseTree(B1,"");
-    ParseTree* s= new ParseTree(S,"");
-    ParseTree* b2 = new ParseTree(B2,"");
+    ParseTree* b1 = new ParseTree(B1,"@");
+    ParseTree* s= new ParseTree(S,"|");
+    ParseTree* b2 = new ParseTree(B2,"@");
 
-    Uroot->children = {b1, LB, s , RB , b2};
+    Uroot->children.clear();
+
+    if(!B1.empty()){
+        Uroot->children.push_back(b1);
+    }
+
+    Uroot->children.push_back(LB);
+
+    if(!S.empty()){
+        Uroot->children.push_back(s);
+    }
+
+    Uroot->children.push_back(RB);
+
+    if(!B2.empty()){
+        Uroot->children.push_back(b2);
+    }
 
     //Go Recursively
     matchBrackets(s);
 }
 
 void LALR::move() const {
-    unsigned long max = Config::getConfig()->getMaxNesting();
+    unsigned long max = 0;//Config::getConfig()->getMaxNesting();
+    unsigned long count = 0;
+    ParseTree* violator = nullptr;
     matchBrackets(_root);
+
+    _root->findViolation(max,count,violator,_cfg.getT());
+
+
+
     std::cout << std::endl;
 }
 
@@ -573,8 +596,10 @@ void ParseTree::clean(const std::vector<std::string> &T, ParseTree* _root, bool 
         }
         V_root = false; //Signal a change
         _root->children=temp; //Replace new children
-        this->children.clear(); //Clear old one
-        delete this; //Delete old one
+        if(_root!=this){
+            this->children.clear(); //Clear old one
+            delete this; //Delete old one
+        }
     }
 }
 
@@ -622,12 +647,31 @@ void ParseTree::findBracket(bool left, std::tuple<ParseTree *, ParseTree *, unsi
         }
     }
 
+    if(std::get<3>(data)){ //In case found
+        return;
+    }
+
     //Nothing found in this subtree; return
+    std::get<4>(data).pop_back(); //Remove this one from the stack
+    --std::get<2>(data); //Decrease depth
 }
 
 ParseTree* LALR::findUpperRoot(vector<ParseTree *> &lStack, vector<ParseTree *> &rStack) const {
-    for(unsigned long int i = 0; i!=lStack.size()-1; ++i){
-        if(lStack[i]!=rStack[i]){
+    vector<ParseTree *> max;
+    vector<ParseTree *> min;
+
+    if(lStack.size()>rStack.size()){ // Left is max
+        max = lStack;
+        min = rStack;
+    }else{ //Right is max
+        max = rStack;
+        min = lStack;
+    }
+
+    for(unsigned long int i = 0; i<max.size(); ++i){
+        if(i==min.size()){
+            return min[i-1]; //index may not go out of bound
+        } else if(lStack[i]!=rStack[i]){
             return lStack[i-1];
         }
     }
@@ -651,9 +695,36 @@ void ParseTree::shift(vector<ParseTree *> &stack, ParseTree* Uroot) {
                 newKids.push_back(child); //Just add the child to keep the correct order
             }
         }
+        stack[stack.size()-1]->children = newKids;
 
         //Free memory of P
         P->children.clear();
         delete P;
     }
+}
+
+void ParseTree::findViolation(unsigned long &max, unsigned long &count, ParseTree *&violator,const std::vector<std::string> &T) const {
+
+    if(count==max){
+        return;
+    }
+
+    for(long unsigned int i = 0; i<children.size();++i){
+        ParseTree* child = children[i];
+
+        if(std::find(T.begin(), T.end(),child->symbol)==T.end()){ //Found some V
+            if(child->symbol=="|"){ //Found nesting
+                ++count;
+
+                if(count==max){
+                    violator = child;
+                    return;
+                }
+            }else{ //Search further in the Variable nodes
+                child->findViolation(max,count,violator,T);
+            }
+        }
+    }
+
+    //Nothing more to handle
 }

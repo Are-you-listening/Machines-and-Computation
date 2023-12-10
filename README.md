@@ -19,3 +19,5 @@ Not-Supported:
     - Double declarations
     - Lambda functions
     - Busy waiting / Time influence in code are not guaranteed (which is basicly bad code)
+    - Declrations in IF/ELSE statements
+    - elseIF
