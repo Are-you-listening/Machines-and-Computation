@@ -620,7 +620,7 @@ void ParseTree::findBracket(bool left, std::tuple<ParseTree *, unsigned long, un
         bracket="{";
     }else{
         i = children.size()-1;
-        extreme = 0;
+        extreme = -1;
         adjust = -1;
         reset = children.size()-1;
         bracket="}";
