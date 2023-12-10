@@ -631,6 +631,10 @@ void ParseTree::findBracket(bool left, std::tuple<ParseTree *, ParseTree *, unsi
         }
     }
 
+    if(std::get<3>(data)){ //In case found
+        return;
+    }
+
     //Nothing found in this subtree; return
     std::get<4>(data).pop_back(); //Remove this one from the stack
     --std::get<2>(data); //Decrease depth
