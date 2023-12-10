@@ -469,7 +469,7 @@ void LALR::matchBrackets(ParseTree* root) const {
 
     if(!std::get<3>(lb) || !std::get<3>(rb)){ //No bracket found
         bool V = false;
-        root->clean(_cfg.getT(), _root, V); //Make it clean
+        root->clean(_cfg.getT(), root, V); //Make it clean
         return;
     }
 
@@ -505,7 +505,7 @@ void LALR::matchBrackets(ParseTree* root) const {
         S.push_back(child);
     }
 
-    for(i = i; i<Uroot->children.size(); ++i){ //Create B2
+    for(i = i+1; i<Uroot->children.size(); ++i){ //Create B2
         auto child = Uroot->children[i];
         B2.push_back(child);
     }
@@ -533,7 +533,7 @@ void LALR::matchBrackets(ParseTree* root) const {
     }
 
     //Go Recursively
-    //matchBrackets(s);
+    matchBrackets(s);
 }
 
 void LALR::move() const {
@@ -580,8 +580,10 @@ void ParseTree::clean(const std::vector<std::string> &T, ParseTree* _root, bool 
         }
         V_root = false; //Signal a change
         _root->children=temp; //Replace new children
-        this->children.clear(); //Clear old one
-        delete this; //Delete old one
+        if(_root!=this){
+            this->children.clear(); //Clear old one
+            delete this; //Delete old one
+        }
     }
 }
 
