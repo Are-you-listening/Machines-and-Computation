@@ -76,7 +76,7 @@ public:
      * @param data, { root, bracket-index, depth, found }
      * @param T , Terminals
      */
-    void findBracket(bool left, std::tuple<ParseTree *, unsigned long, unsigned long,bool> &data, const std::vector<std::string> &T);
+    void findBracket(bool left, std::tuple<ParseTree *, unsigned long, unsigned long,bool> &data, const std::vector<std::string> &Terminals);
 
     /**
      * Check for maxNesting violations
@@ -86,7 +86,7 @@ public:
      * @param Rviolator , the root of the violating nesting
      * @param T , Terminals
      */
-    void findViolation(unsigned long &max, unsigned long &count, unsigned long &index,ParseTree* &Rviolator,const std::vector<std::string> &T);
+    void findViolation(unsigned long &max, unsigned long &count, unsigned long &index,ParseTree* &Rviolator,const std::vector<std::string> &Terminals);
 
     /**
      * Find the root of a given child
@@ -94,13 +94,13 @@ public:
      * @param T , Terminals
      * @return
      */
-    ParseTree* findRoot(ParseTree* &child,const std::vector<std::string> &T);
+    ParseTree* findRoot(ParseTree* &child,const std::vector<std::string> &Terminals);
 
     /**
      * Format the parsetree so each pair of brackets matches itsself on the same node-level
      * @param T , all the used Terminals
      */
-    void matchBrackets(const std::vector<std::string> &T);
+    void matchBrackets(const std::vector<std::string> &Terminals);
 };
 
 /**

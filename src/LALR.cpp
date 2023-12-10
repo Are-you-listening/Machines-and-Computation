@@ -5,7 +5,7 @@
 #include "LALR.h"
 
 class emptyElement : public exception{
-    virtual const char* what() const noexcept override{
+    [[nodiscard]] const char* what() const noexcept override{
         return "it's 'that' error again (the parseTable is empty for this stack and inputsymbol)";
     }
 };
@@ -502,15 +502,15 @@ void LALR::generate() {
 
         //BEGIN Do the actual moving part
             //Find root of violator
-            auto data = _root->findRoot(violator,T);
-            if(data== nullptr){
+            auto data = _root->findRoot(violator,_cfg.getT());
+            if(data == nullptr){
                 std::cout << "error! in LALR move!!" << std::endl;
+                break;
             }
 
             //Insert before index of violator
             vector<ParseTree*> temp;
-            for(long unsigned int i = 0; i<data->children.size(); ++i){ //Skip the part for which we create a function call
-                ParseTree* child = data->children[i];
+            for(auto child : data->children){ //Skip the part for which we create a function call
                 if(child==violator){
                     for(auto &c: tomove){ //Add from moveto
                         temp.push_back(c);
@@ -548,27 +548,23 @@ ParseTree::~ParseTree() {
     }
 }
 
-void ParseTree::findBracket(bool left, std::tuple<ParseTree *, unsigned long, unsigned long, bool> &data,const std::vector<std::string> &T) { // { _root, bracket , depth, found, rootstack }
+void ParseTree::findBracket(bool left, std::tuple<ParseTree *, unsigned long, unsigned long, bool> &data,const std::vector<std::string> &Terminals) { // { _root, bracket , depth, found, rootstack }
     long unsigned int i;
     int adjust;
     long unsigned int extreme;
-    long unsigned int reset;
     std::string bracket;
 
     if(left){
         i = 0;
         extreme = children.size();
         adjust = 1;
-        reset = -1;
         bracket="{";
     }else{
         i = children.size()-1;
         extreme = -1;
         adjust = -1;
-        reset = children.size()-1;
         bracket="}";
         if(children.empty()){
-            reset = 0;
             i = 0;
         }
     }
@@ -582,11 +578,10 @@ void ParseTree::findBracket(bool left, std::tuple<ParseTree *, unsigned long, un
             std::get<0>(data) = this; //Set root
             std::get<1>(data) = j; //Set child
             std::get<3>(data) = true; //Set found
-            j = reset;
             return;
-        }else if( std::find(T.begin(), T.end(),children[j]->symbol)==T.end() ){ //If Variable: search the left most "{" in this tree
+        }else if( std::find(Terminals.begin(), Terminals.end(),children[j]->symbol)==Terminals.end() ){ //If Variable: search the left most "{" in this tree
             std::get<2>(data) = ++std::get<2>(data); //Increase depth
-            children[j]->findBracket(left,data,T);
+            children[j]->findBracket(left,data,Terminals);
         }
     }
 
@@ -599,14 +594,14 @@ void ParseTree::findBracket(bool left, std::tuple<ParseTree *, unsigned long, un
 }
 
 ParseTree* LALR::functionCall() {
-
+    return nullptr;
 }
 
 ParseTree* LALR::function() {
-
+    return nullptr;
 }
 
-void ParseTree::findViolation(unsigned long &max, unsigned long &count, unsigned long &index,ParseTree* &Rviolator,const std::vector<std::string> &T) {
+void ParseTree::findViolation(unsigned long &max, unsigned long &count, unsigned long &index,ParseTree* &Rviolator,const std::vector<std::string> &Terminals) {
     if(count==max){
         return;
     }
@@ -620,19 +615,19 @@ void ParseTree::findViolation(unsigned long &max, unsigned long &count, unsigned
                 index = i;
                 return;
             }
-        }else if(std::find(T.begin(), T.end(),child->symbol)==T.end()){ //Found some V
-            child->findViolation(max,count,index,Rviolator,T); //Search further in the Variable nodes
+        }else if(std::find(Terminals.begin(), Terminals.end(),child->symbol)==Terminals.end()){ //Found some V
+            child->findViolation(max,count,index,Rviolator,Terminals); //Search further in the Variable nodes
         }
     }
     //Nothing more to handle
 }
 
-void ParseTree::matchBrackets(const std::vector<std::string> &T) {
+void ParseTree::matchBrackets(const std::vector<std::string> &Terminals) {
     std::tuple<ParseTree *, unsigned long, unsigned long,bool> lb = {nullptr, NULL, 0, false}; //{ root, child, depth,  }
     std::tuple<ParseTree *, unsigned long, unsigned long,bool> rb = {nullptr, NULL, 0, false}; //{ root, child, depth,  }
 
     //Find left bracket
-    this->findBracket(true,lb,T);
+    this->findBracket(true,lb,Terminals);
 
     //In case not found: return
     if(!get<3>(lb)){
@@ -640,15 +635,14 @@ void ParseTree::matchBrackets(const std::vector<std::string> &T) {
     }
 
     ParseTree* LBroot = std::get<0>(lb); //Initialise root
-    ParseTree* LB = LBroot->children[std::get<1>(lb)];
     ParseTree* V;
 
     //Find RB
     for(unsigned long i = std::get<1>(lb)+1; i<LBroot->children.size(); ++i){
         ParseTree* child = LBroot->children[i];
-        if(std::find(T.begin(), T.end(),child->symbol)==T.end()){ //Found a first variable
+        if(std::find(Terminals.begin(), Terminals.end(),child->symbol)==Terminals.end()){ //Found a first variable
             V = child;
-            child->findBracket(false,rb,T); //Find in here for the right bracket
+            child->findBracket(false,rb,Terminals); //Find in here for the right bracket
             break;
         }
     }
@@ -678,18 +672,17 @@ void ParseTree::matchBrackets(const std::vector<std::string> &T) {
     for(unsigned long i = std::get<1>(lb)+1; i<LBroot->children.size(); ++i){ //Start from child after LB
         ParseTree* child = LBroot->children[i];
         if(child!=RB){ //Go recursively
-            child->matchBrackets(T);
+            child->matchBrackets(Terminals);
         }
     }
 }
 
-ParseTree* ParseTree::findRoot(ParseTree *&child,const std::vector<std::string> &T) {
-    for(unsigned long i = 0; i<children.size(); ++i){
-        auto kid = children[i];
+ParseTree* ParseTree::findRoot(ParseTree *&child,const std::vector<std::string> &Terminals) {
+    for(auto kid : children){
         if(child==kid){
             return this;
-        }else if( std::find(T.begin(), T.end(),child->symbol)==T.end() ){ //Found a variable
-            auto result = kid->findRoot(child,T);
+        }else if( std::find(Terminals.begin(), Terminals.end(),child->symbol)==Terminals.end() ){ //Found a variable
+            auto result = kid->findRoot(child,Terminals);
             if(result!= nullptr){
                 return result; //Found!
             }
