@@ -156,7 +156,7 @@ TEST(TuringMachineTest, TM_tools){
 }
 
 TEST(TuringMachineTest, TM_tokenazation) {
-    int index = 7;
+    int index = 9;
     ifstream test_file("../test/testFiles/TM_test_"+ to_string(index)+".cpp");
     string test_string;
     cout << test_file.is_open() << endl;
@@ -228,6 +228,7 @@ TEST(TuringMachineTest, TM_tokenazation) {
     out << tm.exportTapeData(1);
     out.close();
 }
+
 
 TEST(TuringMachineTest, TM_builder) {
     for (int k=1; k<= 24; k++){
