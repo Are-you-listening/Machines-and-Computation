@@ -3050,17 +3050,18 @@ void TuringTools::makeAntiNestingElse(IncompleteSet &a, const vector<int> &tuple
     go_to(else_anti_nesting, {'I'}, tuple_indexes[0], 1, tuple_indexes);
 
     //check here for return
-    go_to(else_anti_nesting, {'E'}, tuple_indexes[0], -1, tuple_indexes);
-    go_to_multiple(else_anti_nesting, {{'I'},{'R'}}, {tuple_indexes[0], tuple_indexes[1]}, 1, {tuple_indexes});
+    go_to(else_anti_nesting, {'V'}, tuple_indexes[0], -1, tuple_indexes);
+    go_to_multiple(else_anti_nesting, {{'E'},{'R'}}, {tuple_indexes[0], tuple_indexes[1]}, 1, {tuple_indexes});
+
 
     IncompleteSet add_empty_return{"add_empty_return_"+ to_string(counter), "add_empty_return_"+ to_string(counter)};
     counter++;
     //push empty return
     addToken(add_empty_return, tuple_indexes, "return", 'R');
     addToken(add_empty_return, tuple_indexes, ";", 'S');
-    go_to(add_empty_return, {'I'}, tuple_indexes[0], -1, tuple_indexes);
-    link_on(else_anti_nesting, add_empty_return, {'I'}, {tuple_indexes[0]});
-    go_to(else_anti_nesting, {'E'}, tuple_indexes[0], -1, tuple_indexes);
+    go_to(add_empty_return, {'V'}, tuple_indexes[0], -1, tuple_indexes);
+    link_on(else_anti_nesting, add_empty_return, {'E'}, {tuple_indexes[0]});
+    go_to(else_anti_nesting, {'E'}, tuple_indexes[0], 1, tuple_indexes);
 
 
     //add '}' token
