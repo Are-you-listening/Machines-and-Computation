@@ -51,8 +51,8 @@ public:
 class ParseTree {
 public:
     vector<ParseTree*> children;
-    string symbol;
-    tuple<string, string, set<string>> token;
+    string symbol; //Abstract symbol used in the Grammar
+    tuple<string, string, set<string>> token; //Translation
     /**
      * Destructor to free used memory
      */
@@ -87,30 +87,34 @@ public:
 
     /**
      * Find the leftmost or rightmost bracket
-     * @param left
-     * @param data
-     * @param T
+     * @param left, toggle between leftmost or rightmost
+     * @param data, { root, bracket-index, depth, found }
+     * @param T , Terminals
      */
-    void findBracket(bool left, std::tuple<ParseTree *, unsigned long, unsigned long,bool> &data, const std::vector<std::string> &T); // { _root, bracket index  , depth, found, rootstack }
+    void findBracket(bool left, std::tuple<ParseTree *, unsigned long, unsigned long,bool> &data, const std::vector<std::string> &T);
 
     /**
      * Check for maxNesting violations
-     * @param max
-     * @param count
-     * @param index
-     * @param Rviolator
-     * @param T
+     * @param max, max allowed nesting
+     * @param count, counter for the nr of nesting
+     * @param index, Rviolator.children[index] == violator
+     * @param Rviolator , the root of the violating nesting
+     * @param T , Terminals
      */
     void findViolation(unsigned long &max, unsigned long &count, unsigned long &index,ParseTree* &Rviolator,const std::vector<std::string> &T);
 
     /**
      * Find the root of a given child
      * @param child
-     * @param T
+     * @param T , Terminals
      * @return
      */
     ParseTree* findRoot(ParseTree* &child,const std::vector<std::string> &T);
 
+    /**
+     * Format the parsetree so each pair of brackets matches itsself on the same node-level
+     * @param T , all the used Terminals
+     */
     void matchBrackets(const std::vector<std::string> &T);
 };
 
@@ -137,14 +141,35 @@ class LALR {
      */
     ParseTree* findUpperRoot(vector<ParseTree*> &lStack, vector<ParseTree*> &rStack) const;
 
+    /**
+     * Helper function for generate(), creates a new function Call in place
+     * @return , Parsetree* containing the new code
+     */
+    ParseTree* functionCall();
+
+    /**
+     * Helper function for generate(), creates a new function in place
+     * @return , Parsetree* containing the new code
+     */
+    ParseTree* function();
+
 public:
     unordered_map<int, map<string, string>> parseTable;
     CFG _cfg;
     int state_counter = 0;
     ParseTree* _root;
 
-    void printTable();  // this function is mainly for debugging and is not needed for LALR parsing
+    /**
+     * Debug function to print out the created LALR Table
+     * CAVEAT: Not needed for LALR parsing
+     */
+    void printTable();
 
+    /**
+     *
+     * @param inputrule
+     * @return
+     */
     augmentedrules createAugmented(const tuple<string, vector<string>, set<string>> &inputrule);
 
     /**
@@ -158,10 +183,22 @@ public:
      */
     void createTable();
 
+    /**
+     * Find a state
+     * @param rules
+     * @return
+     */
     State* findState(const augmentedrules& rules);
 
+    /**
+     * Print function
+     */
     void printStates();
 
+    /**
+     * Process a given tokenvector and create a parseTable
+     * @param input , tokenvector
+     */
     void parse(std::vector<std::tuple<std::string, std::string, std::set<std::string>>> &input);
 
     void parse(std::vector<std::pair<std::string, std::string>> &input);
@@ -170,10 +207,6 @@ public:
      * Manipulates the parsetree to decrease the amount of nesting
      */
     void generate();
-
-    ParseTree* functionCall();
-
-    ParseTree* function();
 };
 
 #endif//CFG_LALR_H
