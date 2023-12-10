@@ -78,6 +78,13 @@ public:
     void clean(const std::vector<std::string> &T , ParseTree* _root, bool &V_root);
 
     /**
+     * Helper Function, Shifts towards a usable format
+     * @param stack
+     * @param Uroot
+     */
+    void shift(std::vector<ParseTree*> &stack, ParseTree* Uroot);
+
+    /**
      * Find the leftmost or rightmost bracket
      * @param left
      * @param data
@@ -85,12 +92,7 @@ public:
      */
     void findBracket(bool left, std::tuple<ParseTree *, ParseTree *, unsigned long,bool, vector<ParseTree*>> &data, const std::vector<std::string> &T); // { _root, bracket  , depth, found, rootstack }
 
-    /**
-     * Helper Function, Shifts towards a usable format
-     * @param stack
-     * @param Uroot
-     */
-    void shift(std::vector<ParseTree*> &stack, ParseTree* Uroot);
+    void findViolation(long unsigned int &max, long unsigned int &count, ParseTree* &violator,const std::vector<std::string> &T) const;
 };
 
 /**

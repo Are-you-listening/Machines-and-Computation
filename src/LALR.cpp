@@ -537,8 +537,15 @@ void LALR::matchBrackets(ParseTree* root) const {
 }
 
 void LALR::move() const {
-    unsigned long max = Config::getConfig()->getMaxNesting();
+    unsigned long max = 0;//Config::getConfig()->getMaxNesting();
+    unsigned long count = 0;
+    ParseTree* violator = nullptr;
     matchBrackets(_root);
+
+    _root->findViolation(max,count,violator,_cfg.getT());
+
+
+
     std::cout << std::endl;
 }
 
@@ -685,4 +692,30 @@ void ParseTree::shift(vector<ParseTree *> &stack, ParseTree* Uroot) {
         P->children.clear();
         delete P;
     }
+}
+
+void ParseTree::findViolation(unsigned long &max, unsigned long &count, ParseTree *&violator,const std::vector<std::string> &T) const {
+
+    if(count==max){
+        return;
+    }
+
+    for(long unsigned int i = 0; i<children.size();++i){
+        ParseTree* child = children[i];
+
+        if(std::find(T.begin(), T.end(),child->symbol)==T.end()){ //Found some V
+            if(child->symbol=="|"){ //Found nesting
+                ++count;
+
+                if(count==max){
+                    violator = child;
+                    return;
+                }
+            }else{ //Search further in the Variable nodes
+                child->findViolation(max,count,violator,T);
+            }
+        }
+    }
+
+    //Nothing more to handle
 }
