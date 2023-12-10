@@ -635,8 +635,21 @@ void ParseTree::findBracket(bool left, std::tuple<ParseTree *, ParseTree *, unsi
 }
 
 ParseTree* LALR::findUpperRoot(vector<ParseTree *> &lStack, vector<ParseTree *> &rStack) const {
-    for(unsigned long int i = 0; i!=lStack.size()-1; ++i){
-        if(lStack[i]!=rStack[i]){
+    vector<ParseTree *> max;
+    vector<ParseTree *> min;
+
+    if(lStack.size()>rStack.size()){ // Left is max
+        max = lStack;
+        min = rStack;
+    }else{ //Right is max
+        max = rStack;
+        min = lStack;
+    }
+
+    for(unsigned long int i = 0; i<max.size(); ++i){
+        if(i==min.size()){
+            return min[i-1]; //index may not go out of bound
+        } else if(lStack[i]!=rStack[i]){
             return lStack[i-1];
         }
     }
