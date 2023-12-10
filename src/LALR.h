@@ -93,7 +93,23 @@ public:
      */
     void findBracket(bool left, std::tuple<ParseTree *, unsigned long, unsigned long,bool> &data, const std::vector<std::string> &T); // { _root, bracket index  , depth, found, rootstack }
 
-    void findViolation(long unsigned int &max, long unsigned int &count, ParseTree* &violator,const std::vector<std::string> &T) const;
+    /**
+     * Check for maxNesting violations
+     * @param max
+     * @param count
+     * @param index
+     * @param Rviolator
+     * @param T
+     */
+    void findViolation(unsigned long &max, unsigned long &count, unsigned long &index,ParseTree* &Rviolator,const std::vector<std::string> &T);
+
+    /**
+     * Find the root of a given child
+     * @param child
+     * @param T
+     * @return
+     */
+    ParseTree* findRoot(ParseTree* &child,const std::vector<std::string> &T);
 
     void matchBrackets(const std::vector<std::string> &T);
 };
@@ -153,7 +169,11 @@ public:
     /**
      * Manipulates the parsetree to decrease the amount of nesting
      */
-    void move() const;
+    void generate();
+
+    ParseTree* functionCall();
+
+    ParseTree* function();
 };
 
 #endif//CFG_LALR_H
