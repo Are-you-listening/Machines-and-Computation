@@ -23,7 +23,7 @@ set(TestCaseFiles
         test/TuringMachineTest.cpp
         test/ThreadingTest.cpp
         test/CFGTokenTest.cpp
-        )
+        test/testFiles/knapsack.cpp)
 
 set(TuringCode
         src/TM/TuringMachine.cpp
