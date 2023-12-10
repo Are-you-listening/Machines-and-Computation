@@ -510,9 +510,9 @@ void LALR::matchBrackets(ParseTree* root) const {
         B2.push_back(child);
     }
 
-    ParseTree* b1 = new ParseTree(B1,"B");
-    ParseTree* s= new ParseTree(S,"C");
-    ParseTree* b2 = new ParseTree(B2,"B");
+    ParseTree* b1 = new ParseTree(B1,"@");
+    ParseTree* s= new ParseTree(S,"|");
+    ParseTree* b2 = new ParseTree(B2,"@");
 
     Uroot->children.clear();
 
@@ -632,6 +632,8 @@ void ParseTree::findBracket(bool left, std::tuple<ParseTree *, ParseTree *, unsi
     }
 
     //Nothing found in this subtree; return
+    std::get<4>(data).pop_back(); //Remove this one from the stack
+    --std::get<2>(data); //Decrease depth
 }
 
 ParseTree* LALR::findUpperRoot(vector<ParseTree *> &lStack, vector<ParseTree *> &rStack) const {
