@@ -71,21 +71,6 @@ public:
     ParseTree(const vector<ParseTree *> &children, string symbol);
 
     /**
-     * Traverse the parse tree & cleanup
-     * @param T
-     * @param _root
-     * @param V_root
-     */
-    void clean(const std::vector<std::string> &T , ParseTree* _root, bool &V_root);
-
-    /**
-     * Helper Function, Shifts towards a usable format
-     * @param stack
-     * @param Uroot
-     */
-    void shift(std::vector<ParseTree*> &stack, ParseTree* Uroot);
-
-    /**
      * Find the leftmost or rightmost bracket
      * @param left, toggle between leftmost or rightmost
      * @param data, { root, bracket-index, depth, found }
@@ -126,20 +111,6 @@ class LALR {
     void createStates();   // creates I0, I1, ...
     set<State *> findSimilar(const set<tuple<string, vector<string>, set<string>>> &rules);
     void mergeSimilar();
-
-    /**
-     * General Cleanup Function to Call
-     * @param root
-     */
-    void matchBrackets(ParseTree* root) const;
-
-    /**
-     * Helper function to find a shared root of ParseTree members
-     * @param lStack
-     * @param rStack
-     * @return
-     */
-    ParseTree* findUpperRoot(vector<ParseTree*> &lStack, vector<ParseTree*> &rStack) const;
 
     /**
      * Helper function for generate(), creates a new function Call in place
@@ -200,8 +171,6 @@ public:
      * @param input , tokenvector
      */
     void parse(std::vector<std::tuple<std::string, std::string, std::set<std::string>>> &input);
-
-    void parse(std::vector<std::pair<std::string, std::string>> &input);
 
     /**
      * Manipulates the parsetree to decrease the amount of nesting

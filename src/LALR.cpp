@@ -469,82 +469,6 @@ void LALR::printTable() {
     }
 }
 
-void LALR::matchBrackets(ParseTree* root) const {
-    std::tuple<ParseTree *, ParseTree *, unsigned long,bool ,vector<ParseTree*> > lb = {nullptr, nullptr,0,false,{}}; //{ root, child, depth,  }
-    std::tuple<ParseTree *, ParseTree *, unsigned long,bool, vector<ParseTree*>> rb = {nullptr, nullptr,0,false,{}};
-
-    //root->findBracket(true,lb,_cfg.getT());
-    //root->findBracket(false,rb,_cfg.getT());
-
-    if(!std::get<3>(lb) || !std::get<3>(rb)){ //No bracket found
-        bool V = false;
-        root->clean(_cfg.getT(), root, V); //Make it clean
-        return;
-    }
-
-    ParseTree* LB = std::get<1>(lb);
-    vector<ParseTree*> lStack = std::get<4>(lb);
-    ParseTree* RB = std::get<1>(rb);
-    vector<ParseTree*> rStack = std::get<4>(rb);
-
-    ParseTree* Uroot = findUpperRoot(lStack, rStack);
-
-    LB->shift(lStack,Uroot);
-    RB->shift(rStack,Uroot);
-
-    //Format
-    vector<ParseTree*> B1;
-    vector<ParseTree*> S;
-    vector<ParseTree*> B2;
-    long unsigned int i;
-
-    for(i = 0; i<Uroot->children.size(); ++i){ //Create B1
-        auto child = Uroot->children[i];
-        if(child->symbol=="{"){
-            break;
-        }
-        B1.push_back(child);
-    }
-
-    for(i = i+1; i<Uroot->children.size(); ++i){ //Create S
-        auto child = Uroot->children[i];
-        if(child->symbol=="}"){
-            break;
-        }
-        S.push_back(child);
-    }
-
-    for(i = i+1; i<Uroot->children.size(); ++i){ //Create B2
-        auto child = Uroot->children[i];
-        B2.push_back(child);
-    }
-
-    ParseTree* b1 = new ParseTree(B1,"@");
-    ParseTree* s= new ParseTree(S,"|");
-    ParseTree* b2 = new ParseTree(B2,"@");
-
-    Uroot->children.clear();
-
-    if(!B1.empty()){
-        Uroot->children.push_back(b1);
-    }
-
-    Uroot->children.push_back(LB);
-
-    if(!S.empty()){
-        Uroot->children.push_back(s);
-    }
-
-    Uroot->children.push_back(RB);
-
-    if(!B2.empty()){
-        Uroot->children.push_back(b2);
-    }
-
-    //Go Recursively
-    matchBrackets(s);
-}
-
 void LALR::generate() {
     unsigned long max = 1;//Config::getConfig()->getMaxNesting();
     unsigned long count = 0;
@@ -624,43 +548,6 @@ ParseTree::~ParseTree() {
     }
 }
 
-void ParseTree::clean(const std::vector<std::string> &T, ParseTree* _root, bool &V_root) {
-    bool V = false;
-
-    for(long unsigned int i = 0;  i<children.size(); ++i){
-        auto child = children[i];
-        if(child->symbol=="{" || child->symbol=="}"){ //Stop cleanup if a bracket is reached; we may not modify this
-            V=true;
-        }else if( std::find(T.begin(), T.end(),child->symbol)==T.end() ){ //We found a variable
-            V = true;
-            child->clean(T, this, V); //Traverse the child
-            //Reloop
-            if(!V){ //Reloop in case the child made a change
-                i = -1;
-            }
-        }
-    }
-
-    std::vector<ParseTree*> temp;
-    if(!V){ //No Variables found: Cleanup this one
-        for(auto &it: _root->children){ //Collect the "new children"
-            if(it==this){
-                for(auto &k: this->children){ //Add children of this
-                    temp.push_back(k);
-                }
-            }else{ //Add the already added child to keep the correct order
-                temp.push_back(it);
-            }
-        }
-        V_root = false; //Signal a change
-        _root->children=temp; //Replace new children
-        if(_root!=this){
-            this->children.clear(); //Clear old one
-            delete this; //Delete old one
-        }
-    }
-}
-
 void ParseTree::findBracket(bool left, std::tuple<ParseTree *, unsigned long, unsigned long, bool> &data,const std::vector<std::string> &T) { // { _root, bracket , depth, found, rootstack }
     long unsigned int i;
     int adjust;
@@ -711,59 +598,12 @@ void ParseTree::findBracket(bool left, std::tuple<ParseTree *, unsigned long, un
     --std::get<2>(data); //Decrease depth
 }
 
-ParseTree* LALR::findUpperRoot(vector<ParseTree *> &lStack, vector<ParseTree *> &rStack) const {
-    vector<ParseTree *> max;
-    vector<ParseTree *> min;
-
-    if(lStack.size()>rStack.size()){ // Left is max
-        max = lStack;
-        min = rStack;
-    }else{ //Right is max
-        max = rStack;
-        min = lStack;
-    }
-
-    for(unsigned long int i = 0; i<max.size(); ++i){
-        if(i==min.size()){
-            return min[i-1]; //index may not go out of bound
-        } else if(lStack[i]!=rStack[i]){
-            return lStack[i-1];
-        }
-    }
-    std::cout << "this can't happen! findUpperRoot()" << std::endl;
-    return nullptr;
-}
-
 ParseTree* LALR::functionCall() {
 
 }
 
 ParseTree* LALR::function() {
 
-}
-
-void ParseTree::shift(vector<ParseTree *> &stack, ParseTree* Uroot) {
-    while(stack[stack.size()-1]!=Uroot){ //As long as we didn'y find the Upperroot
-        auto P = stack[stack.size()-1]; //Get the top
-        stack.pop_back(); //Throw it away
-        vector<ParseTree*> newKids;
-
-        //Create new set of children
-        for(auto child: stack[stack.size()-1]->children){ //For every current child
-            if(child==P){ //Replace P with its children
-                for(auto lostChild: P->children){
-                    newKids.push_back(lostChild);
-                }
-            }else{
-                newKids.push_back(child); //Just add the child to keep the correct order
-            }
-        }
-        stack[stack.size()-1]->children = newKids;
-
-        //Free memory of P
-        P->children.clear();
-        delete P;
-    }
 }
 
 void ParseTree::findViolation(unsigned long &max, unsigned long &count, unsigned long &index,ParseTree* &Rviolator,const std::vector<std::string> &T) {
