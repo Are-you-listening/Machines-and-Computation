@@ -56,7 +56,7 @@ IncompleteSet TuringIfElseAntiNesting::doAction() {
 
 
     IncompleteSet check_not_2{"check_not_2", "check_not_2"};
-    tools->go_to_not(check_not_2, {'R', 'P', 'E'}, get_tuple_index()[1], 1, get_tuple_index());
+    tools->go_to_not(check_not_2, {'R', 'P', 'E', 'S'}, get_tuple_index()[1], 1, get_tuple_index());
 
     string solo_branch = tools->branch_on(check_not_2, {'}'}, {get_tuple_index()[1]});
     check_not_2.to_state = "check_not_2_never_reached";
@@ -107,6 +107,9 @@ IncompleteSet TuringIfElseAntiNesting::doAction() {
 
     //tools->write_on(result, {'S'}, {get_tuple_index()[0]}, {'\u0000'}, {get_tuple_index()[0]});
 
+    //loop if not nothing to do
+    //tools->make_loop(result);
+
     IncompleteTransition skip;
     skip.state = nothing_todo;
     skip.to_state = result.to_state;
@@ -114,9 +117,11 @@ IncompleteSet TuringIfElseAntiNesting::doAction() {
 
     result.transitions.push_back(skip);
 
+
     tools->go_to_clear(result, {'A'}, get_tuple_index()[0], -1, get_tuple_index(), {get_tuple_index()[0]});
     string final_place = result.to_state;
 
+    //solor part
     result.to_state = solo_branch;
     tools->link_put(result, {'T'}, {get_tuple_index()[0]});
     tools->go_to(result, {'S', 'V'}, get_tuple_index()[0], -1, get_tuple_index());
