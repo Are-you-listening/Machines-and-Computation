@@ -4,6 +4,12 @@
 
 #include "LALR.h"
 
+class emptyElement : public exception{
+    virtual const char* what() const noexcept override{
+        return "it's 'that' error again (the parseTable is empty for this stack and inputsymbol)";
+    }
+};
+
 LALR::LALR(const CFG &cfg) : _cfg(cfg) {}
 
 void LALR::createStates() {
@@ -391,7 +397,10 @@ void LALR::parse(std::vector<std::tuple<std::string, std::string, std::set<std::
         string operation = parseTable[stacksymbol][inputsymbol];
 
         cout << "stacksymbol: " << stacksymbol << ", inputsymbol: " << inputsymbol << " --> " << operation << endl;
-
+        if (operation.empty()){
+            throw emptyElement();
+        }
+        
         if (operation == "accept"){
             break;
         } else if (operation.substr(0, 1) == "S"){

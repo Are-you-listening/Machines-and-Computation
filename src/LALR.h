@@ -22,6 +22,7 @@
 
 #include "Config.h"
 #include "src/CFG.h"
+#include <exception>
 
 typedef set<tuple<string, vector<string>, set<string>>> augmentedrules; //Use typedef to simplify usage
 
@@ -51,7 +52,7 @@ class ParseTree {
 public:
     vector<ParseTree*> children;
     string symbol;
-
+    tuple<string, string, set<string>> token;
     /**
      * Destructor to free used memory
      */
