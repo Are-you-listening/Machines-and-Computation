@@ -1,38 +1,30 @@
 auto cfg = createCFG();
-    auto cfg3 = createCFG();
-    CFG cfg2("input/CFG/testGNF.json");
-    cfg2.setCnf(true);
-    cfg2.toGNF();
-    cfg2.print();
-    cfg->print();
-    cfg->toGNF(); // this still needs massive debugging.
-    cfg->print();
-    //cfg->toCNF();
-    cfg3->toCNF();
+    ParseTree* CL1  = new ParseTree({},"{");
+    ParseTree* CR1  = new ParseTree({},"}");
+    ParseTree* CL2  = new ParseTree({},"{");
+    ParseTree* CR2  = new ParseTree({},"}");
+    ParseTree* CL3  = new ParseTree({},"{");
+    ParseTree* CR3  = new ParseTree({},"}");
 
-    ParseTree* b = new ParseTree({},"b");
-    ParseTree* CL  = new ParseTree({},"{");
+    ParseTree* f  = new ParseTree({},"f");
     ParseTree* c  = new ParseTree({},"c");
-    ParseTree* d  = new ParseTree({},"d");
-    ParseTree* CR  = new ParseTree({},"}");
-    ParseTree* s  = new ParseTree({},"s");
-    ParseTree* k  = new ParseTree({},"k");
-    ParseTree* e  = new ParseTree({},"e");
+    ParseTree* b  = new ParseTree({},"b");
 
-    ParseTree* S = new ParseTree({s},"S");
-    ParseTree* K = new ParseTree({k,S},"K");
-    ParseTree* E = new ParseTree({e,K,CR},"E");
-    ParseTree* D = new ParseTree({d},"D");
-    ParseTree* C = new ParseTree({c,D},"C");
-    ParseTree* B = new ParseTree({CL,C,E},"B");
+    ParseTree* I = new ParseTree({CR3},"I");
+    ParseTree* H = new ParseTree({CL3,I},"H");
+    ParseTree* G = new ParseTree({CR2},"G");
+    ParseTree* F = new ParseTree({f,G},"F");
+    ParseTree* E = new ParseTree({CR1},"E");
+    ParseTree* D = new ParseTree({CL2,F},"D");
+    ParseTree* C = new ParseTree({c,D,E},"C");
+    ParseTree* B = new ParseTree({CL1,C,H},"B");
     ParseTree* A = new ParseTree( {b,B}, "A" );
 
     CFG a = *cfg;
     LALR lalr(a);
-    const std::vector<std::string> t = {"{","}","b","c","d","e","s","k"};
+    const std::vector<std::string> t = {"{","}","b","c","d","e","s","k","m","l","f"};
     a.setT(t);
     lalr._root = A;
     lalr._cfg.setT(t);
+    A->matchBrackets(t);
     std::cout << std::endl;
-    lalr.cleanUp();
-    std::cout << "y" << std::endl;
