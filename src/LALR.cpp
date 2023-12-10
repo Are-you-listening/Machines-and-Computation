@@ -403,7 +403,12 @@ void LALR::parse(std::vector<std::tuple<std::string, std::string, std::set<std::
                 rule++;
                 count++;
             }
-
+            //std::cout << operation << endl;
+            //std::cout << rule->first << "\t-->\t";
+            //for (auto c : rule->second){
+            //    std::cout << " " << c << " ";
+            //}
+            //std::cout << "\n\n";
             if (inputsymbol != "$"){
                 remaininginputvector.insert(remaininginputvector.begin(), inputtuple);
                 remaininginputvector.insert(remaininginputvector.begin(), std::make_tuple(rule->first, "", S));
@@ -413,7 +418,6 @@ void LALR::parse(std::vector<std::tuple<std::string, std::string, std::set<std::
             }
 
             auto* newparent = new ParseTree;
-            treetops.push_back(newparent);
             newparent->symbol = rule->first;
             if (rule->first == _cfg.getS()){
                 _root = newparent;
@@ -439,10 +443,12 @@ void LALR::parse(std::vector<std::tuple<std::string, std::string, std::set<std::
                 }
                 s.pop();
             }
+            treetops.push_back(newparent);
         } else {
             s.push(stoi(operation));
         }
     }
+    std::cout << "debug" << std::endl;
 }
 
 void LALR::printTable() {
