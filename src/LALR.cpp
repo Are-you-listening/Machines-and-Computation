@@ -470,7 +470,7 @@ void LALR::printTable() {
 }
 
 void LALR::generate() {
-    unsigned long max = 1;//Config::getConfig()->getMaxNesting();
+    unsigned long max = Config::getConfig()->getMaxNesting();
     unsigned long count = 0;
     unsigned long index;
     ParseTree* violator = nullptr;
