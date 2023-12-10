@@ -91,9 +91,11 @@ public:
      * @param data
      * @param T
      */
-    void findBracket(bool left, std::tuple<ParseTree *, ParseTree *, unsigned long,bool, vector<ParseTree*>> &data, const std::vector<std::string> &T); // { _root, bracket  , depth, found, rootstack }
+    void findBracket(bool left, std::tuple<ParseTree *, unsigned long, unsigned long,bool> &data, const std::vector<std::string> &T); // { _root, bracket index  , depth, found, rootstack }
 
     void findViolation(long unsigned int &max, long unsigned int &count, ParseTree* &violator,const std::vector<std::string> &T) const;
+
+    void matchBrackets(const std::vector<std::string> &T);
 };
 
 /**
