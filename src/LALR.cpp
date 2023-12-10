@@ -491,7 +491,7 @@ void LALR::matchBrackets(ParseTree* root) const {
         B1.push_back(child);
     }
 
-    for(i = i; i<Uroot->children.size(); ++i){ //Create S
+    for(i = i+1; i<Uroot->children.size(); ++i){ //Create S
         auto child = Uroot->children[i];
         if(child->symbol=="}"){
             break;
@@ -504,14 +504,30 @@ void LALR::matchBrackets(ParseTree* root) const {
         B2.push_back(child);
     }
 
-    ParseTree* b1 = new ParseTree(B1,"");
-    ParseTree* s= new ParseTree(S,"");
-    ParseTree* b2 = new ParseTree(B2,"");
+    ParseTree* b1 = new ParseTree(B1,"B");
+    ParseTree* s= new ParseTree(S,"C");
+    ParseTree* b2 = new ParseTree(B2,"B");
 
-    Uroot->children = {b1, LB, s , RB , b2};
+    Uroot->children.clear();
+
+    if(!B1.empty()){
+        Uroot->children.push_back(b1);
+    }
+
+    Uroot->children.push_back(LB);
+
+    if(!S.empty()){
+        Uroot->children.push_back(s);
+    }
+
+    Uroot->children.push_back(RB);
+
+    if(!B2.empty()){
+        Uroot->children.push_back(b2);
+    }
 
     //Go Recursively
-    matchBrackets(s);
+    //matchBrackets(s);
 }
 
 void LALR::move() const {
@@ -636,6 +652,7 @@ void ParseTree::shift(vector<ParseTree *> &stack, ParseTree* Uroot) {
                 newKids.push_back(child); //Just add the child to keep the correct order
             }
         }
+        stack[stack.size()-1]->children = newKids;
 
         //Free memory of P
         P->children.clear();
