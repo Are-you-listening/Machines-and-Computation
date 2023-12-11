@@ -30,6 +30,7 @@ public:
     string exportTape();
 
     long getTapeHeadIndex() const;
+    void clear();
 
 private:
     unsigned long tape_size;

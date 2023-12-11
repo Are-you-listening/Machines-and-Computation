@@ -185,3 +185,11 @@ int TuringMachine::getTuringIndex(int index) {
     return tapes[index]->getTapeHeadIndex();
 }
 
+void TuringMachine::clear() {
+    for (auto tape: tapes){
+        tape->clear();
+    }
+    current_state = start_state;
+    halted = false;
+}
+

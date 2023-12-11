@@ -36,6 +36,7 @@ public:
 
     [[nodiscard]] const string &getCurrentState() const;
     int getTuringIndex(int i);
+    void clear();
 private:
     vector<Tape*> tapes;
     map<string, TuringProduction*> production_trees;

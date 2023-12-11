@@ -24,6 +24,12 @@ IncompleteSet TuringTokenizer::tokenize() {
     tools->write_on(result, {'\u0000'}, {0}, {'S'}, {0});
     tools->write_on(result, {'E'}, {0}, {'S'}, {0});
 
+    tools->go_to_not(result, {' ', '\n'}, 1, 1, {0,1});
+    //branch on include
+    string on_include = tools->branch_on(result, {'#'}, {1});
+    string on_comment = tools->branch_on(result, {'/'}, {1});
+    tools->go_to(result, {'S', 'A'}, 0, -1, {0,1});
+
     string end_tokenization_state = tools->branch_on(result, {'\u0000'}, {1});
 
     IncompleteSet tokenize_seperator("tokenize_seperator", "tokenize_seperator");
@@ -40,15 +46,82 @@ IncompleteSet TuringTokenizer::tokenize() {
     IncompleteSet find_seperator("tokenize_find_seperator", "tokenize_find_seperator");
     //need to loop this, and repeat if ::
     tools->go_to(find_seperator, seperators, 1, 1, {0, 1});
+
+    //first check if > has a corresponding < before
+    IncompleteSet onLess{"on_less_tokenazation", "on_less_tokenazation"};
+    tools->go_to_multiple(onLess, {{'S'}, {'<'}}, {0, 1}, -1, {0,1});
+    IncompleteSet onNotS{"on_not_s_tokenazation", "on_not_s_tokenazation"};
+    tools->go_to(onNotS, {'>'}, 1, 1, {0, 1});
+    tools->move(onNotS, {0,1}, 1);
+    tools->go_to(onNotS, seperators, 1, 1, {0,1});
+    tools->make_loop_on(onNotS, '>', 1);
+
+    IncompleteSet onTemplate{"on_template_tokenazation", "on_template_tokenazation"};
+    tools->go_to(onTemplate, {'>'}, 1, 1, {0, 1});
+    string temp = onTemplate.to_state;
+    onTemplate.to_state = "on_template_tokenazation_unreached";
+
+    tools->link_on_sequence(onLess, onTemplate, {'t', 'e', 'm', 'p', 'l', 'a', 't', 'e'}, {1});
+
+    string on_not_s = tools->branch_on(onLess, {'<'}, {1});
+
+    tools->go_to(onLess, {'>'}, 1, 1, {0, 1});
+
+
+    IncompleteTransition toOnNotS;
+    toOnNotS.state = on_not_s;
+    toOnNotS.to_state = onNotS.state;
+    toOnNotS.def_move = 0;
+
+    IncompleteTransition fromOnNotS;
+    fromOnNotS.state = onNotS.to_state;
+    fromOnNotS.to_state = onLess.to_state;
+    fromOnNotS.def_move = 0;
+
+    onLess.transitions.push_back(toOnNotS);
+    onLess.transitions.push_back(fromOnNotS);
+    onLess.transitions.insert(onLess.transitions.end(), onNotS.transitions.begin(), onNotS.transitions.end());
+
+    tools->link_on(find_seperator, onLess, {'>'}, {1});
+
+    IncompleteTransition tohere;
+    tohere.state = temp;
+    tohere.to_state = find_seperator.to_state;
+    tohere.def_move = 0;
+
+    find_seperator.transitions.push_back(tohere);
+
+
+
     tools->move(find_seperator, {0,1}, 2);
     tools->make_loop_on_sequence(find_seperator, {':', ':'}, 1);
     tools->move(find_seperator, {0,1}, -2);
 
-
-
     tools->link(result, find_seperator);
 
     tools->link_put(result, {'E'}, {0});
+
+    IncompleteSet onInclude{"onInclude", "onInclude"};
+    tools->go_to(onInclude, {'\n'}, 1, 1, {0, 1});
+    tools->push(onInclude, 'I');
+    tools->link_put(onInclude, {'E'}, {0});
+
+    for (auto s: {on_include, on_comment}){
+        IncompleteTransition toOnInclude;
+        toOnInclude.state = s;
+        toOnInclude.to_state = onInclude.state;
+        toOnInclude.def_move = 0;
+        result.transitions.push_back(toOnInclude);
+    }
+
+    IncompleteTransition fromOnInclude;
+    fromOnInclude.state = onInclude.to_state;
+    fromOnInclude.to_state = result.to_state;
+    fromOnInclude.def_move = 0;
+
+
+    result.transitions.push_back(fromOnInclude);
+    result.transitions.insert(result.transitions.end(), onInclude.transitions.begin(), onInclude.transitions.end());
 
     tools->go_to(result, {'S', 'A'}, 0, -1, {0, 1});
 
@@ -86,6 +159,10 @@ IncompleteSet TuringTokenizer::tokenize() {
 
     tools->stack_replace(result, {'A','P','A'}, {'D'});
     tools->stack_replace(result, {'A','P','A', 'P'}, {'D'});
+    tools->stack_replace(result, {':',':','P','A'}, {'D'});
+    tools->stack_replace(result, {':',':','P','A', 'S', 'A'}, {'D'});
+    tools->stack_replace(result, {':',':','P','A', 'S', 'A', 'P'}, {'D'});
+
     tools->stack_replace(result, {'A', 'P'}, {'A'});
 
     tools->stack_replace(result, {'A','P','A', '('}, {'U'});
@@ -96,9 +173,11 @@ IncompleteSet TuringTokenizer::tokenize() {
     tools->stack_replace(result, {':', ':', '('}, {'O'});
     tools->stack_replace(result, {'A', ':'}, {'I'});
 
+
     //make sure we still have useful tokens
     //tools->stack_replace(result, {'('}, {'A'});
     tools->stack_replace(result, {':'}, {'S'});
+    tools->stack_replace(result, {'S', 'A'}, {'S'});
     tools->stack_replace(result, {'X'}, {'A'});
     tools->stack_replace(result, {'\n'}, {'I'});
 
@@ -202,6 +281,7 @@ IncompleteSet TuringTokenizer::tokenize_runner_productions() {
                 //sets S on stack if no other S is before
                 tools->stack_replace(spatie_pusher, {stack_symbol}, {'P'});
                 tools->stack_replace(spatie_pusher, {'A'}, {'P'});
+                tools->stack_replace(spatie_pusher, {':'}, {'P'});
 
                 trans_prod.to_state = spatie_pusher.state;
 
@@ -252,6 +332,7 @@ IncompleteSet TuringTokenizer::tokenize_runner_productions() {
         //sets A to say here is a token
         tools->stack_replace(tokenize_set, {stack_symbol}, {'A'});
         tools->stack_replace(tokenize_set, {'P'}, {'A'});
+        tools->stack_replace(tokenize_set, {'S'}, {'A'});
 
         tools->link(final_tokenize_set, tokenize_set);
 

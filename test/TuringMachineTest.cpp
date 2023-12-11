@@ -200,7 +200,7 @@ TEST(TuringMachineTest, TM_tokenazation) {
         }
 
 
-        if (i >= 15755000){
+        if (i >= 5100000){
             int j = 0;
 
             for (int i = 0; i < tm.getTapeAmount(); i++){
@@ -231,6 +231,15 @@ TEST(TuringMachineTest, TM_tokenazation) {
 
 
 TEST(TuringMachineTest, TM_builder) {
+
+    TuringTools::reset();
+    auto t = new TMBuilder(4);
+    TMBuilder_output data = t->generateTM();
+    //ofstream o("output/TM_test.json");
+    //o << data;
+    TuringMachine tm;
+    tm.load(data.states, data.start_state, data.input, data.tape_size, data.productions);
+
     for (int k=1; k<= 24; k++){
         ifstream test_file("../test/testFiles/TM_test_"+ to_string(k)+".cpp");
         string test_string;
@@ -241,13 +250,7 @@ TEST(TuringMachineTest, TM_builder) {
             test_string  += line+'\n';
         }
 
-        TuringTools::reset();
-        auto t = new TMBuilder(4);
-        TMBuilder_output data = t->generateTM();
-        //ofstream o("output/TM_test.json");
-        //o << data;
-        TuringMachine tm;
-        tm.load(data.states, data.start_state, data.input, data.tape_size, data.productions);
+        tm.clear();
         tm.load_input(test_string, 1);
 
         int halted_time = -1;

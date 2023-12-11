@@ -124,3 +124,13 @@ string Tape::exportTape() {
 long Tape::getTapeHeadIndex() const {
     return tape_head_index;
 }
+
+void Tape::clear() {
+    free(tape_ptr);
+    tape_size = 20;
+    tape_ptr = (char*) calloc(tape_size, 1);
+    tape_head_index = 0;
+    tape_head = tape_ptr;
+
+
+}
