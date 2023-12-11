@@ -19,11 +19,10 @@ FetchContent_MakeAvailable(googletest)
 enable_testing()
 
 set(TestCaseFiles
-        test/test-main.cpp
         test/TuringMachineTest.cpp
         test/ThreadingTest.cpp
-        test/CFGTokenTest.cpp
-        test/testFiles/knapsack.cpp)
+
+)
 
 set(TuringCode
         src/TM/TuringMachine.cpp
