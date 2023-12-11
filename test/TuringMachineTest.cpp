@@ -156,7 +156,7 @@ TEST(TuringMachineTest, TM_tools){
 }
 
 TEST(TuringMachineTest, TM_tokenazation) {
-    int index = 14;
+    int index = 34;
     ifstream test_file("../test/testFiles/TM_test_"+ to_string(index)+".cpp");
     string test_string;
     cout << test_file.is_open() << endl;
@@ -179,7 +179,7 @@ TEST(TuringMachineTest, TM_tokenazation) {
     tm.load_input(test_string, 1);
 
     int halted_time = -1;
-    for (int i = 0; i<200000; i++){
+    for (int i = 0; i<40000; i++){
 
 
         if (tm.isHalted()){
@@ -190,17 +190,13 @@ TEST(TuringMachineTest, TM_tokenazation) {
             break;
         }
         tm.move();
-        if (tm.getCurrentState() == "3503"){
+        if (tm.getCurrentState() == "go_to_2256"){
             int j=0;
 
-            for (int i = 0; i < tm.getTapeAmount(); i++){
-                cout << tm.getTapeData(i) << endl;
-            }
-            cout << endl;
         }
 
 
-        if (i >= 5100000){
+        if (i >= 32900){
             int j = 0;
 
             for (int i = 0; i < tm.getTapeAmount(); i++){
@@ -223,7 +219,27 @@ TEST(TuringMachineTest, TM_tokenazation) {
 
     cout << "halted time " << halted_time << endl;
 
-
+    string b = tm.exportTapeData(3);
+    int a1 = 0;
+    int a2 = 0;
+    int a3 = 0;
+    int a4 = 0;
+    for (char c: b){
+        if (c == '('){
+            a1 += 1;
+        }
+        if (c == ')'){
+            a2 += 1;
+        }
+        if (c == '{'){
+            a3 += 1;
+        }
+        if (c == '}'){
+            a4 += 1;
+        }
+    }
+    std::cout << "(): " << a1 << " " << a2 << std::endl;
+    std::cout << "{}: " << a3 << " " << a4 << std::endl;
     ofstream out{"../test/results/TM_test_"+ to_string(index)+".cpp"};
     out << tm.exportTapeData(1);
     out.close();
@@ -240,7 +256,7 @@ TEST(TuringMachineTest, TM_builder) {
     TuringMachine tm;
     tm.load(data.states, data.start_state, data.input, data.tape_size, data.productions);
 
-    for (int k=1; k<= 24; k++){
+    for (int k=1; k<= 27; k++){
         ifstream test_file("../test/testFiles/TM_test_"+ to_string(k)+".cpp");
         string test_string;
         cout << test_file.is_open() << endl;
@@ -277,6 +293,7 @@ TEST(TuringMachineTest, TM_builder) {
         ofstream out{"../test/results/TM_test_"+ to_string(k)+".cpp"};
         out << tm.exportTapeData(1);
         out.close();
+        ASSERT_NE(k, -1);
     }
 
 

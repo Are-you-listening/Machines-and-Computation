@@ -19,6 +19,8 @@ IncompleteSet TuringIfElseAntiNesting::doAction() {
     tools->go_to(result, {'O', 'U', '\u0000'}, get_tuple_index()[1], 1, get_tuple_index());
     string nothing_todo = tools->branch_on(result, {'\u0000'}, {get_tuple_index()[1]});
 
+    IncompleteSet b{"B", "BR"};
+    //tools->link(result, b);
     //check if the function found starts with an if statement
     tools->go_to(result, {'{', 'S'}, get_tuple_index()[1], 1, get_tuple_index());
 

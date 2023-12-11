@@ -32,11 +32,11 @@ TMBuilder_output TMBuilder::generateTM() {
     tools->push(program, '#');
     tools->push(program, '-');
     tools->link_put(program, {'A', 'A'}, {0, 2});
-
+    //tools->move(program, {0,1}, -1);
+    //tools->move(program, {0,1}, 1);
 
     TuringTokenizer tokenizer{};
     IncompleteSet tokenize_program = tokenizer.getTransitions();
-    //TODO: tokenize not completly correct for constructor/destructor/ new/delete/return
 
     tools->link(program, tokenize_program);
 
@@ -46,7 +46,6 @@ TMBuilder_output TMBuilder::generateTM() {
     TuringIfElseAntiNesting ifElse{2, 4};
 
     tools->link(program, ifElse.getTransitions());
-
 
 
     TuringVarDictionary vardict{};

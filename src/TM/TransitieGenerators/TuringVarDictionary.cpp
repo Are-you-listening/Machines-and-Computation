@@ -21,9 +21,13 @@ IncompleteSet TuringVarDictionary::storeVar() {
 
     IncompleteSet store_call{"vardict_store_call",  "vardict_store_call"};
     check_defined(store_call);
+
     tools->link_on_multiple(result, store_call, {{'C'}, {'U'}, {'O'}}, {get_tuple_index()[1]});
 
     IncompleteSet store_call_2{"vardict_store_call_2",  "vardict_store_call_2"};
+
+
+
     store_defined(store_call_2);
     tools->link_on_multiple(result, store_call_2, {{'D'}, {'T'}}, {get_tuple_index()[1]});
 
@@ -33,6 +37,7 @@ IncompleteSet TuringVarDictionary::storeVar() {
     tools->link_on(result, remove_nest, {'}'}, {get_tuple_index()[1]});
 
     IncompleteSet add_nest{"vardict_add_nesting", "vardict_add_nesting"};
+
 
     //make sure 2 following if statements have their own key
     IncompleteSet create_key{"vardict_create_key", "vardict_create_key"};
@@ -96,7 +101,6 @@ IncompleteSet TuringVarDictionary::storeVar() {
 
     IncompleteSet skip_bracket{"skip_bracket", "skip_bracket"};
 
-
     tools->skip_nesting(skip_bracket, tapes-1, 1, get_tuple_index()[1], 1, get_tuple_index(), '(', ')');
     tools->move(skip_bracket, get_tuple_index(), 1);
     tools->link_on(result, skip_bracket, {'('}, {get_tuple_index()[1]});
@@ -118,6 +122,7 @@ IncompleteSet TuringVarDictionary::storeVar() {
 
 void TuringVarDictionary::check_defined(IncompleteSet &a) {
     IncompleteSet added("vardict_check_defined", "vardict_check_defined");
+
     vector<int> tuple_index = get_tuple_index();
 
     //but S at the start of tuple tapes
@@ -126,7 +131,12 @@ void TuringVarDictionary::check_defined(IncompleteSet &a) {
 
     //go to seperator or '{'
     tools->move(added, tuple_index, 1);
-    tools->go_to(added, {'S', '{', '\u0000'}, tuple_index[1], 1, tuple_index);
+    tools->go_to(added, {'S', '{', '\u0000', '('}, tuple_index[1], 1, tuple_index);
+    IncompleteSet skipNesting{"skip_nesting_check_defined", "skip_nesting_check_defined"};
+    tools->skip_nesting(skipNesting, tapes-1, 1, tuple_index[1], 1, get_tuple_index(),'(', ')');
+    tools->go_to(skipNesting, {'S', '{', '\u0000'}, tuple_index[1], 1, tuple_index);
+
+    tools->link_on(added, skipNesting, {'('}, {tuple_index[1]});
 
     //set end marker
     tools->write_on(added, {'{'}, {tuple_index[1]}, {'E'}, {tuple_index[0]});

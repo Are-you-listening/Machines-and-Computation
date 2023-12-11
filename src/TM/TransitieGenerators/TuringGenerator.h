@@ -17,6 +17,7 @@ protected:
     TuringTools* tools;
     vector<char> seperators;
     vector<char> special_sep;
+    vector<char> ignore_sep;
     char stack_symbol;
     vector<char> nesting_tokens;
 

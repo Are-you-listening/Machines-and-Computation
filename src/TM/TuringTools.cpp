@@ -1058,6 +1058,7 @@ void TuringTools::heap_push_working(IncompleteSet &push_heap_action, bool functi
 
     go_to(push_heap_action, {'S', 'A'}, 0, -1, {0,1});
 
+
     IncompleteSet copy_to_heap_type("copy_to_heap_type_" + to_string(counter), "copy_to_heap_type_" + to_string(counter));
     counter++;
     //copies classname/function name
@@ -1638,7 +1639,9 @@ TuringTools::nesting_marker(IncompleteSet &a, const vector<int> &tuple_indexes, 
 
             IncompleteSet store_definer{"store_definer_"+ to_string(counter), "store_definer_"+ to_string(counter)};
             counter++;
+
             make_working_nesting(store_definer, tuple_indexes);
+
 
             //clear old S marker
             move(store_definer, {0,1}, -1);
@@ -1648,6 +1651,7 @@ TuringTools::nesting_marker(IncompleteSet &a, const vector<int> &tuple_indexes, 
 
 
             link_on_multiple(forward_action, store_definer, {{'C'}, {'U'}, {'O'}}, {tuple_indexes[1]});
+
             add_nesting_working(forward_action);
 
             //marker cleanup
@@ -1842,6 +1846,9 @@ void TuringTools::make_working_nesting(IncompleteSet &a, const vector<int> &tupl
     link_put(working_nesting, {'S'}, {0});
 
     go_to(working_nesting, {'E'}, tuple_indexes[0], 1, tuple_indexes);
+
+    IncompleteSet b{"b", "br"};
+    link(working_nesting, b);
 
     link(a, working_nesting);
 

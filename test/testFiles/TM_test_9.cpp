@@ -1,6 +1,6 @@
 
 int main(int a) {
-    if (int b = 0){
+    if (a == 0){
 
         int c = 0;
     }

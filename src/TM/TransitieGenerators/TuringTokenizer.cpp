@@ -27,7 +27,14 @@ IncompleteSet TuringTokenizer::tokenize() {
     tools->go_to_not(result, {' ', '\n'}, 1, 1, {0,1});
     //branch on include
     string on_include = tools->branch_on(result, {'#'}, {1});
-    string on_comment = tools->branch_on(result, {'/'}, {1});
+
+    IncompleteSet checkSecondBracket{"check_second_bracket_tokenazation", "check_second_bracket_tokenazation"};
+    tools->move(checkSecondBracket, {0, 1}, 1);
+    string on_comment = tools->branch_on(checkSecondBracket, {'/'}, {1});
+    tools->move(checkSecondBracket, {0, 1}, -1);
+
+    tools->link_on(result, checkSecondBracket, {'/'}, {1});
+
     tools->go_to(result, {'S', 'A'}, 0, -1, {0,1});
 
     string end_tokenization_state = tools->branch_on(result, {'\u0000'}, {1});
@@ -41,7 +48,20 @@ IncompleteSet TuringTokenizer::tokenize() {
         tools->link_on(result, tokenize_seperator, {s}, {1});
     }
 
+    IncompleteSet onString{"on_string_tokenazation", "on_string_tokenazation"};
+    tools->move(onString, {0,1}, 1);
+    tools->go_to(onString, {'\"'}, 1, 1, {0, 1});
+    tools->move(onString, {0,1}, 1);
+    tools->link_put(onString, {'E'}, {0});
+    tools->move(onString, {0,1}, -1);
+    tools->go_to_clear(onString, {'S', 'A'}, 0, -1, {0,1}, {0});
+
+    tools->link_on(result, onString, {'\"'}, {1});
+
+    string skip_find_seperator_1 = result.to_state;
+
     tools->move(result, {0, 1}, 1);
+
 
     IncompleteSet find_seperator("tokenize_find_seperator", "tokenize_find_seperator");
     //need to loop this, and repeat if ::
@@ -122,8 +142,19 @@ IncompleteSet TuringTokenizer::tokenize() {
 
     result.transitions.push_back(fromOnInclude);
     result.transitions.insert(result.transitions.end(), onInclude.transitions.begin(), onInclude.transitions.end());
+    tools->move(result, {0,1}, -1);
 
-    tools->go_to(result, {'S', 'A'}, 0, -1, {0, 1});
+    for (char c: ignore_sep){
+        IncompleteTransition skip_find_sep;
+        skip_find_sep.state = skip_find_seperator_1;
+        skip_find_sep.to_state = result.to_state;
+        skip_find_sep.def_move = 0;
+        skip_find_sep.input = {c};
+        skip_find_sep.input_index = {1};
+        result.transitions.push_back(skip_find_sep);
+    }
+
+    tools->go_to_clear(result, {'S', 'A'}, 0, -1, {0, 1}, {0});
 
 
 
@@ -167,6 +198,7 @@ IncompleteSet TuringTokenizer::tokenize() {
 
     tools->stack_replace(result, {'A','P','A', '('}, {'U'});
     tools->stack_replace(result, {'A','P','A', 'P', '('}, {'U'});
+    tools->stack_replace(result, {'A',':',':','P','A', '('}, {'U'});
     tools->stack_replace(result, {'A', '('}, {'F'});
     tools->stack_replace(result, {'A', 'P' ,'('}, {'F'});
 
@@ -180,6 +212,12 @@ IncompleteSet TuringTokenizer::tokenize() {
     tools->stack_replace(result, {'S', 'A'}, {'S'});
     tools->stack_replace(result, {'X'}, {'A'});
     tools->stack_replace(result, {'\n'}, {'I'});
+    tools->stack_replace(result, {':',':','P'}, {'A'});
+    tools->stack_replace(result, {stack_symbol, 'P','('}, {'P'});
+
+    IncompleteSet putString{"put_string_tokenazation", "put_string_tokenazation"};
+    tools->push(putString, 'A');
+    tools->link_on_sequence(result, putString, {'\"'}, 1);
 
 
 
@@ -333,6 +371,7 @@ IncompleteSet TuringTokenizer::tokenize_runner_productions() {
         tools->stack_replace(tokenize_set, {stack_symbol}, {'A'});
         tools->stack_replace(tokenize_set, {'P'}, {'A'});
         tools->stack_replace(tokenize_set, {'S'}, {'A'});
+
 
         tools->link(final_tokenize_set, tokenize_set);
 
