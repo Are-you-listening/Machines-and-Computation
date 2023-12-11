@@ -186,6 +186,7 @@ void TuringDenestify::createNewFunction(IncompleteSet &a) {
     tools->move(create_function, {0,1}, 1);
 
 
+
     IncompleteSet copy_loop{"copy_loop_create_function", "copy_loop_create_function"};
     tools->write_on(copy_loop, {'.'}, {(int) tapes-1}, {'\u0000'}, {(int) tapes-1});
     tools->move(copy_loop, {(int) tapes-1}, 1);
@@ -268,6 +269,43 @@ void TuringDenestify::createNewFunction(IncompleteSet &a) {
     tools->link_put(create_function, {'\u0000'}, {get_tuple_index()[0]});
     tools->go_to_clear(create_function, {'A'}, get_tuple_index()[0], -1, get_tuple_index(), {get_tuple_index()[0]});
 
+    //copy function to front
+    tools->go_to(create_function, {'\u0000'}, get_tuple_index()[1], 1, get_tuple_index());
+    tools->skip_nesting(create_function, tapes-1, 1, get_tuple_index()[1], -1, get_tuple_index());
+    tools->move(create_function, get_tuple_index(), -1);
+    tools->skip_nesting(create_function, tapes-1, 1, get_tuple_index()[1], -1, get_tuple_index(), ')', '(');
+    tools->move(create_function, get_tuple_index(), -1);
+    tools->go_to_not(create_function, {'E'}, get_tuple_index()[1], -1, get_tuple_index());
+
+    IncompleteSet onU{"onU_move", "onU_move"};
+    tools->link_put(onU, {'S'}, {get_tuple_index()[0]});
+    tools->go_to(onU, {'\u0000'}, get_tuple_index()[1], 1, get_tuple_index());
+    tools->link_put(onU, {'E'}, {get_tuple_index()[0]});
+    tools->go_to(onU, {'S'}, get_tuple_index()[0], -1, get_tuple_index());
+
+    for (int i=1; i<get_tuple_index().size(); i++){
+        int index = get_tuple_index()[i];
+        tools->copy_till(onU, {'E'}, get_tuple_index()[0], index, 1, 1, temp);
+        tools->go_to(onU, {'A'}, get_tuple_index()[0], -1, get_tuple_index());
+        tools->copy_till(onU, {'S'}, get_tuple_index()[0], index, 1, 1, temp);
+
+        tools->link_put(onU, {'E'}, {0});
+        tools->go_to(onU, {'S'}, 0, -1, {0,1});
+        tools->go_to(onU, {'A'}, get_tuple_index()[0], -1, get_tuple_index());
+
+        tools->copy_till(onU, {'E'}, 0, 1, index, 1, temp);
+
+        //clear working
+        tools->go_to_clear(onU, {'S'}, 0, -1, {0,1}, {0,1});
+        tools->link_put(onU, {'\u0000'}, {1});
+
+        tools->go_to(onU, {'S'}, get_tuple_index()[0], -1, get_tuple_index());
+    }
+    tools->go_to(onU, {'E'}, get_tuple_index()[0], 1, get_tuple_index());
+
+    tools->link_on(create_function, onU, {'U'}, {get_tuple_index()[1]});
+
+    tools->go_to_clear(create_function, {'A'}, get_tuple_index()[0], -1, get_tuple_index(), {get_tuple_index()[0]});
     tools->link(a, create_function);
 
 }

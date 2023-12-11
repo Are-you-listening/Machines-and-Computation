@@ -3344,7 +3344,9 @@ void TuringTools::makeAntiNestingIfSolo(IncompleteSet &a, const vector<int> &tup
     go_to(solo_anti_nesting, {'H'}, tuple_indexes[0], 1, tuple_indexes);
     go_to(solo_anti_nesting, {'F'}, tuple_indexes[0], -1, tuple_indexes);
 
-    //first copy F-H than D-F
+
+
+    //first copy F-H than C-F
     auto temp = tuple_indexes;
     temp.push_back(0);
     temp.push_back(1);
@@ -3354,7 +3356,7 @@ void TuringTools::makeAntiNestingIfSolo(IncompleteSet &a, const vector<int> &tup
         int index = tuple_indexes[i];
 
         copy_till(solo_anti_nesting, {'H'}, tuple_indexes[0], index, 1, 1, temp);
-        go_to(solo_anti_nesting, {'D'}, tuple_indexes[0], -1, tuple_indexes);
+        go_to(solo_anti_nesting, {'C'}, tuple_indexes[0], -1, tuple_indexes);
         copy_till(solo_anti_nesting, {'F'}, tuple_indexes[0], index, 1, 1, temp);
 
         go_to(solo_anti_nesting, {'S'}, tuple_indexes[0], -1, tuple_indexes);
