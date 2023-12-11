@@ -279,6 +279,22 @@ void TuringDenestify::createNewFunction(IncompleteSet &a) {
 
     IncompleteSet onU{"onU_move", "onU_move"};
     tools->link_put(onU, {'S'}, {get_tuple_index()[0]});
+
+    tools->move(onU, get_tuple_index(), -1);
+    tools->go_to_not(onU, {'E', 'S'}, get_tuple_index()[1], -1, get_tuple_index());
+
+
+    IncompleteSet onT{"onT_move", "onT_move"};
+    tools->link_put(onT, {'S'}, {get_tuple_index()[0]});
+    tools->move(onT, get_tuple_index(), 1);
+    tools->go_to(onT, {'S'}, get_tuple_index()[0], 1, get_tuple_index());
+    tools->link_put(onT, {'\u0000'}, {get_tuple_index()[0]});
+    tools->go_to(onT, {'S'}, get_tuple_index()[0], -1, get_tuple_index());
+
+    tools->link_on(onU, onT, {'T'}, {get_tuple_index()[1]});
+    tools->go_to(onU, {'S'}, get_tuple_index()[0], 1, get_tuple_index());
+
+
     tools->go_to(onU, {'\u0000'}, get_tuple_index()[1], 1, get_tuple_index());
     tools->link_put(onU, {'E'}, {get_tuple_index()[0]});
     tools->go_to(onU, {'S'}, get_tuple_index()[0], -1, get_tuple_index());
