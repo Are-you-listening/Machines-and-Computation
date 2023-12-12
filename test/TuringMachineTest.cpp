@@ -304,17 +304,24 @@ TEST(TuringMachineTest, TM_builder) {
 
 TEST(TuringMachineTest, TM_single_tape) {
     TuringMachine tm;
-    tm.load("../test/testFiles/TM_1.json");
+    tm.load("../test/testFiles/TM_2.json");
     auto out = tm.toSingleTape();
 
     int halted_time = -1;
-    for (int i=0; i<10; i++){
+    for (int i=0; i<1000; i++){
         if (out.isHalted()){
             if (halted_time == -1){
                 halted_time = i;
             }
 
             break;
+        }
+
+        if (i >= 500){
+            int h = 0;
+            for (int i = 0; i < out.getTapeAmount(); i++){
+                cout << out.getTapeData(i) << endl;
+            }
         }
 
         out.move();
@@ -325,10 +332,13 @@ TEST(TuringMachineTest, TM_single_tape) {
         cout << out.getTapeData(i) << endl;
     }
 
-    for (int i = 0; i < tm.getTapeAmount(); i++){
-        cout << "i " << tm.getTuringIndex(i) << endl;
+    for (int i = 0; i < out.getTapeAmount(); i++){
+        cout << "i " << out.getTuringIndex(i) << endl;
     }
 
+
+    cout << "current state " << out.getCurrentState() << std::endl;
+    cout << "storage " << out.getControlStorage() << endl;
     cout << "halted time"<< ": " << halted_time << endl;
 
 

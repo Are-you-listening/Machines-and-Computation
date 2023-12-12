@@ -68,7 +68,7 @@ TMBuilder_output TMBuilder::generateTM() {
     program.transitions.push_back(re_heap);
 
     for (auto incomp: program.transitions){
-        Transition t = make_transition(incomp);
+        Transition t = tools->make_transition(incomp, tapes);
 
         TM_data.productions.push_back(t);
 
@@ -79,47 +79,7 @@ TMBuilder_output TMBuilder::generateTM() {
     return TM_data;
 }
 
-Transition TMBuilder::make_transition(IncompleteTransition &incomp) {
-    Transition transition;
-    transition.state = incomp.state;
-    vector<char> inputs;
-    vector<char> outputs;
-    vector<int> moves;
 
-    int def_move = incomp.def_move;
-
-    bool input_empty = incomp.input_index.empty();
-    bool output_empty = incomp.output_index.empty();
-
-    for (int i = 0; i< tapes; i++){
-        if (!input_empty && incomp.input_index.front() == i){
-            inputs.push_back(incomp.input.front());
-            incomp.input.erase(incomp.input.begin());
-            incomp.input_index.erase(incomp.input_index.begin());
-        }else{
-            inputs.push_back('\u0001');
-        }
-
-        if (!output_empty && incomp.output_index.front() == i){
-            outputs.push_back(incomp.output.front());
-            moves.push_back(incomp.move.front());
-            incomp.output.erase(incomp.output.begin());
-            incomp.move.erase(incomp.move.begin());
-            incomp.output_index.erase(incomp.output_index.begin());
-        }else{
-            outputs.push_back('\u0001');
-            moves.push_back(def_move);
-        }
-    }
-
-    transition.input = inputs;
-    Production p;
-    p.new_state = incomp.to_state;
-    p.replace_val = outputs;
-    p.movement = moves;
-    transition.production = p;
-    return transition;
-}
 
 json TMBuilder::add_transition(Transition &transition) {
     json production;

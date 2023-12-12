@@ -39,6 +39,7 @@ public:
     void clear();
     TuringMachine toSingleTape();
     void makeStorage(int size);
+    string getControlStorage();
     vector<Transition> getProductions();
 private:
     vector<Tape*> tapes;

@@ -17,6 +17,8 @@ struct Production{
     vector<char> replace_val;
     vector<int> movement;
     string new_state;
+    vector<int> control_increase = {};
+    vector<int> increase_amount = {};
 };
 struct Transition;
 class TuringProduction {

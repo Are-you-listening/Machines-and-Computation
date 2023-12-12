@@ -23,6 +23,10 @@ IncompleteTransition::IncompleteTransition(json &data) {
     }
 }
 
+bool IncompleteTransition::operator==(const IncompleteTransition &other) {
+    return other.state == this->state && other.input == this->input && other.input_index == this->input_index;
+}
+
 
 IncompleteSet::IncompleteSet(const string& state, const string& to_state): state{state}, to_state{to_state} {
 
@@ -3392,52 +3396,209 @@ void TuringTools::makeAntiNestingIfSolo(IncompleteSet &a, const vector<int> &tup
     link(a, solo_anti_nesting);
 }
 
-vector<IncompleteTransition> TuringTools::merge(const vector<IncompleteTransition> &m) {
+vector<IncompleteTransition> TuringTools::mergeToSingle(const vector<IncompleteTransition> &m) {
     vector<IncompleteTransition> out;
     vector<IncompleteTransition> temp_out = m;
     vector<IncompleteTransition> temp_out2;
-    for (int i = 0; i<temp_out.size(); i++){
-        for (int j = i+1; j<temp_out.size(); j++){
-            IncompleteTransition a = temp_out[i];
-            IncompleteTransition b = temp_out[j];
 
-            vector<char> inputs;
-            vector<int> inputs_index;
-            vector<char> outputs;
-            vector<int> outputs_index;
-            vector<int> move_index;
+    while (temp_out.size() > 1){
+        for (int i = 0; i<temp_out.size(); i++){
+            for (int j = i+1; j<temp_out.size(); j++){
+                IncompleteTransition a = temp_out[i];
+                IncompleteTransition b = temp_out[j];
 
-            auto a_c = 0;
-            auto b_c = 0;
-            while (a_c < a.input.size() && b_c < b.input.size()){
-                if (a.input_index[a_c] < b.input_index[b_c]){
-
-                    inputs.push_back(a.input[a_c]);
-                    inputs_index.push_back(a.input_index[a_c]);
-                    a_c += 1;
-                }else{
-                    inputs.push_back(b.input[b_c]);
-                    inputs_index.push_back(b.input_index[b_c]);
-                    b_c += 1;
+                if (a.state != b.state || a.to_state != b.to_state){
+                    continue;
                 }
+
+                vector<char> inputs;
+                vector<int> inputs_index;
+                vector<char> outputs;
+                vector<int> outputs_index;
+                vector<int> move_index;
+
+                vector<int> increase_index;
+                vector<int> increase_amount;
+
+                auto a_c = 0;
+                auto b_c = 0;
+                while (a_c < a.input.size() && b_c < b.input.size()){
+                    if (a.input_index[a_c] == b.input_index[b_c]){
+
+                        inputs.push_back(a.input[a_c]);
+                        inputs_index.push_back(a.input_index[a_c]);
+
+                        a_c += 1;
+                        b_c += 1;
+                        continue;
+                    }
+
+                    if (a.input_index[a_c] < b.input_index[b_c]){
+
+                        inputs.push_back(a.input[a_c]);
+                        inputs_index.push_back(a.input_index[a_c]);
+                        a_c += 1;
+                    }else{
+                        inputs.push_back(b.input[b_c]);
+                        inputs_index.push_back(b.input_index[b_c]);
+                        b_c += 1;
+                    }
+                }
+
+                if (a_c < a.input.size()){
+                    inputs.insert(inputs.end(), a.input.begin()+a_c, a.input.end());
+                    inputs_index.insert(inputs_index.end(), a.input_index.begin()+a_c, a.input_index.end());
+                }else if (b_c < b.input.size()){
+                    inputs.insert(inputs.end(), b.input.begin()+b_c, b.input.end());
+                    inputs_index.insert(inputs_index.end(), b.input_index.begin()+b_c, b.input_index.end());
+                }
+
+                a_c = 0;
+                b_c = 0;
+
+                while (a_c < a.output.size() && b_c < b.output.size()){
+                    if (a.output_index[a_c] == b.output_index[b_c]){
+
+                        outputs.push_back(a.output[a_c]);
+                        outputs_index.push_back(a.output_index[a_c]);
+                        move_index.push_back(a.move[a_c]);
+                        a_c += 1;
+                        b_c += 1;
+                        continue;
+                    }
+
+                    if (a.output_index[a_c] < b.output_index[b_c]){
+
+                        outputs.push_back(a.output[a_c]);
+                        outputs_index.push_back(a.output_index[a_c]);
+                        move_index.push_back(a.move[a_c]);
+                        a_c += 1;
+                    }else{
+                        outputs.push_back(b.output[b_c]);
+                        outputs_index.push_back(b.output_index[b_c]);
+                        move_index.push_back(b.move[b_c]);
+                        b_c += 1;
+                    }
+                }
+
+                if (a_c < a.output.size()){
+                    outputs.insert(outputs.end(), a.output.begin()+a_c, a.output.end());
+                    outputs_index.insert(outputs_index.end(), a.output_index.begin()+a_c, a.output_index.end());
+                    move_index.insert(move_index.end(), a.move.begin()+a_c, a.move.end());
+                }else if (b_c < b.input.size()){
+                    outputs.insert(outputs.end(), b.output.begin()+b_c, b.output.end());
+                    outputs_index.insert(outputs_index.end(), b.output_index.begin()+b_c, b.output_index.end());
+                    move_index.insert(move_index.end(), b.move.begin()+b_c, b.move.end());
+                }
+
+                a_c = 0;
+                b_c = 0;
+
+                while (a_c < a.increase_amount.size() && b_c < b.increase_amount.size()){
+                    if (a.control_increase[a_c] == b.control_increase[b_c]){
+
+                        increase_amount.push_back(a.increase_amount[a_c]+b.increase_amount[b_c]);
+                        increase_index.push_back(a.control_increase[a_c]);
+
+                        a_c += 1;
+                        b_c += 1;
+                        continue;
+                    }
+
+                    if (a.control_increase[a_c] < b.control_increase[b_c]){
+
+                        increase_amount.push_back(a.increase_amount[a_c]);
+                        increase_index.push_back(a.control_increase[a_c]);
+                        a_c += 1;
+                    }else{
+                        increase_amount.push_back(b.increase_amount[b_c]);
+                        increase_index.push_back(b.control_increase[b_c]);
+                        b_c += 1;
+                    }
+
+                }
+
+                if (a_c < a.control_increase.size()){
+                    increase_amount.insert(increase_amount.end(), a.increase_amount.begin()+a_c, a.increase_amount.end());
+                    increase_index.insert(increase_index.end(), a.control_increase.begin()+a_c, a.control_increase.end());
+
+                }else if (b_c < b.control_increase.size()){
+                    increase_amount.insert(increase_amount.end(), b.increase_amount.begin()+b_c, b.increase_amount.end());
+                    increase_index.insert(increase_index.end(), b.control_increase.begin()+b_c, b.control_increase.end());
+                }
+
+                IncompleteTransition new_t;
+                new_t.def_move = a.def_move;
+                new_t.state = a.state;
+                new_t.to_state = a.to_state;
+                new_t.input = inputs;
+                new_t.input_index = inputs_index;
+                new_t.output = outputs;
+                new_t.output_index = outputs_index;
+                new_t.move = move_index;
+                new_t.control_increase = increase_index;
+                new_t.increase_amount = increase_amount;
+
+                if (find(temp_out2.begin(), temp_out2.end(), new_t) == temp_out2.end()){
+                    temp_out2.push_back(new_t);
+                }
+
+
             }
-
-            if (a_c < a.input.size()){
-                inputs.insert(inputs.end(), a.input.begin()+a_c, a.input.end());
-                inputs_index.insert(inputs_index.end(), a.input_index.begin()+a_c, a.input_index.end());
-            }else if (b_c < b.input.size()){
-                inputs.insert(inputs.end(), b.input.begin()+b_c, b.input.end());
-                inputs_index.insert(inputs_index.end(), b.input_index.begin()+b_c, b.input_index.end());
-            }
-
-
-            int h =0 ;
         }
+
+        out.insert(out.end(), temp_out.begin(), temp_out.end());
+        temp_out = temp_out2;
+        temp_out2 = {};
+
     }
+    out.insert(out.end(), temp_out.begin(), temp_out.end());
     return out;
 }
 
+Transition TuringTools::make_transition(IncompleteTransition &incomp, int tapes) {
+    Transition transition;
+    transition.state = incomp.state;
+    vector<char> inputs;
+    vector<char> outputs;
+    vector<int> moves;
 
+    int def_move = incomp.def_move;
+
+    bool input_empty = incomp.input_index.empty();
+    bool output_empty = incomp.output_index.empty();
+
+    for (int i = 0; i< tapes; i++){
+        if (!input_empty && incomp.input_index.front() == i){
+            inputs.push_back(incomp.input.front());
+            incomp.input.erase(incomp.input.begin());
+            incomp.input_index.erase(incomp.input_index.begin());
+        }else{
+            inputs.push_back('\u0001');
+        }
+
+        if (!output_empty && incomp.output_index.front() == i){
+            outputs.push_back(incomp.output.front());
+            moves.push_back(incomp.move.front());
+            incomp.output.erase(incomp.output.begin());
+            incomp.move.erase(incomp.move.begin());
+            incomp.output_index.erase(incomp.output_index.begin());
+        }else{
+            outputs.push_back('\u0001');
+            moves.push_back(def_move);
+        }
+    }
+
+    transition.input = inputs;
+    Production p;
+    p.new_state = incomp.to_state;
+    p.replace_val = outputs;
+    p.movement = moves;
+    p.control_increase = incomp.control_increase;
+    p.increase_amount = incomp.increase_amount;
+    transition.production = p;
+    return transition;
+}
 
 
 

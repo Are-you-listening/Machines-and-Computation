@@ -188,7 +188,7 @@ void Merge(set<vector<string>> &result, vector<vector<string>> &extra){
 }
 
 void Merge(vector<string> &result, vector<string> &extra){
-    cout << "this merge doesn't yet? anything!!" << endl;
+    cout << "this mergeToSingle doesn't yet? anything!!" << endl;
 }
 
 bool SubsetCheck(const vector<string> &uset, const vector<string> &subset){

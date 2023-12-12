@@ -22539,9 +22539,9 @@ class basic_json
     /*!
     @brief applies a JSON Merge Patch
 
-    The merge patch format is primarily intended for use with the HTTP PATCH
+    The mergeToSingle patch format is primarily intended for use with the HTTP PATCH
     method as a means of describing a set of modifications to a target
-    resource's content. This function applies a merge patch to the current
+    resource's content. This function applies a mergeToSingle patch to the current
     JSON value.
 
     The function implements the following algorithm from Section 2 of

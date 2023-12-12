@@ -160,6 +160,11 @@ void TuringMachine::move(){
         storage_in_state[i] = c;
     }
 
+    for (int u=0; u<p.control_increase.size(); u++){
+        storage_in_state[p.control_increase[u]] += p.increase_amount[u];
+    }
+
+
     for (int i=0; i<tapes.size(); i++){
         Tape* t = tapes[i];
         t->write(p.replace_val[i+storage_in_state_size]);
@@ -219,31 +224,176 @@ TuringMachine TuringMachine::toSingleTape() {
 
     auto tools = TuringTools::getInstance(-1);
 
-
-    IncompleteSet new_transitions{"new_transitions", "new_transitions"};
-    IncompleteTransition loop_state;
-    loop_state.state = "q";
-    loop_state.to_state = "q";
-    loop_state.def_move = 1;
-    new_transitions.transitions.push_back(loop_state);
-
-    vector<IncompleteTransition> soon_merging;
-    for (int i =0; i<tapes.size(); i++){
-        IncompleteTransition store;
-        store.state = "q";
-        store.to_state = "q";
-        store.def_move = 0;
-
-        store.input = {'\u0002','X'};
-        store.input_index = {i+1,i*2+new_control};
-
-        store.output = {'a'};
-        store.output_index = {i+1};
-        store.move = {0};
-        soon_merging.push_back(store);
+    vector<int> storage_in_state_indexes;
+    vector<int> all_moving;
+    for (int i =0; i<new_control; i++){
+        storage_in_state_indexes.push_back(i);
+        all_moving.push_back(1);
     }
 
-    auto good = tools->merge(soon_merging);
+
+    IncompleteSet new_transitions{"new_transitions", "new_transitions"};
+    int counter = 0;
+    for (auto prod: getProductions()){
+        //later skip store part for same state
+        IncompleteTransition loop_state;
+        loop_state.state = prod.state;
+        loop_state.to_state = prod.state;
+        loop_state.def_move = 1;
+        new_transitions.transitions.push_back(loop_state);
+
+        vector<IncompleteTransition> soon_merging;
+        for (int i =0; i<tapes.size(); i++){
+            IncompleteTransition store;
+            store.state = prod.state;
+            store.to_state = prod.state;
+            store.def_move = 1;
+
+            store.input = {'X', prod.input[i]};
+            store.input_index = {i*2+new_control, i*2+new_control+1};
+
+            store.output = {prod.input[i]};
+            store.output_index = {i+1};
+            store.move = {1};
+
+            store.control_increase = {0};
+            store.increase_amount = {1};
+            soon_merging.push_back(store);
+
+        }
+
+        auto all_store_options = tools->mergeToSingle(soon_merging);
+        new_transitions.transitions.insert(new_transitions.transitions.begin(), all_store_options.begin(), all_store_options.end());
+
+        IncompleteTransition toWriteMode;
+        toWriteMode.state = prod.state;
+
+        toWriteMode.input = {(char) ('\u0002'+(int) tapes.size())};
+        toWriteMode.input.insert(toWriteMode.input.end(), prod.input.begin(), prod.input.end());
+        toWriteMode.input_index = storage_in_state_indexes;
+
+        toWriteMode.output = {(char) ('\u0002'+(int) tapes.size())};
+        toWriteMode.output.insert(toWriteMode.output.end(), prod.production.replace_val.begin(), prod.production.replace_val.end());
+        toWriteMode.output_index = storage_in_state_indexes;
+        toWriteMode.move = all_moving;
+
+        toWriteMode.to_state = prod.state+"_write"+ to_string(counter);
+        toWriteMode.def_move = 1;
+
+        new_transitions.transitions.push_back(toWriteMode);
+
+
+        soon_merging = {};
+
+        IncompleteTransition loop_state2;
+        loop_state2.state = prod.state+"_write"+ to_string(counter);
+        loop_state2.to_state = prod.state+"_write"+ to_string(counter);
+
+        loop_state2.input = prod.production.replace_val;
+        loop_state2.input_index = storage_in_state_indexes;
+        loop_state2.input_index.erase(loop_state2.input_index.begin());
+
+        loop_state2.def_move = -1;
+        new_transitions.transitions.push_back(loop_state2);
+
+
+        IncompleteTransition loop_state3;
+        loop_state3.state = prod.state+"_write"+ to_string(counter);
+        loop_state3.to_state = prod.state+"_write"+ to_string(counter);
+        loop_state3.def_move = -1;
+        new_transitions.transitions.push_back(loop_state3);
+
+
+
+        for (int i =0; i<tapes.size(); i++){
+            IncompleteTransition write;
+            write.state = prod.state+"_write"+ to_string(counter);
+            write.to_state = prod.state+"_write"+ to_string(counter);
+            write.def_move = 0;
+
+            write.input = {prod.production.replace_val[i], 'X'};
+            write.input_index = {i+1, i*2+new_control};
+
+            write.output = {'\u0003', prod.production.replace_val[i]};
+            write.output_index = {i+1, i*2+1+new_control};
+            write.move = {0, 0};
+
+            write.control_increase = {0};
+            write.increase_amount = {-1};
+            soon_merging.push_back(write);
+
+            IncompleteTransition move_marker;
+            move_marker.state = prod.state+"_write"+ to_string(counter);
+            move_marker.to_state = prod.state+"_mark"+ to_string(counter);
+            move_marker.def_move = prod.production.movement[i];
+
+            move_marker.input = {'\u0003'};
+            move_marker.input_index = {i+1};
+
+            move_marker.output = {'\u0000'};
+            move_marker.output_index = {i*2+new_control};
+            move_marker.move = {prod.production.movement[i]};
+
+            new_transitions.transitions.push_back(move_marker);
+
+            IncompleteTransition move_marker_back;
+            move_marker_back.state = prod.state+"_mark"+ to_string(counter);
+            move_marker_back.to_state = prod.state+"_write"+ to_string(counter);
+            move_marker_back.def_move = -1*prod.production.movement[i];
+
+            move_marker_back.input = {'\u0003'};
+            move_marker_back.input_index = {i+1};
+
+            move_marker_back.output = {'\u0002', 'X'};
+            move_marker_back.output_index = {i+1, i*2+new_control};
+            move_marker_back.move = {-1*prod.production.movement[i], -1*prod.production.movement[i]};
+
+            new_transitions.transitions.push_back(move_marker_back);
+
+        }
+
+        all_store_options = tools->mergeToSingle(soon_merging);
+        new_transitions.transitions.insert(new_transitions.transitions.begin(), all_store_options.begin(), all_store_options.end());
+
+        IncompleteTransition toNextMode;
+        toNextMode.state = prod.state+"_write"+ to_string(counter);
+
+        for (int  i =new_control-1; i<new_control; i++){
+            toNextMode.input.push_back('\u0002');
+            toNextMode.input_index.push_back(i);
+        }
+
+        toNextMode.to_state = prod.production.new_state;
+        toNextMode.def_move = -1;
+
+        new_transitions.transitions.push_back(toNextMode);
+        counter++;
+    }
+
+
+    vector<Transition> real_transitions;
+    for (auto incomp: new_transitions.transitions){
+        Transition t = tools->make_transition(incomp, new_control+tapes.size()*2);
+
+        real_transitions.push_back(t);
+
+        //json production = add_transition(t);
+        //TM_data["Productions"].push_back(production);
+    }
+
+    output_tm.load({}, start_state, "", tapes.size()*2, real_transitions);
+
+    for (int i =0; i<tapes.size(); i++){
+        string head;
+        for (int j =0; j<tapes[i]->getTapeHeadIndex(); j++){
+            head += " ";
+        }
+
+        head += "X";
+
+        output_tm.load_input(head,i*2);
+        output_tm.load_input(tapes[i]->exportTape(),i*2+1);
+    }
 
     /*
     vector<char> kleene_starts;
@@ -368,5 +518,13 @@ vector<Transition> TuringMachine::getProductions() {
         }
     }
     return out;
+}
+
+string TuringMachine::getControlStorage() {
+    string s;
+    for (int i =0; i<storage_in_state_size; i++){
+        s += storage_in_state[i];
+    }
+    return s;
 }
 
