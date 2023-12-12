@@ -9,6 +9,7 @@
 #include <vector>
 #include "lib/json.hpp"
 #include "TuringProduction.h"
+#include <set>
 using namespace std;
 using json = nlohmann::json;
 
@@ -32,7 +33,8 @@ struct IncompleteTransition{
     vector<int> move;
     vector<int> control_increase = {};
     vector<int> increase_amount = {};
-    bool operator==(const IncompleteTransition& other);
+    bool operator==(const IncompleteTransition& other) const;
+    bool operator<(const IncompleteTransition& other) const;
 };
 
 
@@ -125,7 +127,7 @@ public:
     char stack_symbol;
     vector<char> nesting_tokens;
 
-    vector<IncompleteTransition> mergeToSingle(const vector<IncompleteTransition>& m);
+    set<IncompleteTransition> mergeToSingle(const set<IncompleteTransition>& m);
     Transition make_transition(IncompleteTransition& incomp, int tapes);
 private:
 

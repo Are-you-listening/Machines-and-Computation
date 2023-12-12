@@ -304,7 +304,7 @@ TEST(TuringMachineTest, TM_builder) {
 
 TEST(TuringMachineTest, TM_single_tape) {
     TuringMachine tm;
-    tm.load("../test/testFiles/TM_2.json");
+    tm.load("../test/testFiles/TM_4.json");
     auto out = tm.toSingleTape();
 
     int halted_time = -1;
@@ -317,12 +317,7 @@ TEST(TuringMachineTest, TM_single_tape) {
             break;
         }
 
-        if (i >= 500){
-            int h = 0;
-            for (int i = 0; i < out.getTapeAmount(); i++){
-                cout << out.getTapeData(i) << endl;
-            }
-        }
+
 
         out.move();
 
@@ -340,6 +335,101 @@ TEST(TuringMachineTest, TM_single_tape) {
     cout << "current state " << out.getCurrentState() << std::endl;
     cout << "storage " << out.getControlStorage() << endl;
     cout << "halted time"<< ": " << halted_time << endl;
+    cout << tm.getProductions().size() << endl;
+    cout << out.getProductions().size() << endl;
 
+}
+
+TEST(TuringMachineTest, TM_single_tape_2){
+    int index = 9;
+    ifstream test_file("../test/testFiles/TM_test_"+ to_string(index)+".cpp");
+    string test_string;
+    cout << test_file.is_open() << endl;
+    while (!test_file.eof()){
+        string line;
+        getline(test_file, line);
+        test_string  += line+'\n';
+    }
+
+    TuringTools::reset();
+    auto t = new TMBuilder(4);
+    TMBuilder_output data = t->generateTM();
+    //ofstream o("output/TM_test.json");
+    //o << data;
+    TuringMachine tm;
+    tm.load(data.states, data.start_state, data.input, data.tape_size, data.productions);
+    tm.load_input(test_string, 1);
+
+    cout << tm.getProductions().size() << endl;
+    tm = tm.toSingleTape();
+
+    cout << "created" << endl;
+    cout << tm.getProductions().size() << endl;
+
+    int halted_time = -1;
+    for (int i = 0; i<1000000; i++){
+
+
+        if (tm.isHalted()){
+            if (halted_time == -1){
+                halted_time = i;
+            }
+
+            break;
+        }
+        tm.move();
+        if (tm.getCurrentState() == "go_to_2256"){
+            int j=0;
+
+        }
+
+
+        if (i >= 3290000){
+            int j = 0;
+
+            for (int i = 0; i < tm.getTapeAmount(); i++){
+                cout << tm.getTapeData(i) << endl;
+            }
+            cout << endl;
+        }
+    }
+
+    cout << endl;
+    for (int i = 0; i < tm.getTapeAmount(); i++){
+        cout << tm.getTapeData(i) << endl;
+    }
+
+    for (int i = 0; i < tm.getTapeAmount(); i++){
+        cout << "i " << tm.getTuringIndex(i) << endl;
+    }
+
+    cout << tm.getCurrentState() << std::endl;
+
+    cout << "halted time " << halted_time << endl;
+
+    string b = tm.exportTapeData(3);
+    int a1 = 0;
+    int a2 = 0;
+    int a3 = 0;
+    int a4 = 0;
+    for (char c: b){
+        if (c == '('){
+            a1 += 1;
+        }
+        if (c == ')'){
+            a2 += 1;
+        }
+        if (c == '{'){
+            a3 += 1;
+        }
+        if (c == '}'){
+            a4 += 1;
+        }
+    }
+    std::cout << "(): " << a1 << " " << a2 << std::endl;
+    std::cout << "{}: " << a3 << " " << a4 << std::endl;
+    ofstream out{"../test/results/TM_test_"+ to_string(index)+".cpp"};
+    out << tm.exportTapeData(1);
+    out.close();
 
 }

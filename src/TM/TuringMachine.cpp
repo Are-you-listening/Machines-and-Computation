@@ -234,15 +234,21 @@ TuringMachine TuringMachine::toSingleTape() {
 
     IncompleteSet new_transitions{"new_transitions", "new_transitions"};
     int counter = 0;
+    set<string> start_states;
     for (auto prod: getProductions()){
-        //later skip store part for same state
-        IncompleteTransition loop_state;
-        loop_state.state = prod.state;
-        loop_state.to_state = prod.state;
-        loop_state.def_move = 1;
-        new_transitions.transitions.push_back(loop_state);
+        if (start_states.find(prod.state) == start_states.end()){
+            start_states.insert(prod.state);
 
-        vector<IncompleteTransition> soon_merging;
+            cout << counter << endl;
+            //later skip store part for same state
+            IncompleteTransition loop_state;
+            loop_state.state = prod.state;
+            loop_state.to_state = prod.state;
+            loop_state.def_move = 1;
+            new_transitions.transitions.push_back(loop_state);
+        }
+
+        set<IncompleteTransition> soon_merging;
         for (int i =0; i<tapes.size(); i++){
             IncompleteTransition store;
             store.state = prod.state;
@@ -258,12 +264,13 @@ TuringMachine TuringMachine::toSingleTape() {
 
             store.control_increase = {0};
             store.increase_amount = {1};
-            soon_merging.push_back(store);
+            soon_merging.insert(store);
 
         }
 
         auto all_store_options = tools->mergeToSingle(soon_merging);
         new_transitions.transitions.insert(new_transitions.transitions.begin(), all_store_options.begin(), all_store_options.end());
+
 
         IncompleteTransition toWriteMode;
         toWriteMode.state = prod.state;
@@ -282,8 +289,6 @@ TuringMachine TuringMachine::toSingleTape() {
 
         new_transitions.transitions.push_back(toWriteMode);
 
-
-        soon_merging = {};
 
         IncompleteTransition loop_state2;
         loop_state2.state = prod.state+"_write"+ to_string(counter);
@@ -304,7 +309,7 @@ TuringMachine TuringMachine::toSingleTape() {
         new_transitions.transitions.push_back(loop_state3);
 
 
-
+        soon_merging = {};
         for (int i =0; i<tapes.size(); i++){
             IncompleteTransition write;
             write.state = prod.state+"_write"+ to_string(counter);
@@ -320,7 +325,7 @@ TuringMachine TuringMachine::toSingleTape() {
 
             write.control_increase = {0};
             write.increase_amount = {-1};
-            soon_merging.push_back(write);
+            soon_merging.insert(write);
 
             IncompleteTransition move_marker;
             move_marker.state = prod.state+"_write"+ to_string(counter);

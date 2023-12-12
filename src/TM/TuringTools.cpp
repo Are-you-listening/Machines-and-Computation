@@ -2,6 +2,7 @@
 // Created by tibov on 04/11/23.
 //
 
+#include <set>
 #include "TuringTools.h"
 
 
@@ -23,8 +24,12 @@ IncompleteTransition::IncompleteTransition(json &data) {
     }
 }
 
-bool IncompleteTransition::operator==(const IncompleteTransition &other) {
+bool IncompleteTransition::operator==(const IncompleteTransition &other) const{
     return other.state == this->state && other.input == this->input && other.input_index == this->input_index;
+}
+
+bool IncompleteTransition::operator<(const IncompleteTransition &other) const{
+    return this->input_index < other.input_index;
 }
 
 
@@ -3396,29 +3401,44 @@ void TuringTools::makeAntiNestingIfSolo(IncompleteSet &a, const vector<int> &tup
     link(a, solo_anti_nesting);
 }
 
-vector<IncompleteTransition> TuringTools::mergeToSingle(const vector<IncompleteTransition> &m) {
-    vector<IncompleteTransition> out;
-    vector<IncompleteTransition> temp_out = m;
-    vector<IncompleteTransition> temp_out2;
+set<IncompleteTransition> TuringTools::mergeToSingle(const set<IncompleteTransition> &m) {
+    set<IncompleteTransition> out;
+    set<IncompleteTransition> temp_out = m;
+    set<IncompleteTransition> temp_out2;
 
+    vector<char> inputs;
+    vector<int> inputs_index;
+    vector<char> outputs;
+    vector<int> outputs_index;
+    vector<int> move_index;
+
+    vector<int> increase_index;
+    vector<int> increase_amount;
+    IncompleteTransition a;
+    IncompleteTransition b;
+    IncompleteTransition new_t;
+
+    int last_size = 0;
     while (temp_out.size() > 1){
-        for (int i = 0; i<temp_out.size(); i++){
-            for (int j = i+1; j<temp_out.size(); j++){
-                IncompleteTransition a = temp_out[i];
-                IncompleteTransition b = temp_out[j];
+        for (auto it_i = temp_out.begin(); it_i != temp_out.end(); it_i++){
+            for (auto it_j = it_i; it_j != temp_out.end(); it_j++){
+                if (it_i == it_j){
+                    continue;
+                }
+                a = *it_i;
+                b = *it_j;
 
                 if (a.state != b.state || a.to_state != b.to_state){
                     continue;
                 }
 
-                vector<char> inputs;
-                vector<int> inputs_index;
-                vector<char> outputs;
-                vector<int> outputs_index;
-                vector<int> move_index;
-
-                vector<int> increase_index;
-                vector<int> increase_amount;
+                inputs = {};
+                inputs_index = {};
+                outputs = {};
+                outputs_index = {};
+                move_index = {};
+                increase_amount = {};
+                increase_index = {};
 
                 auto a_c = 0;
                 auto b_c = 0;
@@ -3527,7 +3547,7 @@ vector<IncompleteTransition> TuringTools::mergeToSingle(const vector<IncompleteT
                     increase_index.insert(increase_index.end(), b.control_increase.begin()+b_c, b.control_increase.end());
                 }
 
-                IncompleteTransition new_t;
+
                 new_t.def_move = a.def_move;
                 new_t.state = a.state;
                 new_t.to_state = a.to_state;
@@ -3539,20 +3559,20 @@ vector<IncompleteTransition> TuringTools::mergeToSingle(const vector<IncompleteT
                 new_t.control_increase = increase_index;
                 new_t.increase_amount = increase_amount;
 
-                if (find(temp_out2.begin(), temp_out2.end(), new_t) == temp_out2.end()){
-                    temp_out2.push_back(new_t);
+                if (temp_out2.find(new_t) == temp_out2.end()){
+                    temp_out2.insert(new_t);
                 }
 
 
             }
         }
 
-        out.insert(out.end(), temp_out.begin(), temp_out.end());
+        out.insert(temp_out.begin(), temp_out.end());
         temp_out = temp_out2;
         temp_out2 = {};
 
     }
-    out.insert(out.end(), temp_out.begin(), temp_out.end());
+    out.insert(temp_out.begin(), temp_out.end());
     return out;
 }
 
