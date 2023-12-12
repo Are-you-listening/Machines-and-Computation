@@ -324,6 +324,11 @@ TEST(TuringMachineTest, TM_single_tape) {
     for (int i = 0; i < out.getTapeAmount(); i++){
         cout << out.getTapeData(i) << endl;
     }
+
+    for (int i = 0; i < tm.getTapeAmount(); i++){
+        cout << "i " << tm.getTuringIndex(i) << endl;
+    }
+
     cout << "halted time"<< ": " << halted_time << endl;
 
 

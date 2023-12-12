@@ -153,13 +153,17 @@ void TuringMachine::move(){
     current_state = p.new_state;
 
     for (int i=0; i<storage_in_state_size; i++){
-        storage_in_state[i] = p.replace_val[i];
+        char c = p.replace_val[i];
+        if (c == '\u0001'){
+            continue;
+        }
+        storage_in_state[i] = c;
     }
 
-    for (int i=storage_in_state_size; i<tapes.size(); i++){
+    for (int i=0; i<tapes.size(); i++){
         Tape* t = tapes[i];
-        t->write(p.replace_val[i]);
-        t->moveHead(p.movement[i]);
+        t->write(p.replace_val[i+storage_in_state_size]);
+        t->moveHead(p.movement[i+storage_in_state_size]);
     }
 }
 
@@ -211,18 +215,47 @@ TuringMachine TuringMachine::toSingleTape() {
     TuringMachine output_tm;
 
     output_tm.makeStorage(tapes.size()+1);
+    int new_control = tapes.size()+1;
+
+    auto tools = TuringTools::getInstance(-1);
 
 
+    IncompleteSet new_transitions{"new_transitions", "new_transitions"};
+    IncompleteTransition loop_state;
+    loop_state.state = "q";
+    loop_state.to_state = "q";
+    loop_state.def_move = 1;
+    new_transitions.transitions.push_back(loop_state);
 
+    vector<IncompleteTransition> soon_merging;
+    for (int i =0; i<tapes.size(); i++){
+        IncompleteTransition store;
+        store.state = "q";
+        store.to_state = "q";
+        store.def_move = 0;
 
+        store.input = {'\u0002','X'};
+        store.input_index = {i+1,i*2+new_control};
+
+        store.output = {'a'};
+        store.output_index = {i+1};
+        store.move = {0};
+        soon_merging.push_back(store);
+    }
+
+    auto good = tools->merge(soon_merging);
+
+    /*
     vector<char> kleene_starts;
     vector<int> moving_list;
+    vector<int> moving_list_2;
     for (int i =0; i<tapes.size(); i++){
         kleene_starts.push_back('\u0001');
     }
 
     for (int i =0; i<tapes.size()*3+1; i++){
         moving_list.push_back(1);
+        moving_list_2.push_back(0);
     }
 
     vector<Transition> new_productions;
@@ -248,6 +281,7 @@ TuringMachine TuringMachine::toSingleTape() {
             new_productions.push_back(new_t);
 
             new_t.production.replace_val[0] = (char) (i+1+48);
+            new_t.production.movement = moving_list_2;
             for (int k =0; k<tapes.size(); k++){
                 int index = k*2 + tapes.size()+1;
                 new_t.input[index] = 'X';
@@ -261,12 +295,14 @@ TuringMachine TuringMachine::toSingleTape() {
                     }
 
                     new_t.input[index+1] = c;
+                    new_t.input[k+1] = '\u0002';
                     new_t.production.replace_val[k+1] = c;
                     new_productions.push_back(new_t);
                 }
                 new_t.input[index] = '\u0001';
                 new_t.input[index+1] = '\u0001';
                 new_t.production.replace_val[k+1] = '\u0001';
+                new_t.input[k+1] = '\u0001';
 
             }
         }
@@ -287,6 +323,7 @@ TuringMachine TuringMachine::toSingleTape() {
         start_p.movement.push_back(-1);
 
     }
+    start_p.new_state = start_state;
     start_t.production = start_p;
     new_productions.push_back(start_t);
     output_tm.load({}, start_state, "", tapes.size()*2, new_productions);
@@ -301,6 +338,7 @@ TuringMachine TuringMachine::toSingleTape() {
         output_tm.load_input(head,i*2);
         output_tm.load_input(tapes[i]->exportTape(),i*2+1);
     }
+     */
     return output_tm;
 }
 
@@ -308,6 +346,9 @@ void TuringMachine::makeStorage(int size) {
     free(storage_in_state);
     storage_in_state_size = size;
     storage_in_state = (char*) calloc(size, 1);
+    for (int i=0; i<storage_in_state_size; i++){
+        storage_in_state[i] = '\u0002';
+    }
 
 }
 

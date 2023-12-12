@@ -121,6 +121,8 @@ public:
     void compare_single_tape(IncompleteSet& a, char s1, char e1, char s2, char e2, int marker_tape, int data_tape);
     char stack_symbol;
     vector<char> nesting_tokens;
+
+    vector<IncompleteTransition> merge(const vector<IncompleteTransition>& m);
 private:
 
     TuringTools(unsigned int stack_tape);

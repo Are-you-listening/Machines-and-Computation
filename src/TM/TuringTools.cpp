@@ -3392,6 +3392,51 @@ void TuringTools::makeAntiNestingIfSolo(IncompleteSet &a, const vector<int> &tup
     link(a, solo_anti_nesting);
 }
 
+vector<IncompleteTransition> TuringTools::merge(const vector<IncompleteTransition> &m) {
+    vector<IncompleteTransition> out;
+    vector<IncompleteTransition> temp_out = m;
+    vector<IncompleteTransition> temp_out2;
+    for (int i = 0; i<temp_out.size(); i++){
+        for (int j = i+1; j<temp_out.size(); j++){
+            IncompleteTransition a = temp_out[i];
+            IncompleteTransition b = temp_out[j];
+
+            vector<char> inputs;
+            vector<int> inputs_index;
+            vector<char> outputs;
+            vector<int> outputs_index;
+            vector<int> move_index;
+
+            auto a_c = 0;
+            auto b_c = 0;
+            while (a_c < a.input.size() && b_c < b.input.size()){
+                if (a.input_index[a_c] < b.input_index[b_c]){
+
+                    inputs.push_back(a.input[a_c]);
+                    inputs_index.push_back(a.input_index[a_c]);
+                    a_c += 1;
+                }else{
+                    inputs.push_back(b.input[b_c]);
+                    inputs_index.push_back(b.input_index[b_c]);
+                    b_c += 1;
+                }
+            }
+
+            if (a_c < a.input.size()){
+                inputs.insert(inputs.end(), a.input.begin()+a_c, a.input.end());
+                inputs_index.insert(inputs_index.end(), a.input_index.begin()+a_c, a.input_index.end());
+            }else if (b_c < b.input.size()){
+                inputs.insert(inputs.end(), b.input.begin()+b_c, b.input.end());
+                inputs_index.insert(inputs_index.end(), b.input_index.begin()+b_c, b.input_index.end());
+            }
+
+
+            int h =0 ;
+        }
+    }
+    return out;
+}
+
 
 
 
