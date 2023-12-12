@@ -264,7 +264,7 @@ TuringMachine TuringMachine::toSingleTape() {
 
             store.control_increase = {0};
             store.increase_amount = {1};
-            soon_merging.insert(store);
+            soon_merging.insert(std::move(store));
 
         }
 
@@ -400,100 +400,6 @@ TuringMachine TuringMachine::toSingleTape() {
         output_tm.load_input(tapes[i]->exportTape(),i*2+1);
     }
 
-    /*
-    vector<char> kleene_starts;
-    vector<int> moving_list;
-    vector<int> moving_list_2;
-    for (int i =0; i<tapes.size(); i++){
-        kleene_starts.push_back('\u0001');
-    }
-
-    for (int i =0; i<tapes.size()*3+1; i++){
-        moving_list.push_back(1);
-        moving_list_2.push_back(0);
-    }
-
-    vector<Transition> new_productions;
-
-    auto prod = getProductions();
-    for (auto p: prod){
-        for (int i =0; i<tapes.size(); i++){
-            Transition new_t;
-            new_t.input.push_back((char) (i+48));
-            new_t.input.insert(new_t.input.end(), kleene_starts.begin(), kleene_starts.end());
-            for (auto u: p.input){
-                new_t.input.push_back('\u0001');
-                new_t.input.push_back('\u0001');
-            }
-            new_t.state = p.state;
-
-            Production moving;
-            moving.new_state = p.state;
-            moving.movement = moving_list;
-            moving.replace_val = new_t.input;
-
-            new_t.production = moving;
-            new_productions.push_back(new_t);
-
-            new_t.production.replace_val[0] = (char) (i+1+48);
-            new_t.production.movement = moving_list_2;
-            for (int k =0; k<tapes.size(); k++){
-                int index = k*2 + tapes.size()+1;
-                new_t.input[index] = 'X';
-                for (int j =31; j<128; j++){
-                    char c = (char) j;
-                    if (j == 127){
-                        c = '\u0000';
-                    }
-                    if (j == 31){
-                        c = '\n';
-                    }
-
-                    new_t.input[index+1] = c;
-                    new_t.input[k+1] = '\u0002';
-                    new_t.production.replace_val[k+1] = c;
-                    new_productions.push_back(new_t);
-                }
-                new_t.input[index] = '\u0001';
-                new_t.input[index+1] = '\u0001';
-                new_t.production.replace_val[k+1] = '\u0001';
-                new_t.input[k+1] = '\u0001';
-
-            }
-        }
-    }
-    std::cout <<new_productions.size() << std::endl;
-
-    //start Transition
-    Transition start_t;
-    Production start_p;
-    start_t.state = start_state;
-    for (int i =0; i<tapes.size()*3+1; i++){
-        start_t.input.push_back('\u0001');
-        if (i == 0){
-            start_p.replace_val.push_back('0');
-        }else{
-            start_p.replace_val.push_back('\u0001');
-        }
-        start_p.movement.push_back(-1);
-
-    }
-    start_p.new_state = start_state;
-    start_t.production = start_p;
-    new_productions.push_back(start_t);
-    output_tm.load({}, start_state, "", tapes.size()*2, new_productions);
-    for (int i =0; i<tapes.size(); i++){
-        string head;
-        for (int j =0; j<tapes[i]->getTapeHeadIndex(); j++){
-            head += " ";
-        }
-
-        head += "X";
-
-        output_tm.load_input(head,i*2);
-        output_tm.load_input(tapes[i]->exportTape(),i*2+1);
-    }
-     */
     return output_tm;
 }
 

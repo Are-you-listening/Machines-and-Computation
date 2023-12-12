@@ -3418,10 +3418,11 @@ set<IncompleteTransition> TuringTools::mergeToSingle(const set<IncompleteTransit
     IncompleteTransition b;
     IncompleteTransition new_t;
 
-    int last_size = 0;
+
     while (temp_out.size() > 1){
         for (auto it_i = temp_out.begin(); it_i != temp_out.end(); it_i++){
             for (auto it_j = it_i; it_j != temp_out.end(); it_j++){
+
                 if (it_i == it_j){
                     continue;
                 }
@@ -3432,35 +3433,39 @@ set<IncompleteTransition> TuringTools::mergeToSingle(const set<IncompleteTransit
                     continue;
                 }
 
-                inputs = {};
-                inputs_index = {};
-                outputs = {};
-                outputs_index = {};
-                move_index = {};
-                increase_amount = {};
-                increase_index = {};
+                inputs.clear();
+                inputs_index.clear();
+                outputs.clear();
+                outputs_index.clear();
+                move_index.clear();
+                increase_amount.clear();
+                increase_index.clear();
 
-                auto a_c = 0;
-                auto b_c = 0;
+                int a_c = 0;
+                int b_c = 0;
+                int a_index;
+                int b_index;
                 while (a_c < a.input.size() && b_c < b.input.size()){
-                    if (a.input_index[a_c] == b.input_index[b_c]){
+                    a_index = a.input_index[a_c];
+                    b_index = b.input_index[b_c];
+                    if (a_index == b_index){
 
                         inputs.push_back(a.input[a_c]);
-                        inputs_index.push_back(a.input_index[a_c]);
+                        inputs_index.push_back(a_index);
 
                         a_c += 1;
                         b_c += 1;
                         continue;
                     }
 
-                    if (a.input_index[a_c] < b.input_index[b_c]){
+                    if (a_index < b_index){
 
                         inputs.push_back(a.input[a_c]);
-                        inputs_index.push_back(a.input_index[a_c]);
+                        inputs_index.push_back(a_index);
                         a_c += 1;
                     }else{
                         inputs.push_back(b.input[b_c]);
-                        inputs_index.push_back(b.input_index[b_c]);
+                        inputs_index.push_back(b_index);
                         b_c += 1;
                     }
                 }
@@ -3477,7 +3482,9 @@ set<IncompleteTransition> TuringTools::mergeToSingle(const set<IncompleteTransit
                 b_c = 0;
 
                 while (a_c < a.output.size() && b_c < b.output.size()){
-                    if (a.output_index[a_c] == b.output_index[b_c]){
+                    a_index = a.output_index[a_c];
+                    b_index = b.output_index[b_c];
+                    if (a_index == b_index){
 
                         outputs.push_back(a.output[a_c]);
                         outputs_index.push_back(a.output_index[a_c]);
@@ -3487,15 +3494,15 @@ set<IncompleteTransition> TuringTools::mergeToSingle(const set<IncompleteTransit
                         continue;
                     }
 
-                    if (a.output_index[a_c] < b.output_index[b_c]){
+                    if (a_index < b_index){
 
                         outputs.push_back(a.output[a_c]);
-                        outputs_index.push_back(a.output_index[a_c]);
+                        outputs_index.push_back(a_index);
                         move_index.push_back(a.move[a_c]);
                         a_c += 1;
                     }else{
                         outputs.push_back(b.output[b_c]);
-                        outputs_index.push_back(b.output_index[b_c]);
+                        outputs_index.push_back(b_index);
                         move_index.push_back(b.move[b_c]);
                         b_c += 1;
                     }
@@ -3562,14 +3569,12 @@ set<IncompleteTransition> TuringTools::mergeToSingle(const set<IncompleteTransit
                 if (temp_out2.find(new_t) == temp_out2.end()){
                     temp_out2.insert(new_t);
                 }
-
-
             }
         }
 
         out.insert(temp_out.begin(), temp_out.end());
-        temp_out = temp_out2;
-        temp_out2 = {};
+        temp_out = std::move(temp_out2);
+        temp_out2.clear();
 
     }
     out.insert(temp_out.begin(), temp_out.end());
