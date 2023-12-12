@@ -19,8 +19,9 @@ public:
     ~Tape();
     explicit Tape(unsigned long init_size);
 
-    [[nodiscard]] unsigned long getTapeSize() const noexcept;
-    [[nodiscard]] string getTapeData() const noexcept;
+    virtual [[nodiscard]] unsigned long getTapeSize() const noexcept;
+
+    virtual [[nodiscard]] string getTapeData() const noexcept;
 
     void write(char symbol);
     [[nodiscard]] char getSymbol() const noexcept;

@@ -3,7 +3,7 @@
 //
 
 #include "TuringProduction.h"
-
+#include "TuringTools.h"
 void TuringProduction::addRoute(queue<char>& symbols, Production&& p) {
     if (symbols.empty()){
         production = p;
@@ -49,4 +49,23 @@ TuringProduction::~TuringProduction() {
     for (auto [k, v]: ptr_vector){
         delete v;
     }
+}
+
+vector<Transition> TuringProduction::traverse() {
+    if (ptr_vector.empty()){
+        Transition t;
+        t.production = production;
+        return {t};
+    }
+
+    vector<Transition> out;
+    for (auto [k, v]: ptr_vector){
+        auto t = v->traverse();
+        for (auto u: t){
+            u.input.insert(u.input.begin(), k);
+            out.push_back(u);
+        }
+
+    }
+    return out;
 }

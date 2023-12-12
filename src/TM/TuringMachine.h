@@ -19,7 +19,7 @@ using json = nlohmann::json;
 
 class TuringMachine {
 public:
-    TuringMachine() = default;
+    TuringMachine();
     explicit TuringMachine(const string &path);
     ~TuringMachine();
 
@@ -37,12 +37,17 @@ public:
     [[nodiscard]] const string &getCurrentState() const;
     int getTuringIndex(int i);
     void clear();
+    TuringMachine toSingleTape();
+    void makeStorage(int size);
+    vector<Transition> getProductions();
 private:
     vector<Tape*> tapes;
     map<string, TuringProduction*> production_trees;
     set<string> states;
     string start_state;
     string current_state;
+    char* storage_in_state;
+    int storage_in_state_size;
 
     bool halted;
 };

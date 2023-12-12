@@ -301,3 +301,30 @@ TEST(TuringMachineTest, TM_builder) {
 
 
 }
+
+TEST(TuringMachineTest, TM_single_tape) {
+    TuringMachine tm;
+    tm.load("../test/testFiles/TM_1.json");
+    auto out = tm.toSingleTape();
+
+    int halted_time = -1;
+    for (int i=0; i<10; i++){
+        if (out.isHalted()){
+            if (halted_time == -1){
+                halted_time = i;
+            }
+
+            break;
+        }
+
+        out.move();
+
+    }
+
+    for (int i = 0; i < out.getTapeAmount(); i++){
+        cout << out.getTapeData(i) << endl;
+    }
+    cout << "halted time"<< ": " << halted_time << endl;
+
+
+}

@@ -45,7 +45,7 @@ set(TuringCode
         src/TM/TransitieGenerators/TuringDenestify.h
         src/TM/TransitieGenerators/TuringIfElseAntiNesting.cpp
         src/TM/TransitieGenerators/TuringIfElseAntiNesting.h
-        )
+)
 
 set(CodeFiles
         lib/DesignByContract.h

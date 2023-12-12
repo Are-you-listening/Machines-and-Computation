@@ -18,13 +18,14 @@ struct Production{
     vector<int> movement;
     string new_state;
 };
-
+struct Transition;
 class TuringProduction {
 public:
     TuringProduction() = default;
     ~TuringProduction();
     void addRoute(queue<char>& symbols, Production&& p);
     Production getProduction(queue<char>& symbols);
+    vector<Transition> traverse();
 
 private:
     map<char, TuringProduction*> ptr_vector;
