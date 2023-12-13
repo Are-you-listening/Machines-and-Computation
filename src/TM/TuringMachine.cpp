@@ -99,6 +99,10 @@ void TuringMachine::load(const vector<string> &states, const string &start_state
             p.movement.push_back(j.get<int>());
         }*/
 
+        if (state == "0"){
+            int h = 0;
+        }
+
         auto loc = production_trees.find(state);
 
         TuringProduction* tp;
@@ -216,10 +220,10 @@ void TuringMachine::clear() {
     halted = false;
 }
 
-TuringMachine TuringMachine::toSingleTape() {
-    TuringMachine output_tm;
+TuringMachine* TuringMachine::toSingleTape() {
+    TuringMachine* output_tm = new TuringMachine;
 
-    output_tm.makeStorage(tapes.size()+1);
+    output_tm->makeStorage(tapes.size()+1);
     int new_control = tapes.size()+1;
 
     auto tools = TuringTools::getInstance(-1);
@@ -244,13 +248,27 @@ TuringMachine TuringMachine::toSingleTape() {
         loop_state.def_move = 1;
         new_transitions.transitions.push_back(loop_state);
 
+        set<int> usefullUpper = getUsefullIndexesParent(v);
         for (const auto& prod: v){
             cout << counter << endl;
+            counter++;
 
             set<int> usefull = getUsefullIndexes(prod);
+            if (usefull.empty() && v.size() == 1){
+                IncompleteTransition epsilon;
+                epsilon.state = k;
+                epsilon.to_state = prod.production.new_state;
+                epsilon.def_move = 0;
+                new_transitions.transitions.push_back(epsilon);
+
+                continue;
+            }
 
             set<IncompleteTransition> soon_merging;
             for (int i =0; i<tapes.size(); i++){
+                if (usefullUpper.find(i) == usefullUpper.end()){
+                    continue;
+                }
 
                 IncompleteTransition store;
                 store.state = k;
@@ -277,11 +295,11 @@ TuringMachine TuringMachine::toSingleTape() {
             IncompleteTransition toWriteMode;
             toWriteMode.state = k;
 
-            toWriteMode.input = {(char) ('\u0002'+(int) tapes.size())};
+            toWriteMode.input = {(char) ('\u0002'+(int) usefullUpper.size())};
             toWriteMode.input.insert(toWriteMode.input.end(), prod.input.begin(), prod.input.end());
             toWriteMode.input_index = storage_in_state_indexes;
 
-            toWriteMode.output = {(char) ('\u0002'+(int) tapes.size())};
+            toWriteMode.output = {(char) ('\u0002'+(int) usefullUpper.size())};
             toWriteMode.output.insert(toWriteMode.output.end(), prod.production.replace_val.begin(), prod.production.replace_val.end());
             toWriteMode.output_index = storage_in_state_indexes;
             toWriteMode.move = all_moving;
@@ -381,7 +399,7 @@ TuringMachine TuringMachine::toSingleTape() {
             toNextMode.def_move = -1;
 
             new_transitions.transitions.push_back(toNextMode);
-            counter++;
+
         }
     }
 
@@ -390,6 +408,9 @@ TuringMachine TuringMachine::toSingleTape() {
     vector<Transition> real_transitions;
     for (auto incomp: new_transitions.transitions){
         Transition t = tools->make_transition(incomp, new_control+tapes.size()*2);
+        if (t.state == "0"){
+
+        }
 
         real_transitions.push_back(t);
 
@@ -397,7 +418,7 @@ TuringMachine TuringMachine::toSingleTape() {
         //TM_data["Productions"].push_back(production);
     }
 
-    output_tm.load({}, start_state, "", tapes.size()*2, real_transitions);
+    output_tm->load({}, start_state, "", tapes.size()*2, real_transitions);
 
     for (int i =0; i<tapes.size(); i++){
         string head;
@@ -407,8 +428,8 @@ TuringMachine TuringMachine::toSingleTape() {
 
         head += "X";
 
-        output_tm.load_input(head,i*2);
-        output_tm.load_input(tapes[i]->exportTape(),i*2+1);
+        output_tm->load_input(head,i*2);
+        output_tm->load_input(tapes[i]->exportTape(),i*2+1);
     }
 
     return output_tm;
@@ -430,7 +451,7 @@ TuringMachine::TuringMachine() {
 
 }
 
-map<string, vector<Transition>> TuringMachine::getProductions() {
+map<string, vector<Transition>> TuringMachine::getProductions() const{
     map<string, vector<Transition>> out;
 
     for (auto [k, v]: production_trees){
@@ -457,10 +478,23 @@ set<int> TuringMachine::getUsefullIndexes(const Transition &t) {
     set<int> out;
 
     for (int i =0; i<t.input.size(); i++){
-        if (t.input[i] != '\u0001' || t.production.replace_val[i] != '\u0001'){
+        if (t.input[i] != '\u0001' || t.production.replace_val[i] != '\u0001' || t.production.movement[i]){
             out.insert(i);
         }
     }
+    return out;
+}
+
+set<int> TuringMachine::getUsefullIndexesParent(const vector<Transition> &t_list) {
+    set<int> out;
+    for (const auto& t: t_list){
+        for (int i =0; i<t.input.size(); i++){
+            if (t.input[i] != '\u0001' || t.production.replace_val[i] != '\u0001' || t.production.movement[i]){
+                out.insert(i);
+            }
+        }
+    }
+
     return out;
 }
 

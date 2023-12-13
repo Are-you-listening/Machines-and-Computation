@@ -305,7 +305,8 @@ TEST(TuringMachineTest, TM_builder) {
 TEST(TuringMachineTest, TM_single_tape) {
     TuringMachine tm;
     tm.load("../test/testFiles/TM_4.json");
-    auto out = tm.toSingleTape();
+    auto o = tm.toSingleTape();
+    auto out = *o;
 
     int halted_time = -1;
     for (int i=0; i<1000; i++){
@@ -361,14 +362,19 @@ TEST(TuringMachineTest, TM_single_tape_2){
     tm.load(data.states, data.start_state, data.input, data.tape_size, data.productions);
     tm.load_input(test_string, 1);
 
-    cout << tm.getProductions().size() << endl;
-    tm = tm.toSingleTape();
+    int size = 0;
+    for (auto [k,v]: tm.getProductions()){
+        size += v.size();
+    }
+    cout << size << endl;
+    auto tw = tm.toSingleTape();
+    tm = *tw;
 
     cout << "created" << endl;
     cout << tm.getProductions().size() << endl;
 
     int halted_time = -1;
-    for (int i = 0; i<1000000; i++){
+    for (int i = 0; i<50; i++){
 
 
         if (tm.isHalted()){

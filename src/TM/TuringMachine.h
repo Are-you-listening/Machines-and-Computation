@@ -37,10 +37,10 @@ public:
     [[nodiscard]] const string &getCurrentState() const;
     int getTuringIndex(int i);
     void clear();
-    TuringMachine toSingleTape();
+    TuringMachine* toSingleTape();
     void makeStorage(int size);
     string getControlStorage();
-    map<string, vector<Transition>> getProductions();
+    map<string, vector<Transition>> getProductions() const;
 private:
     vector<Tape*> tapes;
     map<string, TuringProduction*> production_trees;
@@ -53,6 +53,7 @@ private:
     bool halted;
 
     set<int> getUsefullIndexes(const Transition& t);
+    set<int> getUsefullIndexesParent(const vector<Transition>& t);
 };
 
 
