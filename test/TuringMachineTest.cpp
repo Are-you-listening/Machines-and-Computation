@@ -304,7 +304,7 @@ TEST(TuringMachineTest, TM_builder) {
 
 TEST(TuringMachineTest, TM_single_tape) {
     TuringMachine tm;
-    tm.load("../test/testFiles/TM_3.json");
+    tm.load("../test/testFiles/TM_4.json");
     auto out = tm.toSingleTape();
 
     int halted_time = -1;
@@ -318,13 +318,9 @@ TEST(TuringMachineTest, TM_single_tape) {
         }
 
 
-
         out.move();
 
-        for (int i = 0; i < out.getTapeAmount(); i++){
-            cout << out.getTapeData(i) << endl;
-        }
-        cout << "------------------" << endl;
+
 
     }
 

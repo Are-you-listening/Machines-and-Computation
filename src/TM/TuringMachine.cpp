@@ -291,19 +291,6 @@ TuringMachine TuringMachine::toSingleTape() {
 
             new_transitions.transitions.push_back(toWriteMode);
 
-
-            IncompleteTransition loop_state2;
-            loop_state2.state = write_state;
-            loop_state2.to_state = write_state;
-
-            loop_state2.input = prod.production.replace_val;
-            loop_state2.input_index = storage_in_state_indexes;
-            loop_state2.input_index.erase(loop_state2.input_index.begin());
-
-            loop_state2.def_move = -1;
-            new_transitions.transitions.push_back(loop_state2);
-
-
             IncompleteTransition loop_state3;
             loop_state3.state = write_state;
             loop_state3.to_state = write_state;
@@ -311,8 +298,11 @@ TuringMachine TuringMachine::toSingleTape() {
             new_transitions.transitions.push_back(loop_state3);
 
 
-            soon_merging = {};
+            //soon_merging = {};
             for (int i =0; i<tapes.size(); i++){
+                if (usefull.find(i) == usefull.end()){
+                    continue;
+                }
                 IncompleteTransition write;
                 write.state = write_state;
                 write.to_state = write_state;
@@ -327,7 +317,19 @@ TuringMachine TuringMachine::toSingleTape() {
 
                 write.control_increase = {0};
                 write.increase_amount = {-1};
-                soon_merging.insert(write);
+                //soon_merging.insert(write);
+                new_transitions.transitions.push_back(write);
+
+                IncompleteTransition loop_state2;
+                loop_state2.state = write_state;
+                loop_state2.to_state = write_state;
+
+                loop_state2.input = {prod.production.replace_val[i]};
+                loop_state2.input_index = {storage_in_state_indexes[i+1]};
+                //loop_state2.input_index.erase(loop_state2.input_index.begin());
+
+                loop_state2.def_move = -1;
+                new_transitions.transitions.push_back(loop_state2);
 
                 IncompleteTransition move_marker;
                 move_marker.state = write_state;
@@ -359,8 +361,8 @@ TuringMachine TuringMachine::toSingleTape() {
 
             }
 
-            all_store_options = tools->mergeToSingle(soon_merging);
-            new_transitions.transitions.insert(new_transitions.transitions.begin(), all_store_options.begin(), all_store_options.end());
+            //all_store_options = tools->mergeToSingle(soon_merging);
+            //new_transitions.transitions.insert(new_transitions.transitions.begin(), all_store_options.begin(), all_store_options.end());
 
             IncompleteTransition toNextMode;
             toNextMode.state = write_state;
@@ -368,7 +370,12 @@ TuringMachine TuringMachine::toSingleTape() {
             for (int  i =new_control-1; i<new_control; i++){
                 toNextMode.input.push_back('\u0002');
                 toNextMode.input_index.push_back(i);
+
+
             }
+            toNextMode.output = {'\u0002'};
+            toNextMode.output_index = {0};
+            toNextMode.move = {-1};
 
             toNextMode.to_state = prod.production.new_state;
             toNextMode.def_move = -1;
