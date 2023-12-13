@@ -40,7 +40,7 @@ public:
     TuringMachine toSingleTape();
     void makeStorage(int size);
     string getControlStorage();
-    vector<Transition> getProductions();
+    map<string, vector<Transition>> getProductions();
 private:
     vector<Tape*> tapes;
     map<string, TuringProduction*> production_trees;
@@ -51,6 +51,8 @@ private:
     int storage_in_state_size;
 
     bool halted;
+
+    set<int> getUsefullIndexes(const Transition& t);
 };
 
 

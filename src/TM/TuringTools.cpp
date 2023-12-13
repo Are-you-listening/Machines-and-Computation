@@ -3518,42 +3518,6 @@ set<IncompleteTransition> TuringTools::mergeToSingle(const set<IncompleteTransit
                     move_index.insert(move_index.end(), b.move.begin()+b_c, b.move.end());
                 }
 
-                a_c = 0;
-                b_c = 0;
-
-                while (a_c < a.increase_amount.size() && b_c < b.increase_amount.size()){
-                    if (a.control_increase[a_c] == b.control_increase[b_c]){
-
-                        increase_amount.push_back(a.increase_amount[a_c]+b.increase_amount[b_c]);
-                        increase_index.push_back(a.control_increase[a_c]);
-
-                        a_c += 1;
-                        b_c += 1;
-                        continue;
-                    }
-
-                    if (a.control_increase[a_c] < b.control_increase[b_c]){
-
-                        increase_amount.push_back(a.increase_amount[a_c]);
-                        increase_index.push_back(a.control_increase[a_c]);
-                        a_c += 1;
-                    }else{
-                        increase_amount.push_back(b.increase_amount[b_c]);
-                        increase_index.push_back(b.control_increase[b_c]);
-                        b_c += 1;
-                    }
-
-                }
-
-                if (a_c < a.control_increase.size()){
-                    increase_amount.insert(increase_amount.end(), a.increase_amount.begin()+a_c, a.increase_amount.end());
-                    increase_index.insert(increase_index.end(), a.control_increase.begin()+a_c, a.control_increase.end());
-
-                }else if (b_c < b.control_increase.size()){
-                    increase_amount.insert(increase_amount.end(), b.increase_amount.begin()+b_c, b.increase_amount.end());
-                    increase_index.insert(increase_index.end(), b.control_increase.begin()+b_c, b.control_increase.end());
-                }
-
 
                 new_t.def_move = a.def_move;
                 new_t.state = a.state;
@@ -3563,8 +3527,17 @@ set<IncompleteTransition> TuringTools::mergeToSingle(const set<IncompleteTransit
                 new_t.output = outputs;
                 new_t.output_index = outputs_index;
                 new_t.move = move_index;
-                new_t.control_increase = increase_index;
-                new_t.increase_amount = increase_amount;
+                new_t.control_increase = a.control_increase;
+
+                int multi = 1;
+                if (!a.control_increase.empty() && a.increase_amount[0] < 0){
+                    multi = -1;
+                }
+
+                new_t.increase_amount = {(int) std::count(inputs.begin(), inputs.end(), 'X')*multi};
+
+
+
 
                 if (temp_out2.find(new_t) == temp_out2.end()){
                     temp_out2.insert(new_t);

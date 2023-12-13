@@ -234,146 +234,150 @@ TuringMachine TuringMachine::toSingleTape() {
 
     IncompleteSet new_transitions{"new_transitions", "new_transitions"};
     int counter = 0;
-    set<string> start_states;
-    for (auto prod: getProductions()){
-        if (start_states.find(prod.state) == start_states.end()){
-            start_states.insert(prod.state);
+    auto trans_map = getProductions();
+    for (auto [k, v]: trans_map){
 
+        //later skip store part for same state
+        IncompleteTransition loop_state;
+        loop_state.state = k;
+        loop_state.to_state = k;
+        loop_state.def_move = 1;
+        new_transitions.transitions.push_back(loop_state);
+
+        for (const auto& prod: v){
             cout << counter << endl;
-            //later skip store part for same state
-            IncompleteTransition loop_state;
-            loop_state.state = prod.state;
-            loop_state.to_state = prod.state;
-            loop_state.def_move = 1;
-            new_transitions.transitions.push_back(loop_state);
+
+            set<int> usefull = getUsefullIndexes(prod);
+
+            set<IncompleteTransition> soon_merging;
+            for (int i =0; i<tapes.size(); i++){
+
+                IncompleteTransition store;
+                store.state = k;
+                store.to_state = k;
+                store.def_move = 1;
+
+                store.input = {'X', prod.input[i]};
+                store.input_index = {i*2+new_control, i*2+new_control+1};
+
+                store.output = {prod.input[i]};
+                store.output_index = {i+1};
+                store.move = {1};
+
+                store.control_increase = {0};
+                store.increase_amount = {1};
+                soon_merging.insert(std::move(store));
+
+            }
+
+            auto all_store_options = tools->mergeToSingle(soon_merging);
+            new_transitions.transitions.insert(new_transitions.transitions.begin(), all_store_options.begin(), all_store_options.end());
+
+            string write_state = k+"_write"+ to_string(counter);
+            IncompleteTransition toWriteMode;
+            toWriteMode.state = k;
+
+            toWriteMode.input = {(char) ('\u0002'+(int) tapes.size())};
+            toWriteMode.input.insert(toWriteMode.input.end(), prod.input.begin(), prod.input.end());
+            toWriteMode.input_index = storage_in_state_indexes;
+
+            toWriteMode.output = {(char) ('\u0002'+(int) tapes.size())};
+            toWriteMode.output.insert(toWriteMode.output.end(), prod.production.replace_val.begin(), prod.production.replace_val.end());
+            toWriteMode.output_index = storage_in_state_indexes;
+            toWriteMode.move = all_moving;
+
+            toWriteMode.to_state = write_state;
+            toWriteMode.def_move = 1;
+
+            new_transitions.transitions.push_back(toWriteMode);
+
+
+            IncompleteTransition loop_state2;
+            loop_state2.state = write_state;
+            loop_state2.to_state = write_state;
+
+            loop_state2.input = prod.production.replace_val;
+            loop_state2.input_index = storage_in_state_indexes;
+            loop_state2.input_index.erase(loop_state2.input_index.begin());
+
+            loop_state2.def_move = -1;
+            new_transitions.transitions.push_back(loop_state2);
+
+
+            IncompleteTransition loop_state3;
+            loop_state3.state = write_state;
+            loop_state3.to_state = write_state;
+            loop_state3.def_move = -1;
+            new_transitions.transitions.push_back(loop_state3);
+
+
+            soon_merging = {};
+            for (int i =0; i<tapes.size(); i++){
+                IncompleteTransition write;
+                write.state = write_state;
+                write.to_state = write_state;
+                write.def_move = 0;
+
+                write.input = {prod.production.replace_val[i], 'X'};
+                write.input_index = {i+1, i*2+new_control};
+
+                write.output = {'\u0003', prod.production.replace_val[i]};
+                write.output_index = {i+1, i*2+1+new_control};
+                write.move = {0, 0};
+
+                write.control_increase = {0};
+                write.increase_amount = {-1};
+                soon_merging.insert(write);
+
+                IncompleteTransition move_marker;
+                move_marker.state = write_state;
+                move_marker.to_state = k+"_mark"+ to_string(counter);
+                move_marker.def_move = prod.production.movement[i];
+
+                move_marker.input = {'\u0003'};
+                move_marker.input_index = {i+1};
+
+                move_marker.output = {'\u0000'};
+                move_marker.output_index = {i*2+new_control};
+                move_marker.move = {prod.production.movement[i]};
+
+                new_transitions.transitions.push_back(move_marker);
+
+                IncompleteTransition move_marker_back;
+                move_marker_back.state = k+"_mark"+ to_string(counter);
+                move_marker_back.to_state = write_state;
+                move_marker_back.def_move = -1*prod.production.movement[i];
+
+                move_marker_back.input = {'\u0003'};
+                move_marker_back.input_index = {i+1};
+
+                move_marker_back.output = {'\u0002', 'X'};
+                move_marker_back.output_index = {i+1, i*2+new_control};
+                move_marker_back.move = {-1*prod.production.movement[i], -1*prod.production.movement[i]};
+
+                new_transitions.transitions.push_back(move_marker_back);
+
+            }
+
+            all_store_options = tools->mergeToSingle(soon_merging);
+            new_transitions.transitions.insert(new_transitions.transitions.begin(), all_store_options.begin(), all_store_options.end());
+
+            IncompleteTransition toNextMode;
+            toNextMode.state = write_state;
+
+            for (int  i =new_control-1; i<new_control; i++){
+                toNextMode.input.push_back('\u0002');
+                toNextMode.input_index.push_back(i);
+            }
+
+            toNextMode.to_state = prod.production.new_state;
+            toNextMode.def_move = -1;
+
+            new_transitions.transitions.push_back(toNextMode);
+            counter++;
         }
-
-        set<IncompleteTransition> soon_merging;
-        for (int i =0; i<tapes.size(); i++){
-            IncompleteTransition store;
-            store.state = prod.state;
-            store.to_state = prod.state;
-            store.def_move = 1;
-
-            store.input = {'X', prod.input[i]};
-            store.input_index = {i*2+new_control, i*2+new_control+1};
-
-            store.output = {prod.input[i]};
-            store.output_index = {i+1};
-            store.move = {1};
-
-            store.control_increase = {0};
-            store.increase_amount = {1};
-            soon_merging.insert(std::move(store));
-
-        }
-
-        auto all_store_options = tools->mergeToSingle(soon_merging);
-        new_transitions.transitions.insert(new_transitions.transitions.begin(), all_store_options.begin(), all_store_options.end());
-
-
-        IncompleteTransition toWriteMode;
-        toWriteMode.state = prod.state;
-
-        toWriteMode.input = {(char) ('\u0002'+(int) tapes.size())};
-        toWriteMode.input.insert(toWriteMode.input.end(), prod.input.begin(), prod.input.end());
-        toWriteMode.input_index = storage_in_state_indexes;
-
-        toWriteMode.output = {(char) ('\u0002'+(int) tapes.size())};
-        toWriteMode.output.insert(toWriteMode.output.end(), prod.production.replace_val.begin(), prod.production.replace_val.end());
-        toWriteMode.output_index = storage_in_state_indexes;
-        toWriteMode.move = all_moving;
-
-        toWriteMode.to_state = prod.state+"_write"+ to_string(counter);
-        toWriteMode.def_move = 1;
-
-        new_transitions.transitions.push_back(toWriteMode);
-
-
-        IncompleteTransition loop_state2;
-        loop_state2.state = prod.state+"_write"+ to_string(counter);
-        loop_state2.to_state = prod.state+"_write"+ to_string(counter);
-
-        loop_state2.input = prod.production.replace_val;
-        loop_state2.input_index = storage_in_state_indexes;
-        loop_state2.input_index.erase(loop_state2.input_index.begin());
-
-        loop_state2.def_move = -1;
-        new_transitions.transitions.push_back(loop_state2);
-
-
-        IncompleteTransition loop_state3;
-        loop_state3.state = prod.state+"_write"+ to_string(counter);
-        loop_state3.to_state = prod.state+"_write"+ to_string(counter);
-        loop_state3.def_move = -1;
-        new_transitions.transitions.push_back(loop_state3);
-
-
-        soon_merging = {};
-        for (int i =0; i<tapes.size(); i++){
-            IncompleteTransition write;
-            write.state = prod.state+"_write"+ to_string(counter);
-            write.to_state = prod.state+"_write"+ to_string(counter);
-            write.def_move = 0;
-
-            write.input = {prod.production.replace_val[i], 'X'};
-            write.input_index = {i+1, i*2+new_control};
-
-            write.output = {'\u0003', prod.production.replace_val[i]};
-            write.output_index = {i+1, i*2+1+new_control};
-            write.move = {0, 0};
-
-            write.control_increase = {0};
-            write.increase_amount = {-1};
-            soon_merging.insert(write);
-
-            IncompleteTransition move_marker;
-            move_marker.state = prod.state+"_write"+ to_string(counter);
-            move_marker.to_state = prod.state+"_mark"+ to_string(counter);
-            move_marker.def_move = prod.production.movement[i];
-
-            move_marker.input = {'\u0003'};
-            move_marker.input_index = {i+1};
-
-            move_marker.output = {'\u0000'};
-            move_marker.output_index = {i*2+new_control};
-            move_marker.move = {prod.production.movement[i]};
-
-            new_transitions.transitions.push_back(move_marker);
-
-            IncompleteTransition move_marker_back;
-            move_marker_back.state = prod.state+"_mark"+ to_string(counter);
-            move_marker_back.to_state = prod.state+"_write"+ to_string(counter);
-            move_marker_back.def_move = -1*prod.production.movement[i];
-
-            move_marker_back.input = {'\u0003'};
-            move_marker_back.input_index = {i+1};
-
-            move_marker_back.output = {'\u0002', 'X'};
-            move_marker_back.output_index = {i+1, i*2+new_control};
-            move_marker_back.move = {-1*prod.production.movement[i], -1*prod.production.movement[i]};
-
-            new_transitions.transitions.push_back(move_marker_back);
-
-        }
-
-        all_store_options = tools->mergeToSingle(soon_merging);
-        new_transitions.transitions.insert(new_transitions.transitions.begin(), all_store_options.begin(), all_store_options.end());
-
-        IncompleteTransition toNextMode;
-        toNextMode.state = prod.state+"_write"+ to_string(counter);
-
-        for (int  i =new_control-1; i<new_control; i++){
-            toNextMode.input.push_back('\u0002');
-            toNextMode.input_index.push_back(i);
-        }
-
-        toNextMode.to_state = prod.production.new_state;
-        toNextMode.def_move = -1;
-
-        new_transitions.transitions.push_back(toNextMode);
-        counter++;
     }
+
 
 
     vector<Transition> real_transitions;
@@ -419,13 +423,16 @@ TuringMachine::TuringMachine() {
 
 }
 
-vector<Transition> TuringMachine::getProductions() {
-    vector<Transition> out;
+map<string, vector<Transition>> TuringMachine::getProductions() {
+    map<string, vector<Transition>> out;
+
     for (auto [k, v]: production_trees){
         auto t = v->traverse();
+
+        out.insert({k, {}});
         for (auto u: t){
             u.state = k;
-            out.push_back(u);
+            out[k].push_back(u);
         }
     }
     return out;
@@ -437,5 +444,16 @@ string TuringMachine::getControlStorage() {
         s += storage_in_state[i];
     }
     return s;
+}
+
+set<int> TuringMachine::getUsefullIndexes(const Transition &t) {
+    set<int> out;
+
+    for (int i =0; i<t.input.size(); i++){
+        if (t.input[i] != '\u0001' || t.production.replace_val[i] != '\u0001'){
+            out.insert(i);
+        }
+    }
+    return out;
 }
 
