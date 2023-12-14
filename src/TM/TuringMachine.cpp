@@ -312,7 +312,13 @@ TuringMachine* TuringMachine::toSingleTape() {
             toWriteMode.input_index = storage_in_state_indexes;
 
             toWriteMode.output = {(char) ('\u0002'+(int) usefullUpper.size())};
-            toWriteMode.output.insert(toWriteMode.output.end(), prod.production.replace_val.begin(), prod.production.replace_val.end());
+            for (auto p: prod.production.replace_val){
+                if (p == '\u0001'){
+                    p = '\u0005';
+                }
+                toWriteMode.output.push_back(p);
+            }
+            //toWriteMode.output.insert(toWriteMode.output.end(), prod.production.replace_val.begin(), prod.production.replace_val.end());
             toWriteMode.output.push_back('N');
             toWriteMode.output_index = storage_in_state_indexes;
             toWriteMode.output_index.push_back(mark_track);
@@ -346,7 +352,12 @@ TuringMachine* TuringMachine::toSingleTape() {
                 write.to_state = write_state;
                 write.def_move = 0;
 
-                write.input = {prod.production.replace_val[i], 'X'};
+                char c = prod.production.replace_val[i];
+                if (c == '\u0001'){
+                    c = '\u0005';
+                }
+
+                write.input = {c, 'X'};
                 write.input_index = {i+1, i*2+new_control};
 
                 write.output = {'\u0003', prod.production.replace_val[i]};
@@ -362,7 +373,7 @@ TuringMachine* TuringMachine::toSingleTape() {
                 loop_state2.state = write_state;
                 loop_state2.to_state = write_state;
 
-                loop_state2.input = {prod.production.replace_val[i]};
+                loop_state2.input = {c};
                 loop_state2.input_index = {storage_in_state_indexes[i+1]};
                 //loop_state2.input_index.erase(loop_state2.input_index.begin());
 
@@ -395,7 +406,7 @@ TuringMachine* TuringMachine::toSingleTape() {
                 move_marker_back.input = {'\u0003'};
                 move_marker_back.input_index = {i+1};
 
-                move_marker_back.output = {'\u0002', 'X'};
+                move_marker_back.output = {'\u0004', 'X'};
                 move_marker_back.output_index = {i+1, i*2+new_control};
                 move_marker_back.move = {-1*prod.production.movement[i], -1*prod.production.movement[i]};
 
@@ -417,35 +428,20 @@ TuringMachine* TuringMachine::toSingleTape() {
             toNextMode.input = {'\u0000'};
             toNextMode.input_index = {mark_track};
 
-            toNextMode.output = {'\u0002'};
-            toNextMode.output_index = {0};
-            toNextMode.move = {-1, -1};
+            for (int c = 0; c <new_control; c++){
+                toNextMode.output.push_back('\u0002');
+                toNextMode.output_index.push_back(c);
+                toNextMode.move.push_back(-1);
+            }
+            //toNextMode.output = {'\u0002'};
+            //toNextMode.output_index = {0};
+            //toNextMode.move = {-1, -1};
 
             //toNextMode.to_state = write_state+"_checkN";
             toNextMode.to_state = prod.production.new_state;
             toNextMode.def_move = -1;
 
             new_transitions.transitions.push_back(toNextMode);
-
-            IncompleteTransition loopCheck;
-            loopCheck.state = write_state+"_checkN";
-
-            loopCheck.to_state = write_state+"_checkN";
-            loopCheck.def_move = -1;
-
-            IncompleteTransition toNextMode2;
-            toNextMode2.state = write_state+"_checkN";
-
-            toNextMode2.input = {'\u0000'};
-            toNextMode2.input_index = {mark_track};
-
-            toNextMode2.to_state = prod.production.new_state;
-            toNextMode2.def_move = -1;
-
-
-            new_transitions.transitions.push_back(toNextMode2);
-            new_transitions.transitions.push_back(loopCheck);
-
         }
     }
 
