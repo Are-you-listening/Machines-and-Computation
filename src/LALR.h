@@ -23,6 +23,7 @@
 #include "Config.h"
 #include "src/CFG.h"
 #include <exception>
+#include <filesystem>
 
 typedef set<tuple<string, vector<string>, set<string>>> augmentedrules; //Use typedef to simplify usage
 
@@ -101,6 +102,10 @@ public:
      * @param T , all the used Terminals
      */
     void matchBrackets(const std::vector<std::string> &Terminals);
+
+    void getYield(vector<tuple<string, string, set<string>>> &yield);
+
+    void addTokens(vector<tuple<string, string, set<string>>>& tokens);
 };
 
 /**
@@ -176,6 +181,10 @@ public:
      * Manipulates the parsetree to decrease the amount of nesting
      */
     void generate();
+
+    void saveTable();
+
+    void loadTable();
 };
 
 #endif//CFG_LALR_H

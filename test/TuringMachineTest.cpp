@@ -374,7 +374,7 @@ TEST(TuringMachineTest, TM_single_tape_2){
     cout << tm.getProductions().size() << endl;
 
     int halted_time = -1;
-    for (int i = 0; i<50; i++){
+    for (int i = 0; i<1004000; i++){
 
 
         if (tm.isHalted()){
@@ -385,13 +385,9 @@ TEST(TuringMachineTest, TM_single_tape_2){
             break;
         }
         tm.move();
-        if (tm.getCurrentState() == "go_to_2256"){
-            int j=0;
-
-        }
 
 
-        if (i >= 3290000){
+        if (i >= 246800000){
             int j = 0;
 
             for (int i = 0; i < tm.getTapeAmount(); i++){
