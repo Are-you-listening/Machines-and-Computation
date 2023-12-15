@@ -501,6 +501,9 @@ void LALR::generate() {
     _root->findViolation(max,count,index,violator,_cfg.getT()); //Check for violations
 
     while(violator!=nullptr){
+        std::set<std::set<std::string>> tokenSet;
+        violator->getTokenSet(tokenSet);
+
 
         vector<ParseTree*> newKids;
         for(long unsigned int i = 0; i<index; ++i){ //Pushback firsthalf of kids
@@ -781,5 +784,14 @@ void ParseTree::getYield(vector<tuple<string, string, set<string>>> &yield) {
         for (auto child : children){
             child->getYield(yield);
         }
+    }
+}
+
+void ParseTree::getTokenSet(set<std::set<std::string>> &tokenSet) const {
+    for(auto &child: children){
+        if(child->symbol=="V"){ //If we found a variable; insert the data
+            tokenSet.insert(get<2>(child->token));
+        }
+        child->getTokenSet(tokenSet); //Go recursively for every child
     }
 }

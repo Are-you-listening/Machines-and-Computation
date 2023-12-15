@@ -10,6 +10,7 @@
 #include <fstream>
 #include <set>
 #include <tuple>
+#include <algorithm>
 
 class Tokenisation {
 private:
