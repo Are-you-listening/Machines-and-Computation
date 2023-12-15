@@ -147,7 +147,7 @@ private:
     bool heap_mode = false;
 
     char heap_sep = '@';
-    int split_nesting = 1;
+    int split_nesting = 2;
 
 
 };

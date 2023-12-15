@@ -2675,8 +2675,7 @@ void TuringTools::check_var_define_location(IncompleteSet &a, const vector<int> 
 
     find_match_heap_traverse(check_var_loop, 'A', 'S', 0, 1);
 
-    //IncompleteSet b{"c", "cc"};
-    //link(check_var_loop, b);
+
 
     IncompleteTransition bypassTraverse;
     bypassTraverse.state = on_skip_store.to_state;

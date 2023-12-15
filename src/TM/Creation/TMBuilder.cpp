@@ -40,7 +40,7 @@ TMBuilder_output TMBuilder::generateTM() {
 
     tools->link(program, tokenize_program);
 
-    TuringIfElseAntiNesting ifElse{1, 3};
+    TuringIfElseAntiNesting ifElse{2, 4};
 
     tools->link(program, ifElse.getTransitions());
 
@@ -50,7 +50,10 @@ TMBuilder_output TMBuilder::generateTM() {
     IncompleteSet vardict_set = vardict.getTransitions();
     tools->link(program, vardict_set);
 
-    TuringDenestify denest{1, 3};
+    IncompleteSet breaker{"breaker", "breaker2"};
+    //tools->link(program, breaker);
+
+    TuringDenestify denest{2, 4};
 
     tools->link(program, denest.getTransitions());
 
