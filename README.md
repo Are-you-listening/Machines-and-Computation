@@ -13,6 +13,7 @@ Supported:
 Requirements:
 - Alles moet in 1 file zitten
 - working code
+- function names met A* mogen niet bestaan
 
 Not-Supported:
     - Auto variables 

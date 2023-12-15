@@ -24,7 +24,7 @@ static unsigned int core_amount = std::thread::hardware_concurrency(); // gets "
 int main() { // Function names we create to replace nesting should have F or I in their names, so we know if they were for-loops or If-loops
     Tokenisation tokenVector; // sometimes variables in a nesting that should be passed in a function call aren't passed because it isn't found in the source file, this is done on purpose.
     //std::string Filelocation="input/nestedExamples/engine.cc"; // for now, doesn't support double declarations like int a,d;
-    std::string Filelocation="input/nestedExamples/test4.cc";
+    std::string Filelocation="../test/testFiles/knapsack.cpp";
     std::thread Tokenizer(&Tokenisation::Tokenize, &tokenVector, Filelocation); // i ignore rvalues in function calls
     core_amount--;
     Tokenizer.join();
@@ -37,75 +37,63 @@ int main() { // Function names we create to replace nesting should have F or I i
     //cfg2.setCnf(true);
     //cfg2.toGNF();
     //cfg2.print();
-    //cfg->print();
+    cfg->print();
     cfg->toGNF(); // this still needs massive debugging.
-    //cfg->print();
+    cfg->print();
     //cfg->toCNF();
     //cfg3->toCNF();
 
-    //string permutatar found online
-    /*std::string str="{}FCIEeDV";
-    unsigned int n = str.length();
-    unsigned long int opsize = pow(2, n);
-    
-    for (int counter = 1; counter < opsize; counter++)
-    {
-        string subs;
-        for (int j = 0; j < n; j++)
-        {
-            if (counter & (1<<j))
-                subs.push_back(str[j]);
-        }
-        
-        do
-        {
-            cout << std::endl;
-            cout << subs << " "<<std::endl;
-            cout << std::endl;
-            // do here CYK checks
-            if(cfg3->accepts(subs)!=cfg->accepts(subs)){
-                std::cout << "oops i did it again" << std::endl;
-                return -3;
-            }
-        }
-        while (next_permutation(subs.begin(), subs.end()));
-    }*/
-    //
+    /*
+    bool a= true;
+    bool b= false;
+    if(a==b){
+        int a=0;
+    } else{
+        string a="test";
+    }
+    std::cout << a << std::endl;
+    */
 
     const CFG a = *cfg;
     LALR lalr(a);
     lalr.createTable();
-    //Tokenizer.join();
-    //core_amount++;
+
+    Tokenizer.join();
+    core_amount++;
 
     //create LARL parser with tokenvector
     auto vec = tokenVector.getTokenVector();
+    /*
     std::set<std::string> test;
-    //vec.emplace_back("}","",test);
-    for (const auto& temp : vec){
-        cout << get<0>(temp) << " ";
+    vec.emplace_back("}","",test);
+    vec.clear();
+    std::vector<string> tokens  = {"V", "{", "C", "{", "C", "}", "{", "C", "}", "}"};
+    std::vector<std::tuple<string, string, set<string>>> out;
+    set<string> abc;
+    for (const auto& t: tokens){
+        vec.emplace_back(t, " ", abc);
     }
-    cout << endl;
+     */
     lalr.parse(vec);
-    //lalr.move();
+    lalr.generate();
     //cleanup
     //if-else antinesting
     //move
     //naam wijzinging states, zie cleanup.
     
     
-    /*
     //threading every function for now, will later be changed
     // I also assume that every function we create to replace nesting is only called upon once
     // result don't work for now, will be changed
     // Function calls in Function calls don't work for now, another function that split those calls up is needed
-    std::string ResultFileLocation="nestedExamples/copyengine.cc";
+    //std::string ResultFileLocation="../test/results/TM_handmatig_result.cpp";
+    std::string ResultFileLocation="output/result.cpp";
     std::string line;
     std::string line2;
     std::ifstream File(ResultFileLocation);
     std::vector<std::string> FunctionCalls;
     while(getline(File,line)){
-        if(line[0]!='#'&&line[0]!=' '&&line.substr(0,6)!="static"&&line.substr(0,6)!="struct"&&!line.empty()&&line!="}"&&line!="{"){ // I assume the code we check people don't write variables or classes above a function, also needs debugging
+        if(line[0]!='#'&&line[0]!=' '&&line.substr(0,6)!="static"&&line.substr(0,6)!="struct"&&!line.empty()&&line!="}"&&line!="{"&&line.substr(0,7)!="typedef"&&line.substr(0,8)!="namespace"&&line.substr(0,6)=="void A"&&line.substr(0,2)!="//"){ // I assume the code we check people don't write variables or classes above a function, also needs debugging
             FunctionCalls.push_back(line);
         }
     }
@@ -213,9 +201,19 @@ int main() { // Function names we create to replace nesting should have F or I i
     }
     std::string c=ResultFileLocation +"tempresult.cc0";
     std::remove(c.c_str());
-    std::cout << "We do really love Tibo" << std::endl;*/
 
-
+    std::ifstream File9(ResultFileLocation+"result.cc");
+    std::vector<std::string> V;
+    std::string C;
+    while(getline(File9,C)){
+        V.push_back(C);
+    }
+    
+    std::ofstream File10(ResultFileLocation+"result.cc");
+    File10<<"#include <thread>"<<std::endl;
+    for(const auto& it:V){
+        File10 << it <<std::endl;
+    }
+    std::cout << "We do really love Tibo" << std::endl;
     return 0;
 }
-
