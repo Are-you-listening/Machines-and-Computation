@@ -550,9 +550,6 @@ void LALR::generate() {
             temp.clear();
         //END Actual Moving
 
-        //Create a the new function in the root
-        function(violator, tokenSet, std::string());
-
         /*for(long unsigned int i = index+1; i<violator->children.size(); ++i){ //Pushback rest of the children
             ParseTree* child = violator->children[i];
             newKids.push_back(child);
@@ -628,7 +625,7 @@ ParseTree* LALR::functionCall(const string& code) {
     return k;
 }
 
-ParseTree * LALR::function(ParseTree *violator, std::set<std::set<std::string>> &tokenSet, const string functionName) {
+string LALR::function(ParseTree *violator, std::set<std::set<std::string>> &tokenSet, const string functionName) {
     std::vector<ParseTree*> newKids;
     long unsigned int i;
     long unsigned int index;
@@ -709,7 +706,7 @@ ParseTree * LALR::function(ParseTree *violator, std::set<std::set<std::string>> 
     }
     _root->children = newKids;
 
-    return nullptr;
+    return functiondefinition;
 }
 
 void ParseTree::findViolation(unsigned long &max, unsigned long &count, unsigned long &index,ParseTree* &Rviolator,const std::vector<std::string> &Terminals) {
