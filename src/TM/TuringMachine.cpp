@@ -242,9 +242,16 @@ TuringMachine* TuringMachine::toSingleTape() {
     IncompleteSet new_transitions{"new_transitions", "new_transitions"};
     int counter = 0;
     auto trans_map = getProductions();
+
+    IncompleteTransition start;
+    start.state = "singletape_start_tape";
+    start.to_state = start_state;
+    start.def_move = -1;
+    new_transitions.transitions.push_back(start);
+
     for (auto [k, v]: trans_map){
 
-        if (k == "go_to_0"){
+        if (k == "tokenize_1"){
             int b = 0;
         }
 
@@ -344,12 +351,31 @@ TuringMachine* TuringMachine::toSingleTape() {
 
             //soon_merging = {};
             for (int i =0; i<tapes.size(); i++){
-                if (usefull.find(i) == usefull.end()){
+                auto self = usefull.find(i);
+                if (self == usefull.end()){
                     continue;
                 }
+                auto next = self;
+                next++;
+
+                string from;
+                if (self == usefull.begin()){
+                    from = write_state;
+                }else{
+
+                    from = write_state+"doCheckOn_"+to_string((*self));
+                }
+
+                string to;
+                if (next == usefull.end()){
+                    to = write_state;
+                }else{
+                    to = write_state+"doCheckOn_"+to_string((*next));
+                }
+
                 IncompleteTransition write;
-                write.state = write_state;
-                write.to_state = write_state;
+                write.state = from;
+                write.to_state = to;
                 write.def_move = 0;
 
                 char c = prod.production.replace_val[i];
@@ -368,6 +394,29 @@ TuringMachine* TuringMachine::toSingleTape() {
                 write.increase_amount = {-1};
                 //soon_merging.insert(write);
                 new_transitions.transitions.push_back(write);
+
+                //can start at any point
+                write.state = write_state;
+                write.input = {c, 'X'};
+                write.input_index = {i+1, i*2+new_control};
+                new_transitions.transitions.push_back(write);
+
+                if (from != write_state){
+                    IncompleteTransition write_skip;
+                    write_skip.state = from;
+                    write_skip.to_state = to;
+                    write_skip.def_move = 0;
+                    new_transitions.transitions.push_back(write_skip);
+                }
+
+
+                IncompleteTransition write_skip2;
+                write_skip2.state = from;
+                write_skip2.to_state = to;
+                write_skip2.def_move = 0;
+                write_skip2.input = {c};
+                write_skip2.input_index = {i+1};
+                new_transitions.transitions.push_back(write_skip2);
 
                 IncompleteTransition loop_state2;
                 loop_state2.state = write_state;
@@ -431,7 +480,7 @@ TuringMachine* TuringMachine::toSingleTape() {
             for (int c = 0; c <new_control; c++){
                 toNextMode.output.push_back('\u0002');
                 toNextMode.output_index.push_back(c);
-                toNextMode.move.push_back(-1);
+                toNextMode.move.push_back(0);
             }
             //toNextMode.output = {'\u0002'};
             //toNextMode.output_index = {0};
@@ -439,7 +488,7 @@ TuringMachine* TuringMachine::toSingleTape() {
 
             //toNextMode.to_state = write_state+"_checkN";
             toNextMode.to_state = prod.production.new_state;
-            toNextMode.def_move = -1;
+            toNextMode.def_move = 0;
 
             new_transitions.transitions.push_back(toNextMode);
         }
@@ -457,7 +506,7 @@ TuringMachine* TuringMachine::toSingleTape() {
         //TM_data["Productions"].push_back(production);
     }
 
-    output_tm->load({}, start_state, "", tapes.size()*2+1, real_transitions);
+    output_tm->load({}, start.state, "", tapes.size()*2+1, real_transitions);
 
     for (int i =0; i<tapes.size(); i++){
         string head;
