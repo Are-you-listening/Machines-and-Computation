@@ -272,6 +272,10 @@ TuringMachine* TuringMachine::toSingleTape() {
             cout << counter << endl;
             counter++;
 
+            if (counter == 1910){
+                int b = 0;
+            }
+
             set<int> usefull = getUsefullIndexes(prod);
             if (usefull.empty() && v.size() == 1){
                 IncompleteTransition epsilon;
@@ -297,9 +301,14 @@ TuringMachine* TuringMachine::toSingleTape() {
                 store.input = {'X', prod.input[i]};
                 store.input_index = {i*2+new_control, i*2+new_control+1};
 
-                store.output = {prod.input[i], 'N'};
-                store.output_index = {i+1, mark_track};
-                store.move = {1, 1};
+                char new_token = 'X';
+                if (usefull.find(i) != usefull.end()){
+                    new_token = 'P';
+                }
+
+                store.output = {prod.input[i], new_token, 'N'};
+                store.output_index = {i+1, i*2+new_control, mark_track};
+                store.move = {1, 1, 1};
 
                 store.control_increase = {0};
                 store.increase_amount = {1};
@@ -353,6 +362,19 @@ TuringMachine* TuringMachine::toSingleTape() {
             for (int i =0; i<tapes.size(); i++){
                 auto self = usefull.find(i);
                 if (self == usefull.end()){
+                    if (usefullUpper.find(i) != usefullUpper.end()){
+                        IncompleteTransition cleanup;
+                        cleanup.state = write_state;
+                        cleanup.to_state = write_state;
+                        cleanup.input = {'P'};
+                        cleanup.input_index = {i*2+new_control};
+
+                        cleanup.def_move = 0;
+                        cleanup.output = {'X'};
+                        cleanup.output_index = {i*2+new_control};
+                        cleanup.move = {0};
+                        new_transitions.transitions.push_back(cleanup);
+                    }
                     continue;
                 }
                 auto next = self;
@@ -360,35 +382,42 @@ TuringMachine* TuringMachine::toSingleTape() {
 
                 string from;
                 if (self == usefull.begin()){
-                    from = write_state;
+                    from = write_state+"_checkModeOverhead";
                 }else{
 
                     from = write_state+"doCheckOn_"+to_string((*self));
                 }
 
+                IncompleteTransition write;
                 string to;
                 if (next == usefull.end()){
                     to = write_state;
+                    write.def_move = -1;
+                    write.move = {-1, -1};
                 }else{
                     to = write_state+"doCheckOn_"+to_string((*next));
+
                 }
 
-                IncompleteTransition write;
+
                 write.state = from;
-                write.to_state = to;
-                write.def_move = 0;
+                write.to_state = k+"_mark"+ to_string(counter)+"_"+ to_string(i);
+
 
                 char c = prod.production.replace_val[i];
                 if (c == '\u0001'){
                     c = '\u0005';
                 }
 
-                write.input = {c, 'X'};
+                write.input = {c, 'P'};
                 write.input_index = {i+1, i*2+new_control};
 
-                write.output = {'\u0003', prod.production.replace_val[i]};
-                write.output_index = {i+1, i*2+1+new_control};
-                write.move = {0, 0};
+                write.output = {'\u0004', '\u0000', prod.production.replace_val[i]};
+                write.output_index = {i+1, i*2+new_control, i*2+1+new_control};
+
+                write.def_move = prod.production.movement[i];
+                write.move = {prod.production.movement[i], prod.production.movement[i], prod.production.movement[i]};
+
 
                 write.control_increase = {0};
                 write.increase_amount = {-1};
@@ -396,10 +425,20 @@ TuringMachine* TuringMachine::toSingleTape() {
                 new_transitions.transitions.push_back(write);
 
                 //can start at any point
+                /*
                 write.state = write_state;
                 write.input = {c, 'X'};
                 write.input_index = {i+1, i*2+new_control};
                 new_transitions.transitions.push_back(write);
+                 */
+
+                IncompleteTransition toCheckMode;
+                toCheckMode.state = write_state;
+                toCheckMode.to_state = write_state+"_checkModeOverhead";
+                toCheckMode.def_move = 0;
+                toCheckMode.input = {'P'};
+                toCheckMode.input_index = {i*2+new_control};
+                new_transitions.transitions.push_back(toCheckMode);
 
                 if (from != write_state){
                     IncompleteTransition write_skip;
@@ -418,6 +457,7 @@ TuringMachine* TuringMachine::toSingleTape() {
                 write_skip2.input_index = {i+1};
                 new_transitions.transitions.push_back(write_skip2);
 
+
                 IncompleteTransition loop_state2;
                 loop_state2.state = write_state;
                 loop_state2.to_state = write_state;
@@ -431,8 +471,9 @@ TuringMachine* TuringMachine::toSingleTape() {
                 loop_state2.move = {-1};
 
                 loop_state2.def_move = -1;
-                new_transitions.transitions.push_back(loop_state2);
+                //new_transitions.transitions.push_back(loop_state2);
 
+                /*
                 IncompleteTransition move_marker;
                 move_marker.state = write_state;
                 move_marker.to_state = k+"_mark"+ to_string(counter);
@@ -446,14 +487,12 @@ TuringMachine* TuringMachine::toSingleTape() {
                 move_marker.move = {prod.production.movement[i]};
 
                 new_transitions.transitions.push_back(move_marker);
+                */
 
                 IncompleteTransition move_marker_back;
-                move_marker_back.state = k+"_mark"+ to_string(counter);
-                move_marker_back.to_state = write_state;
+                move_marker_back.state = k+"_mark"+ to_string(counter)+"_"+ to_string(i);
+                move_marker_back.to_state = to;
                 move_marker_back.def_move = -1*prod.production.movement[i];
-
-                move_marker_back.input = {'\u0003'};
-                move_marker_back.input_index = {i+1};
 
                 move_marker_back.output = {'\u0004', 'X'};
                 move_marker_back.output_index = {i+1, i*2+new_control};
@@ -462,6 +501,7 @@ TuringMachine* TuringMachine::toSingleTape() {
                 new_transitions.transitions.push_back(move_marker_back);
 
             }
+
 
             //all_store_options = tools->mergeToSingle(soon_merging);
             //new_transitions.transitions.insert(new_transitions.transitions.begin(), all_store_options.begin(), all_store_options.end());
