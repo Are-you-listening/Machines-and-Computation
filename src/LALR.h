@@ -106,6 +106,12 @@ public:
     void getYield(vector<tuple<string, string, set<string>>> &yield);
 
     void addTokens(vector<tuple<string, string, set<string>>>& tokens);
+
+    /**
+     * Recursively create the tokenSet of a certain Sub-Parsetree
+     * @param tokenSet
+     */
+    void getTokenSet(std::set<std::set<std::string>> &tokenSet) const;
 };
 
 /**
@@ -121,13 +127,13 @@ class LALR {
      * Helper function for generate(), creates a new function Call in place
      * @return , Parsetree* containing the new code
      */
-    ParseTree* functionCall();
+    ParseTree* functionCall(const string& name,set<std::set<std::string>> &tokenSet);
 
     /**
      * Helper function for generate(), creates a new function in place
      * @return , Parsetree* containing the new code
      */
-    ParseTree* function();
+    ParseTree* function(ParseTree* violator,set<std::set<std::string>> &tokenSet);
 
 public:
     unordered_map<int, map<string, string>> parseTable;
@@ -182,8 +188,14 @@ public:
      */
     void generate();
 
+    /**
+     * Saves the parseTable to a file named "parseTablefile.txt"
+     */
     void saveTable();
 
+    /**
+     * Loads the parseTable from "parseTablefile.txt" if this file exists
+     */
     void loadTable();
 };
 
