@@ -106,6 +106,12 @@ public:
     void getYield(vector<tuple<string, string, set<string>>> &yield);
 
     void addTokens(vector<tuple<string, string, set<string>>>& tokens);
+
+    /**
+     * Recursively create the tokenSet of a certain Sub-Parsetree
+     * @param tokenSet
+     */
+    void getTokenSet(std::set<std::set<std::string>> &tokenSet) const;
 };
 
 /**
