@@ -5,6 +5,7 @@
 #include "Tokenisation.h"
 #include <iostream>
 
+/*
 void findD(unsigned long int Oldsize,std::vector<std::pair<std::string,std::string>>& tokenVector, const std::string& line, const std::string& FileLocation){
     for(unsigned long int i=Oldsize; i<tokenVector.size();i++){
         for(unsigned long int j=Oldsize; j>0;j--){
@@ -50,6 +51,7 @@ void findD(unsigned long int Oldsize,std::vector<std::pair<std::string,std::stri
         }
     }
 }
+ */
 /*
 void findD(unsigned long int Oldsize,std::vector<std::pair<std::string,std::string>>& tokenVector, const std::string& line, const std::string& FileLocation){
     for(unsigned long int i=Oldsize; i<tokenVector.size();i++){
@@ -131,6 +133,7 @@ void findD(unsigned long int Oldsize,std::vector<std::pair<std::string,std::stri
     }
 }
 */
+/*
 void vindVn(std::vector<std::pair<std::string,std::string>>& tokenVector, const std::string& line){
     std::set<char> VariableChar= {'_','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z',
                                   'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'};
@@ -142,7 +145,18 @@ void vindVn(std::vector<std::pair<std::string,std::string>>& tokenVector, const 
     bool append=false;
     bool SecondNotV=false;
     bool SecondNotVother=false;
+    bool skipCS= false;
     for(const char C: line){
+        if(C=='\"'){
+            if(skipCS){
+                skipCS= false;
+            } else{
+                skipCS= true;
+            }
+        }
+        if(skipCS){
+            continue;
+        }
         if(append){
             if(VariableCharSecond.find(C)!=VariableCharSecond.end()){
                 tempV+=C;
@@ -199,16 +213,136 @@ void vindVn(std::vector<std::pair<std::string,std::string>>& tokenVector, const 
         }
     }
 }
+ */
+
+
+void vindVn(std::vector<std::tuple<std::string, std::string, std::set<std::string>>>& tokenTupleVector, const std::string& line, unsigned long int count2, std::set<char> VariableChar, std::set<char> VariableCharSecond){
+    std::string tempV;
+    unsigned long int count=0;
+    bool append=false;
+    bool SecondNotV=false;
+    bool SecondNotVother=false;
+    bool skipCS= false;
+    for(const char C: line){
+        if(C=='\"'){
+            if(skipCS){
+                skipCS= false;
+            } else{
+                skipCS= true;
+            }
+        }
+        if(skipCS){
+            continue;
+        }
+        if(append){
+            if(VariableCharSecond.find(C)!=VariableCharSecond.end()){
+                tempV+=C;
+                continue;
+            } else if(C=='('||C==':'){
+                tempV="";
+                append= false;
+                SecondNotV=false;
+                continue;
+            } else if(C=='.'){
+                if(!SecondNotV){
+                    std::get<2>(tokenTupleVector[tokenTupleVector.size()-count2-1]).insert(tempV);
+                    count++;
+                    append= false;
+                }
+                tempV="";
+                SecondNotV= true;
+                continue;
+            } else if(C=='-'){
+                if(!SecondNotV){
+                    std::get<2>(tokenTupleVector[tokenTupleVector.size()-count2-1]).insert(tempV);
+                    count++;
+                    append= false;
+                } else {
+                    SecondNotV= false;
+                }
+                tempV="";
+                SecondNotVother= true;
+                continue;
+            } else {
+                if(!SecondNotV){
+                    std::get<2>(tokenTupleVector[tokenTupleVector.size()-count2-1]).insert(tempV);
+                    count++;
+                    append= false;
+                } else {
+                    SecondNotV= false;
+                }
+                tempV="";
+                continue;
+            }
+        }
+        if(C=='>'&&SecondNotVother){
+            append= true;
+            SecondNotV= true;
+            SecondNotVother=false;
+            continue;
+        }
+        if(VariableChar.find(C)!=VariableChar.end()){
+            append= true;
+            tempV+=C;
+            SecondNotVother=false;
+        } else{
+            append=false;
+        }
+    }
+}
 
 void Tokenisation::Tokenize(const std::string &FileLocation) {
     std::ifstream File(FileLocation);
-    std::string line;
+    std::string line1;
     std::set<char> VariableChar= {'_','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z',
                                   'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'};
     std::set<char> VariableCharSecond= {'_','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z',
                                         'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z',
                                         '0','1','2','3','4','5','6','7','8','9'};
-    while(getline(File,line)){
+    std::string temp;
+    while(getline(File,line1)){
+        temp+=line1;
+    }
+    std::vector<std::string> lines;
+    std::string temp2;
+    bool include=false;
+    for(const auto & C: temp){
+        if(include){
+            if(C=='>'||C=='"'){
+                include=false;
+                temp2+=C;
+                lines.push_back(temp2);
+                temp2.clear();
+            }else{
+                temp2+=C;
+            }
+            continue;
+        }
+        if(C=='{'){
+            //temp2.push_back('{');
+            lines.push_back(temp2);
+            lines.emplace_back("{");
+            temp2.clear();
+        } else if(C=='}'){
+            //temp2.push_back('}');
+            lines.push_back(temp2);
+            lines.emplace_back("}");
+            temp2.clear();
+        } else if(C==';'){
+            temp2.push_back(';');
+            lines.push_back(temp2);
+            temp2.clear();
+        } else if(C=='#'){
+            include = true;
+            temp2+=C;
+        } else{
+            temp2+=C;
+        }
+    }
+    temp.clear();
+    temp2.clear();
+    
+    for(auto & line : lines){
         unsigned long int tokenVectorSize=tokenVector.size();
         if(line.substr(0,5)=="std::"){
             line=line.substr(5,std::string::npos);
@@ -216,106 +350,21 @@ void Tokenisation::Tokenize(const std::string &FileLocation) {
         while(line.substr(0,1)==" "){
             line=line.substr(1,std::string::npos);
         }
-        bool forloop=false;
-        bool whileloop=false;
-        bool ifloop= false;
+        if(line.substr(0,2)=="//"){
+            continue;
+        }
         if(line.substr(0,3)=="for"){
-            tokenVector.emplace_back("F",line.substr(0,line.size()-1));
-            if(line.find(':')!=std::string::npos&&line.find('=')==std::string::npos){
-                tokenVector.emplace_back("V0",line.substr(line.find(':')+1,line.size()-1-line.find(':'))); // this still needs to be tested
-                findD(tokenVector.size()-1,tokenVector,line,FileLocation);
-            } else {
-                unsigned long int Oldsize=tokenVector.size();
-                unsigned long int LastCharPos;
-                if(line.find('.')!=std::string::npos){
-                    LastCharPos=line.find('.')-1;
-                } else {
-                    LastCharPos=line.find(';')-1;
-                }
-                std::string tempS = line.substr(line.find('=')+1,LastCharPos-line.find('='));
-                tempS+="+"+line.substr(line.find(';')+1,line.size()-1-line.find(';'));
-                vindVn(tokenVector,tempS);
-                findD(Oldsize,tokenVector,line,FileLocation);
-            }
-            forloop= true;
+            tokenVector.emplace_back("F",line);
         } else if(line.substr(0,2)=="if"){
             tokenVector.emplace_back("I",line);
-            ifloop= true;
-            goto Variables;
         } else if(line.find("else if")!=std::string::npos){
             tokenVector.emplace_back("e",line);
-            ifloop= true;
-            goto Variables;
         } else if(line.find("else")!=std::string::npos){
             tokenVector.emplace_back("E",line);
-            ifloop= true;
         } else if(line.find("while")!=std::string::npos){
             tokenVector.emplace_back("F",line);
-            std::string temps=line.substr(line.find("while")+5,std::string::npos);
-            unsigned long int Oldsize=tokenVector.size();
-            vindVn(tokenVector,temps);
-            findD(Oldsize,tokenVector,line,FileLocation);
-            whileloop= true;
-        } else if(line.find(' ')!=std::string::npos&&(line.find('=')!=std::string::npos||((line.find('{')!=std::string::npos||line.find('(')!=std::string::npos)&&!(line.find('{')!=std::string::npos&&line.find('(')!=std::string::npos)))&&(line.find("return")==std::string::npos)&&(line.find('[')>line.find('='))){ // this part finds declarations in code
-            unsigned long int spacecount=0;
-            for(char it : line){
-                if(it==' '){
-                    spacecount++;
-                } else if(it=='='){
-                    break;
-                }
-            }
-            if(line.find(" =")!=std::string::npos){
-                spacecount--;
-            }
-            if(spacecount==0){
-                tokenVector.emplace_back("V",line);
-                goto Variables;
-            }
-            for(auto it=line.cbegin(); it!=line.cend(); it++){
-                if(*it==' '){
-                    it++;
-                    if(*it!='='){
-                        tokenVector.emplace_back("D",line);
-                        tokenVector.emplace_back("D0",line.substr(line.find(' ')+1,line.find('=')-(line.find(' ')+1))); // variable name;
-                        while(tokenVector[tokenVector.size()-1].second.find(' ')!=std::string::npos){
-                            tokenVector[tokenVector.size()-1].second.erase(tokenVector[tokenVector.size()-1].second.find(' '));
-                        }
-                        if(tokenVector[tokenVector.size()-1].second[tokenVector[tokenVector.size()-1].second.size()-1]==';'){
-                            tokenVector[tokenVector.size()-1].second.erase(tokenVector[tokenVector.size()-1].second.size()-1);
-                        }
-                        break;
-                    }
-                }
-            }
-        } else if(line.find(' ')!=std::string::npos&&line.find('=')==std::string::npos&&line.find(';')!=std::string::npos&&line.find("return")==std::string::npos){
-            unsigned int isDeclarationCount=0;
-            bool isComma= false;
-            for(char it : line){
-                if(it==' '&&!isComma){
-                    isDeclarationCount++;
-                } else if(it==','){
-                    isComma= true;
-                } else {
-                    isComma= false;
-                }
-            }
-            if(isDeclarationCount==1){
-                tokenVector.emplace_back("D",line);
-                if(line.find('>')!=std::string::npos){
-                    tokenVector.emplace_back("D0",line.substr(line.find("> ")+1,line.size()-1));
-                } else {
-                    tokenVector.emplace_back("D0",line.substr(line.find(' ')+1,line.size()-1));
-                }
-                while(tokenVector[tokenVector.size()-1].second[0]==' '){
-                    tokenVector[tokenVector.size()-1].second.erase(0,1);
-                }
-                if(tokenVector[tokenVector.size()-1].second[tokenVector[tokenVector.size()-1].second.size()-1]==';'){
-                    tokenVector[tokenVector.size()-1].second.erase(tokenVector[tokenVector.size()-1].second.size()-1);
-                }
-            }
         } else if((line.find('+')!=std::string::npos||line.find('-')!=std::string::npos||line.find('*')!=std::string::npos // this just gives on when a variable is used, not which or even which scope the variable is from
-                   ||line.find('/')!=std::string::npos||line.find('%')!=std::string::npos||line.find("++")!=std::string::npos // so use in combination of (D,line) to dither the scopes.
+                   ||line.find('/')!=std::string::npos||line.find('%')!=std::string::npos||line.find("++")!=std::string::npos // so use in combination of (D,line) to deter the scopes.
                    ||line.find("--")!=std::string::npos||line.find("++")!=std::string::npos||line.find('=')!=std::string::npos
                    ||line.find("+=")!=std::string::npos||line.find("-=")!=std::string::npos||line.find("*=")!=std::string::npos
                    ||line.find("/=")!=std::string::npos||line.find("%=")!=std::string::npos||line.find("==")!=std::string::npos
@@ -327,37 +376,17 @@ void Tokenisation::Tokenize(const std::string &FileLocation) {
                                                                                             line.find(')')!=std::string::npos&&line.find("()")==std::string::npos)||line.find('|')!=std::string::npos)&&
                   line.find('#')==std::string::npos&&line.find("){")==std::string::npos){
             tokenVector.emplace_back("V",line);
-            Variables:
-            unsigned long int Oldsize=tokenVector.size();
-            vindVn(tokenVector,line);
-            findD(Oldsize,tokenVector,line,FileLocation);
         }
-        long int bracecount=0;
-        for(char it: line){
-            if(it=='{'){
-                bracecount++;
-            }
-            if(it=='}'){
-                bracecount--;
-            }
-        }
-        switch(bracecount){
-            case 1:
-                if(!(forloop||whileloop||ifloop)){
-                    tokenVector.emplace_back("C",line.substr(0,line.size()-1));
-                }
-                tokenVector.emplace_back("{","{");
-                break;
-            case -1:
-                tokenVector.emplace_back("}","}");
-                break;
-            default:
-                break;
+        if(line=="{"){
+            tokenVector.emplace_back("{","{");
+        } else if(line=="}"){
+            tokenVector.emplace_back("}","}");
         }
         if(tokenVectorSize==tokenVector.size()){
             tokenVector.emplace_back("C",line);
         }
     }
+    
     File.close();
     bool FoundVn= false;
     std::set<std::string> S={};
@@ -378,8 +407,50 @@ void Tokenisation::Tokenize(const std::string &FileLocation) {
             FoundVn= false;
         }
     }
-    for(const auto & i:tokenVector){
-        std::cout<<i.first+", " << i.second << std::endl;
+    unsigned long int count=0;
+    for(auto it=tokenTupleVector.rbegin(); it!=tokenTupleVector.rend(); it++,count++){
+        if(std::get<0>(*it)=="V"){
+            vindVn(tokenTupleVector,std::get<1>(*it),count, VariableChar, VariableCharSecond);
+            std::set<std::string> visited;
+            for(auto it2=std::get<2>(*it).begin(); it2!=std::get<2>(*it).end();it2++){
+                if(visited.find(*it2)!=visited.end()){
+                    continue;
+                }
+                for(auto & it3 : tokenTupleVector){
+                    if(std::get<1>(it3).find(*it2)!=std::string::npos){
+                        if(std::get<0>(it3)=="V"){
+                            std::get<0>(it3)="D";
+                        }
+                        std::string D0;
+                        for(auto C=std::get<1>(it3).end()-std::get<1>(it3).size()-1+std::get<1>(it3).find(*it2); C!=std::get<1>(it3).begin();C--){
+                            if(*C==' '||VariableCharSecond.find(*C)!=VariableCharSecond.end()||*C=='&'){
+                                D0+=*C;
+                            } else{
+                                break;
+                            }
+                        }
+                        std::reverse(D0.begin(),D0.end());
+                        D0+=*it2;
+                        std::get<2>(*it).erase(*it2);
+                        if(D0.find(' ')!=std::string::npos){
+                            std::get<2>(*it).insert(D0);
+                        }
+                        visited.insert(D0);
+                        it2=std::get<2>(*it).begin();
+                    }
+                }
+            }
+            if(std::get<2>(*it).empty()){
+                std::get<0>(*it)="C";
+            }
+        }
+    }
+    
+    for(const auto & i:tokenTupleVector){
+        std::cout<<std::get<0>(i)+", " << std::get<1>(i) << std::endl;
+        for(const auto &V:std::get<2>(i)){
+            std::cout<<V<< std::endl;
+        }
     }
     tokenVector.clear();
 }
