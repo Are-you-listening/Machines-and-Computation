@@ -389,7 +389,6 @@ void LALR::parse(std::vector<std::tuple<std::string, std::string, std::set<std::
     std::set<std::string> S={};
     auto remaininginputvector = input;
     remaininginputvector.emplace_back("$","$", S);
-
     vector<ParseTree*> treetops;
     while (true){
         if (remaininginputvector.empty()){
@@ -447,6 +446,9 @@ void LALR::parse(std::vector<std::tuple<std::string, std::string, std::set<std::
                         newparent->children.push_back(temp);
                         found = true;
                         toRemove.insert(symbol);
+                        if (found){
+                            break;
+                        }
                     }
                 }
                 for (auto temp : toRemove){
@@ -478,7 +480,6 @@ void LALR::parse(std::vector<std::tuple<std::string, std::string, std::set<std::
     for (auto elem : debugyield){
         cout << get<0>(elem) << " ";
     }
-    std::cout << "debug" << std::endl;
 }
 
 void LALR::printTable() {
