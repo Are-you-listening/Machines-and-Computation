@@ -182,8 +182,14 @@ public:
      */
     void generate();
 
+    /**
+     * Saves the parseTable to a file named "parseTablefile.txt"
+     */
     void saveTable();
 
+    /**
+     * Loads the parseTable from "parseTablefile.txt" if this file exists
+     */
     void loadTable();
 };
 
