@@ -67,6 +67,17 @@ IncompleteSet TuringTokenizer::tokenize() {
     //need to loop this, and repeat if ::
     tools->go_to(find_seperator, seperators, 1, 1, {0, 1});
 
+    IncompleteSet onAmpercent{"tokenize_onAmpercent", "tokenize_onAmpercent"};
+    tools->move(onAmpercent, {0,1}, 1);
+
+    IncompleteSet onAmpercentNot{"tokenize_onAmpercentNot", "tokenize_onAmpercentNot"};
+    tools->go_to(onAmpercentNot, seperators, 1, 1, {0, 1});
+    tools->move(onAmpercentNot, {0,1}, 1);
+    tools->link_on_not(onAmpercent, onAmpercentNot, {'&'}, {1});
+    tools->move(onAmpercent, {0,1}, -1);
+
+    tools->link_on(find_seperator, onAmpercent, {'&'}, {1});
+
     //first check if > has a corresponding < before
     IncompleteSet onLess{"on_less_tokenazation", "on_less_tokenazation"};
     tools->go_to_multiple(onLess, {{'S'}, {'<'}}, {0, 1}, -1, {0,1});
