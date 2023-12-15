@@ -72,6 +72,9 @@ public:
      */
     ParseTree(const vector<ParseTree *> &children, string symbol);
 
+    ParseTree(const vector<ParseTree *> &children, const string &symbol,
+              const tuple<string, string, set<string>> &token);
+
     /**
      * Find the leftmost or rightmost bracket
      * @param left, toggle between leftmost or rightmost
@@ -88,7 +91,7 @@ public:
      * @param Rviolator , the root of the violating nesting
      * @param T , Terminals
      */
-    void findViolation(unsigned long &max, unsigned long &count, unsigned long &index,ParseTree* &Rviolator,const std::vector<std::string> &Terminals);
+    void findViolation(const unsigned long &max, unsigned long &count, unsigned long &index,ParseTree* &Rviolator,const std::vector<std::string> &Terminals);
 
     /**
      * Find the root of a given child

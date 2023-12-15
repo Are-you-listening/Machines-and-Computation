@@ -406,7 +406,7 @@ void LALR::parse(std::vector<std::tuple<std::string, std::string, std::set<std::
         if (operation.empty()){
             throw emptyElement();
         }
-        
+
         if (operation == "accept"){
             break;
         } else if (operation.substr(0, 1) == "S"){
@@ -492,7 +492,7 @@ void LALR::printTable() {
 }
 
 void LALR::generate() {
-    unsigned long max = Config::getConfig()->getMaxNesting();
+    const unsigned long max = Config::getConfig()->getMaxNesting()+1;
     unsigned long count = 0;
     unsigned long index;
     string functionName = "A";
@@ -543,8 +543,9 @@ void LALR::generate() {
                     }*/
                     temp.push_back(functionCall(function(violator,tokenSet,functionName))); //Create a the new function in the root and add its functionCall()
                     functionName+="A";
+                }else{
+                    temp.push_back(child);
                 }
-                temp.push_back(child);
             }
             data->children = temp;
             temp.clear();
@@ -628,7 +629,8 @@ void ParseTree::findBracket(bool left, std::tuple<ParseTree *, unsigned long, un
 
 ParseTree* LALR::functionCall(const string& code) {
     auto k = new ParseTree({},"D");
-    k->token = {"D",code,{}};
+    auto t = code.substr(5,code.size()); //remove "void" from name
+    k->token = {"D",t,{}};
     return k;
 }
 
@@ -721,7 +723,7 @@ string LALR::function(ParseTree *violator, std::set<std::set<std::string>> &toke
     return functiondefinition;
 }
 
-void ParseTree::findViolation(unsigned long &max, unsigned long &count, unsigned long &index,ParseTree* &Rviolator,const std::vector<std::string> &Terminals) {
+void ParseTree::findViolation(const unsigned long &max, unsigned long &count, unsigned long &index,ParseTree* &Rviolator,const std::vector<std::string> &Terminals) {
     if(count==max){
         return;
     }
@@ -737,8 +739,12 @@ void ParseTree::findViolation(unsigned long &max, unsigned long &count, unsigned
             }
         }else if(std::find(Terminals.begin(), Terminals.end(),child->symbol)==Terminals.end()){ //Found some V
             child->findViolation(max,count,index,Rviolator,Terminals); //Search further in the Variable nodes
+        }else if(child->symbol=="}"){ //Didn't reached max but did found matching; should now decrease?
+            --count; //Is this right?
         }
     }
+    //--count;
+    // Reset the count how?
     //Nothing more to handle
 }
 
@@ -801,7 +807,7 @@ ParseTree* ParseTree::findRoot(ParseTree *&child,const std::vector<std::string> 
     for(auto kid : children){
         if(child==kid){
             return this;
-        }else if( std::find(Terminals.begin(), Terminals.end(),child->symbol)==Terminals.end() ){ //Found a variable
+        }else if( std::find(Terminals.begin(), Terminals.end(),kid->symbol)==Terminals.end() ){ //Found a variable
             auto result = kid->findRoot(child,Terminals);
             if(result!= nullptr){
                 return result; //Found!
@@ -890,3 +896,7 @@ void ParseTree::getTokenSet(set<std::set<std::string>> &tokenSet) const {
         child->getTokenSet(tokenSet); //Go recursively for every child
     }
 }
+
+ParseTree::ParseTree(const vector<ParseTree *> &children, const string &symbol,
+                     const tuple<string, string, set<string>> &token) : children(children), symbol(symbol),
+                                                                        token(token) {}
