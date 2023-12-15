@@ -19,6 +19,7 @@
 #include <algorithm>
 #include <tuple>
 #include <set>
+#include <fstream>
 
 #include "Config.h"
 #include "src/CFG.h"

@@ -563,7 +563,15 @@ void LALR::generate() {
         _root->findViolation(max,count,index,violator,_cfg.getT()); //Check for more violations
     }
 
-    std::cout << std::endl;
+    //Create File
+    vector<tuple<string, string, set<string>>> yield;
+    _root->getYield(yield);
+
+    ofstream test("result.cpp");
+    for(auto &k: yield){
+        test << get<1>(k);
+    }
+    test.close();
 }
 
 ParseTree::ParseTree(const vector<ParseTree *> &children, string symbol): children(children),symbol(std::move(symbol)) {}
@@ -641,6 +649,7 @@ string LALR::function(ParseTree *violator, std::set<std::set<std::string>> &toke
         }
         newKids.push_back(child);
     }
+
     set<string> bigSet;
     for (auto smallset : tokenSet){
         for (string elem : smallset){

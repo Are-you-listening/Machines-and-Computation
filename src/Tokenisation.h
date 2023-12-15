@@ -11,6 +11,9 @@
 #include <set>
 #include <tuple>
 #include <algorithm>
+#include <iostream>
+
+using namespace std;
 
 class Tokenisation {
 private:
