@@ -494,6 +494,7 @@ void LALR::generate() {
     unsigned long max = Config::getConfig()->getMaxNesting();
     unsigned long count = 0;
     unsigned long index;
+    string functionName = "A";
     ParseTree* violator = nullptr;
 
     _root->matchBrackets(_cfg.getT()); //Format first
@@ -502,7 +503,6 @@ void LALR::generate() {
     while(violator!=nullptr){
         std::set<std::set<std::string>> tokenSet;
         violator->getTokenSet(tokenSet);
-
 
         vector<ParseTree*> newKids;
         for(long unsigned int i = 0; i<index; ++i){ //Pushback firsthalf of kids
@@ -522,7 +522,8 @@ void LALR::generate() {
             }
             tomove.push_back(child);
         }
-        newKids.push_back(functionCall()); //Create Function Call
+        newKids.push_back(functionCall(functionName)); //Create Function Call
+        functionName+="A";
 
         //BEGIN Do the actual moving part
             //Find root of violator
@@ -617,7 +618,7 @@ void ParseTree::findBracket(bool left, std::tuple<ParseTree *, unsigned long, un
     --std::get<2>(data); //Decrease depth
 }
 
-ParseTree* LALR::functionCall() {
+ParseTree* LALR::functionCall(const string& name) {
     return nullptr;
 }
 
