@@ -25,7 +25,7 @@ void ThreadFunction::ThreadFunctionCall(const std::string& FileLocation, const s
         if(i=='(') {
             appending= true;
         }
-        if(i==','){
+        if(i==','||i==')'){
             temp=temp.substr(1,std::string::npos);
             ChangedVariables.push_back(temp);
             temp.clear();
@@ -46,7 +46,7 @@ void ThreadFunction::ThreadFunctionCall(const std::string& FileLocation, const s
                 if(i=='(') {
                     appending2= true;
                 }
-                if(i==','){
+                if(i==','||i==')'){
                     temp2=temp2.substr(1,std::string::npos);
                     usedVariables.push_back(temp2);
                     temp2.clear();
@@ -86,7 +86,7 @@ void ThreadFunction::ThreadFunctionCall(const std::string& FileLocation, const s
         }
     }
     for(unsigned long int i=0; i<copy.size(); i++){
-        FunctionCall+=VusedVariables[0][i]+", ";
+        FunctionCall+="std::ref("+VusedVariables[0][i]+")"+", ";
     }
     FunctionCall[FunctionCall.size()-2]=')';
     FunctionCall[FunctionCall.size()-1]=';';
@@ -118,7 +118,7 @@ void ThreadFunction::ThreadFunctionCall(const std::string& FileLocation, const s
             thread_name_lock.unlock();
             count++;
             for(unsigned long int i=0; i<copy.size(); i++){
-                FunctionCall+=VusedVariables[count][i]+", ";
+                FunctionCall+="std::ref("+VusedVariables[count][i]+")"+", ";
             }
             FunctionCall[FunctionCall.size()-2]=')';
             FunctionCall[FunctionCall.size()-1]=';';
@@ -169,14 +169,14 @@ void ThreadFunction::ThreadFunctionCall(const std::string& FileLocation, const s
         }
         for(unsigned long int i=0; i<reachedFunctions.size(); i++){
             if(VusedVariables[reachedFunctions[i]].empty()&&line!=temp3+FunctionCalls[reachedFunctions[i]]){
-                File4<<temp3<<joins[reachedFunctions[i]]<<".join()"<<std::endl;
+                File4<<temp3<<joins[reachedFunctions[i]]<<".join();"<<std::endl;
                 reachedFunctions.erase(reachedFunctions.cbegin()+ (int) i);
                 i=-1;
                 continue;
             }
             for(unsigned long int j=0; j<VusedVariables[reachedFunctions[i]].size();j++){
                 if((line.find(VusedVariables[reachedFunctions[i]][j])!=std::string::npos||line.find("return")!=std::string::npos||line.find('}')!=std::string::npos)&&line!=temp3+FunctionCalls[reachedFunctions[i]]){
-                    File4<<temp3<<joins[reachedFunctions[i]]<<".join()"<<std::endl;
+                    File4<<temp3<<joins[reachedFunctions[i]]<<".join();"<<std::endl;
                     reachedFunctions.erase(reachedFunctions.cbegin()+ (int) i);
                     i--;
                     break;

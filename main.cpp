@@ -42,7 +42,7 @@ int main() { // Function names we create to replace nesting should have F or I i
     cfg->print();
     //cfg->toCNF();
     //cfg3->toCNF();
-    
+
     /*
     bool a= true;
     bool b= false;
@@ -109,18 +109,17 @@ int main() { // Function names we create to replace nesting should have F or I i
     //naam wijzinging states, zie cleanup.
     
     
-    /*
     //threading every function for now, will later be changed
     // I also assume that every function we create to replace nesting is only called upon once
     // result don't work for now, will be changed
     // Function calls in Function calls don't work for now, another function that split those calls up is needed
-    std::string ResultFileLocation="nestedExamples/copyengine.cc";
+    std::string ResultFileLocation="../test/results/TM_handmatig_result.cpp";
     std::string line;
     std::string line2;
     std::ifstream File(ResultFileLocation);
     std::vector<std::string> FunctionCalls;
     while(getline(File,line)){
-        if(line[0]!='#'&&line[0]!=' '&&line.substr(0,6)!="static"&&line.substr(0,6)!="struct"&&!line.empty()&&line!="}"&&line!="{"){ // I assume the code we check people don't write variables or classes above a function, also needs debugging
+        if(line[0]!='#'&&line[0]!=' '&&line.substr(0,6)!="static"&&line.substr(0,6)!="struct"&&!line.empty()&&line!="}"&&line!="{"&&line.substr(0,7)!="typedef"&&line.substr(0,8)!="namespace"&&line.substr(0,6)=="void A"&&line.substr(0,2)!="//"){ // I assume the code we check people don't write variables or classes above a function, also needs debugging
             FunctionCalls.push_back(line);
         }
     }
@@ -228,7 +227,19 @@ int main() { // Function names we create to replace nesting should have F or I i
     }
     std::string c=ResultFileLocation +"tempresult.cc0";
     std::remove(c.c_str());
-    std::cout << "We do really love Tibo" << std::endl;*/
 
+    std::ifstream File9(ResultFileLocation+"result.cc");
+    std::vector<std::string> V;
+    std::string C;
+    while(getline(File9,C)){
+        V.push_back(C);
+    }
+    
+    std::ofstream File10(ResultFileLocation+"result.cc");
+    File10<<"#include <thread>"<<std::endl;
+    for(const auto& it:V){
+        File10 << it <<std::endl;
+    }
+    std::cout << "We do really love Tibo" << std::endl;
     return 0;
 }
