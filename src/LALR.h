@@ -127,7 +127,7 @@ class LALR {
      * Helper function for generate(), creates a new function Call in place
      * @return , Parsetree* containing the new code
      */
-    ParseTree* functionCall(const string& name,set<std::set<std::string>> &tokenSet);
+    ParseTree* functionCall(const string& code);
 
     /**
      * Helper function for generate(), creates a new function in place

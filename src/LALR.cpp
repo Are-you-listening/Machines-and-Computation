@@ -541,7 +541,7 @@ void LALR::generate() {
                     /*for(auto &c: tomove){ //Add from moveto
                         temp.push_back(c);
                     }*/
-                    temp.push_back(functionCall(functionName,tokenSet));
+                    temp.push_back(functionCall(function(violator,tokenSet,functionName))); //Create a the new function in the root and add its functionCall()
                     functionName+="A";
                 }
                 temp.push_back(child);
@@ -622,8 +622,10 @@ void ParseTree::findBracket(bool left, std::tuple<ParseTree *, unsigned long, un
     --std::get<2>(data); //Decrease depth
 }
 
-ParseTree* LALR::functionCall(const string& name,set<std::set<std::string>> &tokenSet) {
-    return nullptr;
+ParseTree* LALR::functionCall(const string& code) {
+    auto k = new ParseTree({},"D");
+    k->token = {"D",code,{}};
+    return k;
 }
 
 ParseTree * LALR::function(ParseTree *violator, std::set<std::string> &tokenSet, const string functionName) {
@@ -632,9 +634,8 @@ ParseTree * LALR::function(ParseTree *violator, std::set<std::string> &tokenSet,
     long unsigned int index;
 
     //Create The Function
-
-    for(i = 0; i<_root->children.size(); ++i) { //Pushback firsthalf of kids (the includes)
-        ParseTree *child = _root->children[i];
+    for(i = 0; i<_root->children.size(); ++i){ //Pushback firsthalf of kids
+        ParseTree* child = _root->children[i];
 
         // here we could also check if the first character is "#" and not just "#include"
         if (get<1>(child->token).substr(0, 8) != "#include") { //Create after includes
@@ -702,7 +703,6 @@ ParseTree * LALR::function(ParseTree *violator, std::set<std::string> &tokenSet,
         newKids.push_back(child);
     }
     _root->children = newKids;
-
 
     return nullptr;
 }
