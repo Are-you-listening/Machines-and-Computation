@@ -2451,7 +2451,7 @@ void TuringTools::write_function_header(IncompleteSet &a, const vector<int>&tupl
 
 
     //go to space seperating type with var
-    go_to(stack_loop, {'E'}, 0, 1, {0,1});
+    go_to_multiple(stack_loop, {{'E'},{','}}, {0, 1}, 1, {0,1});
     go_to(stack_loop, {' '}, 1, -1, {0,1});
 
     move(stack_loop, {0,1}, 1);
