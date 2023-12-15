@@ -551,7 +551,7 @@ void LALR::generate() {
         //END Actual Moving
 
         //Create a the new function in the root
-        function(violator, tokenSet);
+        function(violator, tokenSet, std::string());
 
         /*for(long unsigned int i = index+1; i<violator->children.size(); ++i){ //Pushback rest of the children
             ParseTree* child = violator->children[i];
@@ -626,23 +626,76 @@ ParseTree* LALR::functionCall(const string& name,set<std::set<std::string>> &tok
     return nullptr;
 }
 
-ParseTree* LALR::function(ParseTree* violator, std::set<std::set<std::string>> &tokenSet) {
+ParseTree * LALR::function(ParseTree *violator, std::set<std::string> &tokenSet, const string functionName) {
     std::vector<ParseTree*> newKids;
     long unsigned int i;
     long unsigned int index;
 
     //Create The Function
 
-    for(i = 0; i<_root->children.size(); ++i){ //Pushback firsthalf of kids
-        ParseTree* child = _root->children[i];
+    for(i = 0; i<_root->children.size(); ++i) { //Pushback firsthalf of kids (the includes)
+        ParseTree *child = _root->children[i];
 
-        if(get<1>(child->token)!="#include"){ //Create after includes
+        // here we could also check if the first character is "#" and not just "#include"
+        if (get<1>(child->token).substr(0, 8) != "#include") { //Create after includes
             index = i;
             break;
         }
         newKids.push_back(child);
     }
 
+    set<string> newvariables;
+    for (string variable : tokenSet){
+        auto lastSpace = variable.find_last_of(' ');
+        if (lastSpace == variable.npos){
+            // there is no space in the variable --> only name or only type
+            cout << "missing variable type or name" << endl;
+            break;
+        }
+        string variableType = variable.substr(0, lastSpace);
+        string variableName = variable.substr(lastSpace+1);
+        if (variableType.back() == '&' || variableType.back() == '*' || variableName.front() == '&' || variableName.front() == '*'){
+            // we don't need to add an & because the variable is already passed by reference or it is a pointer
+            newvariables.emplace(variable);
+        } else {
+            variableType.push_back('&');
+            string newvariable = variableType + " " + variableName;
+            newvariables.emplace(newvariable);
+        }
+    }
+
+    string functiondefinition = "void " + functionName + "(";
+    for (string variable : newvariables){
+        functiondefinition += variable + ",";
+    }
+    functiondefinition.pop_back();  // remove the unnecessary "," we added in the previous for loop
+    functiondefinition += ")";
+
+    tuple<string, string, set<string>> newfunctiontoken;
+    get<0>(newfunctiontoken)  = "D";
+    get<1>(newfunctiontoken) = functiondefinition;
+    ParseTree* functionTree;
+    functionTree->symbol = "D";
+    functionTree->token = newfunctiontoken;
+
+    tuple<string, string, set<string>> openbracket;
+    get<0>(openbracket) = "{";
+    get<1>(openbracket) = "{";
+    ParseTree* openbracketTree;
+    openbracketTree->symbol = "{";
+    openbracketTree->token = openbracket;
+
+    tuple<string, string, set<string>> closingbracket;
+    get<0>(closingbracket) = "}";
+    get<1>(closingbracket) = "}";
+    ParseTree* closingbracketTree;
+    closingbracketTree->symbol = "}";
+    closingbracketTree->token = closingbracket;
+
+    newKids.push_back(functionTree);
+    newKids.push_back(openbracketTree);
+    newKids.push_back(violator);
+    newKids.push_back(closingbracketTree);
 
     for(i = index; i<_root->children.size(); ++i){
         ParseTree* child = _root->children[i];
