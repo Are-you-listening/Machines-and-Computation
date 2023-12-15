@@ -566,8 +566,7 @@ void LALR::generate() {
     //Create File
     vector<tuple<string, string, set<string>>> yield;
     _root->getYield(yield);
-
-    ofstream test("result.cpp");
+    ofstream test("output/result.cpp");
     for(auto &k: yield){
         test << get<1>(k);
     }
