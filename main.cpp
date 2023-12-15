@@ -54,35 +54,6 @@ int main() { // Function names we create to replace nesting should have F or I i
     std::cout << a << std::endl;
     */
 
-    //string permutatar found online
-    /*std::string str="{}FCIEeDV";
-    unsigned int n = str.length();
-    unsigned long int opsize = pow(2, n);
-    
-    for (int counter = 1; counter < opsize; counter++)
-    {
-        string subs;
-        for (int j = 0; j < n; j++)
-        {
-            if (counter & (1<<j))
-                subs.push_back(str[j]);
-        }
-        
-        do
-        {
-            cout << std::endl;
-            cout << subs << " "<<std::endl;
-            cout << std::endl;
-            // do here CYK checks
-            if(cfg3->accepts(subs)!=cfg->accepts(subs)){
-                std::cout << "oops i did it again" << std::endl;
-                return -3;
-            }
-        }
-        while (next_permutation(subs.begin(), subs.end()));
-    }*/
-    //
-
     const CFG a = *cfg;
     LALR lalr(a);
     lalr.createTable();
@@ -92,6 +63,7 @@ int main() { // Function names we create to replace nesting should have F or I i
 
     //create LARL parser with tokenvector
     auto vec = tokenVector.getTokenVector();
+    /*
     std::set<std::string> test;
     vec.emplace_back("}","",test);
     vec.clear();
@@ -101,6 +73,7 @@ int main() { // Function names we create to replace nesting should have F or I i
     for (const auto& t: tokens){
         vec.emplace_back(t, " ", abc);
     }
+     */
     lalr.parse(vec);
     lalr.generate();
     //cleanup
@@ -113,7 +86,8 @@ int main() { // Function names we create to replace nesting should have F or I i
     // I also assume that every function we create to replace nesting is only called upon once
     // result don't work for now, will be changed
     // Function calls in Function calls don't work for now, another function that split those calls up is needed
-    std::string ResultFileLocation="../test/results/TM_handmatig_result.cpp";
+    //std::string ResultFileLocation="../test/results/TM_handmatig_result.cpp";
+    std::string ResultFileLocation="output/result.cpp";
     std::string line;
     std::string line2;
     std::ifstream File(ResultFileLocation);

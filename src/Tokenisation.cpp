@@ -407,7 +407,7 @@ void Tokenisation::Tokenize(const std::string &FileLocation) {
         }
     }
     unsigned long int count=0;
-    for(auto it=tokenTupleVector.rbegin(); it!=tokenTupleVector.rend(); it++,count++){
+    for(auto it=tokenTupleVector.end()-1; it!=tokenTupleVector.begin(); it--,count++){
         if(std::get<0>(*it)=="V"){
             vindVn(tokenTupleVector,std::get<1>(*it),count, VariableChar, VariableCharSecond);
             std::set<std::string> visited;
@@ -416,7 +416,7 @@ void Tokenisation::Tokenize(const std::string &FileLocation) {
                     continue;
                 }
                 for(auto & it3 : tokenTupleVector){
-                    if(std::get<1>(it3).find(*it2)!=std::string::npos){
+                    if(std::get<1>(it3).find(" "+*it2+";")!=std::string::npos||std::get<1>(it3).find(" "+*it2+",")!=std::string::npos||std::get<1>(it3).find(" "+*it2+")")!=std::string::npos||std::get<1>(it3).find(" "+*it2+"(")!=std::string::npos||std::get<1>(it3).find(" "+*it2+"{")!=std::string::npos||std::get<1>(it3).find(" "+*it2+")")!=std::string::npos&&std::get<1>(it3)!=std::get<1>(*it)){
                         if(std::get<0>(it3)=="V"){
                             std::get<0>(it3)="D";
                         }
@@ -430,12 +430,16 @@ void Tokenisation::Tokenize(const std::string &FileLocation) {
                         }
                         std::reverse(D0.begin(),D0.end());
                         D0+=*it2;
+                        while(D0.substr(0,1)==" "){
+                            D0=D0.substr(1,std::string::npos);
+                        }
                         std::get<2>(*it).erase(*it2);
                         if(D0.find(' ')!=std::string::npos){
                             std::get<2>(*it).insert(D0);
                         }
                         visited.insert(D0);
                         it2=std::get<2>(*it).begin();
+                        break;
                     }
                 }
             }
