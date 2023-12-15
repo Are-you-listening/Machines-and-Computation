@@ -60,6 +60,7 @@ void TuringDenestify::createNewFunction(IncompleteSet &a) {
 
     tools->write_function_header(create_function, get_tuple_index());
 
+
     //checks if function is part of a class
     //if part of class go to H marker tuple tapes
     //call own store function
@@ -186,7 +187,6 @@ void TuringDenestify::createNewFunction(IncompleteSet &a) {
     tools->move(create_function, {0,1}, 1);
 
 
-
     IncompleteSet copy_loop{"copy_loop_create_function", "copy_loop_create_function"};
     tools->write_on(copy_loop, {'.'}, {(int) tapes-1}, {'\u0000'}, {(int) tapes-1});
     tools->move(copy_loop, {(int) tapes-1}, 1);
@@ -221,6 +221,7 @@ void TuringDenestify::createNewFunction(IncompleteSet &a) {
 
     //make a token of the working tape call
     tools->go_to(create_function, {'P'}, 0, -1, {0,1});
+
     tools->make_token(create_function, get_tuple_index(), 'A', 'I');
     tools->go_to(create_function, {'I'}, get_tuple_index()[0], -1, get_tuple_index());
 

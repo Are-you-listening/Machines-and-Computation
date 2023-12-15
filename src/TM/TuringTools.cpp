@@ -2435,6 +2435,7 @@ void TuringTools::write_function_header(IncompleteSet &a, const vector<int>&tupl
     go_to(write_function_header, {'S'}, 0, -1, {0,1});
 
 
+
     //we dont store spaces as token for arguments
     IncompleteSet if_definer{"if_definer_"+ to_string(counter), "if_definer_"+ to_string(counter)};
     counter++;
@@ -2447,7 +2448,12 @@ void TuringTools::write_function_header(IncompleteSet &a, const vector<int>&tupl
     counter++;
 
     push(stack_loop, '.');
-    go_to(stack_loop, {' '}, 1, 1, {0,1});
+
+
+    //go to space seperating type with var
+    go_to(stack_loop, {'E'}, 0, 1, {0,1});
+    go_to(stack_loop, {' '}, 1, -1, {0,1});
+
     move(stack_loop, {0,1}, 1);
     go_to_copy(stack_loop, {',', '\u0000'}, 1, 1, {0,1}, stack_tape, 1, {(int) stack_tape});
 
