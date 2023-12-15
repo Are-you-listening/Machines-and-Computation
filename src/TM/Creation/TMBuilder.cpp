@@ -40,32 +40,28 @@ TMBuilder_output TMBuilder::generateTM() {
 
     tools->link(program, tokenize_program);
 
-    IncompleteSet breaker{"breaker", "breaker2"};
-    //tools->link(program, breaker);
+    TuringIfElseAntiNesting ifElse{1, 3};
 
-    TuringIfElseAntiNesting ifElse{2, 4};
-
-    //tools->link(program, ifElse.getTransitions());
+    tools->link(program, ifElse.getTransitions());
 
 
     TuringVarDictionary vardict{};
 
     IncompleteSet vardict_set = vardict.getTransitions();
-    //tools->link(program, vardict_set);
+    tools->link(program, vardict_set);
 
+    TuringDenestify denest{1, 3};
 
-    TuringDenestify denest{2, 4};
+    tools->link(program, denest.getTransitions());
 
-    //tools->link(program, denest.getTransitions());
-
-    //tools->clear_heap(program);
+    tools->clear_heap(program);
 
     IncompleteTransition re_heap;
     re_heap.state = program.to_state;
     re_heap.to_state = vardict_set.state;
     re_heap.def_move = 0;
 
-    //program.transitions.push_back(re_heap);
+    program.transitions.push_back(re_heap);
 
     for (auto incomp: program.transitions){
         Transition t = tools->make_transition(incomp, tapes);

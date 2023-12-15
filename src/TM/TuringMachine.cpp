@@ -134,6 +134,7 @@ string TuringMachine::getTapeData(unsigned int index) const {
 void TuringMachine::move(){
     queue<char> symbols;
 
+
     for (int i=0; i< storage_in_state_size; i++){
         symbols.push(storage_in_state[i]);
     }
@@ -251,10 +252,6 @@ TuringMachine* TuringMachine::toSingleTape() {
 
     for (auto [k, v]: trans_map){
 
-        if (k == "tokenize_1"){
-            int b = 0;
-        }
-
         //later skip store part for same state
         IncompleteTransition loop_state;
         loop_state.state = k;
@@ -271,10 +268,6 @@ TuringMachine* TuringMachine::toSingleTape() {
         for (const auto& prod: v){
             cout << counter << endl;
             counter++;
-
-            if (counter == 1910){
-                int b = 0;
-            }
 
             set<int> usefull = getUsefullIndexes(prod);
             if (usefull.empty() && v.size() == 1){
@@ -522,11 +515,7 @@ TuringMachine* TuringMachine::toSingleTape() {
                 toNextMode.output_index.push_back(c);
                 toNextMode.move.push_back(0);
             }
-            //toNextMode.output = {'\u0002'};
-            //toNextMode.output_index = {0};
-            //toNextMode.move = {-1, -1};
 
-            //toNextMode.to_state = write_state+"_checkN";
             toNextMode.to_state = prod.production.new_state;
             toNextMode.def_move = 0;
 

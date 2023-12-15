@@ -93,6 +93,7 @@ public:
 
     void copy_to_working(IncompleteSet& a, const vector<int>&tuple_indexes, bool output= false);
     void clear_working(IncompleteSet& a);
+    void check_split_nesting(IncompleteSet& a);
 
     static void reset();
 
@@ -129,6 +130,8 @@ public:
 
     set<IncompleteTransition> mergeToSingle(const set<IncompleteTransition>& m);
     Transition make_transition(IncompleteTransition& incomp, int tapes);
+
+    string check_stack_double(IncompleteSet& a);
 private:
 
     TuringTools(unsigned int stack_tape);
@@ -143,6 +146,8 @@ private:
 
     bool heap_mode = false;
 
+    char heap_sep = '@';
+    int split_nesting = 1;
 
 
 };
