@@ -127,13 +127,13 @@ class LALR {
      * Helper function for generate(), creates a new function Call in place
      * @return , Parsetree* containing the new code
      */
-    ParseTree* functionCall(const string& name);
+    ParseTree* functionCall(const string& name,set<std::set<std::string>> &tokenSet);
 
     /**
      * Helper function for generate(), creates a new function in place
      * @return , Parsetree* containing the new code
      */
-    ParseTree* function();
+    ParseTree* function(ParseTree* violator,set<std::set<std::string>> &tokenSet);
 
 public:
     unordered_map<int, map<string, string>> parseTable;
