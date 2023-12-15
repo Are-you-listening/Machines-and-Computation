@@ -2090,6 +2090,9 @@ void TuringTools::write_function_header(IncompleteSet &a, const vector<int>&tupl
     set_heap_mode(write_function_header, true);
     go_to(write_function_header, {'A'}, 0, -1, {0,1});
 
+    IncompleteSet b{"b", "br"};
+    //link(write_function_header, b);
+
     find_match_heap_traverse(write_function_header, 'A', 'S', 0, 1);
 
     string creatable = branch_on(write_function_header, {'\u0000'}, {(int) stack_tape});

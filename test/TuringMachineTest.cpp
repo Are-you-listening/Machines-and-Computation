@@ -156,7 +156,7 @@ TEST(TuringMachineTest, TM_tools){
 }
 
 TEST(TuringMachineTest, TM_tokenazation) {
-    int index = 36;
+    int index = 44;
     ifstream test_file("../test/testFiles/TM_test_"+ to_string(index)+".cpp");
     string test_string;
     cout << test_file.is_open() << endl;
@@ -179,7 +179,7 @@ TEST(TuringMachineTest, TM_tokenazation) {
     tm.load_input(test_string, 1);
 
     int halted_time = -1;
-    for (int i = 0; i<10500000; i++){
+    for (int i = 0; i<500000; i++){
 
 
         if (tm.isHalted()){
@@ -190,7 +190,7 @@ TEST(TuringMachineTest, TM_tokenazation) {
             break;
         }
         tm.move();
-        if (tm.getCurrentState() == "find_var_4328"){
+        if (tm.getCurrentState() == "4004"){
 
             int j=0;
 
@@ -198,7 +198,7 @@ TEST(TuringMachineTest, TM_tokenazation) {
 
 
 
-        if (i >= 57220000){
+        if (i >= 27000){
             int j = 0;
 
             for (int i = 0; i < tm.getTapeAmount(); i++){
