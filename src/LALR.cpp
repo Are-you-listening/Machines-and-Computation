@@ -402,7 +402,7 @@ void LALR::parse(std::vector<std::tuple<std::string, std::string, std::set<std::
         }
         string operation = parseTable[stacksymbol][inputsymbol];
 
-        //cout << "stacksymbol: " << stacksymbol << ", inputsymbol: " << inputsymbol << " --> " << operation << endl;
+        cout << "stacksymbol: " << stacksymbol << ", inputsymbol: " << inputsymbol << " --> " << operation << endl;
         if (operation.empty()){
             throw emptyElement();
         }
@@ -682,24 +682,28 @@ string LALR::function(ParseTree *violator, std::set<std::set<std::string>> &toke
     functiondefinition.pop_back();  // remove the unnecessary "," we added in the previous for loop
     functiondefinition += ")";
 
+    set<string> emptyset = {};
     tuple<string, string, set<string>> newfunctiontoken;
     get<0>(newfunctiontoken)  = "D";
     get<1>(newfunctiontoken) = functiondefinition;
-    ParseTree* functionTree;
+    get<2>(newfunctiontoken) = emptyset;
+    ParseTree* functionTree = new ParseTree;
     functionTree->symbol = "D";
     functionTree->token = newfunctiontoken;
 
     tuple<string, string, set<string>> openbracket;
     get<0>(openbracket) = "{";
     get<1>(openbracket) = "{";
-    ParseTree* openbracketTree;
+    get<2>(openbracket) = emptyset;
+    ParseTree* openbracketTree = new ParseTree;
     openbracketTree->symbol = "{";
     openbracketTree->token = openbracket;
 
     tuple<string, string, set<string>> closingbracket;
     get<0>(closingbracket) = "}";
     get<1>(closingbracket) = "}";
-    ParseTree* closingbracketTree;
+    get<2>(closingbracket) = emptyset;
+    ParseTree* closingbracketTree = new ParseTree;
     closingbracketTree->symbol = "}";
     closingbracketTree->token = closingbracket;
 
