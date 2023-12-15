@@ -135,65 +135,72 @@ void LALR::mergeSimilar() {
 }
 
 void LALR::createTable() {
-    unordered_map<int, map<string, string>> createdTable;
-    createStates();
+    if (std::filesystem::exists("parseTablefile.txt")){
+        std::cout << "loaded table from file" << std::endl;
+        loadTable();
+    } else {
+        std::cout << "creating table" << std::endl;
+        unordered_map<int, map<string, string>> createdTable;
+        createStates();
 
-    queue<State*> remaining;
-    set<State*> visited;
-    remaining.push(I0);
-    visited.emplace(I0);
+        queue<State *> remaining;
+        set<State *> visited;
+        remaining.push(I0);
+        visited.emplace(I0);
 
-    while(not remaining.empty()){
-        State* currentState = remaining.front();
-        remaining.pop();
+        while (not remaining.empty()) {
+            State *currentState = remaining.front();
+            remaining.pop();
 
-        map<string, string> rowcontent;
+            map<string, string> rowcontent;
 
-        // if currentState is an endState (1 rule with "." at the end of the body) place R{cfg rule number} in lookahead columns
-        for (const auto &endingpair: currentState->endings) {
-            for (const string &lookahead: endingpair.second) {
-                if (endingpair.first == -1) {
-                    rowcontent[lookahead] = "accept";
-                } else {
-                    rowcontent[lookahead] = "R" + to_string(endingpair.first);
-                }
-            }
-        }
-
-        for (const auto &connection: currentState->_connections) {
-            string inputsymbol = connection.first;
-            State *otherState = connection.second;
-
-            if (std::find(_cfg.getV().begin(), _cfg.getV().end(), inputsymbol) != _cfg.getV().end()) {
-                rowcontent[inputsymbol] = to_string(otherState->_stateName);
-            } else {
-                rowcontent[inputsymbol] = "S" + to_string(otherState->_stateName);
-            }
-        }
-
-        // this if Statement and the code in it might be unnecessary and could be removed without consequences
-        if (createdTable.find(currentState->_stateName) != createdTable.end()) {
-            for (auto &element: createdTable[currentState->_stateName]) {
-                if (rowcontent.find(element.first) != rowcontent.end()) {
-                    if (element.second.substr(0, 1) == "R" && rowcontent[element.first].substr(0, 1) == "S") {
-                        element.second = rowcontent[element.first];// the new row has a shift in the corresponding position while the original has a reduction
+            // if currentState is an endState (1 rule with "." at the end of the body) place R{cfg rule number} in lookahead columns
+            for (const auto &endingpair: currentState->endings) {
+                for (const string &lookahead: endingpair.second) {
+                    if (endingpair.first == -1) {
+                        rowcontent[lookahead] = "accept";
+                    } else {
+                        rowcontent[lookahead] = "R" + to_string(endingpair.first);
                     }
                 }
             }
-        }
 
-        createdTable[currentState->_stateName] = rowcontent;
+            for (const auto &connection: currentState->_connections) {
+                string inputsymbol = connection.first;
+                State *otherState = connection.second;
+
+                if (std::find(_cfg.getV().begin(), _cfg.getV().end(), inputsymbol) != _cfg.getV().end()) {
+                    rowcontent[inputsymbol] = to_string(otherState->_stateName);
+                } else {
+                    rowcontent[inputsymbol] = "S" + to_string(otherState->_stateName);
+                }
+            }
+
+            // this if Statement and the code in it might be unnecessary and could be removed without consequences
+            if (createdTable.find(currentState->_stateName) != createdTable.end()) {
+                for (auto &element: createdTable[currentState->_stateName]) {
+                    if (rowcontent.find(element.first) != rowcontent.end()) {
+                        if (element.second.substr(0, 1) == "R" && rowcontent[element.first].substr(0, 1) == "S") {
+                            element.second = rowcontent[element.first];// the new row has a shift in the corresponding position while the original has a reduction
+                        }
+                    }
+                }
+            }
+
+            createdTable[currentState->_stateName] = rowcontent;
 
 
-        for (const auto& connection : currentState->_connections){
-            if (visited.find(connection.second) == visited.end()){
-                remaining.push(connection.second);
-                visited.emplace(connection.second);
+            for (const auto &connection: currentState->_connections) {
+                if (visited.find(connection.second) == visited.end()) {
+                    remaining.push(connection.second);
+                    visited.emplace(connection.second);
+                }
             }
         }
+        parseTable = createdTable;
+        mergeSimilar();
+        saveTable();
     }
-    parseTable = createdTable;
-    mergeSimilar();
 }
 
 augmentedrules LALR::createAugmented(const tuple<string, vector<string>, set<string>> &inputrule) {
@@ -396,7 +403,7 @@ void LALR::parse(std::vector<std::tuple<std::string, std::string, std::set<std::
         }
         string operation = parseTable[stacksymbol][inputsymbol];
 
-        cout << "stacksymbol: " << stacksymbol << ", inputsymbol: " << inputsymbol << " --> " << operation << endl;
+        //cout << "stacksymbol: " << stacksymbol << ", inputsymbol: " << inputsymbol << " --> " << operation << endl;
         if (operation.empty()){
             throw emptyElement();
         }
@@ -433,17 +440,24 @@ void LALR::parse(std::vector<std::tuple<std::string, std::string, std::set<std::
             }
             for (const string& symbol : rule->second){
                 bool found = false;
-                set<vector<ParseTree*>::iterator> toRemove;
+                set<string> toRemove;
                 for(auto it = treetops.begin(); it != treetops.end();it++){
                     if ((*it)->symbol == symbol){
                         ParseTree* temp = *it;
                         newparent->children.push_back(temp);
                         found = true;
-                        toRemove.insert(it);
+                        toRemove.insert(symbol);
                     }
                 }
                 for (auto temp : toRemove){
-                    treetops.erase(temp);
+                    auto it = treetops.begin();
+                    while(it != treetops.end()){
+                        if ((*it)->symbol == temp){
+                            treetops.erase(it);
+                            break;
+                        }
+                        it++;
+                    }
                 }
                 if (not found) {
                     auto *newchild = new ParseTree;
@@ -456,6 +470,13 @@ void LALR::parse(std::vector<std::tuple<std::string, std::string, std::set<std::
         } else {
             s.push(stoi(operation));
         }
+    }
+    auto inputcopy = input;
+    _root->addTokens(inputcopy);
+    vector<tuple<string, string, set<string>>> debugyield;
+    _root->getYield(debugyield);
+    for (auto elem : debugyield){
+        cout << get<0>(elem) << " ";
     }
     std::cout << "debug" << std::endl;
 }
@@ -690,4 +711,74 @@ ParseTree* ParseTree::findRoot(ParseTree *&child,const std::vector<std::string> 
     }
     //Nothing found
     return nullptr;
+}
+
+void LALR::saveTable() {
+    std::ofstream outFile("parseTablefile.txt");
+    if (outFile.is_open()){
+        for (const auto& row : parseTable) {
+            outFile << row.first << std::endl;
+            for (const auto& valuepair : row.second){
+                outFile << valuepair.first << " " << valuepair.second << std::endl;
+            }
+            outFile << "rowend" << std::endl;
+        }
+        outFile.close();
+    }
+}
+
+void LALR::loadTable() {
+    std::ifstream inFile("parseTablefile.txt");
+    if (inFile.is_open()){
+        while(!inFile.eof()){
+            string line;
+            std::getline(inFile, line);
+
+            if (line.empty()){
+                break;
+            }
+
+            int key = stoi(line);       // oh boy here we go again
+
+            while(true){
+                std::getline(inFile, line);
+
+                if (line.empty() || line == "rowend"){
+                    break;
+                }
+
+                string inputsymbol;
+                string operation;
+                std::istringstream linestream(line);
+                linestream >> inputsymbol >> operation;
+                parseTable[key][inputsymbol] = operation;
+            }
+        }
+        inFile.close();
+    } else {
+        std::cout << "couldn't open parseTable file" << std::endl;
+    }
+}
+
+void ParseTree::addTokens(vector<tuple<string, string, set<string>>> &tokens) {
+    if (children.empty()){
+        token = tokens.front();
+        if (not tokens.empty()) {
+            tokens.erase(tokens.begin());
+        }
+    } else {
+        for (auto child : children){
+            child->addTokens(tokens);
+        }
+    }
+}
+
+void ParseTree::getYield(vector<tuple<string, string, set<string>>> &yield) {
+    if (children.empty()){
+        yield.push_back(token);
+    } else {
+        for (auto child : children){
+            child->getYield(yield);
+        }
+    }
 }
