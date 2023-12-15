@@ -541,7 +541,7 @@ void LALR::generate() {
                     /*for(auto &c: tomove){ //Add from moveto
                         temp.push_back(c);
                     }*/
-                    temp.push_back(functionCall(functionName,tokenSet));
+                    temp.push_back(functionCall(function(violator,tokenSet,functionName))); //Create a the new function in the root and add its functionCall()
                     functionName+="A";
                 }
                 temp.push_back(child);
@@ -549,9 +549,6 @@ void LALR::generate() {
             data->children = temp;
             temp.clear();
         //END Actual Moving
-
-        //Create a the new function in the root
-        function(violator, tokenSet);
 
         /*for(long unsigned int i = index+1; i<violator->children.size(); ++i){ //Pushback rest of the children
             ParseTree* child = violator->children[i];
@@ -622,17 +619,18 @@ void ParseTree::findBracket(bool left, std::tuple<ParseTree *, unsigned long, un
     --std::get<2>(data); //Decrease depth
 }
 
-ParseTree* LALR::functionCall(const string& name,set<std::set<std::string>> &tokenSet) {
-    return nullptr;
+ParseTree* LALR::functionCall(const string& code) {
+    auto k = new ParseTree({},"D");
+    k->token = {"D",code,{}};
+    return k;
 }
 
-ParseTree* LALR::function(ParseTree* violator, std::set<std::set<std::string>> &tokenSet) {
+string LALR::function(ParseTree* violator, std::set<std::set<std::string>> &tokenSet, const string &name) {
     std::vector<ParseTree*> newKids;
     long unsigned int i;
     long unsigned int index;
 
     //Create The Function
-
     for(i = 0; i<_root->children.size(); ++i){ //Pushback firsthalf of kids
         ParseTree* child = _root->children[i];
 
@@ -643,13 +641,11 @@ ParseTree* LALR::function(ParseTree* violator, std::set<std::set<std::string>> &
         newKids.push_back(child);
     }
 
-
     for(i = index; i<_root->children.size(); ++i){
         ParseTree* child = _root->children[i];
         newKids.push_back(child);
     }
     _root->children = newKids;
-
 
     return nullptr;
 }
