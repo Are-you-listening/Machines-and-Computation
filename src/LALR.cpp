@@ -628,7 +628,7 @@ ParseTree* LALR::functionCall(const string& code) {
     return k;
 }
 
-ParseTree * LALR::function(ParseTree *violator, std::set<std::string> &tokenSet, const string functionName) {
+ParseTree * LALR::function(ParseTree *violator, std::set<std::set<std::string>> &tokenSet, const string functionName) {
     std::vector<ParseTree*> newKids;
     long unsigned int i;
     long unsigned int index;
@@ -644,9 +644,14 @@ ParseTree * LALR::function(ParseTree *violator, std::set<std::string> &tokenSet,
         }
         newKids.push_back(child);
     }
-
+    set<string> bigSet;
+    for (auto smallset : tokenSet){
+        for (string elem : smallset){
+            bigSet.emplace(elem);
+        }
+    }
     set<string> newvariables;
-    for (string variable : tokenSet){
+    for (string variable : bigSet){
         auto lastSpace = variable.find_last_of(' ');
         if (lastSpace == variable.npos){
             // there is no space in the variable --> only name or only type
