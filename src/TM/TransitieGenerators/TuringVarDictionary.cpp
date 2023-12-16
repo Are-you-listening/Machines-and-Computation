@@ -46,13 +46,14 @@ IncompleteSet TuringVarDictionary::storeVar() {
     tools->push(create_key, 'N');
     tools->push(create_key, '{');
 
-    tools->move(create_key, {(int) tapes-1}, -2);
-    tools->go_to(create_key, {stack_symbol, '{', 'O'}, tapes-1, -1, {(int) tapes-1});
-    tools->move(create_key, {(int) tapes-1}, 1);
-    tools->go_to_copy(create_key, {'{'}, tapes-1, 1, {(int) tapes-1}, 1, 1, {0, 1});
+    //copy nesting type
+    //first 1 N as default
+    //an additional D depending on how many params
+    tools->store_param_count(create_key, get_tuple_index());
     tools->link_put(create_key, {'P', ' '}, {0, 1});
     tools->move(create_key, {0,1}, 1);
 
+    //copy first time
     tools->move(create_key, {(int) tapes-1}, -2);
     tools->go_to(create_key, {stack_symbol, '{', 'O'}, tapes-1, -1, {(int) tapes-1});
     tools->move(create_key, {(int) tapes-1}, 1);

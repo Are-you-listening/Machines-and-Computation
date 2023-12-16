@@ -1013,11 +1013,6 @@ void TuringTools::clear_working(IncompleteSet &a) {
 void TuringTools::heap_push_working(IncompleteSet &push_heap_action, bool function) {
     //store part on heap after insert on working tape after new data
 
-    if (function){
-        IncompleteSet b{"b", "br"};
-        //link(push_heap_action, b);
-    }
-
     IncompleteSet move_heap{"move_heap_"+ to_string(counter), "move_heap_"+ to_string(counter)};
     counter++;
 
@@ -3656,6 +3651,10 @@ void TuringTools::check_split_nesting(IncompleteSet &a) {
     move(check_split_nesting, {(int) stack_tape}, 1);
     link_put(check_split_nesting, {'!'}, {(int) stack_tape});
 
+    //give 1 extra nesting marging for parameters
+
+    //IncompleteSet br{"b", "br"};
+    //link(check_split_nesting, br);
 
 
     std::vector<string> branches;
@@ -3828,6 +3827,56 @@ string TuringTools::check_stack_double(IncompleteSet& a) {
     link(a, find_var);
 
     return on_equals.to_state;
+}
+
+void TuringTools::store_param_count(IncompleteSet &a, const vector<int>&tuple_indexes) {
+    //stores amount of param between () before { on working tape
+    //used when making path for  loops to identify the difference between for loop param and just defined param
+
+    IncompleteSet store_param_count{"store_param_count_"+ to_string(counter), "store_param_count_"+ to_string(counter)};
+    counter++;
+
+    link_put(store_param_count, {'B'}, {tuple_indexes[0]});
+    move(store_param_count, tuple_indexes, -1);
+
+    //on without parameters
+    IncompleteSet on_param_less{"on_param_less_"+ to_string(counter), "on_param_less_"+ to_string(counter)};
+    counter++;
+    link_put(on_param_less, {'N'}, {1});
+    move(on_param_less, {0,1}, 1);
+
+    link_on_not(store_param_count, on_param_less, {')'}, {tuple_indexes[1]});
+
+    IncompleteSet on_param_full{"on_param_full_"+ to_string(counter), "on_param_full_"+ to_string(counter)};
+    counter++;
+    skip_nesting(on_param_full, stack_tape, 1, tuple_indexes[1], -1, tuple_indexes, '(', ')');
+    link_put(on_param_full, {'N'}, {1});
+    move(on_param_full, {0,1}, 1);
+
+    IncompleteSet go_to_B_loop{"go_to_B_loop_"+ to_string(counter), "go_to_B_loop_"+ to_string(counter)};
+    counter++;
+    go_to_multiple(go_to_B_loop, {{'B'}, {'D'}}, {tuple_indexes[0], tuple_indexes[1]}, 1, tuple_indexes);
+
+    string end_loop = branch_on(go_to_B_loop, {'B'}, {tuple_indexes[0]});
+
+    link_put(go_to_B_loop, {'D'}, {1});
+    move(go_to_B_loop, {0,1}, 1);
+
+    move(go_to_B_loop, tuple_indexes, 1);
+    make_loop(go_to_B_loop);
+    go_to_B_loop.to_state = end_loop;
+
+
+    link(on_param_full, go_to_B_loop);
+
+    link_on(store_param_count, on_param_full, {')'}, {tuple_indexes[1]});
+
+    go_to(store_param_count, {'B'}, tuple_indexes[0], 1, tuple_indexes);
+    link_put(store_param_count, {'\u0000'}, {tuple_indexes[0]});
+
+    link(a, store_param_count);
+
+
 }
 
 

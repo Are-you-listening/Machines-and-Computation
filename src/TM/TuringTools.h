@@ -132,6 +132,7 @@ public:
     Transition make_transition(IncompleteTransition& incomp, int tapes);
 
     string check_stack_double(IncompleteSet& a);
+    void store_param_count(IncompleteSet& a, const vector<int>&tuple_indexes);
 private:
 
     TuringTools(unsigned int stack_tape);
