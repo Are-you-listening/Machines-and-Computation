@@ -20,6 +20,7 @@ protected:
     vector<char> ignore_sep;
     char stack_symbol;
     vector<char> nesting_tokens;
+    char stack_sep;
 
     vector<int> get_tuple_index();
 };

@@ -52,6 +52,7 @@ TMBuilder_output TMBuilder::generateTM() {
     IncompleteSet breaker{"breaker", "breaker2"};
     //tools->link(program, breaker);
 
+
     TuringDenestify denest{2, 4};
 
     tools->link(program, denest.getTransitions());

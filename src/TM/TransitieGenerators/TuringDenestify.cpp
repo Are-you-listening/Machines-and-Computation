@@ -180,7 +180,7 @@ void TuringDenestify::createNewFunction(IncompleteSet &a) {
 
     //go to start of stack variables
     tools->go_to(create_function, {stack_symbol, '{'}, tapes-1, -1, {(int) tapes-1});
-    tools->go_to(create_function, {'.'}, tapes-1, 1, {(int) tapes-1});
+    tools->go_to(create_function, {stack_sep}, tapes-1, 1, {(int) tapes-1});
 
     //put start bracket
     tools->link_put(create_function, {'('}, {1});
@@ -188,10 +188,10 @@ void TuringDenestify::createNewFunction(IncompleteSet &a) {
 
 
     IncompleteSet copy_loop{"copy_loop_create_function", "copy_loop_create_function"};
-    tools->write_on(copy_loop, {'.'}, {(int) tapes-1}, {'\u0000'}, {(int) tapes-1});
+    tools->write_on(copy_loop, {stack_sep}, {(int) tapes-1}, {'\u0000'}, {(int) tapes-1});
     tools->move(copy_loop, {(int) tapes-1}, 1);
 
-    tools->go_to_move(copy_loop, {'.', '\u0000'}, tapes-1, 1, {(int) tapes-1}, 1, 1, {0,1});
+    tools->go_to_move(copy_loop, {stack_sep, '\u0000'}, tapes-1, 1, {(int) tapes-1}, 1, 1, {0,1});
 
     string no_vars = tools->branch_on(copy_loop, {'\u0000'}, {(int)tapes-1});
 
@@ -336,7 +336,7 @@ void TuringDenestify::storeObjectDefinition(IncompleteSet &a) {
     tools->go_to(store_object, {':'}, 1, 1, {0,1});
     tools->link_put(store_object, {'C'}, {0});
 
-    tools->push(store_object, '.');
+    tools->push(store_object, stack_sep);
     tools->move(store_object, {0,1}, -1);
     tools->go_to_copy(store_object, {' '}, 1, -1, {0,1}, tapes-1, 1, {(int) tapes-1});
 
@@ -364,7 +364,7 @@ void TuringDenestify::storeObjectDefinition(IncompleteSet &a) {
     //set everything ready for loop
     tools->go_to(store_object_loop, {'C'}, 0, -1, {0,1});
     tools->move(store_object_loop, {0,1}, -1);
-    tools->go_to(store_object_loop, {'.'}, tapes-1, -1, {(int) tapes-1});
+    tools->go_to(store_object_loop, {stack_sep}, tapes-1, -1, {(int) tapes-1});
     tools->move(store_object_loop, {(int) tapes-1}, 1);
     tools->go_to_copy(store_object_loop, {'\u0000'}, tapes-1, 1, {(int) tapes-1}, 1, -1, {0, 1});
     tools->link_put(store_object_loop, {' '}, {1});
@@ -388,23 +388,23 @@ void TuringDenestify::storeObjectDefinition(IncompleteSet &a) {
     tools->link(store_object, store_object_loop);
 
     //remove class from stack
-    tools->go_to_clear(store_object, {'.'}, tapes-1, -1, {(int) tapes-1}, {(int) tapes-1});
+    tools->go_to_clear(store_object, {stack_sep}, tapes-1, -1, {(int) tapes-1}, {(int) tapes-1});
     tools->link_put(store_object, {'\u0000'}, {(int) tapes-1});
 
     //clear working tape
     tools->move(store_object, {0,1}, 2);
-    tools->push(store_object, '.');
+    tools->push(store_object, stack_sep);
     tools->copy_till(store_object, {'E'}, 0, 1, tapes-1, 1, {0, 1, (int) tapes-1});
     tools->go_to(store_object, {'F'}, 0, 1, {0,1});
     tools->go_to_clear(store_object, {'B'}, 0, -1, {0,1}, {0,1});
     tools->link_put(store_object, {'\u0000',' '}, {0, 1});
     tools->move(store_object, {0,1}, 1);
 
-    tools->go_to(store_object, {'.'}, tapes-1, -1, {(int) tapes-1});
+    tools->go_to(store_object, {stack_sep}, tapes-1, -1, {(int) tapes-1});
     tools->move(store_object, {0,1}, -1);
     tools->move(store_object, {(int) tapes-1}, 1);
     tools->go_to(store_object, {'\u0000'}, tapes-1, 1, {0, 1, (int) tapes-1});
-    tools->go_to(store_object, {'.'}, tapes-1, -1, {(int) tapes-1});
+    tools->go_to(store_object, {stack_sep}, tapes-1, -1, {(int) tapes-1});
 
     tools->move(store_object, {(int) tapes-1}, 1);
 
@@ -412,7 +412,7 @@ void TuringDenestify::storeObjectDefinition(IncompleteSet &a) {
     tools->go_to(store_object, {'\u0000'}, 1, 1, {0,1});
     tools->move(store_object, {0,1}, -2);
 
-    tools->go_to(store_object, {'.'}, tapes-1, -1, {(int) tapes-1});
+    tools->go_to(store_object, {stack_sep}, tapes-1, -1, {(int) tapes-1});
     tools->link_put(store_object, {'\u0000'}, {(int) tapes-1});
 
     //store marker 'C' as start of insert
