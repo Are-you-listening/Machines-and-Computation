@@ -199,6 +199,7 @@ IncompleteSet TuringTokenizer::tokenize() {
 
     //before here, tokenize of 1 token without classier symbol
 
+    tools->stack_replace(result, {'.', '('}, {'A'});
     tools->stack_replace(result, {'A','P','A'}, {'D'});
     tools->stack_replace(result, {'A','P','A', 'P'}, {'D'});
     tools->stack_replace(result, {':',':','P','A'}, {'D'});
@@ -215,6 +216,7 @@ IncompleteSet TuringTokenizer::tokenize() {
 
     tools->stack_replace(result, {':', ':', '('}, {'O'});
     tools->stack_replace(result, {'A', ':'}, {'I'});
+    tools->stack_replace(result, {'.'}, {'A'});
 
 
     //make sure we still have useful tokens
@@ -303,6 +305,7 @@ IncompleteSet TuringTokenizer::tokenize_runner_productions() {
 
             bool is_seperator = (find(seperators.begin(), seperators.end(), c) != seperators.end());
             bool is_less_symbol = j == 60;
+            bool dot = j == 46;
 
             IncompleteTransition trans_prod;
             trans_prod.state = from;
@@ -365,6 +368,10 @@ IncompleteSet TuringTokenizer::tokenize_runner_productions() {
                     tools->push(trans_prod, 'S');
                 }
 
+            }
+
+            if (dot){
+                tools->push(trans_prod, '.');
             }
 
             tokenize_set.transitions.push_back(trans_prod);

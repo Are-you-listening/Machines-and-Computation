@@ -1013,6 +1013,11 @@ void TuringTools::clear_working(IncompleteSet &a) {
 void TuringTools::heap_push_working(IncompleteSet &push_heap_action, bool function) {
     //store part on heap after insert on working tape after new data
 
+    if (function){
+        IncompleteSet b{"b", "br"};
+        //link(push_heap_action, b);
+    }
+
     IncompleteSet move_heap{"move_heap_"+ to_string(counter), "move_heap_"+ to_string(counter)};
     counter++;
 
@@ -1440,7 +1445,7 @@ void TuringTools::find_match_heap_traverse(IncompleteSet &a, char start_marker, 
     go_to(do_traverse_check, {'A'}, marker_tape, -1, {marker_tape, data_tape});
 
     set_heap_mode(do_traverse_check, false);
-    push(do_traverse_check, '.');
+    push(do_traverse_check, stack_sep);
     go_to_copy(do_traverse_check, {'\u0000'}, data_tape, 1, {marker_tape, data_tape}, stack_tape, 1, {(int) stack_tape});
 
     set_heap_mode(do_traverse_check, true);
@@ -1466,7 +1471,7 @@ void TuringTools::find_match_heap_traverse(IncompleteSet &a, char start_marker, 
 
     //push lowest root again on working
     move(traverse_loop, {(int) stack_tape}, -1);
-    go_to_move(traverse_loop, {'{', '.'}, stack_tape, -1, {(int) stack_tape}, 1, 1, {marker_tape, data_tape});
+    go_to_move(traverse_loop, {'{', stack_sep}, stack_tape, -1, {(int) stack_tape}, 1, 1, {marker_tape, data_tape});
     link_put(traverse_loop, {'{', '\u0000'}, {data_tape, (int) stack_tape});
 
     move(traverse_loop, {marker_tape, data_tape}, 1);
@@ -1519,10 +1524,10 @@ void TuringTools::find_match_heap_traverse(IncompleteSet &a, char start_marker, 
 
 
     go_to_clear(do_traverse_check, {'A'}, marker_tape, -1, {marker_tape, data_tape}, {marker_tape, data_tape});
-    go_to(do_traverse_check, {'.'}, stack_tape, -1, {(int) stack_tape});
+    go_to(do_traverse_check, {stack_sep}, stack_tape, -1, {(int) stack_tape});
     move(do_traverse_check, {(int) stack_tape}, 1);
     go_to_move(do_traverse_check, {'\u0000'}, stack_tape, 1, {(int) stack_tape}, data_tape, 1, {marker_tape, data_tape});
-    go_to(do_traverse_check, {'.'}, stack_tape, -1, {(int) stack_tape});
+    go_to(do_traverse_check, {stack_sep}, stack_tape, -1, {(int) stack_tape});
     link_put(do_traverse_check, {'S', '\u0000'}, {marker_tape, (int) stack_tape});
 
     //go back to old heap pos
@@ -2131,7 +2136,7 @@ void TuringTools::write_function_header(IncompleteSet &a, const vector<int>&tupl
     //make sure to add void type in front of the function name
     //we are on working currently marked by S marker
 
-    push(write_function_header, '.');
+    push(write_function_header, stack_sep);
     go_to_move(write_function_header, {'\u0000'}, 1, 1, {0,1}, stack_tape, 1, {(int) stack_tape});
     write_on(write_function_header, {'E'}, {0}, {'\u0000'}, {0});
     go_to(write_function_header, {'S'}, 0, -1, {0,1});
@@ -2265,7 +2270,7 @@ void TuringTools::write_function_header(IncompleteSet &a, const vector<int>&tupl
     go_to(write_function_header, {'\u0000'}, stack_tape, 1, {(int) stack_tape});
 
     //put stack back on working
-    go_to(write_function_header, {'.'}, stack_tape, -1, {(int) stack_tape});
+    go_to(write_function_header, {stack_sep}, stack_tape, -1, {(int) stack_tape});
     link_put(write_function_header, {'\u0000'}, {(int) stack_tape});
     move(write_function_header, {(int) stack_tape}, 1);
     go_to_move(write_function_header, {'\u0000'}, stack_tape, 1, {(int) stack_tape}, 1, 1, {0,1});
@@ -2310,7 +2315,7 @@ void TuringTools::write_function_header(IncompleteSet &a, const vector<int>&tupl
     //clear first working tape
     go_to_clear(write_function_header, {'S'}, 0, -1, {0,1}, {0,1});
     link_put(write_function_header, {'\u0000'}, {1});
-    push(write_function_header, '.');
+    push(write_function_header, stack_sep);
 
 
     //store all parameters on stack
@@ -2348,17 +2353,16 @@ void TuringTools::write_function_header(IncompleteSet &a, const vector<int>&tupl
     go_to(write_function_header, {'S'}, 0, -1, {0,1});
     link_put(write_function_header, {'\u0000'}, {1});
 
-
     //putting stack data on working tape
     //start dot
     //copy to working loop
     IncompleteSet copy_to_working{"copy_to_working_"+ to_string(counter), "copy_to_working_"+ to_string(counter)};
     counter++;
 
-    go_to(copy_to_working, {'.'}, stack_tape, -1, {(int) stack_tape});
+    go_to(copy_to_working, {stack_sep}, stack_tape, -1, {(int) stack_tape});
     move(copy_to_working, {(int) stack_tape}, -1);
 
-    go_to(copy_to_working, {'.', stack_symbol}, stack_tape, -1, {(int) stack_tape});
+    go_to(copy_to_working, {stack_sep, stack_symbol}, stack_tape, -1, {(int) stack_tape});
     string end_branch = branch_on(copy_to_working, {stack_symbol}, {(int) stack_tape});
     IncompleteSet copy_data{"copy_data_"+ to_string(counter), "copy_data_"+ to_string(counter)};
     counter++;
@@ -2366,9 +2370,9 @@ void TuringTools::write_function_header(IncompleteSet &a, const vector<int>&tupl
     go_to(copy_data, {heap_sep}, stack_tape, 1, {(int) stack_tape});
 
     move(copy_data, {(int) stack_tape}, 1);
-    go_to_copy(copy_data, {'.'}, stack_tape, 1, {(int) stack_tape}, 1, 1, {0,1});
+    go_to_copy(copy_data, {stack_sep}, stack_tape, 1, {(int) stack_tape}, 1, 1, {0,1});
     move(copy_data, {(int) stack_tape}, -1);
-    go_to(copy_data, {'.'}, stack_tape, -1, {(int) stack_tape});
+    go_to(copy_data, {stack_sep}, stack_tape, -1, {(int) stack_tape});
     move(copy_data, {(int) stack_tape}, 1);
 
     //add by refrence and space on working tape
@@ -2404,7 +2408,7 @@ void TuringTools::write_function_header(IncompleteSet &a, const vector<int>&tupl
     move(copy_check, {(int) stack_tape}, 1);
     link_on_not(copy_check, copy_data, {' '}, {(int) stack_tape});
 
-    link_on(copy_to_working, copy_check, {'.'}, {(int) stack_tape});
+    link_on(copy_to_working, copy_check, {stack_sep}, {(int) stack_tape});
 
     make_loop(copy_to_working);
     copy_to_working.to_state = end_branch;
@@ -2450,7 +2454,7 @@ void TuringTools::write_function_header(IncompleteSet &a, const vector<int>&tupl
     IncompleteSet stack_loop{"stack_loop_"+ to_string(counter), "stack_loop_"+ to_string(counter)};
     counter++;
 
-    push(stack_loop, '.');
+    push(stack_loop, stack_sep);
 
 
     //go to space seperating type with var
@@ -2632,10 +2636,10 @@ void TuringTools::check_var_define_location(IncompleteSet &a, const vector<int> 
     go_to_move(remove_useless, {'\u0000'}, 1, 1, {0,1}, stack_tape, 1, {(int) stack_tape});
     write_on(remove_useless, {'E'}, {0}, {'\u0000'}, {0});
     go_to(remove_useless, {'S'}, 0, -1, {0,1});
-    go_to(remove_useless, {'.'}, stack_tape, -1, {(int) stack_tape});
+    go_to(remove_useless, {stack_sep}, stack_tape, -1, {(int) stack_tape});
     move(remove_useless, {(int) stack_tape}, 1);
     go_to_move(remove_useless, {'\u0000'}, (int) stack_tape, 1, {(int) stack_tape}, 1, 1, {0,1});
-    go_to(remove_useless, {'.'}, stack_tape, -1, {(int) stack_tape});
+    go_to(remove_useless, {stack_sep}, stack_tape, -1, {(int) stack_tape});
     move(remove_useless, {(int) stack_tape}, 1);
 
     write_on(remove_useless, {'\u0000'}, {0}, {'E'}, {0});
@@ -2651,7 +2655,7 @@ void TuringTools::check_var_define_location(IncompleteSet &a, const vector<int> 
     go_to(check_var_loop, {'S'}, 0, -1, {0,1});
 
     //move part from 'P' temporarly on stack
-    push(check_var_loop, '.');
+    push(check_var_loop, stack_sep);
     go_to(check_var_loop, {'P', 'E'}, 0, 1, {0,1});
     go_to_move(check_var_loop, {'\u0000'}, 1, 1, {0, 1}, stack_tape, 1, {(int) stack_tape});
 
@@ -2725,10 +2729,10 @@ void TuringTools::check_var_define_location(IncompleteSet &a, const vector<int> 
     link_put(check_var_loop, {'P'}, {0});
 
     //put data back on working
-    go_to(check_var_loop, {'.'}, stack_tape, -1, {(int) stack_tape});
+    go_to(check_var_loop, {stack_sep}, stack_tape, -1, {(int) stack_tape});
     move(check_var_loop, {(int) stack_tape}, 1);
     go_to_move(check_var_loop, {'\u0000'}, stack_tape, 1, {(int) stack_tape}, 1, 1, {0,1});
-    go_to(check_var_loop, {'.'}, stack_tape, -1, {(int) stack_tape});
+    go_to(check_var_loop, {stack_sep}, stack_tape, -1, {(int) stack_tape});
     link_put(check_var_loop, {'\u0000'}, {(int) stack_tape});
 
     //overrides P if their are no values on stack
@@ -2742,7 +2746,7 @@ void TuringTools::check_var_define_location(IncompleteSet &a, const vector<int> 
 
     go_to(check_var_loop, {'S'}, 0, -1, {0,1});
     go_to_move(check_var_loop, {'\u0000'}, 1, 1, {0, 1},  stack_tape, 1, {(int) stack_tape});
-    push(check_var_loop, '.');
+    push(check_var_loop, stack_sep);
 
     //push remaining stuff on stack
     write_on(check_var_loop, {'P'}, {0}, {'\u0000'}, {0});
@@ -2767,10 +2771,10 @@ void TuringTools::check_var_define_location(IncompleteSet &a, const vector<int> 
     link_put(check_var_loop, {'S'}, {0});
 
     //copy remaining stuff back on right spot
-    go_to(check_var_loop, {'.'}, stack_tape, -1, {(int) stack_tape});
+    go_to(check_var_loop, {stack_sep}, stack_tape, -1, {(int) stack_tape});
     move(check_var_loop, {(int) stack_tape}, 1);
     go_to_move(check_var_loop, {'\u0000'}, stack_tape, 1, {(int) stack_tape}, 1, 1, {0,1});
-    go_to(check_var_loop, {'.'}, stack_tape, -1, {(int) stack_tape});
+    go_to(check_var_loop, {stack_sep}, stack_tape, -1, {(int) stack_tape});
     move(check_var_loop, {(int) stack_tape}, 1);
     write_on(check_var_loop, {'\u0000'}, {0}, {'E'}, {0});
     //this line is double but that is not a problem and is extra redundancy
@@ -3715,7 +3719,7 @@ string TuringTools::check_stack_double(IncompleteSet& a) {
     counter++;
 
     go_to(check_on_stack, {'-'}, stack_tape, -1, {(int) stack_tape});
-    go_to(check_on_stack, {'.'}, stack_tape, 1, {(int) stack_tape});
+    go_to(check_on_stack, {stack_sep}, stack_tape, 1, {(int) stack_tape});
     IncompleteSet check_stack_loop{"check_on_stack_loop_"+ to_string(counter), "check_on_stack_loop_"+ to_string(counter)};
     counter++;
     move(check_stack_loop, {0, 1, (int) stack_tape}, 1);
@@ -3770,7 +3774,7 @@ string TuringTools::check_stack_double(IncompleteSet& a) {
     string different = branch_on(compareStringLoop, {'\u0000'}, {(int) stack_tape});
 
     go_to(compareStringLoop, {'B'}, 0, -1, {0,1});
-    go_to(compareStringLoop, {'.', '\u0000'}, stack_tape, 1, {(int) stack_tape});
+    go_to(compareStringLoop, {stack_sep, '\u0000'}, stack_tape, 1, {(int) stack_tape});
 
     string different2 = branch_on(compareStringLoop, {'\u0000'}, {(int) stack_tape});
 
