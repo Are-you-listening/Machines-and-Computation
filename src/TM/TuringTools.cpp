@@ -3651,15 +3651,112 @@ void TuringTools::check_split_nesting(IncompleteSet &a) {
     move(check_split_nesting, {(int) stack_tape}, 1);
     link_put(check_split_nesting, {'!'}, {(int) stack_tape});
 
-    //give 1 extra nesting marging for parameters
+    //stack setup
+
+    move(check_split_nesting, {0,1}, 1);
+    link_put(check_split_nesting, {heap_sep}, {1});
+    move(check_split_nesting, {0,1}, 1);
+
+    //give 1 extra nesting margin for parameters
+    IncompleteSet check_param_loop{"check_param_"+ to_string(counter), "check_param_"+ to_string(counter)};
+    counter++;
+    go_to(check_param_loop, {'}', '{', stack_symbol, heap_sep}, stack_tape, 1, {(int) stack_tape});
+
+    string reached_end = branch_on(check_param_loop, {'}'}, {(int) stack_tape});
+
+    string not_oke_1 = branch_on(check_param_loop, {'{'}, {(int) stack_tape});
+    string not_oke_2 = branch_on(check_param_loop, {stack_symbol}, {(int) stack_tape});
+
+    link_put(check_param_loop, {'0'}, {1});
+    move(check_param_loop, {0,1}, 1);
+    move(check_param_loop, {(int) stack_tape}, 1);
+    make_loop(check_param_loop);
+    check_param_loop.to_state = reached_end;
+
+    link(check_split_nesting, check_param_loop);
+
+    //above we pushed the amount of params passed including self on working tape
+    //now we will pop for every D we pass
+    go_to(check_split_nesting, {heap_sep}, stack_tape, 1, {(int) stack_tape});
+    go_to(check_split_nesting, {'#'}, stack_tape, -1, {(int) stack_tape});
+    move(check_split_nesting, {0,1}, -1);
+    move(check_split_nesting, {(int) stack_tape}, 1);
+
+    IncompleteSet check_param_loop2{"check_param2_"+ to_string(counter), "check_param2_"+ to_string(counter)+"_never_reached"};
+    counter++;
+
+    IncompleteTransition looper;
+    looper.state = check_param_loop2.state;
+    looper.to_state = check_param_loop2.state;
+    looper.def_move = 0;
+
+    looper.input = {'0', 'D'};
+    looper.input_index = {1, (int) stack_tape};
+
+    looper.output = {'\u0001', '\u0000', '\u0001'};
+    looper.output_index = {0, 1, (int) stack_tape};
+    looper.move = {-1, -1, 1};
+
+    check_param_loop2.transitions.push_back(looper);
+
+    string suc6_state = "suc6_"+ to_string(counter);
+    counter++;
+
+    string failure_state = "failure_"+ to_string(counter);
+    counter++;
+
+    IncompleteTransition suc6;
+    suc6.state = check_param_loop2.state;
+    suc6.to_state = suc6_state;
+    suc6.def_move = 0;
+
+    suc6.input = {heap_sep};
+    suc6.input_index = {1};
+    check_param_loop2.transitions.push_back(suc6);
+
+
+    IncompleteTransition failure;
+    failure.state = check_param_loop2.state;
+    failure.to_state = failure_state;
+    failure.def_move = 0;
+
+    failure.input = {'0'};
+    failure.input_index = {1};
+    check_param_loop2.transitions.push_back(failure);
+
+    check_param_loop2.to_state = suc6_state;
+    link_put(check_param_loop2, {'\u0000'}, {1});
+    move(check_param_loop2, {0,1}, -1);
+    suc6_state = check_param_loop2.to_state;
+
+
+    for (auto s: {failure_state, not_oke_1, not_oke_2}){
+        check_param_loop2.to_state = s;
+        go_to_clear(check_param_loop2, {heap_sep}, 1, -1, {0,1}, {1});
+        link_put(check_param_loop2, {'\u0000'}, {1});
+        move(check_param_loop2, {0,1}, -1);
+        go_to(check_param_loop2, {'!'}, stack_tape, -1, {(int) stack_tape});
+
+        IncompleteTransition toSuc6;
+        toSuc6.state = check_param_loop2.to_state;
+        toSuc6.to_state = suc6_state;
+        toSuc6.def_move = 0;
+        check_param_loop2.transitions.push_back(toSuc6);
+    }
+    check_param_loop2.to_state = suc6_state;
+
+    link(check_split_nesting, check_param_loop2);
+
+    IncompleteSet br{"b", "br"};
+    //link(check_split_nesting, br);
+
 
     //IncompleteSet br{"b", "br"};
     //link(check_split_nesting, br);
 
-
     std::vector<string> branches;
 
-    for (int i=0; i<split_nesting+1; i++){
+    for (int i=0; i<split_nesting+2; i++){
         go_to(check_split_nesting, {'}', '{', stack_symbol}, stack_tape, 1, {(int) stack_tape});
 
         IncompleteSet skip_nesting_set{"skip_nesting_"+ to_string(counter), "skip_nesting_"+ to_string(counter)};
