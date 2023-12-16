@@ -391,16 +391,29 @@ void Tokenisation::Tokenize(const std::string &FileLocation) {
     for(const auto & token:tokenVector){
         tokenTupleVector.emplace_back(token.first,token.second,S);
     }
-    unsigned long int nestingCounter=0;
-    for(const auto & token:tokenVector){
-        if(token.first=="{"||token.first=="}"){
-            nestingCounter++;
-        }
-    }
     unsigned long int count=0;
-    unsigned long int nestingCounterReverse=0;
     for(auto it=tokenTupleVector.end()-1; it!=tokenTupleVector.begin(); it--,count++){
-        if(std::get<0>(*it)=="V"){
+        if(std::get<0>(*it)=="V"||std::get<0>(*it)=="I"||std::get<0>(*it)=="e"){
+            unsigned long int scopeNreverse=0;
+            long int nestingCounter=0;
+            unsigned long int count2=0;
+            std::vector<unsigned long int> stack;
+            stack.push_back(0);
+            for(auto & it3 : tokenTupleVector) {
+                count2++;
+                if(std::get<1>(*it)==std::get<1>(it3)){
+                    break;
+                }
+                if (std::get<0>(it3) == "{") {
+                    scopeNreverse++;
+                    stack.push_back(scopeNreverse);
+                    nestingCounter++;
+                } else if(std::get<0>(it3) == "}"){
+                    stack.pop_back();
+                    nestingCounter--;
+                }
+            }
+            scopeNreverse=stack[stack.size()-1];
             vindVn(tokenTupleVector,std::get<1>(*it),count, VariableChar, VariableCharSecond);
             std::set<std::string> visited;
             here:
@@ -408,14 +421,42 @@ void Tokenisation::Tokenize(const std::string &FileLocation) {
                 if(visited.find(*it2)!=visited.end()){
                     continue;
                 }
-                unsigned long int scopechecker=0;
-                while(scopechecker<nestingCounter){
-                    unsigned long int nestingCounterRight=0;
+                unsigned long int scopechecker=-1;
+                while(scopechecker<=nestingCounter||scopechecker==-1){
+                    unsigned long int scopeN=0;
+                    unsigned long int count3=0;
+                    long int nestingCounterRight=0;
+                    unsigned short int forloop=0;
                     for(auto & it3 : tokenTupleVector){
-                        if(std::get<0>(it3)=="}"||std::get<0>(it3)=="{"){
-                            nestingCounterRight++;
+                        if(count3>count2){
+                            break;
                         }
-                        if(nestingCounter-nestingCounterReverse-nestingCounterRight>scopechecker){
+                        count3++;
+                        if(std::get<0>(it3)=="{"){
+                            nestingCounterRight++;
+                        } else if(std::get<0>(it3)=="}"){
+                            nestingCounterRight--;
+                        }
+                        unsigned short int isFunction=0;
+                        unsigned short int isFor=0;
+                        if((std::get<1>(it3).find(";")==std::string::npos&&std::get<1>(it3).find(" ")!=std::string::npos&&std::get<1>(it3).find("(")!=std::string::npos&&std::get<1>(it3).find(")")!=std::string::npos)||std::get<1>(it3).find("for")!=std::string::npos){
+                            isFunction++;
+                            if(std::get<1>(it3).find("for")!=std::string::npos){
+                                forloop=2;
+                            }
+                        }
+                        if(forloop!=0){
+                            isFor++;
+                            forloop--;
+                        }
+                        if(std::get<0>(it3)=="{"){
+                            scopeN++;
+                            continue;
+                        }
+                        if((nestingCounter+isFor-(nestingCounterRight+isFunction)>=scopechecker||nestingCounterRight+isFunction>=nestingCounter+isFor)&&scopechecker!=-1){
+                            continue;
+                        }
+                        if(scopechecker==-1&&scopeN+isFunction!=scopeNreverse+isFor){
                             continue;
                         }
                         bool it_0= false;
@@ -479,8 +520,17 @@ void Tokenisation::Tokenize(const std::string &FileLocation) {
             if(std::get<2>(*it).empty()){
                 std::get<0>(*it)="C";
             }
-        } else if(std::get<0>(*it)=="}"||std::get<0>(*it)=="{"){
-            nestingCounterReverse++;
+        }
+    }
+    for(auto i=tokenTupleVector.begin(); i<tokenTupleVector.end(); i++){
+        if(std::get<0>(*i)=="V"||std::get<0>(*i)=="i"){
+            here2:
+            for(auto &V:std::get<2>(*i)){
+                if(V.empty()){
+                    std::get<2>(*i).erase(V);
+                    goto here2;
+                }
+            }
         }
     }
     
