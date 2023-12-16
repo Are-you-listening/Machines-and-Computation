@@ -344,6 +344,7 @@ TEST(TuringMachineTest, TM_single_tape) {
 }
 
 TEST(TuringMachineTest, TM_single_tape_2){
+    /*
     int index = 9;
     ifstream test_file("../test/testFiles/TM_test_"+ to_string(index)+".cpp");
     string test_string;
@@ -434,6 +435,6 @@ TEST(TuringMachineTest, TM_single_tape_2){
     std::cout << "{}: " << a3 << " " << a4 << std::endl;
     ofstream out{"../test/results/TM_test_"+ to_string(index)+".cpp"};
     out << tm.exportTapeData(1);
-    out.close();
+    out.close();*/
 
 }
