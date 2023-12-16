@@ -27,7 +27,7 @@ int main() { // Function names we create to replace nesting should have F or I i
     std::string Filelocation="../test/testFiles/knapsack.cpp";
     std::thread Tokenizer(&Tokenisation::Tokenize, &tokenVector, Filelocation); // i ignore rvalues in function calls
     core_amount--;
-    Tokenizer.join();
+    //Tokenizer.join();
 
     Orchestrator();
 
@@ -63,6 +63,7 @@ int main() { // Function names we create to replace nesting should have F or I i
 
     //create LARL parser with tokenvector
     auto vec = tokenVector.getTokenVector();
+    
     /*
     std::set<std::string> test;
     vec.emplace_back("}","",test);
@@ -71,9 +72,10 @@ int main() { // Function names we create to replace nesting should have F or I i
     std::vector<std::tuple<string, string, set<string>>> out;
     set<string> abc;
     for (const auto& t: tokens){
-        vec.emplace_back(t, " ", abc);
+        vec.emplace_back(t, "testing stuff", abc);
     }
-     */
+    */
+     
     lalr.parse(vec);
     lalr.generate();
     //cleanup

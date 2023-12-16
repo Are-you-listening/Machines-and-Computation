@@ -387,73 +387,109 @@ void Tokenisation::Tokenize(const std::string &FileLocation) {
     }
     
     File.close();
-    bool FoundVn= false;
     std::set<std::string> S={};
     for(const auto & token:tokenVector){
-        if(token.first=="V"){
-            tokenTupleVector.emplace_back(token.first,token.second,S);
-            FoundVn= true;
-        } else if(token.first[0]=='V'){
-            if(token.second!="for"&&token.second!="if"&&token.second!="else"&&token.second.find(' ')!=std::string::npos){
-                S.insert(token.second);
-            }
-        } else if(!FoundVn&&token.first!="D0"){
-            tokenTupleVector.emplace_back(token.first,token.second,S);
-            FoundVn= false;
-        } else {
-            std::get<2>(tokenTupleVector[tokenTupleVector.size()-1])=S;
-            S.clear();
-            FoundVn= false;
+        tokenTupleVector.emplace_back(token.first,token.second,S);
+    }
+    unsigned long int nestingCounter=0;
+    for(const auto & token:tokenVector){
+        if(token.first=="{"||token.first=="}"){
+            nestingCounter++;
         }
     }
     unsigned long int count=0;
+    unsigned long int nestingCounterReverse=0;
     for(auto it=tokenTupleVector.end()-1; it!=tokenTupleVector.begin(); it--,count++){
         if(std::get<0>(*it)=="V"){
             vindVn(tokenTupleVector,std::get<1>(*it),count, VariableChar, VariableCharSecond);
             std::set<std::string> visited;
+            here:
             for(auto it2=std::get<2>(*it).begin(); it2!=std::get<2>(*it).end();it2++){
                 if(visited.find(*it2)!=visited.end()){
                     continue;
                 }
-                for(auto & it3 : tokenTupleVector){
-                    if(std::get<1>(it3).find(" "+*it2+";")!=std::string::npos||std::get<1>(it3).find(" "+*it2+",")!=std::string::npos||std::get<1>(it3).find(" "+*it2+")")!=std::string::npos||std::get<1>(it3).find(" "+*it2+"(")!=std::string::npos||std::get<1>(it3).find(" "+*it2+"{")!=std::string::npos||std::get<1>(it3).find(" "+*it2+")")!=std::string::npos&&std::get<1>(it3)!=std::get<1>(*it)){
-                        if(std::get<0>(it3)=="V"){
-                            std::get<0>(it3)="D";
+                unsigned long int scopechecker=0;
+                while(scopechecker<nestingCounter){
+                    unsigned long int nestingCounterRight=0;
+                    for(auto & it3 : tokenTupleVector){
+                        if(std::get<0>(it3)=="}"||std::get<0>(it3)=="{"){
+                            nestingCounterRight++;
                         }
-                        std::string D0;
-                        for(auto C=std::get<1>(it3).end()-std::get<1>(it3).size()-1+std::get<1>(it3).find(*it2); C!=std::get<1>(it3).begin();C--){
-                            if(*C==' '||VariableCharSecond.find(*C)!=VariableCharSecond.end()||*C=='&'){
-                                D0+=*C;
-                            } else{
-                                break;
+                        if(nestingCounter-nestingCounterReverse-nestingCounterRight>scopechecker){
+                            continue;
+                        }
+                        bool it_0= false;
+                        bool it_1= false;
+                        bool it_2= false;
+                        bool it_3= false;
+                        bool it_4= false;
+                        bool it_5= false;
+                        bool it_6= false;
+                        unsigned long int position;
+                        if(std::get<1>(it3).find(" "+*it2+";")!=std::string::npos){
+                            position=std::get<1>(it3).find(" "+*it2+";");
+                            it_0= true;
+                        } else if(std::get<1>(it3).find(" "+*it2+"=")!=std::string::npos){
+                            position=std::get<1>(it3).find(" "+*it2+"=");
+                            it_1= true;
+                        } else if(std::get<1>(it3).find(" "+*it2+",")!=std::string::npos){
+                            position=std::get<1>(it3).find(" "+*it2+",");
+                            it_2= true;
+                        } else if(std::get<1>(it3).find(" "+*it2+")")!=std::string::npos){
+                            position=std::get<1>(it3).find(" "+*it2+")");
+                            it_3= true;
+                        } else if(std::get<1>(it3).find(" "+*it2+"(")!=std::string::npos){
+                            position=std::get<1>(it3).find(" "+*it2+"(");
+                            it_4= true;
+                        } else if(std::get<1>(it3).find(" "+*it2+"{")!=std::string::npos){
+                            position=std::get<1>(it3).find(" "+*it2+"{");
+                            it_5= true;
+                        } else if(std::get<1>(it3).find(" "+*it2+")")!=std::string::npos){
+                            position=std::get<1>(it3).find(" "+*it2+")");
+                            it_6= true;
+                        }
+                        if(it_0||it_1||it_2||it_3||it_4||it_5||it_6&&std::get<1>(it3)!=std::get<1>(*it)){
+                            if(std::get<0>(it3)=="V"){
+                                std::get<0>(it3)="D";
                             }
+                            std::string D0;
+                            for(auto C=std::get<1>(it3).end()-(std::get<1>(it3).size()-position); C!=std::get<1>(it3).begin()-1;C--){
+                                if(*C==' '||VariableCharSecond.find(*C)!=VariableCharSecond.end()||*C=='&'){
+                                    D0+=*C;
+                                } else{
+                                    break;
+                                }
+                            }
+                            std::reverse(D0.begin(),D0.end());
+                            D0+=*it2;
+                            while(D0.substr(0,1)==" "){
+                                D0=D0.substr(1,std::string::npos);
+                            }
+                            std::get<2>(*it).erase(*it2);
+                            if(D0.find(' ')!=std::string::npos){
+                                std::get<2>(*it).insert(D0);
+                            }
+                            visited.insert(D0);
+                            goto here;
                         }
-                        std::reverse(D0.begin(),D0.end());
-                        D0+=*it2;
-                        while(D0.substr(0,1)==" "){
-                            D0=D0.substr(1,std::string::npos);
-                        }
-                        std::get<2>(*it).erase(*it2);
-                        if(D0.find(' ')!=std::string::npos){
-                            std::get<2>(*it).insert(D0);
-                        }
-                        visited.insert(D0);
-                        it2=std::get<2>(*it).begin();
-                        break;
                     }
+                    scopechecker++;
                 }
             }
             if(std::get<2>(*it).empty()){
                 std::get<0>(*it)="C";
             }
+        } else if(std::get<0>(*it)=="}"||std::get<0>(*it)=="{"){
+            nestingCounterReverse++;
         }
     }
     
     for(const auto & i:tokenTupleVector){
-        std::cout<<std::get<0>(i)+", " << std::get<1>(i) << std::endl;
+        std::cout<<std::get<0>(i)+", " << std::get<1>(i);
         for(const auto &V:std::get<2>(i)){
-            std::cout<<V<< std::endl;
+            std::cout<<" "<<V;
         }
+        std::cout<<std::endl;
     }
     tokenVector.clear();
 }
