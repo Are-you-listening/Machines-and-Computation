@@ -2452,7 +2452,11 @@ void TuringTools::write_function_header(IncompleteSet &a, const vector<int>&tupl
 
     //clears all stack overhead
     go_to(write_function_header, {'\u0000'}, stack_tape, 1, {(int) stack_tape});
-    go_to_clear(write_function_header, {'{'}, stack_tape, -1, {(int) stack_tape}, {(int) stack_tape});
+    go_to(write_function_header, {stack_symbol}, stack_tape, -1, {(int) stack_tape});
+    go_to(write_function_header, {stack_sep, '\u0000'}, stack_tape, 1, {(int) stack_tape});
+    go_to_clear(write_function_header, {'\u0000'}, stack_tape, 1, {(int) stack_tape}, {(int) stack_tape});
+    go_to_not(write_function_header, {'\u0000'}, stack_tape, -1, {(int) stack_tape});
+    //go_to_clear(write_function_header, {'{'}, stack_tape, -1, {(int) stack_tape}, {(int) stack_tape});
     move(write_function_header, {(int) stack_tape}, 1);
 
     go_to(write_function_header, {'S'}, 0, -1, {0,1});

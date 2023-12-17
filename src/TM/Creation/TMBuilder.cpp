@@ -40,7 +40,10 @@ TMBuilder_output TMBuilder::generateTM() {
 
     tools->link(program, tokenize_program);
 
-    TuringIfElseAntiNesting ifElse{2, 4};
+    int max_nesting = 4;
+    int split_nesting = 2;
+
+    TuringIfElseAntiNesting ifElse{split_nesting, max_nesting};
 
     tools->link(program, ifElse.getTransitions());
 
@@ -53,7 +56,7 @@ TMBuilder_output TMBuilder::generateTM() {
     //tools->link(program, breaker);
 
 
-    TuringDenestify denest{2, 4};
+    TuringDenestify denest{split_nesting, max_nesting};
 
     tools->link(program, denest.getTransitions());
 
