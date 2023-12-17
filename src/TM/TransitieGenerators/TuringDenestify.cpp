@@ -4,7 +4,7 @@
 
 #include "TuringDenestify.h"
 
-TuringDenestify::TuringDenestify(int split_nesting, int max_nesting): TuringGenerator(4),
+TuringDenestify::TuringDenestify(int tuple_size, int split_nesting, int max_nesting): TuringGenerator(tuple_size),
 split_nesting{split_nesting}, max_nesting{max_nesting} {
 
 }
@@ -262,13 +262,29 @@ void TuringDenestify::createNewFunction(IncompleteSet &a) {
         tools->link(create_function, copy_tuple);
     }
 
+    //stores marker G on function that is denestified
+
+    tools->go_to(create_function, {'H'}, get_tuple_index()[0], 1, get_tuple_index());
+    tools->go_to(create_function, {'N'}, get_tuple_index()[0], -1, get_tuple_index());
+    tools->go_to(create_function, {'U', 'O', '\u0000'}, get_tuple_index()[1], -1, get_tuple_index());
+    IncompleteSet onUMarker{"onUMarker", "onUMarker"};
+    tools->write_on(onUMarker, {'\u0000'}, {get_tuple_index()[0]}, {'G'}, {get_tuple_index()[0]});
+    tools->link_on(create_function, onUMarker, {'U'}, {get_tuple_index()[1]});
+
+
+
     tools->go_to(create_function, {'H'}, get_tuple_index()[0], 1, get_tuple_index());
     tools->link_put(create_function, {'\u0000'}, {get_tuple_index()[0]});
     tools->go_to(create_function, {'I'}, get_tuple_index()[0], -1, get_tuple_index());
     tools->link_put(create_function, {'\u0000'}, {get_tuple_index()[0]});
     tools->go_to(create_function, {'U'}, get_tuple_index()[0], -1, get_tuple_index());
     tools->link_put(create_function, {'\u0000'}, {get_tuple_index()[0]});
-    tools->go_to_clear(create_function, {'A'}, get_tuple_index()[0], -1, get_tuple_index(), {get_tuple_index()[0]});
+    tools->go_to_clear(create_function, {'A', 'G'}, get_tuple_index()[0], -1, get_tuple_index(), {get_tuple_index()[0]});
+
+    IncompleteSet skipG{"skipG_clear", "skipG_clear"};
+    tools->move(skipG, get_tuple_index(), -1);
+    tools->go_to_clear(skipG, {'A'}, get_tuple_index()[0], -1, get_tuple_index(), {get_tuple_index()[0]});
+    tools->link_on(create_function, skipG, {'G'}, {get_tuple_index()[0]});
 
     //copy function to front
     tools->go_to(create_function, {'\u0000'}, get_tuple_index()[1], 1, get_tuple_index());
@@ -303,12 +319,12 @@ void TuringDenestify::createNewFunction(IncompleteSet &a) {
     for (int i=1; i<get_tuple_index().size(); i++){
         int index = get_tuple_index()[i];
         tools->copy_till(onU, {'E'}, get_tuple_index()[0], index, 1, 1, temp);
-        tools->go_to(onU, {'A'}, get_tuple_index()[0], -1, get_tuple_index());
+        tools->go_to(onU, {'A', 'G'}, get_tuple_index()[0], -1, get_tuple_index());
         tools->copy_till(onU, {'S'}, get_tuple_index()[0], index, 1, 1, temp);
 
         tools->link_put(onU, {'E'}, {0});
         tools->go_to(onU, {'S'}, 0, -1, {0,1});
-        tools->go_to(onU, {'A'}, get_tuple_index()[0], -1, get_tuple_index());
+        tools->go_to(onU, {'A', 'G'}, get_tuple_index()[0], -1, get_tuple_index());
 
         tools->copy_till(onU, {'E'}, 0, 1, index, 1, temp);
 
@@ -322,8 +338,11 @@ void TuringDenestify::createNewFunction(IncompleteSet &a) {
 
     tools->link_on(create_function, onU, {'U'}, {get_tuple_index()[1]});
 
+
+
     tools->go_to_clear(create_function, {'A'}, get_tuple_index()[0], -1, get_tuple_index(), {get_tuple_index()[0]});
     tools->link(a, create_function);
+
 
 }
 

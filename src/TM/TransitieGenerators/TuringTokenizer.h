@@ -10,7 +10,7 @@
 
 class TuringTokenizer: public TuringGenerator{
 public:
-    TuringTokenizer();
+    TuringTokenizer(int tuple_size);
     IncompleteSet getTransitions();
 
 private:

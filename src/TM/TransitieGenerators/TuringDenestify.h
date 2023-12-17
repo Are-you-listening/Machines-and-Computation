@@ -8,7 +8,7 @@
 
 class TuringDenestify: public TuringGenerator{
 public:
-    TuringDenestify(int split_nesting, int max_nesting);
+    TuringDenestify(int tuple_size, int split_nesting, int max_nesting);
     IncompleteSet getTransitions();
 
 private:

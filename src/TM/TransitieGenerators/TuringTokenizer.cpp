@@ -7,7 +7,7 @@
 
 
 
-TuringTokenizer::TuringTokenizer(): TuringGenerator(4) {
+TuringTokenizer::TuringTokenizer(int tuple_size): TuringGenerator(tuple_size) {
 }
 
 

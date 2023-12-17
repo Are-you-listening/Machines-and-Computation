@@ -8,7 +8,7 @@
 
 class TuringVarDictionary: public TuringGenerator{
 public:
-    TuringVarDictionary();
+    TuringVarDictionary(int tuple_size);
     IncompleteSet getTransitions();
 
 private:

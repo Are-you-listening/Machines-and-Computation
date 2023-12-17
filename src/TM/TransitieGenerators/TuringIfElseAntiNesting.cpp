@@ -4,7 +4,7 @@
 
 #include "TuringIfElseAntiNesting.h"
 
-TuringIfElseAntiNesting::TuringIfElseAntiNesting(int split_nesting, int max_nesting): TuringGenerator(4), split_nesting{split_nesting}, max_nesting{max_nesting} {
+TuringIfElseAntiNesting::TuringIfElseAntiNesting(int tuple_size, int split_nesting, int max_nesting): TuringGenerator(tuple_size), split_nesting{split_nesting}, max_nesting{max_nesting} {
 
 }
 

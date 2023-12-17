@@ -4,7 +4,7 @@
 
 #include "TuringVarDictionary.h"
 
-TuringVarDictionary::TuringVarDictionary(): TuringGenerator(4) {
+TuringVarDictionary::TuringVarDictionary(int tuple_size): TuringGenerator(tuple_size) {
 
 }
 

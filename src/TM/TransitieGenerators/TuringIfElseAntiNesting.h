@@ -8,7 +8,7 @@
 
 class TuringIfElseAntiNesting: public TuringGenerator{
 public:
-    TuringIfElseAntiNesting(int split_nesting, int max_nesting);
+    TuringIfElseAntiNesting(int tuple_size, int split_nesting, int max_nesting);
     IncompleteSet getTransitions();
 
 private:

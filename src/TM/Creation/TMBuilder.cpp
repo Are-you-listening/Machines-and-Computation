@@ -35,7 +35,7 @@ TMBuilder_output TMBuilder::generateTM() {
     //tools->move(program, {0,1}, -1);
     //tools->move(program, {0,1}, 1);
 
-    TuringTokenizer tokenizer{};
+    TuringTokenizer tokenizer{(int) tapes-5};
     IncompleteSet tokenize_program = tokenizer.getTransitions();
 
     tools->link(program, tokenize_program);
@@ -43,11 +43,11 @@ TMBuilder_output TMBuilder::generateTM() {
     int max_nesting = 4;
     int split_nesting = 2;
 
-    TuringIfElseAntiNesting ifElse{split_nesting, max_nesting};
+    TuringIfElseAntiNesting ifElse{(int) tapes-5, split_nesting, max_nesting};
 
     tools->link(program, ifElse.getTransitions());
 
-    TuringVarDictionary vardict{};
+    TuringVarDictionary vardict{(int) tapes-5};
 
     IncompleteSet vardict_set = vardict.getTransitions();
     tools->link(program, vardict_set);
@@ -56,7 +56,7 @@ TMBuilder_output TMBuilder::generateTM() {
     //tools->link(program, breaker);
 
 
-    TuringDenestify denest{split_nesting, max_nesting};
+    TuringDenestify denest{(int) tapes-5, split_nesting, max_nesting};
 
     tools->link(program, denest.getTransitions());
 

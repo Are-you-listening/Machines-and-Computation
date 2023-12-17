@@ -3781,7 +3781,7 @@ void TuringTools::check_split_nesting(IncompleteSet &a) {
 
     std::vector<string> branches;
 
-    for (int i=0; i<split_nesting+2; i++){
+    for (int i=0; i<split_nesting+1; i++){
         go_to(check_split_nesting, {'}', '{', stack_symbol}, stack_tape, 1, {(int) stack_tape});
 
         IncompleteSet skip_nesting_set{"skip_nesting_"+ to_string(counter), "skip_nesting_"+ to_string(counter)};
