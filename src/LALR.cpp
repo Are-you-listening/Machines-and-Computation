@@ -498,6 +498,9 @@ void LALR::generate() {
     string functionName = "A";
     ParseTree* violator = nullptr;
 
+    //TODO Make sure #includes, typedefs are all _roots children! - Needs function to format
+    //TODO What if _root == violator?
+    //IGNORE If-Else nesting? Can the token therefore not be generated? ("{" and "}" ? )
     _root->matchBrackets(_cfg.getT()); //Format first
     _root->findViolation(max,count,index,violator,_cfg.getT()); //Check for violations
 
@@ -529,7 +532,11 @@ void LALR::generate() {
         //BEGIN Do the actual moving part
             //Find root of violator
             auto data = _root->findRoot(violator,_cfg.getT());
-            if(data == nullptr){
+            if(violator == _root){
+                //std::cout << "error! in LALR move!!" << std::endl;
+                //data = _root;
+                break;
+            }else if(data == nullptr){
                 std::cout << "error! in LALR move!!" << std::endl;
                 break;
             }
@@ -569,7 +576,12 @@ void LALR::generate() {
     _root->getYield(yield);
     ofstream test("output/result.cpp");
     for(auto &k: yield){
-        test << get<1>(k);
+        auto str = get<1>(k);
+        test << str;
+        if(str[str.size()-1]==';' || str[str.size()-1]=='{' || str[str.size()-1]=='}' ||str[str.size()-1]=='>' ){
+            test << "\n";
+        }
+
     }
     test.close();
 }
@@ -638,6 +650,7 @@ string LALR::function(ParseTree *violator, std::set<std::set<std::string>> &toke
     std::vector<ParseTree*> newKids;
     long unsigned int i;
     long unsigned int index;
+    std::vector<string> variableNamesFunctionCall;
 
     //Create The Function
     for(i = 0; i<_root->children.size(); ++i){ //Pushback firsthalf of kids
@@ -675,6 +688,9 @@ string LALR::function(ParseTree *violator, std::set<std::set<std::string>> &toke
             string newvariable = variableType + " " + variableName;
             newvariables.emplace(newvariable);
         }
+
+        //KARS: Use this for later in functionCall
+        variableNamesFunctionCall.push_back(variableName);
     }
 
     string functiondefinition = "void " + functionName + "(";
@@ -720,7 +736,11 @@ string LALR::function(ParseTree *violator, std::set<std::set<std::string>> &toke
     }
     _root->children = newKids;
 
-    return functiondefinition;
+    std::string temp;
+    for(auto &k: variableNamesFunctionCall){
+        temp+=k+",";
+    }
+    return functionName+"(" + temp.substr(0,temp.size()-1) + ");"; //Cut of the last comma
 }
 
 void ParseTree::findViolation(const unsigned long &max, unsigned long &count, unsigned long &index,ParseTree* &Rviolator,const std::vector<std::string> &Terminals) {
