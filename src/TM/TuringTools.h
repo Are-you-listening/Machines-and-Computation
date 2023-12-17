@@ -93,7 +93,7 @@ public:
 
     void copy_to_working(IncompleteSet& a, const vector<int>&tuple_indexes, bool output= false);
     void clear_working(IncompleteSet& a);
-    void check_split_nesting(IncompleteSet& a);
+    void check_split_nesting(IncompleteSet& a, const vector<int>&tuple_indexes);
 
     static void reset();
 

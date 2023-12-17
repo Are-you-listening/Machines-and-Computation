@@ -308,7 +308,16 @@ void TuringDenestify::createNewFunction(IncompleteSet &a) {
     tools->link_put(onT, {'\u0000'}, {get_tuple_index()[0]});
     tools->go_to(onT, {'S'}, get_tuple_index()[0], -1, get_tuple_index());
 
+    //if their exits a G, move it to T
+    tools->go_to(onT, {'A', 'G'}, get_tuple_index()[0], -1, get_tuple_index());
+    tools->write_on(onT, {'G'}, {get_tuple_index()[0]}, {'\u0000'}, {get_tuple_index()[0]});
+    tools->go_to(onT, {'T'}, get_tuple_index()[1], -1, get_tuple_index());
+    tools->write_on(onT, {'\u0000'}, {get_tuple_index()[0]}, {'G'}, {get_tuple_index()[0]});
+    tools->go_to(onT, {'S'}, get_tuple_index()[0], 1, get_tuple_index());
+
     tools->link_on(onU, onT, {'T'}, {get_tuple_index()[1]});
+
+
     tools->go_to(onU, {'S'}, get_tuple_index()[0], 1, get_tuple_index());
 
 

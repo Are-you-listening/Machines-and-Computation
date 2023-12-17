@@ -2721,7 +2721,7 @@ void TuringTools::check_var_define_location(IncompleteSet &a, const vector<int> 
     IncompleteSet check_split_nesting_call{"check_split_nesting_call"+to_string(counter), "check_split_nesting_call"+to_string(counter)};
     counter++;
 
-    check_split_nesting(check_split_nesting_call);
+    check_split_nesting(check_split_nesting_call, tuple_indexes);
 
     link_on_not(check_var_loop, check_split_nesting_call, {'\u0000'}, {(int) stack_tape});
 
@@ -3664,7 +3664,7 @@ Transition TuringTools::make_transition(IncompleteTransition &incomp, int tapes)
     return transition;
 }
 
-void TuringTools::check_split_nesting(IncompleteSet &a) {
+void TuringTools::check_split_nesting(IncompleteSet &a, const vector<int>&tuple_indexes) {
     //requires after done find traverse
     //now check if outside split nesting, if inside split nesting ignore
     //find must be != \u0000
@@ -3785,6 +3785,7 @@ void TuringTools::check_split_nesting(IncompleteSet &a) {
         go_to(check_split_nesting, {'}', '{', stack_symbol}, stack_tape, 1, {(int) stack_tape});
 
         IncompleteSet skip_nesting_set{"skip_nesting_"+ to_string(counter), "skip_nesting_"+ to_string(counter)};
+        counter++;
         skip_nesting(skip_nesting_set, 1, 1, stack_tape, 1, {(int) stack_tape});
 
         link_on(check_split_nesting, skip_nesting_set, {'{'}, {(int) stack_tape});
@@ -3794,6 +3795,30 @@ void TuringTools::check_split_nesting(IncompleteSet &a) {
         move(check_split_nesting, {(int) stack_tape}, 1);
 
     }
+
+    //give one extra slack to objects
+    //startpos is S marker of tuples
+    go_to(check_split_nesting, {'\u0000', 'U', 'O'}, tuple_indexes[1], -1, tuple_indexes);
+    IncompleteSet onObjectSplit{"onObjectSplit_"+ to_string(counter), "onObjectSplit_"+ to_string(counter)};
+    counter++;
+    go_to(onObjectSplit, {'}', '{', stack_symbol}, stack_tape, 1, {(int) stack_tape});
+
+    IncompleteSet skip_nesting_set{"skip_nesting_"+ to_string(counter), "skip_nesting_"+ to_string(counter)};
+    counter++;
+    skip_nesting(skip_nesting_set, 1, 1, stack_tape, 1, {(int) stack_tape});
+
+    link_on(onObjectSplit, skip_nesting_set, {'{'}, {(int) stack_tape});
+
+    string branch_fine = branch_on(onObjectSplit, {stack_symbol}, {(int) stack_tape});
+    branches.push_back(branch_fine);
+    move(onObjectSplit, {(int) stack_tape}, 1);
+
+    link_on(check_split_nesting, onObjectSplit, {'O'}, {tuple_indexes[1]});
+    go_to(check_split_nesting, {'S'}, tuple_indexes[0], 1, tuple_indexes);
+
+
+    //IncompleteSet bs{"b", "br"};
+    //link(check_split_nesting, bs);
 
     go_to(check_split_nesting, {'!'}, stack_tape, -1, {(int) stack_tape});
     link_put(check_split_nesting, {'#'}, {(int) stack_tape});
