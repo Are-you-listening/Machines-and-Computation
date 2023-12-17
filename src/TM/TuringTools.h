@@ -98,8 +98,8 @@ public:
     static void reset();
 
     //this needs to become private in future
-    void find_match_heap(IncompleteSet& a, char start_marker, char end_marker, int marker_tape, int data_tape, bool search_template=false);
-    void find_match_heap_traverse(IncompleteSet& a, char start_marker, char end_marker, int marker_tape, int data_tape);
+    void find_match_heap(IncompleteSet& a, char start_marker, char end_marker, int marker_tape, int data_tape, bool search_template=false, bool full=true);
+    void find_match_heap_traverse(IncompleteSet& a, char start_marker, char end_marker, int marker_tape, int data_tape, bool full=true);
 
     //still needs to become private in future
     void skip_nesting(IncompleteSet& a, int new_stack_tape, int stack_direction, int skip_tape, int skip_direction, const vector<int>& affected, char i='{', char j='}');

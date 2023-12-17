@@ -156,7 +156,7 @@ TEST(TuringMachineTest, TM_tools){
 }
 
 TEST(TuringMachineTest, TM_tokenazation) {
-    int index = 11;
+    int index = 47;
     ifstream test_file("../test/testFiles/TM_test_"+ to_string(index)+".cpp");
     string test_string;
     cout << test_file.is_open() << endl;
@@ -190,7 +190,16 @@ TEST(TuringMachineTest, TM_tokenazation) {
             break;
         }
         tm.move();
-        if (tm.getCurrentState() == "4710"){
+        if (tm.getCurrentState() == "go_to_2149"){
+
+
+            for (int i = 0; i < tm.getTapeAmount(); i++){
+                cout << tm.getTapeData(i) << endl;
+            }
+
+            for (int i = 0; i < tm.getTapeAmount(); i++){
+                cout << "i " << tm.getTuringIndex(i) << endl;
+            }
 
             int j=0;
 
@@ -200,7 +209,7 @@ TEST(TuringMachineTest, TM_tokenazation) {
 
 
 
-        if (i >= 270000000){
+        if (i >= 30000000){
             int j = 0;
 
             for (int i = 0; i < tm.getTapeAmount(); i++){

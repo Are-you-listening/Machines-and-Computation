@@ -1281,7 +1281,7 @@ void TuringTools::make_loop_on_sequence(IncompleteSet &a, const vector<char> &in
 
 }
 
-void TuringTools::find_match_heap(IncompleteSet &a, char start_marker, char end_marker, int marker_tape, int data_tape, bool search_template) {
+void TuringTools::find_match_heap(IncompleteSet &a, char start_marker, char end_marker, int marker_tape, int data_tape, bool search_template, bool full) {
     //precondition: in heap mode
     if (!heap_mode){
         throw "not in heap mode";
@@ -1331,8 +1331,19 @@ void TuringTools::find_match_heap(IncompleteSet &a, char start_marker, char end_
     link(searcher, check_match);
     move(searcher, {marker_tape, data_tape}, 1);
 
-    //branch on found
-    string branch = branch_on(searcher, {end_marker}, {marker_tape});
+
+    string branch_phase_1;
+    if (full){
+        IncompleteSet link_on_branch{"link_on_branch_"+ to_string(counter), "link_on_branch_"+ to_string(counter)};
+        counter++;
+        //branch on found
+        branch_phase_1 = branch_on(link_on_branch, {heap_sep}, {(int) stack_tape});
+        link_on(searcher, link_on_branch, {end_marker}, {marker_tape});
+    }else{
+        branch_phase_1 = branch_on(searcher, {end_marker}, {marker_tape});
+    }
+
+
 
     //check if current not found is a template
     if (search_template){
@@ -1342,12 +1353,22 @@ void TuringTools::find_match_heap(IncompleteSet &a, char start_marker, char end_
 
         IncompleteTransition to_end;
         to_end.state = found_template.to_state;
-        to_end.to_state = branch;
+        to_end.to_state = branch_phase_1;
         to_end.def_move = 0;
         add(found_template, to_end);
 
         link_on_sequence(searcher, found_template, {'e','t','a','l','p','m','e','t'}, stack_tape);
     }
+
+    string end_tape3 = "unreached";
+    if (full){
+        end_tape3 = branch_on(searcher, {'S'}, {marker_tape});
+        //prevent brach issues
+        move(searcher, {marker_tape, data_tape}, 1);
+        move(searcher, {marker_tape, data_tape}, -1);
+    }
+
+
 
     //on not found
     string end_tape = branch_on(searcher, {'\u0000'}, {(int) stack_tape});
@@ -1355,7 +1376,7 @@ void TuringTools::find_match_heap(IncompleteSet &a, char start_marker, char end_
 
     IncompleteSet go_to_end{"find_match_to_end_"+ to_string(counter), "find_match_to_end_"+ to_string(counter)};
     counter++;
-    for (auto& b: {end_tape, end_tape2}){
+    for (auto& b: {end_tape, end_tape2, end_tape3}){
         IncompleteTransition to_end;
         to_end.state = b;
         to_end.to_state = go_to_end.state;
@@ -1368,7 +1389,7 @@ void TuringTools::find_match_heap(IncompleteSet &a, char start_marker, char end_
 
     IncompleteTransition to_branch;
     to_branch.state = go_to_end.to_state;
-    to_branch.to_state = branch;
+    to_branch.to_state = branch_phase_1;
     to_branch.def_move = 0;
 
     go_to_end.transitions.push_back(to_branch);
@@ -1411,7 +1432,7 @@ void TuringTools::find_match_heap(IncompleteSet &a, char start_marker, char end_
     //loop somewhere here
     make_loop(searcher);
     //after loop on found
-    searcher.to_state = branch;
+    searcher.to_state = branch_phase_1;
     go_to(searcher, {'#'}, stack_tape, -1, {(int) stack_tape});
     move(searcher, {(int) stack_tape}, -1);
 
@@ -1424,12 +1445,12 @@ void TuringTools::find_match_heap(IncompleteSet &a, char start_marker, char end_
 }
 
 void TuringTools::find_match_heap_traverse(IncompleteSet &a, char start_marker, char end_marker, int marker_tape,
-                                           int data_tape) {
+                                           int data_tape, bool full) {
     //requires heap mode
     //also check for variables before and after nesting
     //after should not matter for variables, just for functions
     //for functions we want to guarantee uniqueness
-    find_match_heap(a, start_marker, end_marker, marker_tape, data_tape);
+    find_match_heap(a, start_marker, end_marker, marker_tape, data_tape, false, full);
 
 
     IncompleteSet do_traverse_check{"do_traverse_check_"+ to_string(counter), "do_traverse_check_"+ to_string(counter)};
@@ -1474,7 +1495,7 @@ void TuringTools::find_match_heap_traverse(IncompleteSet &a, char start_marker, 
 
     go_to(traverse_loop, {'A'}, 0, -1, {marker_tape, data_tape});
     set_heap_mode(traverse_loop, true);
-    find_match_heap(traverse_loop, start_marker, end_marker, marker_tape, data_tape);
+    find_match_heap(traverse_loop, start_marker, end_marker, marker_tape, data_tape, false, full);
     //still need to move last key
 
     go_to(traverse_loop, {'A'}, marker_tape, -1, {marker_tape, data_tape});
@@ -2093,7 +2114,7 @@ void TuringTools::write_function_header(IncompleteSet &a, const vector<int>&tupl
     IncompleteSet b{"b", "br"};
     //link(write_function_header, b);
 
-    find_match_heap_traverse(write_function_header, 'A', 'S', 0, 1);
+    find_match_heap_traverse(write_function_header, 'A', 'S', 0, 1, false);
 
     string creatable = branch_on(write_function_header, {'\u0000'}, {(int) stack_tape});
 
@@ -2667,7 +2688,8 @@ void TuringTools::check_var_define_location(IncompleteSet &a, const vector<int> 
     //TODO: only do if normal find does not find it
     //setup find match traverse
 
-    string skip_store = check_stack_double(check_var_loop);
+    //string skip_store = check_stack_double(check_var_loop);
+    string skip_store = "a";
 
     IncompleteSet on_skip_store{skip_store, skip_store};
     go_to(on_skip_store, {'A'}, 0, -1, {0,1});

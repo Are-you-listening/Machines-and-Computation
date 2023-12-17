@@ -7,6 +7,6 @@ int main(){
         string a="test";
     }
     std::cout << a << std::endl;
-
+    return 0;
 
 }
