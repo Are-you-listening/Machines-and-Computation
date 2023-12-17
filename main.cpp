@@ -42,7 +42,7 @@ int main() { // Function names we create to replace nesting should have F or I i
     cfg->print();
     //cfg->toCNF();
     //cfg3->toCNF();
-
+    
     /*
     bool a= true;
     bool b= false;
