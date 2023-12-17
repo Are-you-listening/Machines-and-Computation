@@ -2688,8 +2688,7 @@ void TuringTools::check_var_define_location(IncompleteSet &a, const vector<int> 
     //TODO: only do if normal find does not find it
     //setup find match traverse
 
-    //string skip_store = check_stack_double(check_var_loop);
-    string skip_store = "a";
+    string skip_store = check_stack_double(check_var_loop);
 
     IncompleteSet on_skip_store{skip_store, skip_store};
     go_to(on_skip_store, {'A'}, 0, -1, {0,1});
@@ -3888,7 +3887,12 @@ string TuringTools::check_stack_double(IncompleteSet& a) {
     compareStringLoop.to_state = to_string(counter);
     counter++;
 
-    string equals = branch_on(compareStringLoop, {'{'}, {1});
+    IncompleteSet onFullRead{"onFullRead_"+ to_string(counter), "onFullRead_"+ to_string(counter)};
+    counter++;
+    string equals = branch_on(onFullRead, {'{'}, {1});
+
+    link_on(compareStringLoop, onFullRead, {heap_sep}, {(int) stack_tape});
+
     string different = branch_on(compareStringLoop, {'\u0000'}, {(int) stack_tape});
 
     go_to(compareStringLoop, {'B'}, 0, -1, {0,1});
@@ -3997,12 +4001,4 @@ void TuringTools::store_param_count(IncompleteSet &a, const vector<int>&tuple_in
 
 
 }
-
-
-
-
-
-
-
-
 
