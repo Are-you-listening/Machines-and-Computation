@@ -135,11 +135,14 @@ void LALR::mergeSimilar() {
 }
 
 void LALR::createTable() {
+    bool tableexists = false;
     if (std::filesystem::exists("parseTablefile.txt")){
-        std::cout << "loaded table from file" << std::endl;
-        loadTable();
-    } else {
-        std::cout << "creating table" << std::endl;
+        std::cout << "parseTablefile found!" << std::endl;
+        tableexists = loadTable();
+    }
+
+    if (!tableexists) {
+        std::cout << "No parseTablefile found for the current cfg." << std::endl;
         unordered_map<int, map<string, string>> createdTable;
         createStates();
 
@@ -402,7 +405,7 @@ void LALR::parse(std::vector<std::tuple<std::string, std::string, std::set<std::
         }
         string operation = parseTable[stacksymbol][inputsymbol];
 
-        cout << "stacksymbol: " << stacksymbol << ", inputsymbol: " << inputsymbol << " --> " << operation << endl;
+        //cout << "stacksymbol: " << stacksymbol << ", inputsymbol: " << inputsymbol << " --> " << operation << endl;
         if (operation.empty()){
             throw emptyElement();
         }
@@ -475,11 +478,11 @@ void LALR::parse(std::vector<std::tuple<std::string, std::string, std::set<std::
     }
     auto inputcopy = input;
     _root->addTokens(inputcopy);
-    vector<tuple<string, string, set<string>>> debugyield;
-    _root->getYield(debugyield);
-    for (auto elem : debugyield){
-        cout << get<0>(elem) << " ";
-    }
+    //vector<tuple<string, string, set<string>>> debugyield;
+    //_root->getYield(debugyield);
+    //for (auto elem : debugyield){
+    //    cout << get<0>(elem) << " ";
+    //}
 }
 
 void LALR::printTable() {
@@ -850,6 +853,9 @@ ParseTree* ParseTree::findRoot(ParseTree *&child,const std::vector<std::string> 
 void LALR::saveTable() {
     std::ofstream outFile("parseTablefile.txt");
     if (outFile.is_open()){
+        // first output the cfg to the file so we can check what parseTable is in the file
+        outFile << _cfg.createString();
+        outFile << "CFGend" << endl;
         for (const auto& row : parseTable) {
             outFile << row.first << std::endl;
             for (const auto& valuepair : row.second){
@@ -861,9 +867,24 @@ void LALR::saveTable() {
     }
 }
 
-void LALR::loadTable() {
+bool LALR::loadTable() {
     std::ifstream inFile("parseTablefile.txt");
     if (inFile.is_open()){
+        string currentcfg = _cfg.createString();
+        stringstream filecfg;
+        while(!inFile.eof()){
+            string line;
+            std::getline(inFile, line);
+            if (line.empty() || line == "CFGend"){
+                break;
+            }
+            filecfg << line << std::endl;
+        }
+        string result = filecfg.str();
+        if (currentcfg != filecfg.str()){
+            std::filesystem::remove("parseTablefile.txt");
+            return false;
+        }
         while(!inFile.eof()){
             string line;
             std::getline(inFile, line);
@@ -889,8 +910,10 @@ void LALR::loadTable() {
             }
         }
         inFile.close();
+        return true;
     } else {
         std::cout << "couldn't open parseTable file" << std::endl;
+        return false;
     }
 }
 
