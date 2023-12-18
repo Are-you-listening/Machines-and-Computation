@@ -943,7 +943,7 @@ void ParseTree::getTokenSet(set<std::string> &vSet, std::set<std::string> &dSet)
     for(auto &child: children){
         if(get<0>(child->token)=="V" || get<0>(child->token)=="I" || get<0>(child->token)=="e" ){
             vSet.insert( get<2>(child->token).begin(), get<2>(child->token).end() );
-        }else if(get<0>(child->token)=="D"){
+        }else if(get<0>(child->token)=="D" || get<0>(child->token)=="F"){
             dSet.insert(get<2>(child->token).begin(), get<2>(child->token).end() );
         }
         child->getTokenSet(vSet,dSet); //Go recursively for every child
