@@ -934,7 +934,7 @@ void ParseTree::getYield(vector<tuple<string, string, set<string>>> &yield) {
 
 void ParseTree::getTokenSet(set<std::string> &vSet, std::set<std::string> &dSet) const {
     for(auto &child: children){
-        if(get<0>(child->token)=="V" || get<0>(child->token)=="I" || get<0>(child->token)=="e"){ //If we found a variable; insert the data
+        if(get<0>(child->token)=="V" || get<0>(child->token)=="I" || get<0>(child->token)=="e"){
             vSet.insert( get<2>(child->token).begin(), get<2>(child->token).end() );
         }else if(get<0>(child->token)=="D"){
             dSet.insert(get<2>(child->token).begin(), get<2>(child->token).end() );
