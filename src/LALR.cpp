@@ -630,12 +630,12 @@ void ParseTree::findBracket(bool left, std::tuple<ParseTree *, unsigned long, un
             return;
         }
 
-        if(children[j]->symbol==bracket){ //If bracket found
+        if(get<0>(children[j]->token)==bracket){ //If bracket found
             std::get<0>(data) = this; //Set root
             std::get<1>(data) = j; //Set child
             std::get<3>(data) = true; //Set found
             return;
-        }else if( std::find(Terminals.begin(), Terminals.end(),children[j]->symbol)==Terminals.end() ){ //If Variable: search the left most "{" in this tree
+        }else if( std::find(Terminals.begin(), Terminals.end(),get<0>(children[j]->token))==Terminals.end() ){ //If Variable: search the left most "{" in this tree
             std::get<2>(data) = ++std::get<2>(data); //Increase depth
             children[j]->findBracket(left,data,Terminals);
         }
@@ -762,16 +762,16 @@ void ParseTree::findViolation(const unsigned long &max, unsigned long &count, un
 
     for(long unsigned int i = 0; i<children.size();++i){
         ParseTree* child = children[i];
-        if(child->symbol=="{") { //Found nesting
+        if(get<0>(child->token)=="{") { //Found nesting
             ++count;
             if (count == max) {
                 Rviolator = this;
                 index = i;
                 return;
             }
-        }else if(std::find(Terminals.begin(), Terminals.end(),child->symbol)==Terminals.end()){ //Found some V
+        }else if(std::find(Terminals.begin(), Terminals.end(),get<0>(child->token))==Terminals.end()){ //Found some V
             child->findViolation(max,count,index,Rviolator,Terminals); //Search further in the Variable nodes
-        }else if(child->symbol=="}"){ //Didn't reached max but did found matching; should now decrease?
+        }else if(get<0>(child->token)=="}"){ //Didn't reached max but did found matching; should now decrease?
             --count; //Is this right?
         }
     }
@@ -798,7 +798,7 @@ void ParseTree::matchBrackets(const std::vector<std::string> &Terminals) {
     //Find RB
     for(unsigned long i = std::get<1>(lb)+1; i<LBroot->children.size(); ++i){
         ParseTree* child = LBroot->children[i];
-        if(std::find(Terminals.begin(), Terminals.end(),child->symbol)==Terminals.end()){ //Found a first variable
+        if(std::find(Terminals.begin(), Terminals.end(),get<0>(child->token))==Terminals.end()){ //Found a first variable
             V = child;
             child->findBracket(false,rb,Terminals); //Find in here for the right bracket
             break;
@@ -839,7 +839,7 @@ ParseTree* ParseTree::findRoot(ParseTree *&child,const std::vector<std::string> 
     for(auto kid : children){
         if(child==kid){
             return this;
-        }else if( std::find(Terminals.begin(), Terminals.end(),kid->symbol)==Terminals.end() ){ //Found a variable
+        }else if( std::find(Terminals.begin(), Terminals.end(),get<0>(kid->token))==Terminals.end() ){ //Found a variable
             auto result = kid->findRoot(child,Terminals);
             if(result!= nullptr){
                 return result; //Found!
@@ -942,7 +942,7 @@ void ParseTree::getYield(vector<tuple<string, string, set<string>>> &yield) {
 
 void ParseTree::getTokenSet(set<std::set<std::string>> &tokenSet) const {
     for(auto &child: children){
-        if(child->symbol=="V"){ //If we found a variable; insert the data
+        if(get<0>(child->token)=="V"){ //If we found a variable; insert the data
             tokenSet.insert(get<2>(child->token));
         }
         child->getTokenSet(tokenSet); //Go recursively for every child
