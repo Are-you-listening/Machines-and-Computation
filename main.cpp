@@ -94,12 +94,15 @@ int main() { // Function names we create to replace nesting should have F or I i
         if(it.find("{")!=std::string::npos){
             nestingcounter++;
             tab+="    ";
-        }else if(it.find("}")!=std::string::npos){
-            nestingcounter--;
-            tab.substr((nestingcounter*4)-4,std::string::npos);
-        }
-        File1010 <<tab<< it <<std::endl;
+        }else if(std::find(it.begin(), it.end(), '}')!=it.end()){
+            //nestingcounter--;
+            for (int i =0; i<4; i++){
+                tab.pop_back();
+            }
+        }*/
+        
     }
+    
     //cleanup
     //if-else antinesting
     //move

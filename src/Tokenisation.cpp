@@ -540,6 +540,7 @@ void Tokenisation::Tokenize(const std::string &FileLocation) {
                             if(D0.find(' ')!=std::string::npos){
                                 std::get<2>(*it).insert(D0);
                             }
+                            std::get<2>(it3).insert(D0);
                             visited.insert(D0);
                             goto here;
                         }
