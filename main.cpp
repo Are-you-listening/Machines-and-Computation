@@ -91,8 +91,24 @@ int main() { // Function names we create to replace nesting should have F or I i
     unsigned long int nestingcounter=0;
     std::string tab;
     for(const auto& it:V10){
-        if(it.find("{")!=std::string::npos){
-            nestingcounter++;
+        File1010 <<tab<< it <<std::endl;
+        
+        int add = std::count(it.begin(), it.end(), '{');
+        int remove = std::count(it.begin(), it.end(), '}');
+        
+        for (int i = 0; i<add; i++){
+            tab+="    ";
+        }
+
+        for (int i = 0; i<remove; i++){
+            for (int j =0; j<4; j++){
+                tab.pop_back();
+            }
+        }
+        
+        /*
+        if(std::find(it.begin(), it.end(), '{')!=it.end()){
+            //nestingcounter++;
             tab+="    ";
         }else if(std::find(it.begin(), it.end(), '}')!=it.end()){
             //nestingcounter--;
