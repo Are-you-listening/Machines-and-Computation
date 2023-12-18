@@ -116,6 +116,8 @@ public:
      * @param tokenSet
      */
     void getTokenSet(std::set<std::set<std::string>> &tokenSet) const;
+
+    void cleanIncludeTypedefs(std::vector<ParseTree*> &newKids);
 };
 
 /**
