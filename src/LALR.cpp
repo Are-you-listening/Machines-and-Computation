@@ -965,7 +965,7 @@ void ParseTree::cleanIncludeTypedefs(std::vector<ParseTree*> &newKids) {
 
     for(unsigned long i = 0; i<this->children.size(); ++i){
         auto child = children[i];
-        if(get<1>(child->token).substr(0,8)=="#include" || get<1>(child->token).substr(0,7)=="typedef"){
+        if(get<1>(child->token).find("#include")!=std::string::npos || get<1>(child->token).find("typedef")!=std::string::npos){
             newKids.push_back(child);
         }else{
             tempKids.push_back(child);
@@ -973,6 +973,23 @@ void ParseTree::cleanIncludeTypedefs(std::vector<ParseTree*> &newKids) {
         }
     }
     children=tempKids;
+}
+
+bool ParseTree::checkBRC() {
+    for(auto &child: children){
+        if(get<1>(child->token).find("continue")!=std::string::npos || get<1>(child->token).find("break")!=std::string::npos | get<1>(child->token).find("return")!=std::string::npos  ){//If there is no continue, break or return
+            return true;
+        }else{
+            if (child->checkBRC()){
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+void ParseTree::replaceBracket(){
+    
 }
 
 void ParseTree::removeViolator() {

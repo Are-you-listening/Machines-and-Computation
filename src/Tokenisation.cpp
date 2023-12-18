@@ -527,8 +527,14 @@ void Tokenisation::Tokenize(const std::string &FileLocation) {
                                 std::get<0>(it3)="D";
                             }
                             std::string D0;
+                            unsigned long int skip=0;
                             for(auto C=std::get<1>(it3).end()-(std::get<1>(it3).size()-position); C!=std::get<1>(it3).begin()-1;C--){
-                                if(*C==' '||VariableCharSecond.find(*C)!=VariableCharSecond.end()||*C=='&'||*C==':'||*C=='>'||*C=='<'||*C==','){
+                                if(*C=='>'){
+                                    skip++;
+                                } else if(*C=='<'){
+                                    skip--;
+                                }
+                                if(*C==' '||VariableCharSecond.find(*C)!=VariableCharSecond.end()||*C=='&'||*C==':'||*C=='>'||*C=='<'||*C==','&&skip!=0){
                                     D0+=*C;
                                 } else{
                                     break;
