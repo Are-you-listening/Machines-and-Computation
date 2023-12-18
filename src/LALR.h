@@ -72,7 +72,7 @@ public:
      */
     ParseTree(const vector<ParseTree *> &children, string symbol);
 
-    ParseTree(const vector<ParseTree *> &children, const string &symbol,
+    ParseTree(const vector<ParseTree *> &children, string symbol,
               const tuple<string, string, set<string>> &token);
 
     /**
@@ -107,6 +107,10 @@ public:
      */
     void matchBrackets(const std::vector<std::string> &Terminals);
 
+    /**
+     * Get the Yield of the ParseTree
+     * @param yield
+     */
     void getYield(vector<tuple<string, string, set<string>>> &yield);
 
     void addTokens(vector<tuple<string, string, set<string>>>& tokens);
@@ -117,9 +121,11 @@ public:
      */
     void getTokenSet(set<std::string> &vSet, std::set<std::string> &dSet) const;
 
+    /**
+     * Helper function to collect Includes & Typedefs and add them in front
+     * @param newKids
+     */
     void cleanIncludeTypedefs(std::vector<ParseTree*> &newKids);
-
-    void removeViolator();
 };
 
 /**
@@ -135,13 +141,13 @@ class LALR {
      * Helper function for generate(), creates a new function Call in place
      * @return , Parsetree* containing the new code
      */
-    ParseTree* functionCall(const string& code);
+    static ParseTree* functionCall(const string& code);
 
     /**
      * Helper function for generate(), creates a new function in place
      * @return , Parsetree* containing the new code
      */
-    string function(ParseTree *violator, std::set<std::string> &tokenSet, const string functionName);
+    string function(ParseTree *violator, std::set<std::string> &tokenSet, const string &functionName) const;
 
 public:
     unordered_map<int, map<string, string>> parseTable;
