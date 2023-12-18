@@ -504,18 +504,12 @@ void LALR::generate() {
     ParseTree* violator = nullptr;
     std::vector<ParseTree*> new_rootKids;
 
-    //TODO Make sure #includes, typedefs are all _roots children! - Needs function to format
-    //TODO What if _root == violator?
     //IGNORE If-Else nesting? Can the token therefore not be generated? ("{" and "}" ? )
     _root->cleanIncludeTypedefs(new_rootKids); //Collect includes
 
     _root->matchBrackets(_cfg.getT()); //Format first
     _root->findViolation(max,split,count,index,violator,_cfg.getT(),found); //Check for violations
-    
-    if(violator->checkBRC()){
-        
-    }
-    
+
     while(violator!=nullptr){
         //Find difference: vSet - dSet = result
         std::set<std::string> vSet; //Contains V,I,e
@@ -553,6 +547,22 @@ void LALR::generate() {
         }
         auto* createFrom = new ParseTree(tomove,"", {"","",{}}); //Create a variable in between
 
+        pair<bool,int> fDepth = {false,0};
+        pair<bool,int> cbrDepth = {false,0};
+        createFrom->checkBRC(fDepth,cbrDepth);
+        if(cbrDepth.second>=fDepth.second){ //Replace brackets
+            for(auto &node: newKids){
+                if(get<0>(node->token)=="{"){ //
+                    get<0>(node->token) = "\u1F600";
+                    get<1>(node->token) = "\u1F600";
+                }else if(get<0>(node->token)=="}" ){
+                    get<0>(node->token) = "\u1F976";
+                    get<1>(node->token) = "\u1F976";
+                }
+            }
+            goto recheck;
+        }
+
         newKids.push_back(functionCall(function(createFrom,result2,functionName))); //Create the new function in the root and add its functionCall()
         functionName+="A";
         newKids.push_back(violator->children[index]);
@@ -564,6 +574,7 @@ void LALR::generate() {
         violator->children = newKids; //Set children (now with functionCall)
 
         //Recheck everything
+        recheck:
         violator= nullptr;
         count = 0;
         found = false;
@@ -580,6 +591,14 @@ void LALR::generate() {
     _root->getYield(yield);
     ofstream test("output/result.cpp");
     for(auto &k: yield){
+        if(get<1>(k)=="\u1F600"){
+            get<0>(k)="{";
+            get<1>(k)="{";
+        }else if(get<1>(k)=="\u1F976"){
+            get<0>(k)="}";
+            get<1>(k)="}";
+        }
+
         auto str = get<1>(k);
         test << str;
         if(str[str.size()-1]==';' || str[str.size()-1]=='{' || str[str.size()-1]=='}' ||str[str.size()-1]=='>' ){
@@ -743,7 +762,6 @@ string LALR::function(ParseTree *violator, std::set<std::string> &tokenSet, cons
 }
 
 void ParseTree::findViolation(const unsigned long &max,const unsigned long &split, unsigned long &count, unsigned long &index,ParseTree* &Rviolator,const std::vector<std::string> &Terminals, bool &found) {
-    std::cout << "findviolation" << std::endl;
     if(found){
         return;
     }
@@ -959,10 +977,6 @@ void ParseTree::getTokenSet(set<std::string> &vSet, std::set<std::string> &dSet)
     }
 }
 
-ParseTree::ParseTree(const vector<ParseTree *> &children, string symbol,
-                     const tuple<string, string, set<string>> &token) : children(children), symbol(std::move(symbol)),
-                                                                        token(token) {}
-
 void ParseTree::cleanIncludeTypedefs(std::vector<ParseTree*> &newKids) {
     std::vector<unsigned long> indices;
     std::vector<ParseTree*> tempKids;
@@ -979,21 +993,33 @@ void ParseTree::cleanIncludeTypedefs(std::vector<ParseTree*> &newKids) {
     children=tempKids;
 }
 
-bool ParseTree::checkBRC() {
+void ParseTree::checkBRC(pair<bool,int> &fDepth , pair<bool,int> &cbrDepth) {
     for(auto &child: children){
-        if(get<1>(child->token).find("continue")!=std::string::npos || get<1>(child->token).find("break")!=std::string::npos | get<1>(child->token).find("return")!=std::string::npos  ){//If there is no continue, break or return
-            return true;
+        if(cbrDepth.first && fDepth.first){ //Both found, return, else go to through every child
+            return;
+        }
+
+        if(get<1>(child->token).find("continue")!=std::string::npos || get<1>(child->token).find("break")!=std::string::npos || get<1>(child->token).find("return")!=std::string::npos  ){
+            cbrDepth.first=true;
+        }else if(get<0>(child->token)=="F" ){ //Don't count I or e!!
+            fDepth.first=true;
         }else{
-            if (child->checkBRC()){
-                return true;
-            }
+            //if(!get<0>(child->token).empty()){ //Don't count empty nodes
+                if(!cbrDepth.first){ //In case not yet found
+                    --cbrDepth.second;
+                }
+                if(!fDepth.first){
+                    --fDepth.second;
+                }
+            //}
+            child->checkBRC(fDepth,cbrDepth);
         }
     }
-    return false;
 }
 
-void ParseTree::replaceBracket(){
-    
+ParseTree::ParseTree(const vector<ParseTree *> &children, const string &symbol,
+                     const tuple<string, string, set<string>> &token): children(children),symbol(symbol),token(token) {
+
 }
 
 
