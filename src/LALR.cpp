@@ -471,7 +471,7 @@ void LALR::parse(std::vector<std::tuple<std::string, std::string, std::set<std::
                 }
                 s.pop();
             }
-            treetops.push_back(newparent);
+            treetops.insert(treetops.begin(), newparent);
         } else {
             s.push(stoi(operation));
         }
