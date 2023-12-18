@@ -495,10 +495,11 @@ void LALR::printTable() {
 }
 
 void LALR::generate() {
-    const unsigned long split = Config::getConfig()->getSplitNesting()+1;
-    const unsigned long max = Config::getConfig()->getMaxNesting()+1;
+    const unsigned long split = Config::getConfig()->getSplitNesting();
+    const unsigned long max = Config::getConfig()->getMaxNesting();
     unsigned long count = 0;
     unsigned long index;
+    bool found = false;
     string functionName = "A";
     ParseTree* violator = nullptr;
     std::vector<ParseTree*> new_rootKids;
@@ -509,7 +510,7 @@ void LALR::generate() {
     _root->cleanIncludeTypedefs(new_rootKids); //Collect includes
 
     _root->matchBrackets(_cfg.getT()); //Format first
-    _root->findViolation(max,split,count,index,violator,_cfg.getT()); //Check for violations
+    _root->findViolation(max,split,count,index,violator,_cfg.getT(),found); //Check for violations
 
     while(violator!=nullptr){
         std::set<std::set<std::string>> tokenSet;
@@ -549,7 +550,8 @@ void LALR::generate() {
         //Recheck everything
         violator= nullptr;
         count = 0;
-        _root->findViolation(max,split,count,index,violator,_cfg.getT()); //Check for more violations
+        found = false;
+        _root->findViolation(max,split,count,index,violator,_cfg.getT(), found); //Check for more violations
     }
 
     for(auto child: _root->children){ //Readd includes
@@ -730,8 +732,9 @@ string LALR::function(ParseTree *violator, std::set<std::set<std::string>> &toke
     return functionName+"(" + temp.substr(0,temp.size()-1) + ");"; //Cut of the last comma
 }
 
-void ParseTree::findViolation(const unsigned long &max,const unsigned long &split, unsigned long &count, unsigned long &index,ParseTree* &Rviolator,const std::vector<std::string> &Terminals) {
-    if(count==max){
+void ParseTree::findViolation(const unsigned long &max,const unsigned long &split, unsigned long &count, unsigned long &index,ParseTree* &Rviolator,const std::vector<std::string> &Terminals, bool &found) {
+    std::cout << "findviolation" << std::endl;
+    if(found){
         return;
     }
 
@@ -745,12 +748,22 @@ void ParseTree::findViolation(const unsigned long &max,const unsigned long &spli
             }
 
             if( count == max){
+                found = true;
                 return;
             }
+
+            if(found){
+                return;
+            }
+
         }else if(std::find(Terminals.begin(), Terminals.end(),get<0>(child->token))==Terminals.end()){ //Found some V
-            child->findViolation(max,split,count,index,Rviolator,Terminals); //Search further in the Variable nodes
+            child->findViolation(max,split,count,index,Rviolator,Terminals,found); //Search further in the Variable nodes
         }else if(get<0>(child->token)=="}"){ //Didn't reached max but did found matching; should now decrease?
             --count; //Is this right?
+            if(Rviolator!= nullptr && count<split){
+                Rviolator = nullptr;
+                found = true;
+            }
         }
     }
     //--count;

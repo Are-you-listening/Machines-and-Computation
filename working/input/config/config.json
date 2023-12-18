@@ -1,6 +1,6 @@
 {
-  "max_nesting" : 2,
-  "split_nesting": 1,
+  "max_nesting" : 3,
+  "split_nesting": 2,
   "ifElse_nesting": 0,
   "threading": false,
   "staticMemory": false
