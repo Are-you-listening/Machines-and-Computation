@@ -519,62 +519,32 @@ void LALR::generate() {
         std::set<std::set<std::string>> tokenSet;
         violator->getTokenSet(tokenSet);
 
-        /*vector<ParseTree*> newKids;
-        for(long unsigned int i = 0; i<index; ++i){ //Pushback firsthalf of kids
-            ParseTree* child = violator->children[i];
-            if(child->symbol=="{"){
-                break;
-            }
+        vector<ParseTree *> newKids;
+
+        for (long unsigned int i = 0; i<index; ++i) { //Pushback firsthalf of kids
+            ParseTree *child = violator->children[i];
             newKids.push_back(child);
         }
 
-        vector<ParseTree*> tomove;
-        for(long unsigned int i = index+1; i<violator->children.size(); ++i){ //Skip the part for which we create a function call
-            ParseTree* child = violator->children[i];
-            if(child->symbol=="}"){
+        vector<ParseTree *> tomove;
+        for (long unsigned int i = index + 1; i < violator->children.size(); ++i) { //Skip the part for the functionCall
+            ParseTree *child = violator->children[i];
+            if (get<0>(child->token) == "}") {
                 index = i;
                 break;
             }
             tomove.push_back(child);
-        }*/
-        //newKids.push_back(functionCall(functionName,tokenSet)); //Create Function Call
+        }
+        ParseTree* createFrom = new ParseTree(tomove,"", {"","",{}}); //Create a variable in between
 
+        newKids.push_back(functionCall(function(createFrom,tokenSet,functionName))); //Create the new function in the root and add its functionCall()
+        functionName+="A";
 
-        //BEGIN Do the actual moving part
-            //Find root of violator
-            auto data = _root->findRoot(violator,_cfg.getT());
-            if(violator == _root){
-                //std::cout << "error! in LALR move!!" << std::endl;
-                //data = _root;
-                break;
-            }else if(data == nullptr){
-                std::cout << "error! in LALR move!!" << std::endl;
-                break;
-            }
-
-            //Insert before index of violator
-            vector<ParseTree*> temp;
-            for(auto child : data->children){ //Skip the part for which we create a function call
-                if(child==violator){
-                    /*for(auto &c: tomove){ //Add from moveto
-                        temp.push_back(c);
-                    }*/
-                    temp.push_back(functionCall(function(violator,tokenSet,functionName))); //Create a the new function in the root and add its functionCall()
-                    functionName+="A";
-                }else{
-                    temp.push_back(child);
-                }
-            }
-            data->children = temp;
-            temp.clear();
-        //END Actual Moving
-
-        /*for(long unsigned int i = index+1; i<violator->children.size(); ++i){ //Pushback rest of the children
-            ParseTree* child = violator->children[i];
+        for (long unsigned int i = index + 1; i < violator->children.size(); ++i) { //Pushback rest of the children
+            ParseTree *child = violator->children[i];
             newKids.push_back(child);
         }
-
-        violator->children = newKids;*/
+        violator->children = newKids; //Set children (now with functionCall)
 
         //Recheck everything
         violator= nullptr;
@@ -967,4 +937,8 @@ void ParseTree::cleanIncludeTypedefs(std::vector<ParseTree*> &newKids) {
         }
     }
     children=tempKids;
+}
+
+void ParseTree::removeViolator() {
+
 }
