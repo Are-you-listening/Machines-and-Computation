@@ -21,6 +21,7 @@ enable_testing()
 set(TestCaseFiles
         test/TuringMachineTest.cpp
         test/ThreadingTest.cpp
+        #working/output/result.cpp
 
 )
 
