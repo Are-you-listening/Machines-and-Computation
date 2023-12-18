@@ -66,12 +66,11 @@ public:
     ParseTree() = default;
 
     /**
-     * Full Constructor
+     * Constructor
      * @param children
      * @param symbol
+     * @param token
      */
-    ParseTree(const vector<ParseTree *> &children, string symbol);
-
     ParseTree(const vector<ParseTree *> &children, const string &symbol,
               const tuple<string, string, set<string>> &token);
 

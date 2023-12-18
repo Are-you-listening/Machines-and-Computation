@@ -14,8 +14,7 @@ LALR::LALR(const CFG &cfg) : _cfg(cfg) {}
 
 void LALR::createStates() {
     // manually create I0
-    auto* I0 = new State;
-    this->I0 = I0;
+    I0 = new State;
     state_counter = 0;
     I0->_stateName = 0;
     I0->_connections = {};
@@ -24,7 +23,6 @@ void LALR::createStates() {
     std::cout << "end createAugmented" << std::endl;
     I0->createConnections(*this);
     std::cout << "end createConnections" << std::endl;
-    //cout << "debug" << endl;
 }
 
 set<State *> LALR::findSimilar(const set<tuple<string, vector<string>, set<string>>> &rules) {
@@ -608,8 +606,6 @@ void LALR::generate() {
     test.close();
 }
 
-ParseTree::ParseTree(const vector<ParseTree *> &children, string symbol): children(children),symbol(std::move(symbol)) {}
-
 ParseTree::~ParseTree() {
     for (const auto& child : children){
         delete child;
@@ -662,10 +658,7 @@ void ParseTree::findBracket(bool left, std::tuple<ParseTree *, unsigned long, un
 }
 
 ParseTree* LALR::functionCall(const string& code) {
-    auto k = new ParseTree({},"D");
-    //auto t = code.substr(5,code.size()); //remove "void" from name
-    k->token = {"D",code,{}};
-    return k;
+    return new ParseTree({},"D",{"D",code,{}});
 }
 
 string LALR::function(ParseTree *violator, std::set<std::string> &tokenSet, const string &functionName) const {
