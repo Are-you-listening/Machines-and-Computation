@@ -514,7 +514,7 @@ void LALR::generate() {
 
     while(violator!=nullptr){
         //Find difference: vSet - dSet = result
-        std::set<std::string> vSet;
+        std::set<std::string> vSet; //Contains V,I,e
         std::set<std::string> dSet;
         violator->getTokenSet(vSet,dSet);
         std::set<std::string> result;
