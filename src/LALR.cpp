@@ -519,7 +519,13 @@ void LALR::generate() {
         violator->getTokenSet(vSet,dSet);
         std::set<std::string> result;
         std::set_difference(vSet.begin(), vSet.end(), dSet.begin(), dSet.end(), std::inserter(result, result.end()));
-
+        std::set<string> result2;
+        for(auto &k: result){
+            if(!k.empty()){
+                result2.insert(k);
+            }
+        }
+        
 
         vector<ParseTree *> newKids;
 
@@ -543,7 +549,7 @@ void LALR::generate() {
         }
         ParseTree* createFrom = new ParseTree(tomove,"", {"","",{}}); //Create a variable in between
 
-        newKids.push_back(functionCall(function(createFrom,result,functionName))); //Create the new function in the root and add its functionCall()
+        newKids.push_back(functionCall(function(createFrom,result2,functionName))); //Create the new function in the root and add its functionCall()
         functionName+="A";
 
         for (long unsigned int i = index + 1; i < violator->children.size(); ++i) { //Pushback rest of the children
