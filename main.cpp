@@ -90,6 +90,7 @@ int main() { // Function names we create to replace nesting should have F or I i
         V10.push_back(C10);
     }
 
+    
     std::ofstream File1010("output/result.cpp");
     unsigned long int nestingcounter=0;
     std::string tab;
@@ -108,18 +109,6 @@ int main() { // Function names we create to replace nesting should have F or I i
                 tab.pop_back();
             }
         }
-        
-        /*
-        if(std::find(it.begin(), it.end(), '{')!=it.end()){
-            //nestingcounter++;
-            tab+="    ";
-        }else if(std::find(it.begin(), it.end(), '}')!=it.end()){
-            //nestingcounter--;
-            for (int i =0; i<4; i++){
-                tab.pop_back();
-            }
-        }*/
-        
     }
     
     //cleanup
