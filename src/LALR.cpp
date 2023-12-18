@@ -697,7 +697,7 @@ string LALR::function(ParseTree *violator, std::set<std::string> &tokenSet, cons
         string variableType = variable.substr(0, lastSpace);
         string variableName = variable.substr(lastSpace+1);
         if (variableType.back() == '&' || variableType.back() == '*' || variableName.front() == '&' || variableName.front() == '*'){
-            // we don't need to add an & because the variable is already passed by reference or it is a pointer
+            // we don't need to add a & because the variable is already passed by reference, or it is a pointer
             newvariables.emplace(variable);
         } else {
             variableType.push_back('&');
@@ -723,7 +723,7 @@ string LALR::function(ParseTree *violator, std::set<std::string> &tokenSet, cons
     get<0>(newfunctiontoken)  = "D";
     get<1>(newfunctiontoken) = functiondefinition;
     get<2>(newfunctiontoken) = emptyset;
-    ParseTree* functionTree = new ParseTree;
+    auto functionTree = new ParseTree;
     functionTree->symbol = "D";
     functionTree->token = newfunctiontoken;
 
@@ -731,7 +731,7 @@ string LALR::function(ParseTree *violator, std::set<std::string> &tokenSet, cons
     get<0>(openbracket) = "{";
     get<1>(openbracket) = "{";
     get<2>(openbracket) = emptyset;
-    ParseTree* openbracketTree = new ParseTree;
+    auto openbracketTree = new ParseTree;
     openbracketTree->symbol = "{";
     openbracketTree->token = openbracket;
 
@@ -739,7 +739,7 @@ string LALR::function(ParseTree *violator, std::set<std::string> &tokenSet, cons
     get<0>(closingbracket) = "}";
     get<1>(closingbracket) = "}";
     get<2>(closingbracket) = emptyset;
-    ParseTree* closingbracketTree = new ParseTree;
+    auto closingbracketTree = new ParseTree;
     closingbracketTree->symbol = "}";
     closingbracketTree->token = closingbracket;
 
@@ -791,7 +791,7 @@ void ParseTree::findViolation(const unsigned long &max,const unsigned long &spli
                 return;
             }
             
-        }else if(get<0>(child->token)=="}"){ //Didn't reached max but did found matching; should now decrease?
+        }else if(get<0>(child->token)=="}"){ //Didn't reach max but did found matching; should now decrease?
             --count; //Is this right?
             if(!found){
                 if(Rviolator!= nullptr && count<split){
@@ -879,7 +879,7 @@ ParseTree* ParseTree::findRoot(ParseTree *&child,const std::vector<std::string> 
 void LALR::saveTable() {
     std::ofstream outFile("parseTablefile.txt");
     if (outFile.is_open()){
-        // first output the cfg to the file so we can check what parseTable is in the file
+        // first output the cfg to the file, so we can check what parseTable is in the file
         outFile << _cfg.createString();
         outFile << "CFGend" << endl;
         for (const auto& row : parseTable) {
@@ -996,12 +996,12 @@ void ParseTree::cleanIncludeTypedefs(std::vector<ParseTree*> &newKids) {
 void ParseTree::checkBRC(pair<bool,int> &fDepth , pair<bool,int> &cbrDepth) {
     for(auto &child: children){
         if(cbrDepth.first && fDepth.first){ //Both found, return, else go to through every child
-            return;
+            return; //This statement can make the proces shorter
         }
 
         if(get<1>(child->token).find("continue")!=std::string::npos || get<1>(child->token).find("break")!=std::string::npos || get<1>(child->token).find("return")!=std::string::npos  ){
             cbrDepth.first=true;
-        }else if(get<0>(child->token)=="F" ){ //Don't count I or e!!
+        }else if(get<0>(child->token)=="F" ){ //Don't count I or e, we only want to check if the cbr is in a forloop!
             fDepth.first=true;
         }else{
             //if(!get<0>(child->token).empty()){ //Don't count empty nodes
