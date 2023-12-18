@@ -518,6 +518,9 @@ void Tokenisation::Tokenize(const std::string &FileLocation) {
                         } else if(std::get<1>(it3).find(" "+*it2+")")!=std::string::npos){
                             position=std::get<1>(it3).find(" "+*it2+")");
                             it_6= true;
+                        } else if(std::get<1>(it3).find(" "+*it2+" ")!=std::string::npos){
+                            position=std::get<1>(it3).find(" "+*it2+" ");
+                            it_6= true;
                         }
                         if(it_0||it_1||it_2||it_3||it_4||it_5||it_6&&std::get<1>(it3)!=std::get<1>(*it)){
                             if(std::get<0>(it3)=="V"){
@@ -525,7 +528,7 @@ void Tokenisation::Tokenize(const std::string &FileLocation) {
                             }
                             std::string D0;
                             for(auto C=std::get<1>(it3).end()-(std::get<1>(it3).size()-position); C!=std::get<1>(it3).begin()-1;C--){
-                                if(*C==' '||VariableCharSecond.find(*C)!=VariableCharSecond.end()||*C=='&'){
+                                if(*C==' '||VariableCharSecond.find(*C)!=VariableCharSecond.end()||*C=='&'||*C==':'||*C=='>'||*C=='<'||*C==','){
                                     D0+=*C;
                                 } else{
                                     break;
