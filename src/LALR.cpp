@@ -513,8 +513,13 @@ void LALR::generate() {
     _root->findViolation(max,split,count,index,violator,_cfg.getT(),found); //Check for violations
 
     while(violator!=nullptr){
-        std::set<std::set<std::string>> tokenSet;
-        violator->getTokenSet(tokenSet);
+        //Find difference: vSet - dSet = result
+        std::set<std::string> vSet;
+        std::set<std::string> dSet;
+        violator->getTokenSet(vSet,dSet);
+        std::set<std::string> result;
+        std::set_difference(vSet.begin(), vSet.end(), dSet.begin(), dSet.end(), std::inserter(result, result.end()));
+
 
         vector<ParseTree *> newKids;
 
@@ -538,7 +543,7 @@ void LALR::generate() {
         }
         ParseTree* createFrom = new ParseTree(tomove,"", {"","",{}}); //Create a variable in between
 
-        newKids.push_back(functionCall(function(createFrom,tokenSet,functionName))); //Create the new function in the root and add its functionCall()
+        newKids.push_back(functionCall(function(createFrom,result,functionName))); //Create the new function in the root and add its functionCall()
         functionName+="A";
 
         for (long unsigned int i = index + 1; i < violator->children.size(); ++i) { //Pushback rest of the children
@@ -633,7 +638,7 @@ ParseTree* LALR::functionCall(const string& code) {
     return k;
 }
 
-string LALR::function(ParseTree *violator, std::set<std::set<std::string>> &tokenSet, const string functionName) {
+string LALR::function(ParseTree *violator, std::set<std::string> &tokenSet, const string functionName) {
     std::vector<ParseTree*> newKids;
     long unsigned int i;
     long unsigned int index;
@@ -651,14 +656,8 @@ string LALR::function(ParseTree *violator, std::set<std::set<std::string>> &toke
         newKids.push_back(child);
     }
 
-    set<string> bigSet;
-    for (auto smallset : tokenSet){
-        for (string elem : smallset){
-            bigSet.emplace(elem);
-        }
-    }
     set<string> newvariables;
-    for (string variable : bigSet){
+    for (string variable : tokenSet){
         auto lastSpace = variable.find_last_of(' ');
         if (lastSpace == variable.npos){
             // there is no space in the variable --> only name or only type
@@ -933,12 +932,14 @@ void ParseTree::getYield(vector<tuple<string, string, set<string>>> &yield) {
     }
 }
 
-void ParseTree::getTokenSet(set<std::set<std::string>> &tokenSet) const {
+void ParseTree::getTokenSet(set<std::string> &vSet, std::set<std::string> &dSet) const {
     for(auto &child: children){
         if(get<0>(child->token)=="V"){ //If we found a variable; insert the data
-            tokenSet.insert(get<2>(child->token));
+            vSet.insert( get<2>(child->token).begin(), get<2>(child->token).end() );
+        }else if(get<0>(child->token)=="D"){
+            dSet.insert(get<2>(child->token).begin(), get<2>(child->token).end() );
         }
-        child->getTokenSet(tokenSet); //Go recursively for every child
+        child->getTokenSet(vSet,dSet); //Go recursively for every child
     }
 }
 
