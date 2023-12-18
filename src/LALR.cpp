@@ -651,8 +651,8 @@ void ParseTree::findBracket(bool left, std::tuple<ParseTree *, unsigned long, un
 
 ParseTree* LALR::functionCall(const string& code) {
     auto k = new ParseTree({},"D");
-    auto t = code.substr(5,code.size()); //remove "void" from name
-    k->token = {"D",t,{}};
+    //auto t = code.substr(5,code.size()); //remove "void" from name
+    k->token = {"D",code,{}};
     return k;
 }
 
