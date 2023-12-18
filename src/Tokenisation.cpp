@@ -379,6 +379,7 @@ void Tokenisation::Tokenize(const std::string &FileLocation) {
             line=line.substr(1,std::string::npos);
         }
         if(line.substr(0,2)=="//"){
+            tokenVector.emplace_back("C",line);
             continue;
         }
         if(line.substr(0,3)=="for"){
