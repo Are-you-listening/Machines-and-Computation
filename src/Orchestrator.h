@@ -5,9 +5,9 @@
 #ifndef TOG_ORCHESTRATOR_H
 #define TOG_ORCHESTRATOR_H
 
-#include <string>
-
 #include "CFGConstructor.h"
+
+#include <string>
 
 using namespace std;
 

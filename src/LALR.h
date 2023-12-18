@@ -66,12 +66,11 @@ public:
     ParseTree() = default;
 
     /**
-     * Full Constructor
+     * Constructor
      * @param children
      * @param symbol
+     * @param token
      */
-    ParseTree(const vector<ParseTree *> &children, string symbol);
-
     ParseTree(const vector<ParseTree *> &children, const string &symbol,
               const tuple<string, string, set<string>> &token);
 
@@ -130,18 +129,7 @@ public:
     /**
      * Checks if there is no break, continue or return
      */
-    bool checkBRC();
-    
-    /**
-     * 
-     * @return 
-     */
-    bool containsForLoopBeforeBRC();
-    
-    /**
-     * If checkBRC = true; change the brackets to "\u1F600" ("{") and "\U+1F976" ("}")
-     */
-    void replaceBracket();
+    void checkBRC(pair<bool,int> &fDepth , pair<bool,int> &cbrDepth);
 };
 
 /**
