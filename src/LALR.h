@@ -91,7 +91,7 @@ public:
      * @param Rviolator , the root of the violating nesting
      * @param T , Terminals
      */
-    void findViolation(const unsigned long &max, const unsigned long &split, unsigned long &count, unsigned long &index,ParseTree* &Rviolator,const std::vector<std::string> &Terminals);
+    void findViolation(const unsigned long &max, const unsigned long &split, unsigned long &count, unsigned long &index,ParseTree* &Rviolator,const std::vector<std::string> &Terminals,bool &found);
 
     /**
      * Find the root of a given child
