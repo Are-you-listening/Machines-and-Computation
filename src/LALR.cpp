@@ -540,7 +540,7 @@ void LALR::generate() {
         for (long unsigned int i = index + 1; i < violator->children.size(); ++i) { //Skip the part for the functionCall
             ParseTree *child = violator->children[i];
             if (get<0>(child->token) == "}") {
-                newKids.push_back(child);
+                //newKids.push_back(child);
                 //get<1>(newKids[newKids.size()-1]->token)+="}";
                 index = i;
                 break;
@@ -551,6 +551,7 @@ void LALR::generate() {
 
         newKids.push_back(functionCall(function(createFrom,result2,functionName))); //Create the new function in the root and add its functionCall()
         functionName+="A";
+        newKids.push_back(violator->children[index]);
 
         for (long unsigned int i = index + 1; i < violator->children.size(); ++i) { //Pushback rest of the children
             ParseTree *child = violator->children[i];
@@ -940,7 +941,7 @@ void ParseTree::getYield(vector<tuple<string, string, set<string>>> &yield) {
 
 void ParseTree::getTokenSet(set<std::string> &vSet, std::set<std::string> &dSet) const {
     for(auto &child: children){
-        if(get<0>(child->token)=="V" || get<0>(child->token)=="I" || get<0>(child->token)=="e"){
+        if(get<0>(child->token)=="V" || get<0>(child->token)=="I" || get<0>(child->token)=="e" ){
             vSet.insert( get<2>(child->token).begin(), get<2>(child->token).end() );
         }else if(get<0>(child->token)=="D"){
             dSet.insert(get<2>(child->token).begin(), get<2>(child->token).end() );
