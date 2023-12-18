@@ -764,6 +764,11 @@ void ParseTree::findViolation(const unsigned long &max,const unsigned long &spli
 
         }else if(std::find(Terminals.begin(), Terminals.end(),get<0>(child->token))==Terminals.end()){ //Found some V
             child->findViolation(max,split,count,index,Rviolator,Terminals,found); //Search further in the Variable nodes
+
+            if(found){
+                return;
+            }
+            
         }else if(get<0>(child->token)=="}"){ //Didn't reached max but did found matching; should now decrease?
             --count; //Is this right?
             if(!found){
