@@ -969,3 +969,43 @@ void CFG::setT(const vector<std::string> &t) {
     T = t;
 }
 
+string CFG::createString() {
+    stringstream result;
+    if(V.size()==1){
+        result << "V = {" << V[0] <<"}"<<std::endl;
+    } else {
+        result << "V = {";
+        for(auto it=V.begin(); it!=V.end()-1;it++){
+            result << *it <<", ";
+        }
+        result << V[V.size()-1] <<"}" <<std::endl;
+    }
+
+    if(T.size()==1){
+        result << "T = {" << T[0] <<"}"<<std::endl;
+    } else {
+        result << "T = {";
+        for(auto it=T.begin(); it!=T.end()-1;it++){
+            result << *it <<", ";
+        }
+        result << T[T.size()-1] <<"}" <<std::endl;
+    }
+
+    result << "P = {" << std::endl;
+    for(auto it=P.begin(); it!=P.end();it++){
+        std::string c="";
+        if(it->second.empty()){
+            c+="`";
+        } else {
+            for (auto it2 = it->second.begin(); it2 != it->second.end() - 1; it2++) {
+                c += *it2 + " ";
+            }
+            c += it->second[it->second.size() - 1] + "";
+        }
+        result <<"   "<< it->first <<" -> " << c << std::endl;
+    }
+    result << "}" << std::endl;
+
+    result <<"S = "<< S << std::endl;
+    return result.str();
+}

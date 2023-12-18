@@ -200,7 +200,7 @@ public:
     /**
      * Loads the parseTable from "parseTablefile.txt" if this file exists
      */
-    void loadTable();
+    bool loadTable();
 };
 
 #endif//CFG_LALR_H

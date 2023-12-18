@@ -49,6 +49,8 @@ public:
      */
     void print();
 
+    string createString();
+
     /**
      * Simple Constructor
      * @param v , variables
