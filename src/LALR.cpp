@@ -551,10 +551,8 @@ void LALR::generate() {
             }
             tomove.push_back(child);
         }
-        ParseTree* createFrom = new ParseTree(tomove,"", {"","",{}}); //Create a variable in between
-        
-        //search in createFrom nr Contintues & ForLoops
-        
+        auto* createFrom = new ParseTree(tomove,"", {"","",{}}); //Create a variable in between
+
         newKids.push_back(functionCall(function(createFrom,result2,functionName))); //Create the new function in the root and add its functionCall()
         functionName+="A";
         newKids.push_back(violator->children[index]);
@@ -651,7 +649,7 @@ ParseTree* LALR::functionCall(const string& code) {
     return k;
 }
 
-string LALR::function(ParseTree *violator, std::set<std::string> &tokenSet, const string functionName) {
+string LALR::function(ParseTree *violator, std::set<std::string> &tokenSet, const string &functionName) const {
     std::vector<ParseTree*> newKids;
     long unsigned int i;
     long unsigned int index;
@@ -670,7 +668,7 @@ string LALR::function(ParseTree *violator, std::set<std::string> &tokenSet, cons
     }
 
     set<string> newvariables;
-    for (string variable : tokenSet){
+    for (const string& variable : tokenSet){
         auto lastSpace = variable.find_last_of(' ');
         if (lastSpace == variable.npos){
             // there is no space in the variable --> only name or only type
@@ -693,7 +691,7 @@ string LALR::function(ParseTree *violator, std::set<std::string> &tokenSet, cons
     }
 
     string functiondefinition = "void " + functionName + "(";
-    for (string variable : newvariables){
+    for (const string& variable : newvariables){
         functiondefinition += variable + ",";
     }
     if(functiondefinition.back()!='('){
@@ -961,8 +959,8 @@ void ParseTree::getTokenSet(set<std::string> &vSet, std::set<std::string> &dSet)
     }
 }
 
-ParseTree::ParseTree(const vector<ParseTree *> &children, const string &symbol,
-                     const tuple<string, string, set<string>> &token) : children(children), symbol(symbol),
+ParseTree::ParseTree(const vector<ParseTree *> &children, string symbol,
+                     const tuple<string, string, set<string>> &token) : children(children), symbol(std::move(symbol)),
                                                                         token(token) {}
 
 void ParseTree::cleanIncludeTypedefs(std::vector<ParseTree*> &newKids) {
