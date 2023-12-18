@@ -704,7 +704,9 @@ string LALR::function(ParseTree *violator, std::set<std::set<std::string>> &toke
     for (string variable : newvariables){
         functiondefinition += variable + ",";
     }
-    functiondefinition.pop_back();  // remove the unnecessary "," we added in the previous for loop
+    if(functiondefinition.back()!='('){
+        functiondefinition.pop_back();  // remove the unnecessary "," we added in the previous for loop
+    }
     functiondefinition += ")";
 
     set<string> emptyset = {};
