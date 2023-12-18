@@ -195,6 +195,8 @@ IncompleteSet TuringTokenizer::tokenize() {
     tools->push_on_sequence(result, {'e', 'l', 's', 'e'}, 1, '1');
     tools->push_on_sequence(result, {'e', 'l', 's', 'e', ' ', 'i', 'f'}, 1, '2');
     tools->push_on_sequence(result, {'r','e','t', 'u', 'r', 'n'}, 1, 'R');
+    tools->push_on_sequence(result, {'c','o','n', 't', 'i', 'n', 'u', 'e'}, 1, '3');
+    tools->push_on_sequence(result, {'b','r','e', 'a', 'k'}, 1, '3');
     tools->go_to_not(result, {' '}, 1, 1, {0,1});
 
     //before here, tokenize of 1 token without classier symbol

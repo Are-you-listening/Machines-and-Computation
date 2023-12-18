@@ -156,7 +156,7 @@ TEST(TuringMachineTest, TM_tools){
 }
 
 TEST(TuringMachineTest, TM_tokenazation) {
-    int index = 14;
+    int index = 52;
     ifstream test_file("../test/testFiles/TM_test_"+ to_string(index)+".cpp");
     string test_string;
     cout << test_file.is_open() << endl;
@@ -195,7 +195,7 @@ TEST(TuringMachineTest, TM_tokenazation) {
 
         }
 
-        if (i >= 37600000){
+        if (i >= 1720000){
             int j = 0;
 
             for (int i = 0; i < tm.getTapeAmount(); i++){
@@ -255,7 +255,7 @@ TEST(TuringMachineTest, TM_builder) {
     TuringMachine tm;
     tm.load(data.states, data.start_state, data.input, data.tape_size, data.productions);
 
-    for (int k=1; k<= 49; k++){
+    for (int k=1; k<= 52; k++){
         ifstream test_file("../test/testFiles/TM_test_"+ to_string(k)+".cpp");
         string test_string;
         cout << test_file.is_open() << endl;
