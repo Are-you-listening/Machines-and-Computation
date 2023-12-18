@@ -80,6 +80,26 @@ int main() { // Function names we create to replace nesting should have F or I i
      
     lalr.parse(vec);
     lalr.generate();
+    std::ifstream File910("output/result.cpp");
+    std::vector<std::string> V10;
+    std::string C10;
+    while(getline(File910,C10)){
+        V10.push_back(C10);
+    }
+
+    std::ofstream File1010("output/result.cpp");
+    unsigned long int nestingcounter=0;
+    std::string tab;
+    for(const auto& it:V10){
+        if(it.find("{")!=std::string::npos){
+            nestingcounter++;
+            tab+="    ";
+        }else if(it.find("}")!=std::string::npos){
+            nestingcounter--;
+            tab.substr((nestingcounter*4)-4,std::string::npos);
+        }
+        File1010 <<tab<< it <<std::endl;
+    }
     //cleanup
     //if-else antinesting
     //move
