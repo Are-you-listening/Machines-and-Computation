@@ -21,10 +21,12 @@
 static unsigned int core_amount = std::thread::hardware_concurrency(); // gets "core amount", in windows you can allocate infinite threads. In linux this isn't possible, I believe. so pls care about this.
 // so whenever you thread something, pls change core_amount. Also core_amount isn't the perfect name for this
 
+
 int main() { // Function names we create to replace nesting should have F or I in their names, so we know if they were for-loops or If-loops
     Tokenisation tokenVector; // sometimes variables in a nesting that should be passed in a function call aren't passed because it isn't found in the source file, this is done on purpose.
     //std::string Filelocation="input/nestedExamples/engine.cc"; // for now, doesn't support double declarations like int a,d;
     std::string Filelocation="../test/testFiles/knapsack.cpp";
+    //std::string Filelocation="../test/testFiles/TM_test_11.cpp";
     std::thread Tokenizer(&Tokenisation::Tokenize, &tokenVector, Filelocation); // i ignore rvalues in function calls
     core_amount--;
     //Tokenizer.join();
@@ -89,6 +91,7 @@ int main() { // Function names we create to replace nesting should have F or I i
     // result don't work for now, will be changed
     // Function calls in Function calls don't work for now, another function that split those calls up is needed
     //std::string ResultFileLocation="../test/results/TM_handmatig_result.cpp";
+    /*
     std::string ResultFileLocation="output/result.cpp";
     std::string line;
     std::string line2;
@@ -217,5 +220,6 @@ int main() { // Function names we create to replace nesting should have F or I i
         File10 << it <<std::endl;
     }
     std::cout << "We do really love Tibo" << std::endl;
+     */
     return 0;
 }
