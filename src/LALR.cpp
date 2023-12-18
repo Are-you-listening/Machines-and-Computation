@@ -500,10 +500,18 @@ void LALR::generate() {
     unsigned long index;
     string functionName = "A";
     ParseTree* violator = nullptr;
+    std::vector<ParseTree*> new_rootKids;
 
     //TODO Make sure #includes, typedefs are all _roots children! - Needs function to format
     //TODO What if _root == violator?
     //IGNORE If-Else nesting? Can the token therefore not be generated? ("{" and "}" ? )
+    _root->cleanIncludeTypedefs(new_rootKids);
+    for(auto child: _root->children){
+        new_rootKids.push_back(child);
+    }
+    _root->children = new_rootKids;
+    new_rootKids.clear();
+
     _root->matchBrackets(_cfg.getT()); //Format first
     _root->findViolation(max,count,index,violator,_cfg.getT()); //Check for violations
 
@@ -584,7 +592,6 @@ void LALR::generate() {
         if(str[str.size()-1]==';' || str[str.size()-1]=='{' || str[str.size()-1]=='}' ||str[str.size()-1]=='>' ){
             test << "\n";
         }
-
     }
     test.close();
 }
@@ -660,7 +667,7 @@ string LALR::function(ParseTree *violator, std::set<std::set<std::string>> &toke
         ParseTree* child = _root->children[i];
 
         // here we could also check if the first character is "#" and not just "#include"
-        if (get<1>(child->token).substr(0, 8) != "#include") { //Create after includes
+        if (get<1>(child->token).substr(0, 8) != "#include" || get<1>(child->token).substr(0, 7) != "typedef" ) { //Create after includes
             index = i;
             break;
         }
@@ -943,3 +950,19 @@ void ParseTree::getTokenSet(set<std::set<std::string>> &tokenSet) const {
 ParseTree::ParseTree(const vector<ParseTree *> &children, const string &symbol,
                      const tuple<string, string, set<string>> &token) : children(children), symbol(symbol),
                                                                         token(token) {}
+
+void ParseTree::cleanIncludeTypedefs(std::vector<ParseTree*> &newKids) {
+    std::vector<unsigned long> indices;
+    std::vector<ParseTree*> tempKids;
+
+    for(unsigned long i = 0; i<this->children.size(); ++i){
+        auto child = children[i];
+        if(get<1>(child->token).substr(0,8)=="#include" || get<1>(child->token).substr(0,7)=="typedef"){
+            newKids.push_back(child);
+        }else{
+            tempKids.push_back(child);
+            child->cleanIncludeTypedefs(newKids); //Go recursively
+        }
+    }
+    children=tempKids;
+}
