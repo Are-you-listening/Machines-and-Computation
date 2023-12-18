@@ -760,9 +760,11 @@ void ParseTree::findViolation(const unsigned long &max,const unsigned long &spli
             child->findViolation(max,split,count,index,Rviolator,Terminals,found); //Search further in the Variable nodes
         }else if(get<0>(child->token)=="}"){ //Didn't reached max but did found matching; should now decrease?
             --count; //Is this right?
-            if(Rviolator!= nullptr && count<split){
-                Rviolator = nullptr;
-                found = true;
+            if(!found){
+                if(Rviolator!= nullptr && count<split){
+                    Rviolator = nullptr;
+                    found = true;
+                }
             }
         }
     }
