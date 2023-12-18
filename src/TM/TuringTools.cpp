@@ -1665,7 +1665,25 @@ TuringTools::nesting_marker(IncompleteSet &a, const vector<int> &tuple_indexes, 
 
         IncompleteSet forward_action{"forward_action_"+ to_string(original_counter), "forward_action_"+ to_string(original_counter)};
         if (i <= split_nesting || true){
+
             move(forward_action, tuple_indexes, -1);
+
+            IncompleteSet onV{"onV_forward_"+ to_string(counter), "onV_forward_"+ to_string(counter)};
+            counter++;
+            skip_nesting(onV, stack_tape, 1, tuple_indexes[1], 1, tuple_indexes);
+            move(onV, tuple_indexes, 1);
+
+            string V_end = onV.to_state;
+            onV.to_state = "unreached";
+
+            IncompleteTransition toStay;
+            toStay.state = V_end;
+            toStay.to_state = "nesting_marking_"+ to_string(original_counter);
+            toStay.def_move = 0;
+            onV.transitions.push_back(toStay);
+
+            link_on(forward_action, onV, {'V'}, {tuple_indexes[0]});
+
             mark_definer(forward_action, tuple_indexes);
 
             IncompleteSet store_definer{"store_definer_"+ to_string(counter), "store_definer_"+ to_string(counter)};
@@ -4028,6 +4046,52 @@ void TuringTools::store_param_count(IncompleteSet &a, const vector<int>&tuple_in
 
     link(a, store_param_count);
 
+
+}
+
+void TuringTools::check_for_loop_continue_split(IncompleteSet &a, const vector<int> &tuple_indexes) {
+    //check if a forloop and continue/break are split up by a new function, at least if we follow current param
+    //if a return would be split of, it is also not allowed
+    IncompleteSet check_split{"check+split_"+ to_string(counter), "check+split_"+ to_string(counter)};
+    counter++;
+
+    go_to(check_split, {'N', 'A'}, tuple_indexes[0], -1, tuple_indexes);
+    go_to_multiple(check_split, {{'U'}, {'3'}}, {tuple_indexes[0], tuple_indexes[1]}, 1, tuple_indexes);
+
+    IncompleteSet check_exist_for{"check_exist_for_"+ to_string(counter), "check_exist_for_"+ to_string(counter)};
+    counter++;
+
+    go_to_multiple(check_exist_for, {{'N', 'A'}, {'F'}}, {tuple_indexes[0], tuple_indexes[1]}, -1, tuple_indexes);
+
+    IncompleteSet on_not_exist{"on_not_exist_"+ to_string(counter), "on_not_exist_"+ to_string(counter)};
+    counter++;
+
+    link_put(on_not_exist, {'V'}, {tuple_indexes[0]});
+    link_on(check_exist_for, on_not_exist, {'N'}, {tuple_indexes[0]});
+
+    link_on(check_split, check_exist_for, {'3'}, {tuple_indexes[1]});
+
+    go_to(check_split, {'U'}, tuple_indexes[0], 1, tuple_indexes);
+    go_to(check_split, {'N', 'A'}, tuple_indexes[0], -1, tuple_indexes);
+    go_to_multiple(check_split, {{'U'}, {'R'}}, {tuple_indexes[0], tuple_indexes[1]}, 1, tuple_indexes);
+
+    IncompleteSet on_return{"on_return_"+ to_string(counter), "on_return_"+ to_string(counter)};
+    counter++;
+
+    IncompleteSet on_return_write{"on_return_"+ to_string(counter), "on_return_"+ to_string(counter)};
+    counter++;
+
+    go_to_multiple(on_return, {{'N', 'A'}}, {tuple_indexes[0]}, -1, tuple_indexes);
+    link_put(on_return_write, {'V'}, {tuple_indexes[0]});
+
+    link_on(on_return, on_return_write, {'N'}, {tuple_indexes[0]});
+
+    link_on(check_split, on_return, {'R'}, {tuple_indexes[1]});
+
+
+    go_to(check_split, {'U'}, tuple_indexes[0], 1, tuple_indexes);
+
+    link(a, check_split);
 
 }
 

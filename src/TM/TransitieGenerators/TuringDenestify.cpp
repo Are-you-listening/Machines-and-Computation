@@ -18,9 +18,34 @@ IncompleteSet TuringDenestify::deNestify() {
 
 
     tools->nesting_marker(result, get_tuple_index(), split_nesting, max_nesting);
+    tools->check_for_loop_continue_split(result, get_tuple_index());
+
     string end_denesting = tools->branch_on(result, {'\u0000'}, {get_tuple_index()[1]});
 
-    tools->go_to(result, {'N', 'A'}, get_tuple_index()[0], -1, get_tuple_index());
+    tools->go_to(result, {'N', 'A', 'V'}, get_tuple_index()[0], -1, get_tuple_index());
+
+
+    //onV make loop reset working and go to start
+    IncompleteSet onV{"onV_loop_back", "onV_loop_back"};
+    //clear working tape
+    tools->go_to_clear(onV, {'A'}, 0, -1, {0,1}, {0,1});
+    tools->link_put(onV, {'\u0000'}, {1});
+
+    tools->go_to(onV, {'U'}, get_tuple_index()[0], 1, get_tuple_index());
+    tools->link_put(onV, {'\u0000'}, {get_tuple_index()[0]});
+    tools->go_to(onV, {'A'}, get_tuple_index()[0], -1, get_tuple_index());
+    tools->clear_stack(onV);
+
+    string end_point_V = onV.to_state;
+    onV.to_state = "unreached";
+
+    tools->link_on(result, onV, {'V'}, {get_tuple_index()[0]});
+
+    IncompleteTransition VtoStart;
+    VtoStart.state = end_point_V;
+    VtoStart.to_state = result.state;
+    VtoStart.def_move = 0;
+    result.transitions.push_back(VtoStart);
 
     createNewFunction(result);
 
