@@ -300,11 +300,13 @@ void Tokenisation::Tokenize(const std::string &FileLocation) {
                                         '0','1','2','3','4','5','6','7','8','9'};
     std::string temp;
     while(getline(File,line1)){
-        temp+=line1;
+        temp+=line1+"\n";
     }
     std::vector<std::string> lines;
     std::string temp2;
     bool include=false;
+    bool comment=false;
+    bool maybeComment=false;
     for(const auto & C: temp){
         if(include){
             if(C=='>'||C=='"'){
@@ -316,6 +318,20 @@ void Tokenisation::Tokenize(const std::string &FileLocation) {
                 temp2+=C;
             }
             continue;
+        }
+        if(comment){
+            if(C=='\n'){
+                comment=false;
+                temp2+=C;
+                lines.push_back(temp2);
+                temp2.clear();
+            }else{
+                temp2+=C;
+            }
+            continue;
+        }
+        if(C!='/'){
+            maybeComment= false;
         }
         if(C=='{'){
             //temp2.push_back('{');
@@ -332,14 +348,27 @@ void Tokenisation::Tokenize(const std::string &FileLocation) {
             lines.push_back(temp2);
             temp2.clear();
         } else if(C=='#'){
+            lines.push_back(temp2);
+            temp2.clear();
             include = true;
             temp2+=C;
-        } else{
+        } else if(C=='/'&&!maybeComment){
+            maybeComment = true;
+            temp2+=C;
+        }else if(C=='/'&&maybeComment){
+            comment = true;
+            temp2+=C;
+        }else{
             temp2+=C;
         }
     }
     temp.clear();
     temp2.clear();
+    for(auto & line : lines){
+        if(line.find("\n")!=std::string::npos){
+            line.replace(line.find("\n"),1,"");
+        }
+    }
     
     for(auto & line : lines){
         unsigned long int tokenVectorSize=tokenVector.size();
@@ -526,11 +555,14 @@ void Tokenisation::Tokenize(const std::string &FileLocation) {
         if(std::get<0>(*i)=="V"||std::get<0>(*i)=="i"){
             here2:
             for(auto &V:std::get<2>(*i)){
-                if(V.empty()){
+                if(V.empty()||V.find(" ")==std::string::npos){
                     std::get<2>(*i).erase(V);
                     goto here2;
                 }
             }
+        } else if(std::get<1>(*i).empty()){
+            tokenTupleVector.erase(i);
+            i--;
         }
     }
     
