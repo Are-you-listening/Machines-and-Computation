@@ -511,7 +511,11 @@ void LALR::generate() {
 
     _root->matchBrackets(_cfg.getT()); //Format first
     _root->findViolation(max,split,count,index,violator,_cfg.getT(),found); //Check for violations
-
+    
+    if(violator->checkBRC()){
+        
+    }
+    
     while(violator!=nullptr){
         //Find difference: vSet - dSet = result
         std::set<std::string> vSet; //Contains V,I,e
@@ -548,7 +552,9 @@ void LALR::generate() {
             tomove.push_back(child);
         }
         ParseTree* createFrom = new ParseTree(tomove,"", {"","",{}}); //Create a variable in between
-
+        
+        //search in createFrom nr Contintues & ForLoops
+        
         newKids.push_back(functionCall(function(createFrom,result2,functionName))); //Create the new function in the root and add its functionCall()
         functionName+="A";
         newKids.push_back(violator->children[index]);
@@ -992,6 +998,4 @@ void ParseTree::replaceBracket(){
     
 }
 
-void ParseTree::removeViolator() {
 
-}

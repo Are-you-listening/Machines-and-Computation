@@ -118,8 +118,22 @@ public:
     void getTokenSet(set<std::string> &vSet, std::set<std::string> &dSet) const;
 
     void cleanIncludeTypedefs(std::vector<ParseTree*> &newKids);
-
-    void removeViolator();
+    
+    /**
+     * Checks if there is no break, continue or return
+     */
+    bool checkBRC();
+    
+    /**
+     * 
+     * @return 
+     */
+    bool containsForLoopBeforeBRC();
+    
+    /**
+     * If checkBRC = true; change the brackets to "\u1F600" ("{") and "\U+1F976" ("}")
+     */
+    void replaceBracket();
 };
 
 /**
