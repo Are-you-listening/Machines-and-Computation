@@ -959,7 +959,7 @@ void ParseTree::getTokenSet(set<std::string> &vSet, std::set<std::string> &dSet)
     }
 }
 
-ParseTree::ParseTree(const vector<ParseTree *> &children, string symbol,
+ParseTree::ParseTree(const vector<ParseTree *> &children,const string& symbol,
                      const tuple<string, string, set<string>> &token) : children(children), symbol(std::move(symbol)),
                                                                         token(token) {}
 
