@@ -495,6 +495,7 @@ void LALR::printTable() {
 }
 
 void LALR::generate() {
+    const unsigned long split = Config::getConfig()->getSplitNesting()+1;
     const unsigned long max = Config::getConfig()->getMaxNesting()+1;
     unsigned long count = 0;
     unsigned long index;
@@ -505,15 +506,10 @@ void LALR::generate() {
     //TODO Make sure #includes, typedefs are all _roots children! - Needs function to format
     //TODO What if _root == violator?
     //IGNORE If-Else nesting? Can the token therefore not be generated? ("{" and "}" ? )
-    _root->cleanIncludeTypedefs(new_rootKids);
-    for(auto child: _root->children){
-        new_rootKids.push_back(child);
-    }
-    _root->children = new_rootKids;
-    new_rootKids.clear();
+    _root->cleanIncludeTypedefs(new_rootKids); //Collect includes
 
     _root->matchBrackets(_cfg.getT()); //Format first
-    _root->findViolation(max,count,index,violator,_cfg.getT()); //Check for violations
+    _root->findViolation(max,split,count,index,violator,_cfg.getT()); //Check for violations
 
     while(violator!=nullptr){
         std::set<std::set<std::string>> tokenSet;
@@ -521,15 +517,19 @@ void LALR::generate() {
 
         vector<ParseTree *> newKids;
 
-        for (long unsigned int i = 0; i<index; ++i) { //Pushback firsthalf of kids
+        for (long unsigned int i = 0; i<=index; ++i) { //Pushback firsthalf of kids
             ParseTree *child = violator->children[i];
             newKids.push_back(child);
         }
+        //if(newKids!= empty())
+        //get<1>(newKids[newKids.size()-1]->token)+="{";
 
         vector<ParseTree *> tomove;
         for (long unsigned int i = index + 1; i < violator->children.size(); ++i) { //Skip the part for the functionCall
             ParseTree *child = violator->children[i];
             if (get<0>(child->token) == "}") {
+                newKids.push_back(child);
+                //get<1>(newKids[newKids.size()-1]->token)+="}";
                 index = i;
                 break;
             }
@@ -549,8 +549,13 @@ void LALR::generate() {
         //Recheck everything
         violator= nullptr;
         count = 0;
-        _root->findViolation(max,count,index,violator,_cfg.getT()); //Check for more violations
+        _root->findViolation(max,split,count,index,violator,_cfg.getT()); //Check for more violations
     }
+
+    for(auto child: _root->children){ //Readd includes
+        new_rootKids.push_back(child);
+    }
+    _root->children = new_rootKids;
 
     //Create File
     vector<tuple<string, string, set<string>>> yield;
@@ -725,7 +730,7 @@ string LALR::function(ParseTree *violator, std::set<std::set<std::string>> &toke
     return functionName+"(" + temp.substr(0,temp.size()-1) + ");"; //Cut of the last comma
 }
 
-void ParseTree::findViolation(const unsigned long &max, unsigned long &count, unsigned long &index,ParseTree* &Rviolator,const std::vector<std::string> &Terminals) {
+void ParseTree::findViolation(const unsigned long &max,const unsigned long &split, unsigned long &count, unsigned long &index,ParseTree* &Rviolator,const std::vector<std::string> &Terminals) {
     if(count==max){
         return;
     }
@@ -734,13 +739,16 @@ void ParseTree::findViolation(const unsigned long &max, unsigned long &count, un
         ParseTree* child = children[i];
         if(get<0>(child->token)=="{") { //Found nesting
             ++count;
-            if (count == max) {
+            if (count == split) {
                 Rviolator = this;
                 index = i;
+            }
+
+            if( count == max){
                 return;
             }
         }else if(std::find(Terminals.begin(), Terminals.end(),get<0>(child->token))==Terminals.end()){ //Found some V
-            child->findViolation(max,count,index,Rviolator,Terminals); //Search further in the Variable nodes
+            child->findViolation(max,split,count,index,Rviolator,Terminals); //Search further in the Variable nodes
         }else if(get<0>(child->token)=="}"){ //Didn't reached max but did found matching; should now decrease?
             --count; //Is this right?
         }
