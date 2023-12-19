@@ -13,6 +13,7 @@
 #include "src/Config.h"
 #include "src/CFGConstructor.h"
 #include "src/LALR.h"
+#include "src/GUI/GUI.h"
 
 //!!!!!!!!!!!!!!!!!!! Default Config Location is already SET in Orchestrator.cpp
 // Variabel Define might be a problem?
@@ -22,6 +23,8 @@ static unsigned int core_amount = std::thread::hardware_concurrency(); // gets "
 // so whenever you thread something, pls change core_amount. Also core_amount isn't the perfect name for this
 
 int main() { // Function names we create to replace nesting should have F or I in their names, so we know if they were for-loops or If-loops
+    GUI g;
+
     Tokenisation tokenVector; // sometimes variables in a nesting that should be passed in a function call aren't passed because it isn't found in the source file, this is done on purpose.
     //std::string Filelocation="input/nestedExamples/engine.cc"; // for now, doesn't support double declarations like int a,d;
     std::string Filelocation="../test/testFiles/knapsack.cpp";

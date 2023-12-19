@@ -1,7 +1,8 @@
 //
 // Created by tibov on 10/11/23.
 //
-
+#include <thread>
+#include <future>
 #ifndef TOG_TMBUILDER_H
 #define TOG_TMBUILDER_H
 #include "src/TM/TransitieGenerators/TuringTokenizer.h"
@@ -21,14 +22,20 @@ struct TMBuilder_output{
 
 class TMBuilder {
 public:
-    TMBuilder(unsigned int tuple_size);
+    TMBuilder(unsigned int tuple_size, bool if_else_antinesting, int split_nesting, int max_nesting);
     TMBuilder_output generateTM();
 private:
     unsigned int tapes;
     TuringTools* tools;
 
+    bool if_else_anti;
 
     json add_transition(Transition& transition);
+
+    int max_nesting = 4;
+    int split_nesting = 2;
+
+
 
 };
 

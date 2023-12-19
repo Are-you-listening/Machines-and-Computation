@@ -582,6 +582,10 @@ void LALR::generate() {
         _root->findViolation(max,count,index,violator,_cfg.getT()); //Check for more violations
     }
 
+    saveYield();
+}
+
+void LALR::saveYield() {
     //Create File
     vector<tuple<string, string, set<string>>> yield;
     _root->getYield(yield);
@@ -594,6 +598,7 @@ void LALR::generate() {
         }
     }
     test.close();
+
 }
 
 ParseTree::ParseTree(const vector<ParseTree *> &children, string symbol): children(children),symbol(std::move(symbol)) {}
@@ -604,7 +609,7 @@ ParseTree::~ParseTree() {
     }
 }
 
-void ParseTree::findBracket(bool left, std::tuple<ParseTree *, unsigned long, unsigned long, bool> &data,const std::vector<std::string> &Terminals) { // { _root, bracket , depth, found, rootstack }
+void ParseTree::findBracket(bool left, std::tuple<ParseTree *, unsigned long, unsigned long, bool> &data, const std::vector<std::string> &Terminals) { // { _root, bracket , depth, found, rootstack }
     long unsigned int i;
     int adjust;
     long unsigned int extreme;
@@ -635,7 +640,7 @@ void ParseTree::findBracket(bool left, std::tuple<ParseTree *, unsigned long, un
             std::get<1>(data) = j; //Set child
             std::get<3>(data) = true; //Set found
             return;
-        }else if( std::find(Terminals.begin(), Terminals.end(),get<0>(children[j]->token))==Terminals.end() ){ //If Variable: search the left most "{" in this tree
+        }else if( std::find(Terminals.begin(), Terminals.end(),get<0>(children[j]->token))==Terminals.end()){ //If Variable: search the left most "{" in this tree
             std::get<2>(data) = ++std::get<2>(data); //Increase depth
             children[j]->findBracket(left,data,Terminals);
         }
@@ -916,6 +921,23 @@ bool LALR::loadTable() {
         return false;
     }
 }
+
+string LALR::getYield() {
+    vector<tuple<string, string, set<string>>> yield;
+    _root->getYield(yield);
+
+    string s;
+    for(auto &k: yield){
+        auto str = get<1>(k);
+        s += str;
+        if(str[str.size()-1]==';' || str[str.size()-1]=='{' || str[str.size()-1]=='}' ||str[str.size()-1]=='>' ){
+            s += "\n";
+        }
+    }
+
+    return s;
+}
+
 
 void ParseTree::addTokens(vector<tuple<string, string, set<string>>> &tokens) {
     if (children.empty()){

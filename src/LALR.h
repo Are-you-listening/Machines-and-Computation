@@ -203,6 +203,9 @@ public:
      * Loads the parseTable from "parseTablefile.txt" if this file exists
      */
     bool loadTable();
+
+    void saveYield();
+    string getYield();
 };
 
 #endif//CFG_LALR_H

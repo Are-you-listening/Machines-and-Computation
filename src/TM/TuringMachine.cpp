@@ -228,7 +228,7 @@ TuringMachine* TuringMachine::toSingleTape() {
     int new_control = tapes.size()+1;
     int mark_track = tapes.size()+1 + tapes.size()*2;
 
-    auto tools = TuringTools::getInstance(-1);
+    auto tools = TuringTools::getInstance(-1, -1);
 
     vector<int> storage_in_state_indexes;
     vector<int> all_moving;

@@ -37,19 +37,20 @@ IncompleteSet::IncompleteSet(const string& state, const string& to_state): state
 
 }
 
-TuringTools::TuringTools(unsigned int stack_tape) {
+TuringTools::TuringTools(unsigned int stack_tape, int split_nesting) {
     goto_counter = 0;
     counter = 0;
     branch_counter = 0;
     stack_symbol = '-';
     this->stack_tape = stack_tape;
     nesting_tokens = {'F', '0', '1', '2'};
+    TuringTools::split_nesting = split_nesting;
 }
 
-TuringTools* TuringTools::getInstance(unsigned int stack_tape) {
+TuringTools* TuringTools::getInstance(unsigned int stack_tape, int split_nesting) {
     if (!_instance_flag){
         _instance_flag = true;
-        _instance = unique_ptr<TuringTools>(new TuringTools(stack_tape));
+        _instance = unique_ptr<TuringTools>(new TuringTools(stack_tape, split_nesting));
     }
     return _instance.get();
 }
@@ -4094,4 +4095,5 @@ void TuringTools::check_for_loop_continue_split(IncompleteSet &a, const vector<i
     link(a, check_split);
 
 }
+
 

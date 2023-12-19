@@ -131,7 +131,7 @@ TEST(TuringMachineTest, TM_4_test) {
 }
 
 TEST(TuringMachineTest, TM_tools){
-    TuringTools* tools = TuringTools::getInstance(0);
+    TuringTools* tools = TuringTools::getInstance(0, 0);
     IncompleteSet s("start", "start");
     tools->go_to(s, {'E'}, 0, 1);
     vector<IncompleteTransition> results1 = s.transitions;
@@ -170,7 +170,7 @@ TEST(TuringMachineTest, TM_tokenazation) {
     //test_string = "class base{}; class derived{int test(){};int taco(){};}";
     // not in real use yet
     TuringTools::reset();
-    auto t = new TMBuilder(4);
+    auto t = new TMBuilder(4, true, 2, 4);
     TMBuilder_output data = t->generateTM();
     //ofstream o("output/TM_test.json");
     //o << data;
@@ -179,7 +179,7 @@ TEST(TuringMachineTest, TM_tokenazation) {
     tm.load_input(test_string, 1);
 
     int halted_time = -1;
-    for (int i = 0; i<500000; i++){
+    for (int i = 0; i<200000; i++){
 
         if (tm.isHalted()){
             if (halted_time == -1){
@@ -248,7 +248,7 @@ TEST(TuringMachineTest, TM_tokenazation) {
 TEST(TuringMachineTest, TM_builder) {
 
     TuringTools::reset();
-    auto t = new TMBuilder(4);
+    auto t = new TMBuilder(4, true, 2, 4);
     TMBuilder_output data = t->generateTM();
     //ofstream o("output/TM_test.json");
     //o << data;
@@ -431,5 +431,13 @@ TEST(TuringMachineTest, TM_single_tape_2){
     ofstream out{"../test/results/TM_test_"+ to_string(index)+".cpp"};
     out << tm.exportTapeData(1);
     out.close();*/
+
+}
+
+TEST(TuringMachineTest, TM_builder_2){
+    auto t = new TMBuilder(4, true, 2, 4);
+    TMBuilder_output data = t->generateTM();
+
+    delete t;
 
 }
