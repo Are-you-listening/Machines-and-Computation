@@ -14,8 +14,7 @@ LALR::LALR(const CFG &cfg) : _cfg(cfg) {}
 
 void LALR::createStates() {
     // manually create I0
-    auto* I0 = new State;
-    this->I0 = I0;
+    I0 = new State;
     state_counter = 0;
     I0->_stateName = 0;
     I0->_connections = {};
@@ -24,7 +23,6 @@ void LALR::createStates() {
     std::cout << "end createAugmented" << std::endl;
     I0->createConnections(*this);
     std::cout << "end createConnections" << std::endl;
-    //cout << "debug" << endl;
 }
 
 set<State *> LALR::findSimilar(const set<tuple<string, vector<string>, set<string>>> &rules) {
@@ -471,7 +469,7 @@ void LALR::parse(std::vector<std::tuple<std::string, std::string, std::set<std::
                 }
                 s.pop();
             }
-            treetops.push_back(newparent);
+            treetops.insert(treetops.begin(), newparent);
         } else {
             s.push(stoi(operation));
         }
@@ -495,102 +493,110 @@ void LALR::printTable() {
 }
 
 void LALR::generate() {
-    const unsigned long max = Config::getConfig()->getMaxNesting()+1;
+    const unsigned long split = Config::getConfig()->getSplitNesting();
+    const unsigned long max = Config::getConfig()->getMaxNesting();
     unsigned long count = 0;
     unsigned long index;
+    bool found = false;
     string functionName = "A";
     ParseTree* violator = nullptr;
     std::vector<ParseTree*> new_rootKids;
 
-    //TODO Make sure #includes, typedefs are all _roots children! - Needs function to format
-    //TODO What if _root == violator?
     //IGNORE If-Else nesting? Can the token therefore not be generated? ("{" and "}" ? )
-    _root->cleanIncludeTypedefs(new_rootKids);
-    for(auto child: _root->children){
-        new_rootKids.push_back(child);
-    }
-    _root->children = new_rootKids;
-    new_rootKids.clear();
+    _root->cleanIncludeTypedefs(new_rootKids); //Collect includes
 
     _root->matchBrackets(_cfg.getT()); //Format first
-    _root->findViolation(max,count,index,violator,_cfg.getT()); //Check for violations
+    _root->findViolation(max,split,count,index,violator,_cfg.getT(),found); //Check for violations
 
     while(violator!=nullptr){
-        std::set<std::set<std::string>> tokenSet;
-        violator->getTokenSet(tokenSet);
-
-        /*vector<ParseTree*> newKids;
-        for(long unsigned int i = 0; i<index; ++i){ //Pushback firsthalf of kids
-            ParseTree* child = violator->children[i];
-            if(child->symbol=="{"){
-                break;
+        //Find difference: vSet - dSet = result
+        std::set<std::string> vSet; //Contains V,I,e
+        std::set<std::string> dSet;
+        violator->getTokenSet(vSet,dSet);
+        std::set<std::string> result;
+        std::set_difference(vSet.begin(), vSet.end(), dSet.begin(), dSet.end(), std::inserter(result, result.end()));
+        std::set<string> result2;
+        for(auto &k: result){
+            if(!k.empty()){
+                result2.insert(k);
             }
+        }
+        
+
+        vector<ParseTree *> newKids;
+
+        for (long unsigned int i = 0; i<=index; ++i) { //Pushback firsthalf of kids
+            ParseTree *child = violator->children[i];
             newKids.push_back(child);
         }
+        //if(newKids!= empty())
+        //get<1>(newKids[newKids.size()-1]->token)+="{";
 
-        vector<ParseTree*> tomove;
-        for(long unsigned int i = index+1; i<violator->children.size(); ++i){ //Skip the part for which we create a function call
-            ParseTree* child = violator->children[i];
-            if(child->symbol=="}"){
+        vector<ParseTree *> tomove;
+        for (long unsigned int i = index + 1; i < violator->children.size(); ++i) { //Skip the part for the functionCall
+            ParseTree *child = violator->children[i];
+            if (get<0>(child->token) == "}") {
+                //newKids.push_back(child);
+                //get<1>(newKids[newKids.size()-1]->token)+="}";
                 index = i;
                 break;
             }
             tomove.push_back(child);
-        }*/
-        //newKids.push_back(functionCall(functionName,tokenSet)); //Create Function Call
+        }
+        auto* createFrom = new ParseTree(tomove,"", {"","",{}}); //Create a variable in between
 
-
-        //BEGIN Do the actual moving part
-            //Find root of violator
-            auto data = _root->findRoot(violator,_cfg.getT());
-            if(violator == _root){
-                //std::cout << "error! in LALR move!!" << std::endl;
-                //data = _root;
-                break;
-            }else if(data == nullptr){
-                std::cout << "error! in LALR move!!" << std::endl;
-                break;
-            }
-
-            //Insert before index of violator
-            vector<ParseTree*> temp;
-            for(auto child : data->children){ //Skip the part for which we create a function call
-                if(child==violator){
-                    /*for(auto &c: tomove){ //Add from moveto
-                        temp.push_back(c);
-                    }*/
-                    temp.push_back(functionCall(function(violator,tokenSet,functionName))); //Create a the new function in the root and add its functionCall()
-                    functionName+="A";
-                }else{
-                    temp.push_back(child);
+        pair<bool,int> fDepth = {false,0};
+        pair<bool,int> cbrDepth = {false,0};
+        createFrom->checkBRC(fDepth,cbrDepth);
+        if(cbrDepth.second>=fDepth.second){ //Replace brackets
+            for(auto &node: newKids){
+                if(get<0>(node->token)=="{"){ //
+                    get<0>(node->token) = "\u1F600";
+                    get<1>(node->token) = "\u1F600";
+                }else if(get<0>(node->token)=="}" ){
+                    get<0>(node->token) = "\u1F976";
+                    get<1>(node->token) = "\u1F976";
                 }
             }
-            data->children = temp;
-            temp.clear();
-        //END Actual Moving
-
-        /*for(long unsigned int i = index+1; i<violator->children.size(); ++i){ //Pushback rest of the children
-            ParseTree* child = violator->children[i];
-            newKids.push_back(child);
+            goto recheck;
         }
 
-        violator->children = newKids;*/
+        newKids.push_back(functionCall(function(createFrom,result2,functionName))); //Create the new function in the root and add its functionCall()
+        functionName+="A";
+        newKids.push_back(violator->children[index]);
+
+        for (long unsigned int i = index + 1; i < violator->children.size(); ++i) { //Pushback rest of the children
+            ParseTree *child = violator->children[i];
+            newKids.push_back(child);
+        }
+        violator->children = newKids; //Set children (now with functionCall)
 
         //Recheck everything
+        recheck:
         violator= nullptr;
         count = 0;
-        _root->findViolation(max,count,index,violator,_cfg.getT()); //Check for more violations
+        found = false;
+        _root->findViolation(max,split,count,index,violator,_cfg.getT(), found); //Check for more violations
     }
 
-    saveYield();
-}
+    for(auto child: _root->children){ //Readd includes
+        new_rootKids.push_back(child);
+    }
+    _root->children = new_rootKids;
 
-void LALR::saveYield() {
     //Create File
     vector<tuple<string, string, set<string>>> yield;
     _root->getYield(yield);
     ofstream test("output/result.cpp");
     for(auto &k: yield){
+        if(get<1>(k)=="\u1F600"){
+            get<0>(k)="{";
+            get<1>(k)="{";
+        }else if(get<1>(k)=="\u1F976"){
+            get<0>(k)="}";
+            get<1>(k)="}";
+        }
+
         auto str = get<1>(k);
         test << str;
         if(str[str.size()-1]==';' || str[str.size()-1]=='{' || str[str.size()-1]=='}' ||str[str.size()-1]=='>' ){
@@ -598,10 +604,7 @@ void LALR::saveYield() {
         }
     }
     test.close();
-
 }
-
-ParseTree::ParseTree(const vector<ParseTree *> &children, string symbol): children(children),symbol(std::move(symbol)) {}
 
 ParseTree::~ParseTree() {
     for (const auto& child : children){
@@ -609,7 +612,7 @@ ParseTree::~ParseTree() {
     }
 }
 
-void ParseTree::findBracket(bool left, std::tuple<ParseTree *, unsigned long, unsigned long, bool> &data, const std::vector<std::string> &Terminals) { // { _root, bracket , depth, found, rootstack }
+void ParseTree::findBracket(bool left, std::tuple<ParseTree *, unsigned long, unsigned long, bool> &data,const std::vector<std::string> &Terminals) { // { _root, bracket , depth, found, rootstack }
     long unsigned int i;
     int adjust;
     long unsigned int extreme;
@@ -640,7 +643,7 @@ void ParseTree::findBracket(bool left, std::tuple<ParseTree *, unsigned long, un
             std::get<1>(data) = j; //Set child
             std::get<3>(data) = true; //Set found
             return;
-        }else if( std::find(Terminals.begin(), Terminals.end(),get<0>(children[j]->token))==Terminals.end()){ //If Variable: search the left most "{" in this tree
+        }else if( std::find(Terminals.begin(), Terminals.end(),get<0>(children[j]->token))==Terminals.end() ){ //If Variable: search the left most "{" in this tree
             std::get<2>(data) = ++std::get<2>(data); //Increase depth
             children[j]->findBracket(left,data,Terminals);
         }
@@ -655,13 +658,10 @@ void ParseTree::findBracket(bool left, std::tuple<ParseTree *, unsigned long, un
 }
 
 ParseTree* LALR::functionCall(const string& code) {
-    auto k = new ParseTree({},"D");
-    auto t = code.substr(5,code.size()); //remove "void" from name
-    k->token = {"D",t,{}};
-    return k;
+    return new ParseTree({},"D",{"D",code,{}});
 }
 
-string LALR::function(ParseTree *violator, std::set<std::set<std::string>> &tokenSet, const string functionName) {
+string LALR::function(ParseTree *violator, std::set<std::string> &tokenSet, const string &functionName) const {
     std::vector<ParseTree*> newKids;
     long unsigned int i;
     long unsigned int index;
@@ -679,14 +679,8 @@ string LALR::function(ParseTree *violator, std::set<std::set<std::string>> &toke
         newKids.push_back(child);
     }
 
-    set<string> bigSet;
-    for (auto smallset : tokenSet){
-        for (string elem : smallset){
-            bigSet.emplace(elem);
-        }
-    }
     set<string> newvariables;
-    for (string variable : bigSet){
+    for (const string& variable : tokenSet){
         auto lastSpace = variable.find_last_of(' ');
         if (lastSpace == variable.npos){
             // there is no space in the variable --> only name or only type
@@ -696,7 +690,7 @@ string LALR::function(ParseTree *violator, std::set<std::set<std::string>> &toke
         string variableType = variable.substr(0, lastSpace);
         string variableName = variable.substr(lastSpace+1);
         if (variableType.back() == '&' || variableType.back() == '*' || variableName.front() == '&' || variableName.front() == '*'){
-            // we don't need to add an & because the variable is already passed by reference or it is a pointer
+            // we don't need to add a & because the variable is already passed by reference, or it is a pointer
             newvariables.emplace(variable);
         } else {
             variableType.push_back('&');
@@ -709,7 +703,7 @@ string LALR::function(ParseTree *violator, std::set<std::set<std::string>> &toke
     }
 
     string functiondefinition = "void " + functionName + "(";
-    for (string variable : newvariables){
+    for (const string& variable : newvariables){
         functiondefinition += variable + ",";
     }
     if(functiondefinition.back()!='('){
@@ -722,7 +716,7 @@ string LALR::function(ParseTree *violator, std::set<std::set<std::string>> &toke
     get<0>(newfunctiontoken)  = "D";
     get<1>(newfunctiontoken) = functiondefinition;
     get<2>(newfunctiontoken) = emptyset;
-    ParseTree* functionTree = new ParseTree;
+    auto functionTree = new ParseTree;
     functionTree->symbol = "D";
     functionTree->token = newfunctiontoken;
 
@@ -730,7 +724,7 @@ string LALR::function(ParseTree *violator, std::set<std::set<std::string>> &toke
     get<0>(openbracket) = "{";
     get<1>(openbracket) = "{";
     get<2>(openbracket) = emptyset;
-    ParseTree* openbracketTree = new ParseTree;
+    auto openbracketTree = new ParseTree;
     openbracketTree->symbol = "{";
     openbracketTree->token = openbracket;
 
@@ -738,7 +732,7 @@ string LALR::function(ParseTree *violator, std::set<std::set<std::string>> &toke
     get<0>(closingbracket) = "}";
     get<1>(closingbracket) = "}";
     get<2>(closingbracket) = emptyset;
-    ParseTree* closingbracketTree = new ParseTree;
+    auto closingbracketTree = new ParseTree;
     closingbracketTree->symbol = "}";
     closingbracketTree->token = closingbracket;
 
@@ -760,8 +754,8 @@ string LALR::function(ParseTree *violator, std::set<std::set<std::string>> &toke
     return functionName+"(" + temp.substr(0,temp.size()-1) + ");"; //Cut of the last comma
 }
 
-void ParseTree::findViolation(const unsigned long &max, unsigned long &count, unsigned long &index,ParseTree* &Rviolator,const std::vector<std::string> &Terminals) {
-    if(count==max){
+void ParseTree::findViolation(const unsigned long &max,const unsigned long &split, unsigned long &count, unsigned long &index,ParseTree* &Rviolator,const std::vector<std::string> &Terminals, bool &found) {
+    if(found){
         return;
     }
 
@@ -769,15 +763,35 @@ void ParseTree::findViolation(const unsigned long &max, unsigned long &count, un
         ParseTree* child = children[i];
         if(get<0>(child->token)=="{") { //Found nesting
             ++count;
-            if (count == max) {
+            if (count == split) {
                 Rviolator = this;
                 index = i;
+            }
+
+            if( count == max){
+                found = true;
                 return;
             }
+
+            if(found){
+                return;
+            }
+
         }else if(std::find(Terminals.begin(), Terminals.end(),get<0>(child->token))==Terminals.end()){ //Found some V
-            child->findViolation(max,count,index,Rviolator,Terminals); //Search further in the Variable nodes
-        }else if(get<0>(child->token)=="}"){ //Didn't reached max but did found matching; should now decrease?
+            child->findViolation(max,split,count,index,Rviolator,Terminals,found); //Search further in the Variable nodes
+
+            if(found){
+                return;
+            }
+            
+        }else if(get<0>(child->token)=="}"){ //Didn't reach max but did found matching; should now decrease?
             --count; //Is this right?
+            if(!found){
+                if(Rviolator!= nullptr && count<split){
+                    Rviolator = nullptr;
+                    found = true;
+                }
+            }
         }
     }
     //--count;
@@ -858,7 +872,7 @@ ParseTree* ParseTree::findRoot(ParseTree *&child,const std::vector<std::string> 
 void LALR::saveTable() {
     std::ofstream outFile("parseTablefile.txt");
     if (outFile.is_open()){
-        // first output the cfg to the file so we can check what parseTable is in the file
+        // first output the cfg to the file, so we can check what parseTable is in the file
         outFile << _cfg.createString();
         outFile << "CFGend" << endl;
         for (const auto& row : parseTable) {
@@ -922,23 +936,6 @@ bool LALR::loadTable() {
     }
 }
 
-string LALR::getYield() {
-    vector<tuple<string, string, set<string>>> yield;
-    _root->getYield(yield);
-
-    string s;
-    for(auto &k: yield){
-        auto str = get<1>(k);
-        s += str;
-        if(str[str.size()-1]==';' || str[str.size()-1]=='{' || str[str.size()-1]=='}' ||str[str.size()-1]=='>' ){
-            s += "\n";
-        }
-    }
-
-    return s;
-}
-
-
 void ParseTree::addTokens(vector<tuple<string, string, set<string>>> &tokens) {
     if (children.empty()){
         token = tokens.front();
@@ -962,18 +959,16 @@ void ParseTree::getYield(vector<tuple<string, string, set<string>>> &yield) {
     }
 }
 
-void ParseTree::getTokenSet(set<std::set<std::string>> &tokenSet) const {
+void ParseTree::getTokenSet(set<std::string> &vSet, std::set<std::string> &dSet) const {
     for(auto &child: children){
-        if(get<0>(child->token)=="V"){ //If we found a variable; insert the data
-            tokenSet.insert(get<2>(child->token));
+        if(get<0>(child->token)=="V" || get<0>(child->token)=="I" || get<0>(child->token)=="e" ){
+            vSet.insert( get<2>(child->token).begin(), get<2>(child->token).end() );
+        }else if(get<0>(child->token)=="D" || get<0>(child->token)=="F"){
+            dSet.insert(get<2>(child->token).begin(), get<2>(child->token).end() );
         }
-        child->getTokenSet(tokenSet); //Go recursively for every child
+        child->getTokenSet(vSet,dSet); //Go recursively for every child
     }
 }
-
-ParseTree::ParseTree(const vector<ParseTree *> &children, const string &symbol,
-                     const tuple<string, string, set<string>> &token) : children(children), symbol(symbol),
-                                                                        token(token) {}
 
 void ParseTree::cleanIncludeTypedefs(std::vector<ParseTree*> &newKids) {
     std::vector<unsigned long> indices;
@@ -981,7 +976,7 @@ void ParseTree::cleanIncludeTypedefs(std::vector<ParseTree*> &newKids) {
 
     for(unsigned long i = 0; i<this->children.size(); ++i){
         auto child = children[i];
-        if(get<1>(child->token).substr(0,8)=="#include" || get<1>(child->token).substr(0,7)=="typedef"){
+        if(get<1>(child->token).find("#include")!=std::string::npos || get<1>(child->token).find("typedef")!=std::string::npos){
             newKids.push_back(child);
         }else{
             tempKids.push_back(child);
@@ -990,3 +985,34 @@ void ParseTree::cleanIncludeTypedefs(std::vector<ParseTree*> &newKids) {
     }
     children=tempKids;
 }
+
+void ParseTree::checkBRC(pair<bool,int> &fDepth , pair<bool,int> &cbrDepth) {
+    for(auto &child: children){
+        if(cbrDepth.first && fDepth.first){ //Both found, return, else go to through every child
+            return; //This statement can make the proces shorter
+        }
+
+        if(get<1>(child->token).find("continue")!=std::string::npos || get<1>(child->token).find("break")!=std::string::npos || get<1>(child->token).find("return")!=std::string::npos  ){
+            cbrDepth.first=true;
+        }else if(get<0>(child->token)=="F" ){ //Don't count I or e, we only want to check if the cbr is in a forloop!
+            fDepth.first=true;
+        }else{
+            //if(!get<0>(child->token).empty()){ //Don't count empty nodes
+                if(!cbrDepth.first){ //In case not yet found
+                    --cbrDepth.second;
+                }
+                if(!fDepth.first){
+                    --fDepth.second;
+                }
+            //}
+            child->checkBRC(fDepth,cbrDepth);
+        }
+    }
+}
+
+ParseTree::ParseTree(const vector<ParseTree *> &children, const string &symbol,
+                     const tuple<string, string, set<string>> &token): children(children),symbol(symbol),token(token) {
+
+}
+
+

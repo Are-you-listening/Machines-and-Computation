@@ -22,3 +22,4 @@ Not-Supported:
     - Busy waiting / Time influence in code are not guaranteed (which is basicly bad code)
     - Declrations in IF/ELSE statements
     - elseIF
+    - Commands are removed

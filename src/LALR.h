@@ -66,12 +66,11 @@ public:
     ParseTree() = default;
 
     /**
-     * Full Constructor
+     * Constructor
      * @param children
      * @param symbol
+     * @param token
      */
-    ParseTree(const vector<ParseTree *> &children, string symbol);
-
     ParseTree(const vector<ParseTree *> &children, const string &symbol,
               const tuple<string, string, set<string>> &token);
 
@@ -91,7 +90,7 @@ public:
      * @param Rviolator , the root of the violating nesting
      * @param T , Terminals
      */
-    void findViolation(const unsigned long &max, unsigned long &count, unsigned long &index,ParseTree* &Rviolator,const std::vector<std::string> &Terminals);
+    void findViolation(const unsigned long &max, const unsigned long &split, unsigned long &count, unsigned long &index,ParseTree* &Rviolator,const std::vector<std::string> &Terminals,bool &found);
 
     /**
      * Find the root of a given child
@@ -107,6 +106,10 @@ public:
      */
     void matchBrackets(const std::vector<std::string> &Terminals);
 
+    /**
+     * Get the Yield of the ParseTree
+     * @param yield
+     */
     void getYield(vector<tuple<string, string, set<string>>> &yield);
 
     void addTokens(vector<tuple<string, string, set<string>>>& tokens);
@@ -115,9 +118,18 @@ public:
      * Recursively create the tokenSet of a certain Sub-Parsetree
      * @param tokenSet
      */
-    void getTokenSet(std::set<std::set<std::string>> &tokenSet) const;
+    void getTokenSet(set<std::string> &vSet, std::set<std::string> &dSet) const;
 
+    /**
+     * Helper function to collect Includes & Typedefs and add them in front
+     * @param newKids
+     */
     void cleanIncludeTypedefs(std::vector<ParseTree*> &newKids);
+    
+    /**
+     * Checks if there is no break, continue or return
+     */
+    void checkBRC(pair<bool,int> &fDepth , pair<bool,int> &cbrDepth);
 };
 
 /**
@@ -133,13 +145,13 @@ class LALR {
      * Helper function for generate(), creates a new function Call in place
      * @return , Parsetree* containing the new code
      */
-    ParseTree* functionCall(const string& code);
+    static ParseTree* functionCall(const string& code);
 
     /**
      * Helper function for generate(), creates a new function in place
      * @return , Parsetree* containing the new code
      */
-    string function(ParseTree *violator, std::set<std::set<std::string>> &tokenSet, const string functionName);
+    string function(ParseTree *violator, std::set<std::string> &tokenSet, const string &functionName) const;
 
 public:
     unordered_map<int, map<string, string>> parseTable;

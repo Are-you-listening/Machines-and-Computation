@@ -300,11 +300,13 @@ void Tokenisation::Tokenize(const std::string &FileLocation) {
                                         '0','1','2','3','4','5','6','7','8','9'};
     std::string temp;
     while(getline(File,line1)){
-        temp+=line1;
+        temp+=line1+"\n";
     }
     std::vector<std::string> lines;
     std::string temp2;
     bool include=false;
+    bool comment=false;
+    bool maybeComment=false;
     for(const auto & C: temp){
         if(include){
             if(C=='>'||C=='"'){
@@ -316,6 +318,20 @@ void Tokenisation::Tokenize(const std::string &FileLocation) {
                 temp2+=C;
             }
             continue;
+        }
+        if(comment){
+            if(C=='\n'){
+                comment=false;
+                temp2+=C;
+                lines.push_back(temp2);
+                temp2.clear();
+            }else{
+                temp2+=C;
+            }
+            continue;
+        }
+        if(C!='/'){
+            maybeComment= false;
         }
         if(C=='{'){
             //temp2.push_back('{');
@@ -332,14 +348,27 @@ void Tokenisation::Tokenize(const std::string &FileLocation) {
             lines.push_back(temp2);
             temp2.clear();
         } else if(C=='#'){
+            lines.push_back(temp2);
+            temp2.clear();
             include = true;
             temp2+=C;
-        } else{
+        } else if(C=='/'&&!maybeComment){
+            maybeComment = true;
+            temp2+=C;
+        }else if(C=='/'&&maybeComment){
+            comment = true;
+            temp2+=C;
+        }else{
             temp2+=C;
         }
     }
     temp.clear();
     temp2.clear();
+    for(auto & line : lines){
+        if(line.find("\n")!=std::string::npos){
+            line.replace(line.find("\n"),1,"");
+        }
+    }
     
     for(auto & line : lines){
         unsigned long int tokenVectorSize=tokenVector.size();
@@ -350,6 +379,7 @@ void Tokenisation::Tokenize(const std::string &FileLocation) {
             line=line.substr(1,std::string::npos);
         }
         if(line.substr(0,2)=="//"){
+            tokenVector.emplace_back("C",line);
             continue;
         }
         if(line.substr(0,3)=="for"){
@@ -488,14 +518,23 @@ void Tokenisation::Tokenize(const std::string &FileLocation) {
                         } else if(std::get<1>(it3).find(" "+*it2+")")!=std::string::npos){
                             position=std::get<1>(it3).find(" "+*it2+")");
                             it_6= true;
+                        } else if(std::get<1>(it3).find(" "+*it2+" ")!=std::string::npos){
+                            position=std::get<1>(it3).find(" "+*it2+" ");
+                            it_6= true;
                         }
                         if(it_0||it_1||it_2||it_3||it_4||it_5||it_6&&std::get<1>(it3)!=std::get<1>(*it)){
                             if(std::get<0>(it3)=="V"){
                                 std::get<0>(it3)="D";
                             }
                             std::string D0;
+                            unsigned long int skip=0;
                             for(auto C=std::get<1>(it3).end()-(std::get<1>(it3).size()-position); C!=std::get<1>(it3).begin()-1;C--){
-                                if(*C==' '||VariableCharSecond.find(*C)!=VariableCharSecond.end()||*C=='&'){
+                                if(*C=='>'){
+                                    skip++;
+                                } else if(*C=='<'){
+                                    skip--;
+                                }
+                                if(*C==' '||VariableCharSecond.find(*C)!=VariableCharSecond.end()||*C=='&'||*C==':'||*C=='>'||*C=='<'||*C==','&&skip!=0){
                                     D0+=*C;
                                 } else{
                                     break;
@@ -510,6 +549,7 @@ void Tokenisation::Tokenize(const std::string &FileLocation) {
                             if(D0.find(' ')!=std::string::npos){
                                 std::get<2>(*it).insert(D0);
                             }
+                            std::get<2>(it3).insert(D0);
                             visited.insert(D0);
                             goto here;
                         }
@@ -526,11 +566,14 @@ void Tokenisation::Tokenize(const std::string &FileLocation) {
         if(std::get<0>(*i)=="V"||std::get<0>(*i)=="i"){
             here2:
             for(auto &V:std::get<2>(*i)){
-                if(V.empty()){
+                if(V.empty()||V.find(" ")==std::string::npos){
                     std::get<2>(*i).erase(V);
                     goto here2;
                 }
             }
+        } else if(std::get<1>(*i).empty()){
+            tokenTupleVector.erase(i);
+            i--;
         }
     }
     

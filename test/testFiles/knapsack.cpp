@@ -14,7 +14,7 @@ int knapsack(int capacity, const ItemList& items){
         int value=0;
         int current_capacity=0;
         unsigned int count2=0;
-        for(auto it=items.begin(); current_capacity<capacity&&it!=items.end(); it++, count2++){
+        for(std::list<std::pair<int, int>>::const_iterator it=items.begin(); current_capacity<capacity&&it!=items.end(); it++, count2++){
             if(count2<count){
                 continue;
             }
