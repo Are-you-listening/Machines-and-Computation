@@ -587,6 +587,15 @@ void LALR::generate() {
     //Create File
     vector<tuple<string, string, set<string>>> yield;
     _root->getYield(yield);
+
+
+    saveYield();
+}
+
+void LALR::saveYield() {
+    //Create File
+    vector<tuple<string, string, set<string>>> yield;
+    _root->getYield(yield);
     ofstream test("output/result.cpp");
     for(auto &k: yield){
         if(get<1>(k)=="\u1F600"){
@@ -604,7 +613,9 @@ void LALR::generate() {
         }
     }
     test.close();
+
 }
+
 
 ParseTree::~ParseTree() {
     for (const auto& child : children){
@@ -934,6 +945,30 @@ bool LALR::loadTable() {
         std::cout << "couldn't open parseTable file" << std::endl;
         return false;
     }
+}
+
+string LALR::getYield() {
+    vector<tuple<string, string, set<string>>> yield;
+    _root->getYield(yield);
+
+    string s;
+    for(auto &k: yield){
+        if(get<1>(k)=="\u1F600"){
+            get<0>(k)="{";
+            get<1>(k)="{";
+        }else if(get<1>(k)=="\u1F976"){
+            get<0>(k)="}";
+            get<1>(k)="}";
+        }
+
+        auto str = get<1>(k);
+        s += str;
+        if(str[str.size()-1]==';' || str[str.size()-1]=='{' || str[str.size()-1]=='}' ||str[str.size()-1]=='>' ){
+            s += "\n";
+        }
+    }
+
+    return s;
 }
 
 void ParseTree::addTokens(vector<tuple<string, string, set<string>>> &tokens) {
