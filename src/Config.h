@@ -82,6 +82,42 @@ public:
      * @return
      */
     [[nodiscard]] bool isStaticMemory() const;
+
+    /**
+     * Simple Setter
+     * @param maxNesting
+     */
+    void setMaxNesting(int maxNesting);
+
+    /**
+     * Simple setter
+     * @param splitNesting
+     */
+    void setSplitNesting(int splitNesting);
+
+    /**
+     * Simple setter
+     * @param ifElseNesting
+     */
+    void setIfElseNesting(int ifElseNesting);
+
+    /**
+     * Simple setter
+     * @param threading
+     */
+    void setThreading(bool threading);
+
+    /**
+     * Simple setter
+     * @param staticMemory
+     */
+    void setStaticMemory(bool staticMemory);
+
+    /**
+     * Simple setter
+     * @param init
+     */
+    static void setInit(Config *init);
 };
 
 
