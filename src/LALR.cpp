@@ -548,7 +548,7 @@ void LALR::generate() {
         pair<bool,int> fDepth = {false,0};
         pair<bool,int> cbrDepth = {false,0};
         createFrom->checkBRC(fDepth,cbrDepth);
-        if(cbrDepth.second>=fDepth.second){ //Replace brackets
+        if(cbrDepth.second>fDepth.second){ //Replace brackets
             for(auto &node: newKids){
                 if(get<0>(node->token)=="{"){ //
                     get<0>(node->token) = "\u1F600";
