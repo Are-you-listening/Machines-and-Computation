@@ -179,75 +179,86 @@ void GUI::Config() {
     }
 
     if (ImGui::Button("Convert")){
-        if (lalr){
-            auto config = Config::getConfig();
-
-            config->setMaxNesting(max_nesting);
-            config->setSplitNesting(split_nesting);
-            config->setThreading(threading);
-            config->setIfElseNesting(if_else_antinesting);
-
-
-            ofstream file{"input/SandBox/A.cpp"};
-            for (char c: input_text){
-                file << c;
-                if (c == '\u0001'){
-                    break;
-                }
-            }
-            file.close();
-
-            Tokenisation tokenVector;
-            std::string Filelocation="input/SandBox/A.cpp";
-            std::thread Tokenizer(&Tokenisation::Tokenize, &tokenVector, Filelocation);
-            core_amount--;
-
-            Orchestrator("");
-            auto cfg = createCFG();
-            cfg->toGNF();
-
-            const CFG a = *cfg;
-            LALR lalr(a);
-            lalr.createTable();
-
-            Tokenizer.join();
-            core_amount++;
-
-            //create LARL parser with tokenvector
-            auto vec = tokenVector.getTokenVector();
-
-            lalr.parse(vec);
-            lalr.generate();
-
-            string out = lalr.getYield();
-            output_text = out;
-            fixTabs();
-
-            if (threading){
-                threading_check();
-                ifstream readThread{Filelocation};
-                string text;
-                while (!readThread.eof()){
-                    text += (char) readThread.get();
-                }
-
-                output_text = text;
-            }
+        if (input_text[0] == '\u0000'){
 
         }else{
-            tm_busy = true;
-            move_counter = 0;
-            string text_string;
-            for (char c: input_text){
-                text_string += c;
+            if (lalr){
+                auto config = Config::getConfig();
+
+                config->setMaxNesting(max_nesting);
+                config->setSplitNesting(split_nesting);
+                config->setThreading(threading);
+                config->setIfElseNesting(if_else_antinesting);
+
+
+                ofstream file{"input/SandBox/A.cpp"};
+                for (char c: input_text){
+                    file << c;
+                    if (c == '\u0001'){
+                        break;
+                    }
+                }
+                file.close();
+
+                Tokenisation tokenVector;
+                std::string Filelocation="input/SandBox/A.cpp";
+                std::thread Tokenizer(&Tokenisation::Tokenize, &tokenVector, Filelocation);
+                core_amount--;
+
+                Orchestrator("");
+                auto cfg = createCFG();
+                cfg->toGNF();
+
+                const CFG a = *cfg;
+                LALR lalr(a);
+                lalr.createTable();
+
+                Tokenizer.join();
+                core_amount++;
+
+                //create LARL parser with tokenvector
+                auto vec = tokenVector.getTokenVector();
+
+                lalr.parse(vec);
+                lalr.generate();
+
+                string out = lalr.getYield();
+                output_text = out;
+                fixTabs();
+
+                if (threading){
+                    threading_check();
+                    ifstream readThread{Filelocation};
+                    string text;
+                    while (!readThread.eof()){
+                        text += (char) readThread.get();
+                    }
+
+                    output_text = text;
+                }
+
+            }else{
+                if (single_tape){
+                    if (!tm_machine.isSingleTape()){
+                        tm_machine = *tm_machine.toSingleTape();
+                    }
+                }
+
+                tm_busy = true;
+                move_counter = 0;
+                string text_string;
+                for (char c: input_text){
+                    text_string += c;
+                }
+
+                auto data = tm_b->generateTM();
+
+                tm_machine.clear(true);
+                tm_machine.load(data.states, data.start_state, data.input, data.tape_size, data.productions);
+                tm_machine.load_input(text_string, 1);
             }
-
-            auto data = tm_b->generateTM();
-
-            tm_machine.clear(true);
-            tm_machine.load(data.states, data.start_state, data.input, data.tape_size, data.productions);
-            tm_machine.load_input(text_string, 1);
         }
+
     }
 
 
