@@ -16,18 +16,18 @@ static unsigned int core_amount = std::thread::hardware_concurrency(); // gets "
 #include "src/Config.h"
 #include "src/CFGConstructor.h"
 #include "src/LALR.h"
-#include "src/GUI/GUI.h"
+//#include "src/GUI/GUI.h"
 
 //!!!!!!!!!!!!!!!!!!! Default Config Location is already SET in Orchestrator.cpp
 // Variabel Define might be a problem?
 
 int main() { // Function names we create to replace nesting should have F or I in their names, so we know if they were for-loops or If-loops
-    GUI g;
-    return 0;
+    //GUI g;
+    
     Tokenisation tokenVector; // sometimes variables in a nesting that should be passed in a function call aren't passed because it isn't found in the source file, this is done on purpose.
     //std::string Filelocation="input/nestedExamples/engine.cc"; // for now, doesn't support double declarations like int a,d;
-    std::string Filelocation="../test/nestedExamples/game5.cpp";
-    //std::string Filelocation="../test/testFiles/TM_test_53.cpp";
+    //std::string Filelocation="../test/nestedExamples/game5.cpp";
+    std::string Filelocation="../test/testFiles/TM_test_54.cpp";
     std::thread Tokenizer(&Tokenisation::Tokenize, &tokenVector, Filelocation); // i ignore rvalues in function calls
     core_amount--;
     //Tokenizer.join();
@@ -82,9 +82,12 @@ int main() { // Function names we create to replace nesting should have F or I i
     File910.close();
     File1010.close();
     
-    std::cout << "We do really love Tibo" << std::endl;
     std::string ResultFileLocation="output/result.cpp";
-    ThreadFunction::threadFILE(ResultFileLocation);
+    
+    Config::getConfig()->setThreading(true);
+    if(Config::getConfig()->isThreading()){
+        ThreadFunction::threadFILE(ResultFileLocation);
+    }
     
     auto start1=std::chrono::high_resolution_clock::now();
     std::string SystemString= "g++ " + ResultFileLocation + "result.cc";
@@ -100,6 +103,6 @@ int main() { // Function names we create to replace nesting should have F or I i
     auto second=std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(second - start);
 
-    cout << "threaded: "<< duration.count() << " microseconds" << endl;
+    cout << "denested: "<< duration.count() << " microseconds" << endl;
     return 0;
 }
