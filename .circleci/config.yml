@@ -1,5 +1,7 @@
 version: 2.1
 
+cache_directories:
+    - "~/.local"
 
 executors:
   main_executor:
@@ -16,7 +18,6 @@ jobs:
       - run: apt update
       - run: DEBIAN_FRONTEND=noninteractive apt install -y gcc g++ libgl1 cmake git
       - run: apt install -y sudo
-      - run: sudo dpkg -i vendor/apt/archives/*.deb
 
 
   install_glfw:
