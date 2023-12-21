@@ -47,11 +47,3 @@ bool check_zero_options(const int &color){ //Hulpfunctie; anti-duplicated code
     }
     return true;
 }
-
-
-
-
-
-
-
-
