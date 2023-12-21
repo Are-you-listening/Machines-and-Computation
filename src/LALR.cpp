@@ -517,7 +517,8 @@ void LALR::generate() {
                 result2.insert(k);
             }
         }
-        
+
+
 
         vector<ParseTree *> newKids;
 
