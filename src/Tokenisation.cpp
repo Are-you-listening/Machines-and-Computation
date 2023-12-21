@@ -5,6 +5,7 @@
 #include "Tokenisation.h"
 
 void vindVn(std::vector<std::tuple<std::string, std::string, std::set<std::string>>>& tokenTupleVector, const std::string& line, unsigned long int count2, std::set<char> VariableChar, std::set<char> VariableCharSecond){
+
     std::string tempV;
     unsigned long int count=0;
     bool append=false;
