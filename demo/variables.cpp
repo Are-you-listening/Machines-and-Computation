@@ -14,6 +14,7 @@ std::vector<int*> function(const int &color)  {
     std::vector<int*> options;
 
     for(int r=0 ; r<8 ; r++){
+        std::string temp = "yay";
         for(int k=0 ; k<8 ; k++){
             int* piece = function2(r,k);
             if(piece!= nullptr){
