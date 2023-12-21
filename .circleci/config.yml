@@ -1,7 +1,5 @@
 version: 2.1
 
-cache_directories:
-    - "~/.local"
 
 executors:
   main_executor:
@@ -10,23 +8,6 @@ executors:
 
 
 jobs:
-  install_libg1:
-    resource_class: small
-    executor: main_executor
-    steps:
-      - checkout
-      - run: apt update
-      - run: DEBIAN_FRONTEND=noninteractive apt install -y gcc g++ libgl1 cmake git
-      - run: apt install -y sudo
-
-
-  install_glfw:
-    resource_class: small
-    executor: main_executor
-    steps:
-      - checkout
-      - run: apt update
-      - run: DEBIAN_FRONTEND=noninteractive TZ=Europe/Brussels apt install -y gcc g++ libglfw3-dev
 
   build:
     resource_class: small
@@ -34,6 +15,8 @@ jobs:
     steps:
       - checkout
       - run: apt update
+      - run: DEBIAN_FRONTEND=noninteractive apt install -y gcc g++ libgl1 cmake git
+      - run: DEBIAN_FRONTEND=noninteractive TZ=Europe/Brussels apt install -y gcc g++ libglfw3-dev
       - run: mkdir -p build
       - run: cd build && cmake ..
       - run: cd build && make
@@ -67,12 +50,8 @@ jobs:
 workflows:
   default_validation: &default_validation
     jobs:
-      - install_libg1
-      - install_glfw
-      - build:
-          requires:
-            - install_libg1
-            - install_glfw
+      - build
+
       - run_tests:
           requires:
             - build
