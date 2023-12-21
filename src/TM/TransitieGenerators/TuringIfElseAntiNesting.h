@@ -4,6 +4,7 @@
 
 #ifndef TOG_TURINGIFELSEANTINESTING_H
 #define TOG_TURINGIFELSEANTINESTING_H
+
 #include "TuringGenerator.h"
 
 class TuringIfElseAntiNesting: public TuringGenerator{

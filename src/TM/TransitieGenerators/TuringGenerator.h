@@ -4,6 +4,7 @@
 
 #ifndef TOG_TURINGGENERATOR_H
 #define TOG_TURINGGENERATOR_H
+
 #include "src/TM/TuringTools.h"
 
 class TuringGenerator {

@@ -14,15 +14,15 @@
 #ifndef CFG_LALR_H
 #define CFG_LALR_H
 
+#include "Config.h"
+#include "src/CFG.h"
+
 #include <queue>
 #include <stack>
 #include <algorithm>
 #include <tuple>
 #include <set>
 #include <fstream>
-
-#include "Config.h"
-#include "src/CFG.h"
 #include <exception>
 #include <filesystem>
 

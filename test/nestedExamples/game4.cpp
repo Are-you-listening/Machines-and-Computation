@@ -2,20 +2,21 @@
 #include <iostream>
 
 class SchaakStuk;
+
 class Pion{
 private:
     int zwart;
 public:
-    Pion(int zwart,string t): zwart(zwart){}
+    Pion(int zwart,std::string t): zwart(zwart){}
 
     std::string getKleur();
 
-    pair<int,int> getPosition();
+    std::pair<int,int> getPosition();
 };
 
 static int zwart = 1;
 static int wit = 0;
-static vector<vector<Pion*>> board;
+static std::vector<std::vector<Pion*>> board;
 
 void setStartBord();
 

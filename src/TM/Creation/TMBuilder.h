@@ -1,15 +1,19 @@
 //
 // Created by tibov on 10/11/23.
 //
-#include <thread>
-#include <future>
+
 #ifndef TOG_TMBUILDER_H
 #define TOG_TMBUILDER_H
+
 #include "src/TM/TransitieGenerators/TuringTokenizer.h"
 #include "src/TM/TuringTools.h"
 #include "src/TM/TransitieGenerators/TuringVarDictionary.h"
 #include "src/TM/TransitieGenerators/TuringDenestify.h"
 #include "src/TM/TransitieGenerators/TuringIfElseAntiNesting.h"
+
+#include <thread>
+#include <future>
+#include <chrono>
 
 struct TMBuilder_output{
     vector<string> states;

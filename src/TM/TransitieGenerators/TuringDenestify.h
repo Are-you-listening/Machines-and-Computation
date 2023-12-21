@@ -4,6 +4,7 @@
 
 #ifndef TOG_TURINGDENESTIFY_H
 #define TOG_TURINGDENESTIFY_H
+
 #include "TuringGenerator.h"
 
 class TuringDenestify: public TuringGenerator{

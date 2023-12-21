@@ -5,11 +5,13 @@
 #ifndef TOG_TURINGTOOLS_H
 #define TOG_TURINGTOOLS_H
 
-#include <iostream>
-#include <vector>
 #include "lib/json.hpp"
 #include "TuringProduction.h"
+
+#include <iostream>
+#include <vector>
 #include <set>
+
 using namespace std;
 using json = nlohmann::json;
 

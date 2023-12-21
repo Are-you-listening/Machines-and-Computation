@@ -5,11 +5,11 @@
 #ifndef TOG_TAPE_H
 #define TOG_TAPE_H
 
+#include "lib/DesignByContract.h"
+
 #include <optional>
 #include <iostream>
 #include <cstdlib>
-
-#include "lib/DesignByContract.h"
 
 using namespace std;
 

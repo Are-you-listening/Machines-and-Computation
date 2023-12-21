@@ -5,6 +5,9 @@
 #ifndef TOG_CFG_H
 #define TOG_CFG_H
 
+#include "lib/json.hpp"
+#include "lib/kars/CFGKars.h"
+
 #include <vector>
 #include <cstring>
 #include <tuple>
@@ -12,9 +15,6 @@
 #include <fstream>
 #include <iostream>
 #include <set>
-
-#include "lib/json.hpp"
-#include "lib/kars/CFGKars.h"
 
 using json = nlohmann::json;
 

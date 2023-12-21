@@ -4,6 +4,7 @@
 
 #ifndef TOG_TURINGTOKENIZER_H
 #define TOG_TURINGTOKENIZER_H
+
 #include "src/TM/TuringMachine.h"
 #include "TuringGenerator.h"
 
