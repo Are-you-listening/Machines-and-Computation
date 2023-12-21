@@ -27,6 +27,10 @@ jobs:
             - testing/testing/TESTS
             - testing/testing/Tog
           root: build
+      - persist_to_workspace:
+          root: /
+          paths:
+            - /usr/lib/
 
   run_tests:
     resource_class: large
@@ -35,6 +39,8 @@ jobs:
       - checkout
       - attach_workspace:
           at: build
+      - attach_workspace:
+          at: /
       - run: cd working && mkdir -p output
       - run: cd working && ./../build/testing/testing/TESTS
 
