@@ -8,15 +8,6 @@ executors:
 
 
 jobs:
-  install1:
-    resource_class: small
-    executor: main_executor
-    steps:
-      - checkout
-      - run: apt update
-
-
-
   build:
     resource_class: small
     executor: main_executor
@@ -66,10 +57,7 @@ jobs:
 workflows:
   default_validation: &default_validation
     jobs:
-      - install1
-      - build:
-          requires:
-            - install1
+      - build
 
       - run_tests:
           requires:
