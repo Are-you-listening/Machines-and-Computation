@@ -90,13 +90,13 @@ public:
      * Simple getter
      * @return
      */
-    const vector<std::string> &getV() const;
+    [[nodiscard]] const vector<std::string> &getV() const;
 
     /**
      * Simple getter
      * @return
      */
-    const vector<std::string> &getT() const;
+    [[nodiscard]] const vector<std::string> &getT() const;
 
     /**
      * Simple setter
@@ -108,13 +108,13 @@ public:
      * Simple getter
      * @return
      */
-    const vector<std::pair<std::string, std::vector<std::string>>> &getP() const;
+    [[nodiscard]] const vector<std::pair<std::string, std::vector<std::string>>> &getP() const;
 
     /**
      * Simple getter
      * @return
      */
-    const string &getS() const;
+    [[nodiscard]] const string &getS() const;
 
     /**
      * Simple setter

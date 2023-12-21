@@ -493,8 +493,8 @@ void LALR::printTable() {
 }
 
 void LALR::generate() {
-    const unsigned long split = Config::getConfig()->getSplitNesting();
-    const unsigned long max = Config::getConfig()->getMaxNesting();
+    const unsigned long split = Config::getConfig()->getSplitNesting()+1;
+    const unsigned long max = Config::getConfig()->getMaxNesting()+1;
     unsigned long count = 0;
     unsigned long index;
     bool found = false;
