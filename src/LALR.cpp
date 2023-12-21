@@ -133,6 +133,7 @@ void LALR::mergeSimilar() {
 }
 
 void LALR::createTable() {
+    std::cout << "started creating parse table" << std::endl;
     bool tableexists = false;
     if (std::filesystem::exists("parseTablefile.txt")){
         std::cout << "parseTablefile found!" << std::endl;
@@ -385,6 +386,7 @@ void LALR::printStates() {
 }
 
 void LALR::parse(std::vector<std::tuple<std::string, std::string, std::set<std::string>>> &input) {
+    std::cout << "started parsing" << std::endl;
     stack<int> s;
     s.push(0);
     std::set<std::string> S={};
@@ -403,7 +405,7 @@ void LALR::parse(std::vector<std::tuple<std::string, std::string, std::set<std::
         }
         string operation = parseTable[stacksymbol][inputsymbol];
 
-        cout << "stacksymbol: " << stacksymbol << ", inputsymbol: " << inputsymbol << " --> " << operation << endl;
+        //cout << "stacksymbol: " << stacksymbol << ", inputsymbol: " << inputsymbol << " --> " << operation << endl;
         if (operation.empty()){
             throw emptyElement();
         }
@@ -419,12 +421,7 @@ void LALR::parse(std::vector<std::tuple<std::string, std::string, std::set<std::
                 rule++;
                 count++;
             }
-            //std::cout << operation << endl;
-            //std::cout << rule->first << "\t-->\t";
-            //for (auto c : rule->second){
-            //    std::cout << " " << c << " ";
-            //}
-            //std::cout << "\n\n";
+
             if (inputsymbol != "$"){
                 remaininginputvector.insert(remaininginputvector.begin(), inputtuple);
                 remaininginputvector.insert(remaininginputvector.begin(), std::make_tuple(rule->first, "", S));
@@ -476,11 +473,7 @@ void LALR::parse(std::vector<std::tuple<std::string, std::string, std::set<std::
     }
     auto inputcopy = input;
     _root->addTokens(inputcopy);
-    //vector<tuple<string, string, set<string>>> debugyield;
-    //_root->getYield(debugyield);
-    //for (auto elem : debugyield){
-    //    cout << get<0>(elem) << " ";
-    //}
+    std::cout << "done parsing" << endl;
 }
 
 void LALR::printTable() {

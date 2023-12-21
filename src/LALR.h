@@ -201,7 +201,7 @@ public:
     void printStates();
 
     /**
-     * Process a given tokenvector and create a parseTable
+     * Process a given tokenvector using the parse Table and create a parse Tree
      * @param input , tokenvector
      */
     void parse(std::vector<std::tuple<std::string, std::string, std::set<std::string>>> &input);
