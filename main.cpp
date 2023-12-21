@@ -40,6 +40,7 @@ int main() {
     auto vec = tokenVector.getTokenVector();
     lalr.parse(vec);
     lalr.generate();
+    lalr.generateParseTreeImage("tree");
     Orchestrator::tabber(); //Cleanup output file; match tabs & spaces
     if(Config::getConfig()->isThreading()){
         ThreadFunction::threadFILE("result.cpp");
