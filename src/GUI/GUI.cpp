@@ -11,6 +11,12 @@ GUI::GUI() {
     TMBuilder_output data = tm_b->generateTM();
     tm_machine.load(data.states, data.start_state, data.input, data.tape_size, data.productions);
 
+    auto config = Config::getConfig();
+    split_nesting = config->getSplitNesting();
+    max_nesting = config->getMaxNesting();
+    if_else_antinesting = config->getIfElseNesting();
+    threading = config->isThreading();
+
     const char* glsl_version = "#version 130";
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
@@ -174,12 +180,12 @@ void GUI::Config() {
     if (ImGui::Button("Convert")){
         if (lalr){
             auto config = Config::getConfig();
-            /*
+
             config->setMaxNesting(max_nesting);
             config->setSplitNesting(split_nesting);
             config->setThreading(threading);
             config->setIfElseNesting(if_else_antinesting);
-             */
+
 
             ofstream file{"input/SandBox/A.cpp"};
             for (char c: input_text){
