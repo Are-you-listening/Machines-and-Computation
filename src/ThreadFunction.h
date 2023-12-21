@@ -11,10 +11,14 @@
 #include <sstream>
 #include <iostream>
 #include <mutex>
+#include <thread>
+#include <filesystem>
 
 class ThreadFunction {
 public:
     void ThreadFunctionCall(const std::string& FileLocation, const std::string& Function);
+
+    static void threadFILE(const std::string &ResultFileLocation);
 };
 
 #endif //TOG_THREADFUNCTION_H
