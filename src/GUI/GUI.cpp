@@ -3,8 +3,9 @@
 //
 
 #include "GUI.h"
-#include "../Config.h"
+
 static unsigned int core_amount = std::thread::hardware_concurrency();
+
 GUI::GUI() {
 
     tm_b = new TMBuilder(4, true, 2, 4);

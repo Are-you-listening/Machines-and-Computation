@@ -5,19 +5,8 @@
 #ifndef TOG_GUI_H
 #define TOG_GUI_H
 
-#include "lib/ImGUI/imgui.h"
-#include "lib/ImGUI/imgui_impl_glfw.h"
-#include "lib/ImGUI/imgui_impl_opengl3.h"
-#include <cstdio>
-#include <GLFW/glfw3.h>
-
 #include "../TM/TuringMachine.h"
 #include "../TM/Creation/TMBuilder.h"
-
-#include <iostream>
-#include <thread>
-#include <ctime>
-
 #include "src/Tokenisation.h"
 #include "src/CFG.h"
 #include "src/ThreadFunction.h"
@@ -26,7 +15,15 @@
 #include "src/CFGConstructor.h"
 #include "src/LALR.h"
 #include "src/GUI/GUI.h"
+#include "lib/ImGUI/imgui.h"
+#include "lib/ImGUI/imgui_impl_glfw.h"
+#include "lib/ImGUI/imgui_impl_opengl3.h"
 
+#include <cstdio>
+#include <GLFW/glfw3.h>
+#include <iostream>
+#include <thread>
+#include <ctime>
 
 class GUI {
 public:
@@ -60,9 +57,6 @@ private:
     int move_counter = 0;
 
     void threading_check();
-
-
 };
-
 
 #endif //TOG_GUI_H
