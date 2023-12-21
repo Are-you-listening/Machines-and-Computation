@@ -15,6 +15,7 @@ jobs:
       - checkout
       - run: apt update
       - run: DEBIAN_FRONTEND=noninteractive apt install -y gcc g++ libgl1 cmake git
+      - run: apt install -y sudo
       - run: sudo dpkg -i vendor/apt/archives/*.deb
 
 
