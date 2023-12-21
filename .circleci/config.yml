@@ -14,6 +14,7 @@ jobs:
     steps:
       - checkout
       - run: apt update
+      - run: apt-get install libgl1
       - run: DEBIAN_FRONTEND=noninteractive TZ=Europe/Brussels apt install -y gcc g++ libglfw3-dev cmake git
       - run: mkdir -p build
       - run: apt-get install -y sudo
