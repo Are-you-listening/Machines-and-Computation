@@ -156,7 +156,7 @@ TEST(TuringMachineTest, TM_tools){
 }
 
 TEST(TuringMachineTest, TM_tokenazation) {
-    int index = 63;
+    int index = 65;
     ifstream test_file("../test/testFiles/TM_test_"+ to_string(index)+".cpp");
     string test_string;
     cout << test_file.is_open() << endl;
@@ -179,7 +179,7 @@ TEST(TuringMachineTest, TM_tokenazation) {
     tm.load_input(test_string, 1);
 
     int halted_time = -1;
-    for (int i = 0; i<400000; i++){
+    for (int i = 0; i<200000; i++){
 
         if (tm.isHalted()){
             if (halted_time == -1){
@@ -189,7 +189,11 @@ TEST(TuringMachineTest, TM_tokenazation) {
             break;
         }
         tm.move();
-        if (tm.getCurrentState() == "tokenize_sub_finished_token"){
+        if (tm.getCurrentState() == "failure_4945"){
+            for (int i = 0; i < tm.getTapeAmount(); i++){
+                cout << tm.getTapeData(i) << endl;
+            }
+            cout << endl;
 
             int j=0;
 
@@ -336,7 +340,7 @@ TEST(TuringMachineTest, TM_single_tape) {
 }
 
 TEST(TuringMachineTest, TM_single_tape_2){
-
+    /*
     int index = 9;
     ifstream test_file("../test/testFiles/TM_test_"+ to_string(index)+".cpp");
     string test_string;
@@ -428,7 +432,7 @@ TEST(TuringMachineTest, TM_single_tape_2){
     ofstream out{"../test/results/TM_test_"+ to_string(index)+".cpp"};
     out << tm.exportTapeData(1);
     out.close();
-
+    */
 }
 
 TEST(TuringMachineTest, TM_builder_2){

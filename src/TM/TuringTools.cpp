@@ -3723,6 +3723,7 @@ void TuringTools::check_split_nesting(IncompleteSet &a, const vector<int>&tuple_
 
     //above we pushed the amount of params passed including self on working tape
     //now we will pop for every D we pass
+
     go_to(check_split_nesting, {heap_sep}, stack_tape, 1, {(int) stack_tape});
     go_to(check_split_nesting, {'#'}, stack_tape, -1, {(int) stack_tape});
     move(check_split_nesting, {0,1}, -1);
@@ -3802,7 +3803,7 @@ void TuringTools::check_split_nesting(IncompleteSet &a, const vector<int>&tuple_
 
     std::vector<string> branches;
 
-    for (int i=0; i<split_nesting+1; i++){
+    for (int i=0; i<split_nesting+2; i++){
         go_to(check_split_nesting, {'}', '{', stack_symbol}, stack_tape, 1, {(int) stack_tape});
 
         IncompleteSet skip_nesting_set{"skip_nesting_"+ to_string(counter), "skip_nesting_"+ to_string(counter)};
