@@ -761,8 +761,6 @@ void ParseTree::findViolation(const unsigned long &max,const unsigned long &spli
         return;
     }
 
-
-
     for(long unsigned int i = 0; i<children.size();++i){
         ParseTree* child = children[i];
 
