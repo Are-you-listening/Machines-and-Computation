@@ -130,6 +130,11 @@ public:
      * Checks if there is no break, continue or return
      */
     void checkBRC(pair<bool,int> &fDepth , pair<bool,int> &cbrDepth);
+
+    /**
+     * describes this node and its children (recursively) in the dot format
+     */
+    void generateDot(std::ostream& out);
 };
 
 /**
@@ -218,6 +223,11 @@ public:
 
     void saveYield();
     string getYield();
+
+    /**
+     * creates an image of the parse tree using dot
+     */
+    void generateParseTreeImage(const string filename);
 };
 
 #endif//CFG_LALR_H
