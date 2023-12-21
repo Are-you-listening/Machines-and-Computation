@@ -28,7 +28,7 @@ public:
     void load(const vector<string>& states, const string& start_state, const string& input, int tape_size, const vector<Transition>& productions);
     void load_input(const string& input, int index);
     [[nodiscard]] string getTapeData(unsigned int index) const;
-    [[nodiscard]] string exportTapeData(unsigned int index) const;
+    [[nodiscard]] string exportTapeData(unsigned int index, bool full=false) const;
     void move();
 
     [[nodiscard]] bool isHalted() const;
@@ -36,7 +36,7 @@ public:
 
     [[nodiscard]] const string &getCurrentState() const;
     int getTuringIndex(int i);
-    void clear();
+    void clear(bool full=false);
     TuringMachine* toSingleTape();
     void makeStorage(int size);
     string getControlStorage();

@@ -134,7 +134,7 @@ public:
     string check_stack_double(IncompleteSet& a);
     void store_param_count(IncompleteSet& a, const vector<int>&tuple_indexes);
     void check_for_loop_continue_split(IncompleteSet& a, const vector<int>&tuple_indexes);
-
+    void resetCounter();
 
 private:
 

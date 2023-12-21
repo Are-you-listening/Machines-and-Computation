@@ -5,6 +5,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 
+
 include_directories(.)
 #Google Test Setup
 include(FetchContent)
@@ -23,6 +24,24 @@ set(TestCaseFiles
         test/ThreadingTest.cpp
         #working/output/result.cpp
 
+)
+
+#for ImGUI
+find_package(OpenGL REQUIRED)
+
+file(GLOB_RECURSE imGuiLib
+        "lib/ImGUI/*.h"
+        "lib/ImGUI/*.cpp"
+)
+
+add_library("imgui" STATIC ${imGuiLib})
+target_include_directories("imgui" PUBLIC ${lib/ImGUI})
+target_link_libraries("imgui" PRIVATE glfw OpenGL::GL)
+
+set(GUI
+        ${imGuiLib}
+        src/GUI/GUI.cpp
+        src/GUI/GUI.h
 )
 
 set(TuringCode
@@ -94,7 +113,12 @@ gtest_discover_tests(TESTS)
 add_executable(Tog
         main.cpp
         ${CodeFiles}
+        ${GUI}
         )
+
+#for ImGUI
+target_link_libraries(Tog PUBLIC imgui)
+target_include_directories( Tog PUBLIC imgui)
 
 set(CMAKE_INSTALL_PREFIX testing)
 install(TARGETS TESTS
