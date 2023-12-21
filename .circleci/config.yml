@@ -14,11 +14,7 @@ jobs:
     steps:
       - checkout
       - run: apt update
-      - run: DEBIAN_FRONTEND=noninteractive apt install -y gcc g++ libgl1 cmake git
-      - persist_to_workspace:
-          root: tmp
-          paths:
-            - tmp/packages_installed
+
 
 
   build:
@@ -27,8 +23,7 @@ jobs:
     steps:
       - checkout
       - run: apt update
-      - attach_workspace:
-          at: /tmp
+      - run: DEBIAN_FRONTEND=noninteractive apt install -y gcc g++ libgl1 cmake git
       - run: DEBIAN_FRONTEND=noninteractive TZ=Europe/Brussels apt install -y gcc g++ libglfw3-dev
       - run: mkdir -p build
       - run: cd build && cmake ..
