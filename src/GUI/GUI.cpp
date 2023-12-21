@@ -202,7 +202,7 @@ void GUI::Config() {
             std::thread Tokenizer(&Tokenisation::Tokenize, &tokenVector, Filelocation);
             core_amount--;
 
-            Orchestrator();
+            Orchestrator("");
             auto cfg = createCFG();
             cfg->toGNF();
 
@@ -448,4 +448,3 @@ void GUI::fixTabs() {
     }
     output_text = output;
 }
-
