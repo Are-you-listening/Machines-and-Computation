@@ -1,26 +1,27 @@
-# MB-Tog
+# The never{ Nestifier }
+> Group project for the course "Machines en berekenbaarheid" (INFORMAT 1001WETMAB)
+> > By Anas Stitou, Tibo Vereycken, Emil Lambert & Kars van Velzen
 
-Trying to figure it out
+### How to start?
+    Run main.cpp    Enjoy =)
 
-The never{
-Nestifier}
+#### Supported Included List:
+- [X] Classes
+- [X] STL Library Includes
+- [X] The code gives the same output as usual (Code Behavior should be the same)
 
-Supported:
-- Classes zijn supported
-- STL Library Includes
-- The codes gives the same output as usual // Code Behavior is the same
+#### Requirements:
+1. Commands are removed 
+2. All code must be placed in a single file 
+3. The to-be-processed code should compile and run without errors 
+4. Function names consisting of A* may not exist in de pre-processed code
 
-Requirements:
-- Alles moet in 1 file zitten
-- working code
-- function names met A* mogen niet bestaan
-
-Not-Supported:
-    - Auto variables 
-    - Double declarations
-    - Lambda functions
-    - Busy waiting / Time influence in code are not guaranteed (which is basicly bad code)
-    - Declrations in IF/ELSE statements
-    - elseIF
-    - Commands are removed
-    - Initialiser lists
+#### Support Excluded List:
+- [ ] Auto variables 
+- [ ] Double declarations
+- [ ] Lambda functions
+- [ ] Busy waiting
+- [ ] Time influences in code are not guaranteed
+- [ ] Declarations in IF/ELSE statements
+- [ ] elseIF statements
+- [ ] Initializer lists
