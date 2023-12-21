@@ -76,6 +76,19 @@ void ThreadFunction::ThreadFunctionCall(const std::string& FileLocation, const s
     ThreadNameFunction++;
     thread_name_lock.unlock();
     std::vector<std::string> copy=VusedVariables[0];
+    for(std::vector<std::vector<std::string>>::iterator it=VusedVariables.begin(); it!=VusedVariables.end(); it++){
+        for(std::vector<std::string>::iterator it2=it->begin(); it2!=it->end(); it2++){
+            if((*it2).empty()){
+                *it2="a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3";
+            }
+        }
+    }
+    
+    for(std::vector<std::string>::iterator it2=ChangedVariables.begin(); it2!=ChangedVariables.end(); it2++){
+        if((*it2).empty()){
+            *it2="a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3";
+        }
+    }
     for(unsigned long int i=0; i<copy.size(); i++){
         for(unsigned long int j=0; j<copy[i].size(); j++){
             if(copy[i][j]==' '||copy[i][j]=='&'){
@@ -85,7 +98,7 @@ void ThreadFunction::ThreadFunctionCall(const std::string& FileLocation, const s
             }
         }
     }
-    for(unsigned long int i=0; i<copy.size(); i++){
+    for(unsigned long int i=0; i<copy.size()-1; i++){
         FunctionCall+="std::ref("+VusedVariables[0][i]+")"+", ";
     }
     FunctionCall[FunctionCall.size()-2]=')';
@@ -97,15 +110,15 @@ void ThreadFunction::ThreadFunctionCall(const std::string& FileLocation, const s
     std::vector<std::string> FunctionCalls;
     unsigned long int count=0;
     while(getline(File,line2)){
-        if(line2!=Function&& line2.find(FunctionName + "(") != std::string::npos){
-            std::string temp2;
-            for(auto S: line2){
-                if(S==' '){
-                    temp2+=' ';
-                } else {
-                    break;
-                }
+        std::string temp2;
+        for(auto S: line2){
+            if(S==' '){
+                temp2+=' ';
+            } else {
+                break;
             }
+        }
+        if(line2!=Function&& line2.find(FunctionName + "(") != std::string::npos&&line2.find(';')!=std::string::npos&&line2.find('(')==(temp2+FunctionName).size()){
             File2 << temp2<<FunctionCall<<std::endl;
             FunctionCalls.push_back(FunctionCall);
             FunctionCall.clear();
@@ -117,8 +130,10 @@ void ThreadFunction::ThreadFunctionCall(const std::string& FileLocation, const s
             ThreadNameFunction++;
             thread_name_lock.unlock();
             count++;
-            for(unsigned long int i=0; i<copy.size(); i++){
-                FunctionCall+="std::ref("+VusedVariables[count][i]+")"+", ";
+            if(count<VusedVariables.size()-1){
+                for(unsigned long int i=0; i<copy.size()-1; i++){
+                    FunctionCall+="std::ref("+VusedVariables[count][i]+")"+", ";
+                }
             }
             FunctionCall[FunctionCall.size()-2]=')';
             FunctionCall[FunctionCall.size()-1]=';';
