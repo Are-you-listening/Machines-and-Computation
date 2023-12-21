@@ -14,7 +14,8 @@ jobs:
     steps:
       - checkout
       - run: apt update
-      - run: apt-get install -y libgl1
+      - run: DEBIAN_FRONTEND=noninteractive apt install -y gcc g++ libgl1 cmake git
+
 
   install_glfw:
     resource_class: small
