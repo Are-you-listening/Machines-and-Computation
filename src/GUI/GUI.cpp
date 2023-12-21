@@ -3,7 +3,7 @@
 //
 
 #include "GUI.h"
-
+#include "../Config.h"
 
 GUI::GUI() {
 
@@ -52,7 +52,7 @@ GUI::GUI() {
         setupInput();
         setupOutput();
         Config();
-        if (!lalr){
+        if (tm_busy){
             TMEmulator();
         }
 
@@ -107,7 +107,12 @@ void GUI::setupOutput() {
     ImGui::Begin("Output Code");
 
     ImVec4 output_color = ImVec4(1.0f, 1.0f, 0.00f, 1.00f);
-    ImGui::TextColored(output_color, "%s", output_text.c_str());
+    if (tm_busy){
+        ImGui::TextColored(output_color, "%s", "TM still in progress");
+    }else{
+        ImGui::TextColored(output_color, "%s", output_text.c_str());
+    }
+
     ImGui::End();
 
 }
@@ -150,8 +155,30 @@ void GUI::Config() {
         changed = true;
     }
 
+    if (tm){
+        if (ImGui::Checkbox("Singletape", &single_tape)){
+            changed = true;
+        }
+        if (ImGui::Checkbox("IfElse Antinesting", &if_else_antinesting)){
+            changed = true;
+        }
+
+        if (ImGui::SliderInt("tuple size", &tuple_size, 2, 8)){
+            changed = true;
+        }
+    }else{
+        ImGui::Checkbox("Threading", &threading);
+
+    }
+
     if (ImGui::Button("Convert")){
         if (lalr){
+            auto config = Config::getConfig();
+            config->setMaxNesting(max_nesting);
+            config->setSplitNesting(split_nesting);
+            config->setThreading(threading);
+            config->setIfElseNesting(if_else_antinesting);
+
             ofstream file{"input/SandBox/A.cpp"};
             for (char c: input_text){
                 file << c;
@@ -184,21 +211,64 @@ void GUI::Config() {
             string out = lalr.getYield();
             output_text = out;
 
-        }else{
+            if (threading){
+                threading_check();
+                ifstream readThread{Filelocation};
+                string text;
+                while (!readThread.eof()){
+                    text += (char) readThread.get();
+                }
 
+                output_text = text;
+            }
+
+        }else{
+            tm_busy = true;
+            move_counter = 0;
+            string text_string;
+            for (char c: input_text){
+                text_string += c;
+            }
+
+            auto data = tm_b->generateTM();
+
+            tm_machine.clear(true);
+            tm_machine.load(data.states, data.start_state, data.input, data.tape_size, data.productions);
+            tm_machine.load_input(text_string, 1);
         }
     }
 
-    if (tm){
-        if (ImGui::Checkbox("Singletape", &single_tape)){
-            changed = true;
+
+
+    if (tm_busy){
+        int moves_doing = 0;
+        if (ImGui::Button("1X")){
+            moves_doing = 1;
+
         }
-        if (ImGui::Checkbox("IfElse Antinesting", &if_else_antinesting)){
-            changed = true;
+        ImGui::SameLine();
+        if (ImGui::Button("10X")){
+            moves_doing = 10;
+
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("100X")){
+            moves_doing = 100;
+
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("1000X")){
+            moves_doing = 1000;
+
         }
 
-        if (ImGui::SliderInt("tuple size", &tuple_size, 2, 8)){
-            changed = true;
+        for (int m=0; m<moves_doing; m++){
+            if (tm_machine.isHalted()){
+                break;
+            }
+
+            move_counter += 1;
+            tm_machine.move();
         }
     }
 
@@ -206,11 +276,10 @@ void GUI::Config() {
 
     if (changed){
         delete tm_b;
-        tm_b = new TMBuilder(4, if_else_antinesting, split_nesting, max_nesting);
+        tm_b = new TMBuilder(tuple_size, if_else_antinesting, split_nesting, max_nesting);
     }
 
 
-    ImGui::TextColored(output_color, "%s", input_text);
     ImGui::End();
 
 
@@ -223,7 +292,7 @@ void GUI::TMEmulator() {
 
 
     ImGui::SetNextWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x/4.0, ImGui::GetIO().DisplaySize.y/2.0), ImGuiCond_Once);
-    ImGui::SetNextWindowSize(ImVec2(size.x*2.5, size.y*1.5), ImGuiCond_Once);
+    ImGui::SetNextWindowSize(ImVec2(size.x*2.5, size.y*2), ImGuiCond_Once);
     ImGui::Begin("TM drawing");
 
     size = ImGui::GetWindowSize();
@@ -234,16 +303,55 @@ void GUI::TMEmulator() {
 
     ImDrawList* draw_list = ImGui::GetWindowDrawList();
 
-    double i = 0.1;
-    double j = 0.1;
 
-    float offset_x = i*size.x*4;
-    float offset_y = j*size.y*4;
+    int blocks_per_tape = 40;
+    int tapes_amount = tm_machine.getTapeAmount();
 
-    float size_x = size.y/2.0;
-    float size_y = size.y/2.0;
+    float default_offset_x = 0.075*size.x*4;
+    float default_offset_y = 0.1*size.y*4;
 
-    draw_list->AddRect(ImVec2{widget_pos.x+offset_x, widget_pos.y+offset_y}, ImVec2{widget_pos.x+size_x+offset_x, widget_pos.y+size_y+offset_y}, IM_COL32(255, 255, 255, 255));
+    string moves_string = "Move: ";
+    moves_string += to_string(move_counter);
+    moves_string += " State: ";
+    moves_string += tm_machine.getCurrentState();
+    moves_string += '\u0000';
+
+    draw_list->AddText(ImVec2{widget_pos.x+ (int)(default_offset_x*1.1), widget_pos.y+(int)(default_offset_y*0.5)},ImColor(1.0f, 1.0f, 1.00f, 1.00f), moves_string.c_str());
+
+    for (int j= 0; j<tapes_amount; j++){
+        float size_y = size.y/5.0;
+        float offset_y = j*0.07*size.y*4+ default_offset_y;
+
+        string tape_data = tm_machine.exportTapeData(j, true);
+        int i_x = 0;
+        for (int i= tm_machine.getTuringIndex(j)-10; i<blocks_per_tape+tm_machine.getTuringIndex(j)-10; i++, i_x++){
+            float size_x = size.y/5.0;
+            float offset_x = i_x*size_x+ default_offset_x;
+
+
+            auto output_color = ImColor(1.0f, 1.0f, 1.00f, 1.00f);
+            if (i == tm_machine.getTuringIndex(j)){
+                output_color = ImColor(0.0f, 1.00f, 0.00f, 1.00f);
+            }
+            ImGui::SetWindowFontScale(2);
+            if (i < 0|| i >= tape_data.size() || tape_data[i] == '\u0000'){
+                output_color = ImColor(1.0f, 0.00f, 0.00f, 0.40f);
+                if (i == tm_machine.getTuringIndex(j)){
+                    output_color = ImColor(1.0f, 0.70f, 0.00f, 0.40f);
+                }
+                draw_list->AddText(ImVec2{widget_pos.x+offset_x+size_x/8, widget_pos.y+offset_y+size_y/8}, output_color, "B");
+
+
+            }else{
+                string temp;
+                temp += tape_data[i];
+                draw_list->AddText(ImVec2{widget_pos.x+offset_x+size_x/8, widget_pos.y+offset_y+size_y/8}, output_color, temp.c_str());
+            }
+
+            draw_list->AddRect(ImVec2{widget_pos.x+offset_x, widget_pos.y+offset_y}, ImVec2{widget_pos.x+size_x+offset_x, widget_pos.y+size_y+offset_y}, IM_COL32(255, 255, 255, 255));
+        }
+    }
+
     ImGui::End();
 }
 
@@ -363,7 +471,7 @@ void GUI::threading_check() {
         V.push_back(C);
     }
 
-    std::ofstream File10(ResultFileLocation+"result.cc");
+    std::ofstream File10(ResultFileLocation);
     File10<<"#include <thread>"<<std::endl;
     for(const auto& it:V){
         File10 << it <<std::endl;

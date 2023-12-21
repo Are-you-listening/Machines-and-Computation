@@ -19,16 +19,16 @@ public:
     ~Tape();
     explicit Tape(unsigned long init_size);
 
-    virtual [[nodiscard]] unsigned long getTapeSize() const noexcept;
+    virtual unsigned long getTapeSize() const noexcept;
 
-    virtual [[nodiscard]] string getTapeData() const noexcept;
+    virtual string getTapeData() const noexcept;
 
     void write(char symbol);
     [[nodiscard]] char getSymbol() const noexcept;
     void moveHead(int move_direction);
 
     void load(const string& input);
-    string exportTape();
+    string exportTape(bool full=false);
 
     long getTapeHeadIndex() const;
     void clear();

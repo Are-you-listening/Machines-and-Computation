@@ -51,9 +51,12 @@ private:
     bool lalr = true;
     bool single_tape = false;
     bool if_else_antinesting = false;
+    bool threading = false;
 
     TuringMachine tm_machine;
     TMBuilder* tm_b;
+    bool tm_busy = false;
+    int move_counter = 0;
 
     void threading_check();
 

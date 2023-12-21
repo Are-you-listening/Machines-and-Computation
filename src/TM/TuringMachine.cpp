@@ -63,6 +63,11 @@ void TuringMachine::load(json &data) {
 
 void TuringMachine::load(const vector<string> &states, const string &start_state, const string &input, int tape_size,
                          const vector<Transition> &productions) {
+
+    this->states.clear();
+    this->tapes.clear();
+    this->production_trees.clear();
+
     halted = false;
     for (const string& i : states){
         this->states.insert(i);
@@ -205,18 +210,28 @@ const string &TuringMachine::getCurrentState() const {
     return current_state;
 }
 
-string TuringMachine::exportTapeData(unsigned int index) const {
-    return tapes[index]->exportTape();
+string TuringMachine::exportTapeData(unsigned int index, bool full) const {
+    return tapes[index]->exportTape(full);
 }
 
 int TuringMachine::getTuringIndex(int index) {
     return tapes[index]->getTapeHeadIndex();
 }
 
-void TuringMachine::clear() {
+void TuringMachine::clear(bool full) {
     for (auto tape: tapes){
-        tape->clear();
+        if (full){
+            delete tape;
+        }else{
+            tape->clear();
+        }
+
+
     }
+    if (full){
+        tapes.clear();
+    }
+
     current_state = start_state;
     halted = false;
 }

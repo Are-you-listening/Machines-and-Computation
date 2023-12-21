@@ -107,12 +107,12 @@ Tape::~Tape() {
     free(tape_ptr);
 }
 
-string Tape::exportTape() {
+string Tape::exportTape(bool full) {
     string output = "";
     char* tape_reader = tape_ptr;
     for (int i=0; i<tape_size; i++){
         char c = *tape_reader;
-        if (c != '\0'){
+        if (c != '\0' || full){
             output += c;
         }
 

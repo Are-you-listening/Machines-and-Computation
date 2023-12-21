@@ -16,6 +16,7 @@ TMBuilder::TMBuilder(unsigned int tuple_size, bool if_else_antinesting, int spli
 
 
 TMBuilder_output TMBuilder::generateTM() {
+    tools->resetCounter();
     //json TM_data;
     vector<string> states = {"still need to do"};
 

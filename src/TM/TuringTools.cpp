@@ -4096,4 +4096,11 @@ void TuringTools::check_for_loop_continue_split(IncompleteSet &a, const vector<i
 
 }
 
+void TuringTools::resetCounter() {
+    counter = 0;
+    goto_counter = 0;
+    branch_counter = 0;
+
+}
+
 
