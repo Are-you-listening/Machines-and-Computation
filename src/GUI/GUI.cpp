@@ -137,7 +137,7 @@ void GUI::Config() {
 
     ImGui::SetNextWindowSize(size);
     bool changed = false;
-    if (ImGui::SliderInt("split nesting", &split_nesting, 1, 9)){
+    if (ImGui::SliderInt("split nesting", &split_nesting, 2, 9)){
 
         if (split_nesting >= max_nesting){
             max_nesting = split_nesting + 1;
@@ -145,7 +145,7 @@ void GUI::Config() {
 
         changed = true;
     }
-    if (ImGui::SliderInt("max nesting", &max_nesting, 2, 10)){
+    if (ImGui::SliderInt("max nesting", &max_nesting, 3, 10)){
 
         if (split_nesting >= max_nesting){
             split_nesting = max_nesting - 1;
