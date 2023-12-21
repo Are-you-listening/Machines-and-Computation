@@ -584,10 +584,6 @@ void LALR::generate() {
     }
     _root->children = new_rootKids;
 
-    //Create File
-    vector<tuple<string, string, set<string>>> yield;
-    _root->getYield(yield);
-
 
     saveYield();
 }

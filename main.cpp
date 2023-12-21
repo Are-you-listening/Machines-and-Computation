@@ -25,7 +25,7 @@ static unsigned int core_amount = std::thread::hardware_concurrency(); // gets "
 
 int main() { // Function names we create to replace nesting should have F or I in their names, so we know if they were for-loops or If-loops
     GUI g;
-
+    return 0;
     Tokenisation tokenVector; // sometimes variables in a nesting that should be passed in a function call aren't passed because it isn't found in the source file, this is done on purpose.
     //std::string Filelocation="input/nestedExamples/engine.cc"; // for now, doesn't support double declarations like int a,d;
     std::string Filelocation="../test/nestedExamples/game5.cpp";
