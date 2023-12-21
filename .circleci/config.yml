@@ -16,9 +16,10 @@ jobs:
       - run: apt update
       - run: DEBIAN_FRONTEND=noninteractive apt install -y gcc g++ libgl1 cmake git
       - persist_to_workspace:
+          root: /tmp
           paths:
-            - usr/lib
-          root: /
+            - tmp/packages_installed
+
 
   build:
     resource_class: small
@@ -27,7 +28,7 @@ jobs:
       - checkout
       - run: apt update
       - attach_workspace:
-          at: /
+          at: /tmp
       - run: DEBIAN_FRONTEND=noninteractive TZ=Europe/Brussels apt install -y gcc g++ libglfw3-dev
       - run: mkdir -p build
       - run: cd build && cmake ..
@@ -38,6 +39,10 @@ jobs:
             - testing/testing/TESTS
             - testing/testing/Tog
           root: build
+      - persist_to_workspace:
+          paths:
+            - usr/lib
+          root: /
 
   run_tests:
     resource_class: large
