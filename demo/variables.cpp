@@ -15,11 +15,13 @@ std::vector<int*> function(const int &color)  {
 
     for(int r=0 ; r<8 ; r++){
         std::string temp = "yay";
+        int b = 0;
         for(int k=0 ; k<8 ; k++){
             int* piece = function2(r,k);
             if(piece!= nullptr){
                 if(false){
                     options.push_back(piece);
+                    b += 1;
                 }
             }
         }
