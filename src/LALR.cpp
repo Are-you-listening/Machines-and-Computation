@@ -493,13 +493,16 @@ void LALR::generate() {
     bool found = false;
     string functionName = "A";
     ParseTree* violator = nullptr;
+    ParseTree* lastFunction = nullptr; //Last known function call
     std::vector<ParseTree*> new_rootKids;
 
     //IGNORE If-Else nesting? Can the token therefore not be generated? ("{" and "}" ? )
     _root->cleanIncludeTypedefs(new_rootKids); //Collect includes
 
     _root->matchBrackets(_cfg.getT()); //Format first
-    _root->findViolation(max,split,count,index,violator,_cfg.getT(),found); //Check for violations
+    _root->findViolation(max,split,count,index,violator,_cfg.getT(),found,lastFunction); //Check for violations
+    //this->generateParseTreeImage("test.dot");
+    lastFunction = _root->findRoot(lastFunction,_cfg.getT()); //We need to insert it in the root
 
     while(violator!=nullptr){
         //Find difference: vSet - dSet = result
@@ -554,7 +557,7 @@ void LALR::generate() {
             goto recheck;
         }
 
-        newKids.push_back(functionCall(function(createFrom,result2,functionName))); //Create the new function in the root and add its functionCall()
+        newKids.push_back(functionCall(function(createFrom,result2,functionName,lastFunction))); //Create the new function in the root and add its functionCall()
         functionName+="A";
         newKids.push_back(violator->children[index]);
 
@@ -567,9 +570,11 @@ void LALR::generate() {
         //Recheck everything
         recheck:
         violator= nullptr;
+        lastFunction = nullptr;
         count = 0;
         found = false;
-        _root->findViolation(max,split,count,index,violator,_cfg.getT(), found); //Check for more violations
+        _root->findViolation(max,split,count,index,violator,_cfg.getT(), found,lastFunction); //Check for more violations
+        lastFunction = _root->findRoot(lastFunction,_cfg.getT()); //We need to insert it in the root
     }
 
     for(auto child: _root->children){ //Readd includes
@@ -658,15 +663,15 @@ ParseTree* LALR::functionCall(const string& code) {
     return new ParseTree({},"D",{"D",code,{}});
 }
 
-string LALR::function(ParseTree *violator, std::set<std::string> &tokenSet, const string &functionName) const {
+string LALR::function(ParseTree *violator, std::set<std::string> &tokenSet, const string &functionName, ParseTree* root) const {
     std::vector<ParseTree*> newKids;
     long unsigned int i;
     long unsigned int index;
     std::vector<string> variableNamesFunctionCall;
 
     //Create The Function
-    for(i = 0; i<_root->children.size(); ++i){ //Pushback firsthalf of kids
-        ParseTree* child = _root->children[i];
+    for(i = 0; i<root->children.size(); ++i){ //Pushback firsthalf of kids
+        ParseTree* child = root->children[i];
 
         // here we could also check if the first character is "#" and not just "#include"
         if (get<1>(child->token).substr(0, 8) != "#include" || get<1>(child->token).substr(0, 7) != "typedef" ) { //Create after includes
@@ -738,11 +743,11 @@ string LALR::function(ParseTree *violator, std::set<std::string> &tokenSet, cons
     newKids.push_back(violator);
     newKids.push_back(closingbracketTree);
 
-    for(i = index; i<_root->children.size(); ++i){
-        ParseTree* child = _root->children[i];
+    for(i = index; i<root->children.size(); ++i){
+        ParseTree* child = root->children[i];
         newKids.push_back(child);
     }
-    _root->children = newKids;
+    root->children = newKids;
 
     std::string temp;
     for(auto &k: variableNamesFunctionCall){
@@ -751,13 +756,31 @@ string LALR::function(ParseTree *violator, std::set<std::string> &tokenSet, cons
     return functionName+"(" + temp.substr(0,temp.size()-1) + ");"; //Cut of the last comma
 }
 
-void ParseTree::findViolation(const unsigned long &max,const unsigned long &split, unsigned long &count, unsigned long &index,ParseTree* &Rviolator,const std::vector<std::string> &Terminals, bool &found) {
+void ParseTree::findViolation(const unsigned long &max,const unsigned long &split, unsigned long &count, unsigned long &index,ParseTree* &Rviolator,const std::vector<std::string> &Terminals, bool &found, ParseTree* &function) {
     if(found){
         return;
     }
 
+
+
     for(long unsigned int i = 0; i<children.size();++i){
         ParseTree* child = children[i];
+
+        //Keep track of the latest defined function
+        std::string line = get<1>(child->token);
+        if(line[0]!='#'&&line[0]!=' '&&line.substr(0,6)!="static"&&line.substr(0,6)!="struct"&&!line.empty()&&line!="}"&&line!="{"&&line.substr(0,7)!="typedef"&&line.substr(0,8)!="namespace"&&line.substr(0,2)!="//"){
+            if(line.find("if")==std::string::npos && line.find("for")==std::string::npos && line.find("while")==std::string::npos && line.find("elseIf")==std::string::npos){
+                if(line.find(" ")!=std::string::npos){
+                    if(line.find("(")!=std::string::npos && line.find(")")!=std::string::npos ){
+                        if(line.find(";")==std::string::npos ){
+                            function = child;
+                        }
+                    }
+                }
+            }
+        }
+
+
         if(get<0>(child->token)=="{") { //Found nesting
             ++count;
             if (count == split) {
@@ -775,7 +798,7 @@ void ParseTree::findViolation(const unsigned long &max,const unsigned long &spli
             }
 
         }else if(std::find(Terminals.begin(), Terminals.end(),get<0>(child->token))==Terminals.end()){ //Found some V
-            child->findViolation(max,split,count,index,Rviolator,Terminals,found); //Search further in the Variable nodes
+            child->findViolation(max,split,count,index,Rviolator,Terminals,found,function); //Search further in the Variable nodes
 
             if(found){
                 return;
