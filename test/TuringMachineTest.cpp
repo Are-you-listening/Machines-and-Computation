@@ -156,7 +156,7 @@ TEST(TuringMachineTest, TM_tools){
 }
 
 TEST(TuringMachineTest, TM_tokenazation) {
-    int index = 59;
+    int index = 62;
     ifstream test_file("../test/testFiles/TM_test_"+ to_string(index)+".cpp");
     string test_string;
     cout << test_file.is_open() << endl;
@@ -179,7 +179,7 @@ TEST(TuringMachineTest, TM_tokenazation) {
     tm.load_input(test_string, 1);
 
     int halted_time = -1;
-    for (int i = 0; i<200000; i++){
+    for (int i = 0; i<400000; i++){
 
         if (tm.isHalted()){
             if (halted_time == -1){
@@ -189,7 +189,7 @@ TEST(TuringMachineTest, TM_tokenazation) {
             break;
         }
         tm.move();
-        if (tm.getCurrentState() == "4413"){
+        if (tm.getCurrentState() == "tokenize_sub_finished_token"){
 
             int j=0;
 
