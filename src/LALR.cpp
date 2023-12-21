@@ -493,8 +493,8 @@ void LALR::printTable() {
 }
 
 void LALR::generate() {
-    const unsigned long split = Config::getConfig()->getSplitNesting();
-    const unsigned long max = Config::getConfig()->getMaxNesting();
+    const unsigned long split = Config::getConfig()->getSplitNesting()+1;
+    const unsigned long max = Config::getConfig()->getMaxNesting()+1;
     unsigned long count = 0;
     unsigned long index;
     bool found = false;
@@ -584,7 +584,6 @@ void LALR::generate() {
     }
     _root->children = new_rootKids;
 
-
     saveYield();
 }
 
@@ -609,9 +608,7 @@ void LALR::saveYield() {
         }
     }
     test.close();
-
 }
-
 
 ParseTree::~ParseTree() {
     for (const auto& child : children){
@@ -963,7 +960,6 @@ string LALR::getYield() {
             s += "\n";
         }
     }
-
     return s;
 }
 
@@ -1042,8 +1038,30 @@ void ParseTree::checkBRC(pair<bool,int> &fDepth , pair<bool,int> &cbrDepth) {
 }
 
 ParseTree::ParseTree(const vector<ParseTree *> &children, const string &symbol,
-                     const tuple<string, string, set<string>> &token): children(children),symbol(symbol),token(token) {
+                     const tuple<string, string, set<string>> &token): children(children),symbol(symbol),token(token) {}
 
+void ParseTree::generateDot(ostream &out) {
+    out << "  " << '"' << this << '"' << " [label=\"" << symbol << "\"";
+    if (children.empty()){
+        out << ", color=\"red\", style=\"filled\", fillcolor=\"coral\"";
+    }
+    out << "];" << std::endl;
+    for (ParseTree* child : children) {
+        child->generateDot(out);
+        out << "  " << '"' << this << '"' << " -- " << '"' << child << '"' << ";\n";
+    }
 }
 
+void LALR::generateParseTreeImage(const string filename) {
+    std::ofstream dotFile(filename);
+    if (dotFile.is_open() && _root != nullptr){
+        dotFile << "graph ParseTree {\n";
+        _root->generateDot(dotFile);
+        dotFile << "}\n";
 
+        dotFile.close();
+
+        std::string dotCommand = "dot -Tpng " + filename + " -o " + filename.substr(0, filename.length()-4) + ".png";
+        system(dotCommand.c_str());
+    }
+}

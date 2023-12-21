@@ -5,11 +5,11 @@
 #ifndef TOG_TAPE_H
 #define TOG_TAPE_H
 
+#include "lib/DesignByContract.h"
+
 #include <optional>
 #include <iostream>
 #include <cstdlib>
-
-#include "lib/DesignByContract.h"
 
 using namespace std;
 
@@ -32,7 +32,6 @@ public:
 
     long getTapeHeadIndex() const;
     void clear();
-
 private:
     unsigned long tape_size;
     char* tape_ptr;

@@ -4,18 +4,17 @@
 
 #ifndef TOG_TURINGIFELSEANTINESTING_H
 #define TOG_TURINGIFELSEANTINESTING_H
+
 #include "TuringGenerator.h"
 
 class TuringIfElseAntiNesting: public TuringGenerator{
 public:
     TuringIfElseAntiNesting(int tuple_size, int split_nesting, int max_nesting);
     IncompleteSet getTransitions();
-
 private:
     IncompleteSet doAction();
     int split_nesting;
     int max_nesting;
 };
-
 
 #endif //TOG_TURINGIFELSEANTINESTING_H

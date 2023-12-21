@@ -3177,8 +3177,10 @@ void TuringTools::makeAntiNestingElse(IncompleteSet &a, const vector<int> &tuple
     go_to(else_anti_nesting, {'H'},  tuple_indexes[0], 1, tuple_indexes);
     link_put(else_anti_nesting, {'}'}, {1});
     move(else_anti_nesting, {0,1}, 1);
+    link_put(else_anti_nesting, {'\n'}, {1});
+    move(else_anti_nesting, {0,1}, 1);
     link_put(else_anti_nesting, {'E'}, {0});
-    move(else_anti_nesting, {0,1}, -1);
+    move(else_anti_nesting, {0,1}, -2);
     make_token(else_anti_nesting, tuple_indexes, '}');
 
     //clear working tape

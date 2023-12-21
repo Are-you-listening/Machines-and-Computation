@@ -5,15 +5,15 @@
 #ifndef TOG_TURINGMACHINE_H
 #define TOG_TURINGMACHINE_H
 
-#include <vector>
-#include <map>
-#include <fstream>
-#include <set>
-
 #include "Tape.h"
 #include "TuringProduction.h"
 #include "lib/json.hpp"
 #include "TuringTools.h"
+
+#include <vector>
+#include <map>
+#include <fstream>
+#include <set>
 
 using json = nlohmann::json;
 
@@ -54,6 +54,7 @@ private:
 
     set<int> getUsefullIndexes(const Transition& t);
     set<int> getUsefullIndexesParent(const vector<Transition>& t);
+
 };
 
 

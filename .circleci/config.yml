@@ -8,16 +8,17 @@ executors:
 
 
 jobs:
+
   build:
     resource_class: small
     executor: main_executor
     steps:
       - checkout
       - run: apt update
-      - run: apt-get install libgl1
-      - run: DEBIAN_FRONTEND=noninteractive TZ=Europe/Brussels apt install -y gcc g++ libglfw3-dev cmake git
+      - run: apt install -y sudo
+      - run: DEBIAN_FRONTEND=noninteractive sudo apt install -y gcc g++ libgl1 cmake git
+      - run: DEBIAN_FRONTEND=noninteractive TZ=Europe/Brussels sudo apt install -y gcc g++ libglfw3-dev
       - run: mkdir -p build
-      - run: apt-get install -y sudo
       - run: cd build && cmake ..
       - run: cd build && make
       - run: cd build && make install
@@ -51,6 +52,7 @@ workflows:
   default_validation: &default_validation
     jobs:
       - build
+
       - run_tests:
           requires:
             - build

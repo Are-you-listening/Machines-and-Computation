@@ -5,6 +5,9 @@
 #ifndef TOG_CFG_H
 #define TOG_CFG_H
 
+#include "lib/json.hpp"
+#include "lib/kars/CFGKars.h"
+
 #include <vector>
 #include <cstring>
 #include <tuple>
@@ -12,9 +15,6 @@
 #include <fstream>
 #include <iostream>
 #include <set>
-
-#include "lib/json.hpp"
-#include "lib/kars/CFGKars.h"
 
 using json = nlohmann::json;
 
@@ -90,13 +90,13 @@ public:
      * Simple getter
      * @return
      */
-    const vector<std::string> &getV() const;
+    [[nodiscard]] const vector<std::string> &getV() const;
 
     /**
      * Simple getter
      * @return
      */
-    const vector<std::string> &getT() const;
+    [[nodiscard]] const vector<std::string> &getT() const;
 
     /**
      * Simple setter
@@ -108,13 +108,13 @@ public:
      * Simple getter
      * @return
      */
-    const vector<std::pair<std::string, std::vector<std::string>>> &getP() const;
+    [[nodiscard]] const vector<std::pair<std::string, std::vector<std::string>>> &getP() const;
 
     /**
      * Simple getter
      * @return
      */
-    const string &getS() const;
+    [[nodiscard]] const string &getS() const;
 
     /**
      * Simple setter
@@ -122,6 +122,5 @@ public:
      */
     void setCnf(bool cnf);
 };
-
 
 #endif //TOG_CFG_H

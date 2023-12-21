@@ -5,11 +5,13 @@
 #ifndef TOG_TURINGTOOLS_H
 #define TOG_TURINGTOOLS_H
 
-#include <iostream>
-#include <vector>
 #include "lib/json.hpp"
 #include "TuringProduction.h"
+
+#include <iostream>
+#include <vector>
 #include <set>
+
 using namespace std;
 using json = nlohmann::json;
 
@@ -36,7 +38,6 @@ struct IncompleteTransition{
     bool operator==(const IncompleteTransition& other) const;
     bool operator<(const IncompleteTransition& other) const;
 };
-
 
 struct IncompleteSet{
     IncompleteSet(const string& state, const string& to_state);
@@ -137,11 +138,9 @@ public:
     void resetCounter();
 
 private:
-
     TuringTools(unsigned int stack_tape, int split_nesting);
     inline static unique_ptr<TuringTools> _instance;
     inline static bool _instance_flag;
-
 
     unsigned long goto_counter;
     unsigned long counter;
@@ -153,11 +152,6 @@ private:
 
     char heap_sep = '@';
     char stack_sep = '?';
-
-
-
 };
-
-
 
 #endif //TOG_TURINGTOOLS_H

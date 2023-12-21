@@ -3,7 +3,8 @@
 //
 
 #include "GUI.h"
-#include "../Config.h"
+
+static unsigned int core_amount = std::thread::hardware_concurrency();
 
 GUI::GUI() {
 
@@ -43,8 +44,6 @@ GUI::GUI() {
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init(glsl_version);
 
-    bool show_demo_window = true;
-    bool show_another_window = false;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
 
@@ -199,8 +198,9 @@ void GUI::Config() {
             Tokenisation tokenVector;
             std::string Filelocation="input/SandBox/A.cpp";
             std::thread Tokenizer(&Tokenisation::Tokenize, &tokenVector, Filelocation);
+            core_amount--;
 
-            Orchestrator();
+            Orchestrator("");
             auto cfg = createCFG();
             cfg->toGNF();
 
@@ -209,6 +209,7 @@ void GUI::Config() {
             lalr.createTable();
 
             Tokenizer.join();
+            core_amount++;
 
             //create LARL parser with tokenvector
             auto vec = tokenVector.getTokenVector();
@@ -218,6 +219,7 @@ void GUI::Config() {
 
             string out = lalr.getYield();
             output_text = out;
+            fixTabs();
 
             if (threading){
                 threading_check();
@@ -270,6 +272,18 @@ void GUI::Config() {
 
         }
 
+        ImGui::SameLine();
+        if (ImGui::Button("10000X")){
+            moves_doing = 10000;
+
+        }
+
+        ImGui::SameLine();
+        if (ImGui::Button("100000X")){
+            moves_doing = 100000;
+
+        }
+
         for (int m=0; m<moves_doing; m++){
             if (tm_machine.isHalted()){
                 break;
@@ -277,6 +291,12 @@ void GUI::Config() {
 
             move_counter += 1;
             tm_machine.move();
+        }
+
+        if (tm_machine.isHalted()){
+            tm_busy = false;
+            output_text = tm_machine.exportTapeData(1);
+            fixTabs();
         }
     }
 
@@ -368,123 +388,61 @@ GUI::~GUI() {
 }
 
 void GUI::threading_check() {
-    //threading every function for now, will later be changed
-    // I also assume that every function we create to replace nesting is only called upon once
-    // result don't work for now, will be changed
-    // Function calls in Function calls don't work for now, another function that split those calls up is needed
-    //std::string ResultFileLocation="../test/results/TM_handmatig_result.cpp";
-    std::string ResultFileLocation="input/SandBox/A.cpp";
-    std::string line;
-    std::string line2;
-    std::ifstream File(ResultFileLocation);
-    std::vector<std::string> FunctionCalls;
-    while(getline(File,line)){
-        if(line[0]!='#'&&line[0]!=' '&&line.substr(0,6)!="static"&&line.substr(0,6)!="struct"&&!line.empty()&&line!="}"&&line!="{"&&line.substr(0,7)!="typedef"&&line.substr(0,8)!="namespace"&&line.substr(0,6)=="void A"&&line.substr(0,2)!="//"){ // I assume the code we check people don't write variables or classes above a function, also needs debugging
-            FunctionCalls.push_back(line);
-        }
-    }
-    std::vector<std::thread> Threads; // still doesn't work, remember void functions and their returns, etc.
-    ThreadFunction threading; // maybe create a function that turns every function into a void one.
-    unsigned long int count=0; // I also assume calling join() on a thread that's already joined is not harmful.
-    for(const auto & i : FunctionCalls){
-        std::filesystem::copy(ResultFileLocation,ResultFileLocation + std::to_string(count));
-        std::thread temp(&ThreadFunction::ThreadFunctionCall, &threading, ResultFileLocation + std::to_string(count), i);
-        Threads.push_back(std::move(temp));
-    }
-    for(std::vector<std::thread>::iterator it=Threads.begin(); it!=Threads.end(); it++){
-        it->join();
-    }
-    File.close();
-
-    std::ofstream File2(ResultFileLocation+"result.cc");
-    std::ifstream File1(ResultFileLocation);
-    for(unsigned long int i=0; i<count; i++){
-        std::ifstream File4(ResultFileLocation + std::to_string(i));
-        std::string line4;
-        while(getline(File1,line)){
-            getline(File4,line4);
-            if(line4.find("std::thread a")!=std::string::npos){
-                File2 << line4 << std::endl;
-            } else {
-                File2 << line << std::endl;
-            }
-            while(line4.find("a000")!=std::string::npos&&line4.find("thread ")==std::string::npos){
-                getline(File4,line4);
-            }
-        }
-        std::ifstream File7(ResultFileLocation+"result.cc");
-        std::string line7;
-        std::ofstream File8(ResultFileLocation+"tempresult.cc0");
-        while(getline(File7,line7)){
-            File8 << line7 << std::endl;
-        }
-        File7.close();
-        File8.close();
-        File2=std::ofstream(ResultFileLocation+"result.cc");
-        File1=std::ifstream(ResultFileLocation+"tempresult.cc0");
-    }
-    File2.close();
-    File1.close();
-
-    std::ofstream File5(ResultFileLocation+"result.cc");
-    std::ifstream File6(ResultFileLocation+"tempresult.cc0");
-    for(unsigned long int i=0; i<count; i++){
-        std::ifstream File3(ResultFileLocation + std::to_string(i));
-        std::string line3;
-        while(getline(File6,line)){
-            getline(File3,line3);
-            while(line.find("a000")!=std::string::npos&&line.find("thread ")==std::string::npos){
-                File5 << line << std::endl;
-                getline(File6,line);
-            }
-            while(line3.find("a000")!=std::string::npos&&line3.find("thread ")==std::string::npos){
-                File5 << line3 << std::endl;
-                getline(File3,line3);
-            }
-            File5 << line << std::endl;
-        }
-        std::ifstream File7(ResultFileLocation+"result.cc");
-        std::string line7;
-        std::ofstream File8(ResultFileLocation+"tempresult.cc0");
-        while(getline(File7,line7)){
-            File8 << line7 << std::endl;
-        }
-        File7.close();
-        File8.close();
-        File5=std::ofstream(ResultFileLocation+"result.cc");
-        File6=std::ifstream(ResultFileLocation+"tempresult.cc0");
-    }
-    std::ofstream File7(ResultFileLocation+"result.cc");
-    std::string line8;
-    std::ifstream File8(ResultFileLocation+"tempresult.cc0");
-    while(getline(File8,line8)){
-        File7 << line8 << std::endl;
-    }
-    File5.close();
-    File6.close();
-    File7.close();
-    File8.close();
-
-    for(unsigned long int i=0; i<count; i++){
-        std::string c=ResultFileLocation + std::to_string(i);
-        std::remove(c.c_str());
-    }
-    std::string c=ResultFileLocation +"tempresult.cc0";
-    std::remove(c.c_str());
-
-    std::ifstream File9(ResultFileLocation+"result.cc");
-    std::vector<std::string> V;
-    std::string C;
-    while(getline(File9,C)){
-        V.push_back(C);
-    }
-
-    std::ofstream File10(ResultFileLocation);
-    File10<<"#include <thread>"<<std::endl;
-    for(const auto& it:V){
-        File10 << it <<std::endl;
-    }
+    std::string ResultFileLocation="output/result.cpp";
+    ThreadFunction::threadFILE(ResultFileLocation);
 
 
 }
 
+void GUI::fixTabs() {
+    bool start = true;
+
+    string output;
+    for (char c: output_text){
+        if (' ' == c && start){
+            continue;
+        }
+
+        if ('\n' == c){
+            start = true;
+
+        }else{
+            start = false;
+        }
+
+        output.push_back(c);
+    }
+
+    output_text = output;
+    output.clear();
+    start = true;
+    string tab;
+    for(char c: output_text){
+        bool add = c == '{';
+        bool remove = c == '}';
+
+        if (add){
+            tab+="    ";
+        }
+
+        if (remove){
+            for (int j =0; j<4; j++){
+                tab.pop_back();
+            }
+        }
+
+        if (start){
+            output += tab;
+        }
+
+        if ('\n' == c){
+            start = true;
+
+        }else{
+            start = false;
+        }
+
+        output.push_back(c);
+    }
+    output_text = output;
+}

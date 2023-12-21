@@ -5,12 +5,12 @@
 #ifndef TOG_CFGCONSTRUCTOR_H
 #define TOG_CFGCONSTRUCTOR_H
 
+#include "Config.h"
+#include "CFG.h"
+
 #include <string>
 #include <vector>
 #include <map>
-
-#include "Config.h"
-#include "CFG.h"
 
 using namespace std;
 

@@ -314,10 +314,7 @@ TEST(TuringMachineTest, TM_single_tape) {
             break;
         }
 
-
         out.move();
-
-
 
     }
 
