@@ -1034,7 +1034,12 @@ ParseTree::ParseTree(const vector<ParseTree *> &children, const string &symbol,
                      const tuple<string, string, set<string>> &token): children(children),symbol(symbol),token(token) {}
 
 void ParseTree::generateDot(ostream &out) {
-    out << "  " << '"' << this << '"' << " [label=\"" << symbol << "\"";
+    if (children.empty()) {
+        out << "  " << '"' << this << '"' << " [label=\"" << get<1>(token) << "\"";
+    } else {
+        out << "  " << '"' << this << '"' << " [label=\"" << symbol << "\"";
+    }
+    // out << "  " << '"' << this << '"' << " [label=\"" << symbol << "\"";
     if (children.empty()){
         out << ", color=\"red\", style=\"filled\", fillcolor=\"coral\"";
     }
