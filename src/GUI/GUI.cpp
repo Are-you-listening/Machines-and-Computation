@@ -194,7 +194,7 @@ void GUI::Config() {
                 ofstream file{"input/SandBox/A.cpp"};
                 for (char c: input_text){
                     file << c;
-                    if (c == '\u0001'){
+                    if (c == '\u0000'){
                         break;
                     }
                 }
@@ -209,8 +209,8 @@ void GUI::Config() {
                 auto cfg = createCFG();
                 cfg->toGNF();
                 const CFG a = *cfg;
-                LALR lalr(a);
-                lalr.createTable();
+                LALR lalry(a);
+                lalry.createTable();
 
                 Tokenizer.join();
                 core_amount++;
@@ -218,10 +218,10 @@ void GUI::Config() {
                 //create LARL parser with tokenvector
                 auto vec = tokenVector.getTokenVector();
 
-                lalr.parse(vec);
-                lalr.generate();
+                lalry.parse(vec);
+                lalry.generate();
 
-                string out = lalr.getYield();
+                string out = lalry.getYield();
                 output_text = out;
                 fixTabs();
 
