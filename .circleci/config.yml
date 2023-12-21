@@ -8,6 +8,18 @@ executors:
 
 
 jobs:
+  install1:
+    resource_class: small
+    executor: main_executor
+    steps:
+      - checkout
+      - run: apt update
+      - run: apt install -y sudo
+      - run: DEBIAN_FRONTEND=noninteractive sudo apt install -y gcc g++ libgl1 cmake git
+      - persist_to_workspace:
+          paths:
+            - usr/lib
+          root: /
 
   build:
     resource_class: small
@@ -16,22 +28,18 @@ jobs:
       - checkout
       - run: apt update
       - run: apt install -y sudo
-      - run: DEBIAN_FRONTEND=noninteractive sudo apt install -y gcc g++ libgl1 cmake git
       - run: DEBIAN_FRONTEND=noninteractive TZ=Europe/Brussels sudo apt install -y gcc g++ libglfw3-dev
       - run: mkdir -p build
       - run: cd build && cmake ..
       - run: cd build && make
       - run: cd build && make install
+      - attach_workspace:
+          at: /
       - persist_to_workspace:
           paths:
             - testing/testing/TESTS
             - testing/testing/Tog
           root: build
-      - persist_to_workspace:
-          paths:
-            - usr/lib
-          root: /
-
 
   run_tests:
     resource_class: large
@@ -60,7 +68,10 @@ jobs:
 workflows:
   default_validation: &default_validation
     jobs:
-      - build
+      - install1
+      - build:
+          requires:
+            - install1
 
       - run_tests:
           requires:
