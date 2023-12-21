@@ -28,7 +28,6 @@ public:
     void addRoute(queue<char>& symbols, Production&& p);
     Production getProduction(queue<char>& symbols);
     vector<Transition> traverse();
-
 private:
     map<char, TuringProduction*> ptr_vector;
     Production production;

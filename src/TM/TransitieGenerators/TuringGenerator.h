@@ -13,7 +13,6 @@ public:
     virtual IncompleteSet getTransitions() = 0;
 protected:
     int tuple_size;
-
     unsigned int tapes;
     TuringTools* tools;
     vector<char> seperators;
@@ -22,9 +21,7 @@ protected:
     char stack_symbol;
     vector<char> nesting_tokens;
     char stack_sep;
-
     vector<int> get_tuple_index();
 };
-
 
 #endif //TOG_TURINGGENERATOR_H

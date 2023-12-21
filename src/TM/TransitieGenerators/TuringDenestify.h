@@ -11,16 +11,12 @@ class TuringDenestify: public TuringGenerator{
 public:
     TuringDenestify(int tuple_size, int split_nesting, int max_nesting);
     IncompleteSet getTransitions();
-
 private:
     IncompleteSet deNestify();
     void createNewFunction(IncompleteSet& a);
     void storeObjectDefinition(IncompleteSet& a);
-
     int split_nesting;
     int max_nesting;
-
 };
-
 
 #endif //TOG_TURINGDENESTIFY_H

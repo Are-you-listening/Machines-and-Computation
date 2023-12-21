@@ -16,14 +16,17 @@ using namespace std;
  */
 class Orchestrator {
     friend class Config;
+public:
+    /**
+     * Simple constructor
+     * @param cppFile
+     */
+    explicit Orchestrator(const std::string &cppFile);
 private:
     /**
      * Location of the Config.json file
      */
     static string file;
-
-public:
-    Orchestrator();
 };
 
 #endif //TOG_ORCHESTRATOR_H

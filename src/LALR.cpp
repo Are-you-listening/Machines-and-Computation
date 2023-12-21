@@ -584,7 +584,6 @@ void LALR::generate() {
     }
     _root->children = new_rootKids;
 
-
     saveYield();
 }
 
@@ -609,9 +608,7 @@ void LALR::saveYield() {
         }
     }
     test.close();
-
 }
-
 
 ParseTree::~ParseTree() {
     for (const auto& child : children){
@@ -963,7 +960,6 @@ string LALR::getYield() {
             s += "\n";
         }
     }
-
     return s;
 }
 
@@ -1042,8 +1038,4 @@ void ParseTree::checkBRC(pair<bool,int> &fDepth , pair<bool,int> &cbrDepth) {
 }
 
 ParseTree::ParseTree(const vector<ParseTree *> &children, const string &symbol,
-                     const tuple<string, string, set<string>> &token): children(children),symbol(symbol),token(token) {
-
-}
-
-
+                     const tuple<string, string, set<string>> &token): children(children),symbol(symbol),token(token) {}

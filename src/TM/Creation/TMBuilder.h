@@ -21,7 +21,6 @@ struct TMBuilder_output{
     string input;
     int tape_size;
     vector<Transition> productions;
-
 };
 
 class TMBuilder {
@@ -31,17 +30,10 @@ public:
 private:
     unsigned int tapes;
     TuringTools* tools;
-
     bool if_else_anti;
-
     json add_transition(Transition& transition);
-
     int max_nesting = 4;
     int split_nesting = 2;
-
-
-
 };
-
 
 #endif //TOG_TMBUILDER_H

@@ -39,7 +39,6 @@ struct IncompleteTransition{
     bool operator<(const IncompleteTransition& other) const;
 };
 
-
 struct IncompleteSet{
     IncompleteSet(const string& state, const string& to_state);
     string state;
@@ -139,11 +138,9 @@ public:
     void resetCounter();
 
 private:
-
     TuringTools(unsigned int stack_tape, int split_nesting);
     inline static unique_ptr<TuringTools> _instance;
     inline static bool _instance_flag;
-
 
     unsigned long goto_counter;
     unsigned long counter;
@@ -155,11 +152,6 @@ private:
 
     char heap_sep = '@';
     char stack_sep = '?';
-
-
-
 };
-
-
 
 #endif //TOG_TURINGTOOLS_H

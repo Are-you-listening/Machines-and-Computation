@@ -123,5 +123,4 @@ public:
     void setCnf(bool cnf);
 };
 
-
 #endif //TOG_CFG_H

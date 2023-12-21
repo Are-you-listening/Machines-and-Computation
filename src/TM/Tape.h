@@ -32,7 +32,6 @@ public:
 
     long getTapeHeadIndex() const;
     void clear();
-
 private:
     unsigned long tape_size;
     char* tape_ptr;
