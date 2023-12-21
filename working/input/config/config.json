@@ -2,6 +2,6 @@
   "max_nesting" : 3,
   "split_nesting": 2,
   "ifElse_nesting": 0,
-  "threading": false,
+  "threading": true,
   "staticMemory": false
 }
