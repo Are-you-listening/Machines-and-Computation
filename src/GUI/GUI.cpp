@@ -4,7 +4,7 @@
 
 #include "GUI.h"
 #include "../Config.h"
-
+static unsigned int core_amount = std::thread::hardware_concurrency();
 GUI::GUI() {
 
     tm_b = new TMBuilder(4, true, 2, 4);
@@ -199,6 +199,7 @@ void GUI::Config() {
             Tokenisation tokenVector;
             std::string Filelocation="input/SandBox/A.cpp";
             std::thread Tokenizer(&Tokenisation::Tokenize, &tokenVector, Filelocation);
+            core_amount--;
 
             Orchestrator();
             auto cfg = createCFG();
@@ -209,6 +210,7 @@ void GUI::Config() {
             lalr.createTable();
 
             Tokenizer.join();
+            core_amount++;
 
             //create LARL parser with tokenvector
             auto vec = tokenVector.getTokenVector();
