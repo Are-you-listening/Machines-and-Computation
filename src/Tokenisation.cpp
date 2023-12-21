@@ -537,7 +537,7 @@ void Tokenisation::Tokenize(const std::string &FileLocation) {
                                 } else if(*C=='<'){
                                     skip--;
                                 }
-                                if(*C==' '||VariableCharSecond.find(*C)!=VariableCharSecond.end()||*C=='&'||*C==':'||*C=='>'||*C=='<'||*C==','&&skip!=0){
+                                if(*C==' '||VariableCharSecond.find(*C)!=VariableCharSecond.end()||*C=='*'||*C=='&'||*C==':'||*C=='>'||*C=='<'||skip!=0){
                                     D0+=*C;
                                 } else{
                                     break;
