@@ -23,3 +23,4 @@ Not-Supported:
     - Declrations in IF/ELSE statements
     - elseIF
     - Commands are removed
+    - Initialiser lists

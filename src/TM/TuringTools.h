@@ -47,7 +47,7 @@ struct IncompleteSet{
 
 class TuringTools {
 public:
-    static TuringTools* getInstance(unsigned int stack_tape);
+    static TuringTools* getInstance(unsigned int stack_tape, int split_nesting);
 
     void go_to(IncompleteSet& a, const vector<char>& symbol, int tape_index, int direction);
     void go_to_multiple(IncompleteSet& a, const vector<vector<char>>& symbol, const vector<int>& tape_index, int direction, const vector<int>& affected);
@@ -134,9 +134,11 @@ public:
     string check_stack_double(IncompleteSet& a);
     void store_param_count(IncompleteSet& a, const vector<int>&tuple_indexes);
     void check_for_loop_continue_split(IncompleteSet& a, const vector<int>&tuple_indexes);
+
+
 private:
 
-    TuringTools(unsigned int stack_tape);
+    TuringTools(unsigned int stack_tape, int split_nesting);
     inline static unique_ptr<TuringTools> _instance;
     inline static bool _instance_flag;
 
@@ -145,12 +147,13 @@ private:
     unsigned long counter;
     unsigned int stack_tape;
     unsigned int branch_counter;
+    int split_nesting = 2;
 
     bool heap_mode = false;
 
     char heap_sep = '@';
     char stack_sep = '?';
-    int split_nesting = 2;
+
 
 
 };

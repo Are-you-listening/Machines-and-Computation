@@ -4,8 +4,14 @@
 
 #include "TMBuilder.h"
 #include "chrono"
-TMBuilder::TMBuilder(unsigned int tuple_size): tapes{tuple_size+5} {
-    tools = TuringTools::getInstance(tapes-1);
+TMBuilder::TMBuilder(unsigned int tuple_size, bool if_else_antinesting, int split_nesting, int max_nesting): tapes{tuple_size+5} {
+    TuringTools::reset();
+    tools = TuringTools::getInstance(tapes-1, split_nesting);
+
+    TMBuilder::split_nesting = split_nesting;
+    TMBuilder::max_nesting = max_nesting;
+
+    if_else_anti = if_else_antinesting;
 }
 
 
@@ -40,20 +46,21 @@ TMBuilder_output TMBuilder::generateTM() {
 
     tools->link(program, tokenize_program);
 
-    int max_nesting = 4;
-    int split_nesting = 2;
+    //IncompleteSet breaker{"breaker", "breaker2"};
+    //tools->link(program, breaker);
 
-    TuringIfElseAntiNesting ifElse{(int) tapes-5, split_nesting, max_nesting};
-
-    tools->link(program, ifElse.getTransitions());
+    if (if_else_anti){
+        TuringIfElseAntiNesting ifElse{(int) tapes-5, split_nesting, max_nesting};
+        IncompleteSet if_else_program = ifElse.getTransitions();
+        tools->link(program, if_else_program);
+    }
 
     TuringVarDictionary vardict{(int) tapes-5};
 
     IncompleteSet vardict_set = vardict.getTransitions();
     tools->link(program, vardict_set);
 
-    IncompleteSet breaker{"breaker", "breaker2"};
-    //tools->link(program, breaker);
+
 
 
     TuringDenestify denest{(int) tapes-5, split_nesting, max_nesting};
