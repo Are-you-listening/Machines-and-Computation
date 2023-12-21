@@ -137,7 +137,7 @@ void GUI::Config() {
 
     ImGui::SetNextWindowSize(size);
     bool changed = false;
-    if (ImGui::SliderInt("split nesting", &split_nesting, 1, 9)){
+    if (ImGui::SliderInt("split nesting", &split_nesting, 2, 9)){
 
         if (split_nesting >= max_nesting){
             max_nesting = split_nesting + 1;
@@ -145,7 +145,7 @@ void GUI::Config() {
 
         changed = true;
     }
-    if (ImGui::SliderInt("max nesting", &max_nesting, 2, 10)){
+    if (ImGui::SliderInt("max nesting", &max_nesting, 3, 10)){
 
         if (split_nesting >= max_nesting){
             split_nesting = max_nesting - 1;
@@ -208,7 +208,6 @@ void GUI::Config() {
                 Orchestrator("");
                 auto cfg = createCFG();
                 cfg->toGNF();
-
                 const CFG a = *cfg;
                 LALR lalr(a);
                 lalr.createTable();
@@ -228,7 +227,7 @@ void GUI::Config() {
 
                 if (threading){
                     threading_check();
-                    ifstream readThread{Filelocation};
+                    ifstream readThread{"result.cc"};
                     string text;
                     while (!readThread.eof()){
                         text += (char) readThread.get();
@@ -401,8 +400,11 @@ GUI::~GUI() {
 }
 
 void GUI::threading_check() {
-    std::string ResultFileLocation="output/result.cpp";
-    ThreadFunction::threadFILE(ResultFileLocation);
+    Orchestrator::tabber(); //Cleanup output file; match tabs & spaces
+    if(Config::getConfig()->isThreading()){
+        ThreadFunction::threadFILE("result.cpp");
+        Orchestrator::threadingTest(); //Perform a speed test
+    }
 
 
 }
