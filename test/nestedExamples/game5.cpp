@@ -1,6 +1,10 @@
 #include <vector>
 #include <iostream>
 
+int* getPiece(const int r, const int k) {
+    //return board[r][k];
+}
+
 //Return alle posities waar een stuk van color opstaat
 std::vector<int*> getAllPieces(const int &color)  {
     std::vector<int*> options;
