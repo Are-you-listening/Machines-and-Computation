@@ -41,6 +41,11 @@ public:
     void makeStorage(int size);
     string getControlStorage();
     map<string, vector<Transition>> getProductions() const;
+
+    void setSingleTape(bool singleTape);
+
+    bool isSingleTape() const;
+
 private:
     vector<Tape*> tapes;
     map<string, TuringProduction*> production_trees;
@@ -54,6 +59,10 @@ private:
 
     set<int> getUsefullIndexes(const Transition& t);
     set<int> getUsefullIndexesParent(const vector<Transition>& t);
+
+    bool single_tape = false;
+
+    void singleTapeProd(IncompleteSet& new_transitions, const string k, const vector<Transition> v, int& counter, const int& mark_track, const int& new_control, const vector<int>& storage_in_state_indexes, const vector<int>& none_moving);
 
 };
 

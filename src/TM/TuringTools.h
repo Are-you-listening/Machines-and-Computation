@@ -129,7 +129,7 @@ public:
     char stack_symbol;
     vector<char> nesting_tokens;
 
-    set<IncompleteTransition> mergeToSingle(const set<IncompleteTransition>& m);
+    static set<IncompleteTransition> mergeToSingle(const set<IncompleteTransition>& m);
     Transition make_transition(IncompleteTransition& incomp, int tapes);
 
     string check_stack_double(IncompleteSet& a);
