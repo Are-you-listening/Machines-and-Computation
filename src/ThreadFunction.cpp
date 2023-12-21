@@ -98,7 +98,7 @@ void ThreadFunction::ThreadFunctionCall(const std::string& FileLocation, const s
             }
         }
     }
-    for(unsigned long int i=0; i<copy.size()-1; i++){
+    for(unsigned long int i=0; i<copy.size(); i++){
         FunctionCall+="std::ref("+VusedVariables[0][i]+")"+", ";
     }
     FunctionCall[FunctionCall.size()-2]=')';

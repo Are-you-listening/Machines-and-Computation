@@ -136,6 +136,10 @@ void Tokenisation::Tokenize(const std::string &FileLocation) {
             temp2.push_back(';');
             lines.push_back(temp2);
             temp2.clear();
+        }else if(C=='='){
+            temp2.push_back('=');
+            lines.push_back(temp2);
+            temp2.clear();
         } else if(C=='#'){
             lines.push_back(temp2);
             temp2.clear();
@@ -161,9 +165,11 @@ void Tokenisation::Tokenize(const std::string &FileLocation) {
     
     for(auto & line : lines){
         unsigned long int tokenVectorSize=tokenVector.size();
+        /*
         if(line.substr(0,5)=="std::"){
             line=line.substr(5,std::string::npos);
         }
+         */
         while(line.substr(0,1)==" "){
             line=line.substr(1,std::string::npos);
         }
