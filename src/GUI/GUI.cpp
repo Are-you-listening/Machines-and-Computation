@@ -174,10 +174,12 @@ void GUI::Config() {
     if (ImGui::Button("Convert")){
         if (lalr){
             auto config = Config::getConfig();
+            /*
             config->setMaxNesting(max_nesting);
             config->setSplitNesting(split_nesting);
             config->setThreading(threading);
             config->setIfElseNesting(if_else_antinesting);
+             */
 
             ofstream file{"input/SandBox/A.cpp"};
             for (char c: input_text){
