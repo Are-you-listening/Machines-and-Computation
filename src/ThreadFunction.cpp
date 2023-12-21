@@ -206,7 +206,10 @@ void ThreadFunction::threadFILE(const std::string& ResultFileLocation){
     std::ifstream File(ResultFileLocation);
     std::vector<std::string> FunctionCalls;
     while(getline(File,line)){
-        if(line[0]!='#'&&line[0]!=' '&&line.substr(0,6)!="static"&&line.substr(0,6)!="struct"&&!line.empty()&&line!="}"&&line!="{"&&line.substr(0,7)!="typedef"&&line.substr(0,8)!="namespace"&&line.substr(0,6)=="void A"&&line.substr(0,2)!="//"){ // I assume the code we check people don't write variables or classes above a function, also needs debugging
+        if(line[0]!='#'&&line[0]!=' '&&line.substr(0,6)!="static"&&line.substr(0,6)!="struct"&&!line.empty()&&line!="}"&&line!="{"&&line.substr(0,7)!="typedef"&&line.substr(0,8)!="namespace"&&line.substr(0,6)=="void A"&&line.substr(0,2)!="//"){ // I assume in the code
+            // we check
+            // that people don't write variables or classes above a function,
+            // also needs debugging
             FunctionCalls.push_back(line);
         }
     }
@@ -221,7 +224,7 @@ void ThreadFunction::threadFILE(const std::string& ResultFileLocation){
             count++;
             core_amount--;
         } else {
-            for(std::vector<std::thread>::iterator it=Threads.begin(); it!=Threads.end(); it++){
+            for(auto it=Threads.begin(); it!=Threads.end(); it++){
                 it->join();
                 core_amount++;
             }
@@ -233,7 +236,7 @@ void ThreadFunction::threadFILE(const std::string& ResultFileLocation){
             core_amount--;
         }
     }
-    for(std::vector<std::thread>::iterator it=Threads.begin(); it!=Threads.end(); it++){
+    for(auto it=Threads.begin(); it!=Threads.end(); it++){
         it->join();
         core_amount++;
     }
