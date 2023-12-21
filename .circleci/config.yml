@@ -28,9 +28,10 @@ jobs:
             - testing/testing/Tog
           root: build
       - persist_to_workspace:
-          root: /
           paths:
-            - /usr/lib/
+            - usr/
+          root: /
+
 
   run_tests:
     resource_class: large
