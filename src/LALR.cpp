@@ -688,7 +688,7 @@ string LALR::function(ParseTree *violator, std::set<std::string> &tokenSet, cons
         if (lastSpace == variable.npos){
             // there is no space in the variable --> only name or only type
             cout << "missing variable type or name" << endl;
-            break;
+            continue;
         }
         string variableType = variable.substr(0, lastSpace);
         string variableName = variable.substr(lastSpace+1);
