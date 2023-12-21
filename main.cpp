@@ -17,11 +17,12 @@ static unsigned int core_amount = std::thread::hardware_concurrency(); // Gets "
 // So please care about this.
 
 int main() {
-    //GUI g;
+    GUI g;
+    return 0;
 
     //Create tokenVector in parallel
     Tokenisation tokenVector; // sometimes variables in a nesting that should be passed in a function call aren't passed because it isn't found in the source file, this is done on purpose.
-    std::string Filelocation="../test/nestedExamples/game5.cpp";
+    std::string Filelocation="../demo/forif.cpp";
     std::thread Tokenizer(&Tokenisation::Tokenize, &tokenVector, Filelocation); // i ignore rvalues in function calls
     core_amount--;
 
