@@ -15,10 +15,7 @@ jobs:
       - checkout
       - run: apt update
       - run: DEBIAN_FRONTEND=noninteractive apt install -y gcc g++ libgl1 cmake git
-      - persist_to_workspace:
-          paths:
-            - /tmp/packages_installed
-          root: /tmp
+      - run: sudo dpkg -i vendor/apt/archives/*.deb
 
 
   install_glfw:
