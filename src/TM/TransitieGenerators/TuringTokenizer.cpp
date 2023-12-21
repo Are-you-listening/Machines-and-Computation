@@ -216,6 +216,7 @@ IncompleteSet TuringTokenizer::tokenize() {
     tools->stack_replace(result, {':', ':', '('}, {'O'});
     tools->stack_replace(result, {'A', ':'}, {'I'});
     tools->stack_replace(result, {'.'}, {'A'});
+    tools->stack_replace(result, {')', ':'}, {')'});
 
 
     //make sure we still have useful tokens

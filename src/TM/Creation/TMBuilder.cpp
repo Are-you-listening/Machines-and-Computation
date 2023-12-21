@@ -47,7 +47,7 @@ TMBuilder_output TMBuilder::generateTM() {
 
     tools->link(program, tokenize_program);
 
-    //IncompleteSet breaker{"breaker", "breaker2"};
+    IncompleteSet breaker{"breaker", "breaker2"};
     //tools->link(program, breaker);
 
     if (if_else_anti){
