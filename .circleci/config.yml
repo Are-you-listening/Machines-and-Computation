@@ -15,8 +15,9 @@ jobs:
     steps:
       - checkout
       - run: apt update
-      - run: DEBIAN_FRONTEND=noninteractive apt install -y gcc g++ libgl1 cmake git
-      - run: DEBIAN_FRONTEND=noninteractive TZ=Europe/Brussels apt install -y gcc g++ libglfw3-dev -lglfw
+      - run: apt update -y sudo
+      - run: DEBIAN_FRONTEND=noninteractive sudo apt install -y gcc g++ libgl1 cmake git
+      - run: DEBIAN_FRONTEND=noninteractive TZ=Europe/Brussels sudo apt install -y gcc g++ libglfw3-dev
       - run: mkdir -p build
       - run: cd build && cmake ..
       - run: cd build && make
