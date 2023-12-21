@@ -90,7 +90,7 @@ public:
      * @param Rviolator , the root of the violating nesting
      * @param T , Terminals
      */
-    void findViolation(const unsigned long &max, const unsigned long &split, unsigned long &count, unsigned long &index,ParseTree* &Rviolator,const std::vector<std::string> &Terminals,bool &found);
+    void findViolation(const unsigned long &max, const unsigned long &split, unsigned long &count, unsigned long &index,ParseTree* &Rviolator,const std::vector<std::string> &Terminals,bool &found,ParseTree* &function);
 
     /**
      * Find the root of a given child
@@ -156,7 +156,7 @@ class LALR {
      * Helper function for generate(), creates a new function in place
      * @return , Parsetree* containing the new code
      */
-    string function(ParseTree *violator, std::set<std::string> &tokenSet, const string &functionName) const;
+    string function(ParseTree *violator, std::set<std::string> &tokenSet, const string &functionName,ParseTree* root) const;
 
 public:
     unordered_map<int, map<string, string>> parseTable;

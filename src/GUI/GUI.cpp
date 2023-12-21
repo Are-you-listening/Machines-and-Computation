@@ -44,7 +44,10 @@ GUI::GUI() {
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init(glsl_version);
 
-    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+    ImGui::GetStyle().Colors[ImGuiCol_WindowBg] = ImColor(25.0/255.0, 25.0/255.0, 40.0/255.0, 1.00f);
+    ImGui::GetStyle().Colors[ImGuiCol_FrameBg] = ImColor(35.0/255.0, 35.0/255.0, 60.0/255.0, 1.00f);
+
+    ImVec4 clear_color = ImVec4(50.0/255.0, 50.0/255.0, 80.0/255.0, 1.00f);
 
 
     while (!glfwWindowShouldClose(window)){
@@ -92,9 +95,9 @@ void GUI::setupInput() {
     ImGui::SetNextWindowSize(size, ImGuiCond_FirstUseEver);
     ImGui::Begin("Enter Input Code");
     ImGuiInputTextFlags flags = ImGuiInputTextFlags_AllowTabInput;
+
     ImGui::InputTextMultiline("##source", input_text, IM_ARRAYSIZE(input_text), ImVec2(-FLT_MIN, -FLT_MIN), flags);
     ImGui::End();
-    auto v = ImVec2(-FLT_MIN, -FLT_MIN);
 
 }
 
@@ -131,7 +134,6 @@ void GUI::Config() {
     ImGui::SetNextWindowSize(size);
     ImGui::Begin("Config File");
 
-    ImVec4 output_color = ImVec4(1.0f, 1.0f, 0.00f, 1.00f);
 
     ImGui::SetNextWindowSize(size);
     bool changed = false;
