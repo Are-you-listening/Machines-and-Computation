@@ -41,3 +41,25 @@ void Orchestrator::tabber() {
     File910.close();
     File1010.close();
 }
+
+void Orchestrator::threadingTest() {
+    std::string ResultFileLocation="output/result.cpp";
+    ThreadFunction::threadFILE(ResultFileLocation);
+
+    auto start1=std::chrono::high_resolution_clock::now();
+    std::string SystemString= "g++ " + ResultFileLocation + "result.cc";
+    system(SystemString.c_str());
+    auto second1=std::chrono::high_resolution_clock::now();
+    auto duration1 = std::chrono::duration_cast<std::chrono::microseconds>(second1 - start1);
+
+    cout << "normal: "<< duration1.count() << " microseconds" << endl;
+
+    auto start=std::chrono::high_resolution_clock::now();
+    const std::string SystemString2= "g++ " + ResultFileLocation;
+    system(SystemString2.c_str());
+    auto second=std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(second - start);
+
+    cout << "threaded: "<< duration.count() << " microseconds" << endl;
+
+}
