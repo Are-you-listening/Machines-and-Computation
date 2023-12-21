@@ -93,20 +93,6 @@ void TuringMachine::load(const vector<string> &states, const string &start_state
 
         //json to = production["to"];
         Production p = production.production;
-        /*
-        p.new_state = to["state"];
-
-        for (const auto & j : to["symbols"]){
-            p.replace_val.push_back(j.get<string>()[0]);
-        }
-
-        for (const auto & j : to["moves"]){
-            p.movement.push_back(j.get<int>());
-        }*/
-
-        if (state == "0"){
-            int h = 0;
-        }
 
         auto loc = production_trees.find(state);
 
@@ -253,7 +239,6 @@ TuringMachine* TuringMachine::toSingleTape() {
         all_moving.push_back(1);
         none_moving.push_back(0);
     }
-
 
     IncompleteSet new_transitions{"new_transitions", "new_transitions"};
     int counter = 0;
@@ -432,14 +417,6 @@ TuringMachine* TuringMachine::toSingleTape() {
                 //soon_merging.insert(write);
                 new_transitions.transitions.push_back(write);
 
-                //can start at any point
-                /*
-                write.state = write_state;
-                write.input = {c, 'X'};
-                write.input_index = {i+1, i*2+new_control};
-                new_transitions.transitions.push_back(write);
-                 */
-
                 IncompleteTransition toCheckMode;
                 toCheckMode.state = write_state;
                 toCheckMode.to_state = write_state+"_checkModeOverhead";
@@ -456,7 +433,6 @@ TuringMachine* TuringMachine::toSingleTape() {
                     new_transitions.transitions.push_back(write_skip);
                 }
 
-
                 IncompleteTransition write_skip2;
                 write_skip2.state = from;
                 write_skip2.to_state = to;
@@ -464,7 +440,6 @@ TuringMachine* TuringMachine::toSingleTape() {
                 write_skip2.input = {c};
                 write_skip2.input_index = {i+1};
                 new_transitions.transitions.push_back(write_skip2);
-
 
                 IncompleteTransition loop_state2;
                 loop_state2.state = write_state;
@@ -480,22 +455,6 @@ TuringMachine* TuringMachine::toSingleTape() {
 
                 loop_state2.def_move = -1;
                 //new_transitions.transitions.push_back(loop_state2);
-
-                /*
-                IncompleteTransition move_marker;
-                move_marker.state = write_state;
-                move_marker.to_state = k+"_mark"+ to_string(counter);
-                move_marker.def_move = prod.production.movement[i];
-
-                move_marker.input = {'\u0003'};
-                move_marker.input_index = {i+1};
-
-                move_marker.output = {'\u0000'};
-                move_marker.output_index = {i*2+new_control};
-                move_marker.move = {prod.production.movement[i]};
-
-                new_transitions.transitions.push_back(move_marker);
-                */
 
                 IncompleteTransition move_marker_back;
                 move_marker_back.state = k+"_mark"+ to_string(counter)+"_"+ to_string(i);
@@ -629,4 +588,3 @@ set<int> TuringMachine::getUsefullIndexesParent(const vector<Transition> &t_list
 
     return out;
 }
-

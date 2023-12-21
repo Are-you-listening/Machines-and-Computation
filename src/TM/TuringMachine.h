@@ -54,6 +54,7 @@ private:
 
     set<int> getUsefullIndexes(const Transition& t);
     set<int> getUsefullIndexesParent(const vector<Transition>& t);
+
 };
 
 
