@@ -15,6 +15,7 @@
 2. All code must be placed in a single file 
 3. The to-be-processed code should compile and run without errors 
 4. Function names consisting of A* may not exist in de pre-processed code
+5. This string may not be used in the codebase: "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3"
 
 #### Support Excluded List:
 - [ ] Auto variables 
