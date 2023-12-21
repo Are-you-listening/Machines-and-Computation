@@ -403,7 +403,7 @@ void LALR::parse(std::vector<std::tuple<std::string, std::string, std::set<std::
         }
         string operation = parseTable[stacksymbol][inputsymbol];
 
-        //cout << "stacksymbol: " << stacksymbol << ", inputsymbol: " << inputsymbol << " --> " << operation << endl;
+        cout << "stacksymbol: " << stacksymbol << ", inputsymbol: " << inputsymbol << " --> " << operation << endl;
         if (operation.empty()){
             throw emptyElement();
         }

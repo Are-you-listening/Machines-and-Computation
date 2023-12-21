@@ -423,6 +423,9 @@ void Tokenisation::Tokenize(const std::string &FileLocation) {
     }
     unsigned long int count=0;
     for(auto it=tokenTupleVector.end()-1; it!=tokenTupleVector.begin(); it--,count++){
+        if(std::get<1>(*it).find("return")!=std::string::npos){
+            continue;
+        }
         if(std::get<0>(*it)=="V"||std::get<0>(*it)=="I"||std::get<0>(*it)=="e"){
             unsigned long int scopeNreverse=0;
             long int nestingCounter=0;
@@ -523,7 +526,7 @@ void Tokenisation::Tokenize(const std::string &FileLocation) {
                             it_6= true;
                         }
                         if(it_0||it_1||it_2||it_3||it_4||it_5||it_6&&std::get<1>(it3)!=std::get<1>(*it)){
-                            if(std::get<0>(it3)=="V"){
+                            if(std::get<0>(it3)=="V"||std::get<0>(it3)=="C"){
                                 std::get<0>(it3)="D";
                             }
                             std::string D0;
@@ -574,6 +577,12 @@ void Tokenisation::Tokenize(const std::string &FileLocation) {
         } else if(std::get<1>(*i).empty()){
             tokenTupleVector.erase(i);
             i--;
+        } else if(std::get<0>(*i)=="D"){
+            for(std::string V :std::get<2>(*i)){
+                if(V.substr(V.size()-1,V.size()-1)==" "){
+                    std::get<2>(*i).erase(V);
+                }
+            }
         }
     }
     

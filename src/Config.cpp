@@ -51,3 +51,27 @@ bool Config::isThreading() const {
 bool Config::isStaticMemory() const {
     return staticMemory;
 }
+
+void Config::setMaxNesting(int maxNesting) {
+    max_nesting = maxNesting;
+}
+
+void Config::setSplitNesting(int splitNesting) {
+    split_nesting = splitNesting;
+}
+
+void Config::setIfElseNesting(int ifElseNesting) {
+    ifElse_nesting = ifElseNesting;
+}
+
+void Config::setThreading(bool threading) {
+    Config::threading = threading;
+}
+
+void Config::setStaticMemory(bool staticMemory) {
+    Config::staticMemory = staticMemory;
+}
+
+void Config::setInit(Config *init) {
+    Config::init = init;
+}

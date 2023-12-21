@@ -28,7 +28,7 @@ int main() { // Function names we create to replace nesting should have F or I i
 
     Tokenisation tokenVector; // sometimes variables in a nesting that should be passed in a function call aren't passed because it isn't found in the source file, this is done on purpose.
     //std::string Filelocation="input/nestedExamples/engine.cc"; // for now, doesn't support double declarations like int a,d;
-    std::string Filelocation="../test/testFiles/knapsack.cpp";
+    std::string Filelocation="../test/nestedExamples/game5.cpp";
     //std::string Filelocation="../test/testFiles/TM_test_53.cpp";
     std::thread Tokenizer(&Tokenisation::Tokenize, &tokenVector, Filelocation); // i ignore rvalues in function calls
     core_amount--;
@@ -37,27 +37,7 @@ int main() { // Function names we create to replace nesting should have F or I i
     Orchestrator();
 
     auto cfg = createCFG();
-    //auto cfg3 = createCFG();
-    //CFG cfg2("input/CFG/testGNF.json");
-    //cfg2.setCnf(true);
-    //cfg2.toGNF();
-    //cfg2.print();
-    cfg->print();
-    cfg->toGNF(); // this still needs massive debugging.
-    cfg->print();
-    //cfg->toCNF();
-    //cfg3->toCNF();
-    
-    /*
-    bool a= true;
-    bool b= false;
-    if(a==b){
-        int a=0;
-    } else{
-        string a="test";
-    }
-    std::cout << a << std::endl;
-    */
+    cfg->toGNF();
 
     const CFG a = *cfg;
     LALR lalr(a);
@@ -68,19 +48,7 @@ int main() { // Function names we create to replace nesting should have F or I i
 
     //create LARL parser with tokenvector
     auto vec = tokenVector.getTokenVector();
-    
-    /*
-    std::set<std::string> test;
-    vec.emplace_back("}","",test);
-    vec.clear();
-    std::vector<string> tokens  = {"V", "{", "C", "{", "C", "}", "{", "C", "}", "}"};
-    std::vector<std::tuple<string, string, set<string>>> out;
-    set<string> abc;
-    for (const auto& t: tokens){
-        vec.emplace_back(t, "testing stuff", abc);
-    }
-    */
-     
+
     lalr.parse(vec);
     lalr.generate();
     std::ifstream File910("output/result.cpp");
@@ -93,16 +61,16 @@ int main() { // Function names we create to replace nesting should have F or I i
         V10.push_back(C10);
     }
 
-    
+
     std::ofstream File1010("output/result.cpp");
     unsigned long int nestingcounter=0;
     std::string tab;
     for(const auto& it:V10){
         File1010 <<tab<< it <<std::endl;
-        
+
         int add = std::count(it.begin(), it.end(), '{');
         int remove = std::count(it.begin(), it.end(), '}');
-        
+
         for (int i = 0; i<add; i++){
             tab+="    ";
         }
@@ -113,13 +81,7 @@ int main() { // Function names we create to replace nesting should have F or I i
             }
         }
     }
-    
-    //cleanup
-    //if-else antinesting
-    //move
-    //naam wijzinging states, zie cleanup.
-    
-    
+
     //threading every function for now, will later be changed
     // I also assume that every function we create to replace nesting is only called upon once
     // result don't work for now, will be changed
@@ -194,7 +156,7 @@ int main() { // Function names we create to replace nesting should have F or I i
     }
     File2.close();
     File1.close();
-    
+
     std::ofstream File5(ResultFileLocation+"result.cc");
     std::ifstream File6(ResultFileLocation+"tempresult.cc0");
     for(unsigned long int i=0; i<count; i++){
@@ -233,7 +195,7 @@ int main() { // Function names we create to replace nesting should have F or I i
     File6.close();
     File7.close();
     File8.close();
-    
+
     for(unsigned long int i=0; i<count; i++){
         std::string c=ResultFileLocation + std::to_string(i);
         std::remove(c.c_str());
@@ -247,7 +209,7 @@ int main() { // Function names we create to replace nesting should have F or I i
     while(getline(File9,C)){
         V.push_back(C);
     }
-    
+
     std::ofstream File10(ResultFileLocation+"result.cc");
     File10<<"#include <thread>"<<std::endl;
     for(const auto& it:V){
@@ -255,6 +217,6 @@ int main() { // Function names we create to replace nesting should have F or I i
     }
     std::cout << "We do really love Tibo" << std::endl;
      */
- 
+
     return 0;
 }
