@@ -193,10 +193,11 @@ void GUI::Config() {
 
                 ofstream file{"input/SandBox/A.cpp"};
                 for (char c: input_text){
-                    file << c;
+
                     if (c == '\u0000'){
                         break;
                     }
+                    file << c;
                 }
                 file.close();
 
