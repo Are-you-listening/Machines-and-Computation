@@ -38,6 +38,7 @@ private:
     void setupOutput();
     void Config();
     void TMEmulator();
+    void fixTabs();
 
     static const unsigned int max_char = 10000;
     char input_text[max_char] = "";
