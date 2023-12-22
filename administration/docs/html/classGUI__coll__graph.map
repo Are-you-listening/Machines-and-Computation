@@ -1,0 +1,6 @@
+<map id="GUI" name="GUI">
+<area shape="rect" id="node1" title=" " alt="" coords="97,184,144,211"/>
+<area shape="rect" id="node2" href="$classTuringMachine.html" title=" " alt="" coords="5,95,121,121"/>
+<area shape="rect" id="node3" href="$classTMBuilder.html" title=" " alt="" coords="146,95,234,121"/>
+<area shape="rect" id="node4" href="$classTuringTools.html" title=" " alt="" coords="143,5,237,32"/>
+</map>
