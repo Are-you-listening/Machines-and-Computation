@@ -1838,18 +1838,24 @@ TuringTools::nesting_marker(IncompleteSet &a, const vector<int> &tuple_indexes, 
 }
 
 void TuringTools::make_working_nesting(IncompleteSet &a, const vector<int> &tuple_indexes) {
-
     IncompleteSet working_nesting{"make_working_nesting_"+ to_string(counter), "make_working_nesting_"+ to_string(counter)};
     counter++;
 
     copy_to_working(working_nesting, tuple_indexes);
 
+    move(working_nesting, {(int) stack_tape}, -1);
+    //if their is a nesting symbol, place a stack_seperator on N
+    IncompleteSet onN{"on_N"+ to_string(counter), "on_N"+ to_string(counter)};
+    counter++;
+    link_put(onN, {stack_sep}, {(int) stack_tape});
+
+    link_on(working_nesting, onN, {'N'}, {(int) stack_tape});
+    move(working_nesting, {(int) stack_tape}, 1);
+
     move(working_nesting, {0, 1}, -1);
 
     IncompleteSet on_bracket{"on_bracket_"+ to_string(counter), "on_bracket_"+ to_string(counter)};
     counter++;
-
-
 
     go_to_copy(on_bracket, {'('}, 1, -1, {0,1}, stack_tape, 1, {(int) stack_tape});
     copy(on_bracket, 1, stack_tape);
@@ -1881,7 +1887,7 @@ void TuringTools::make_working_nesting(IncompleteSet &a, const vector<int> &tupl
 
     move(working_nesting, {(int) stack_tape}, -1);
 
-    go_to_move(working_nesting, {stack_symbol, '{', ':', '('}, stack_tape, -1, {(int) stack_tape}, 1, 1, {0,1});
+    go_to_move(working_nesting, {stack_symbol, '{', ':', '(', stack_sep}, stack_tape, -1, {(int) stack_tape}, 1, 1, {0,1});
 
 
     IncompleteSet replace_double_dot{"replace_double_dot_"+ to_string(counter), "replace_double_dot_"+ to_string(counter)};
@@ -1892,7 +1898,7 @@ void TuringTools::make_working_nesting(IncompleteSet &a, const vector<int> &tupl
     link_put(replace_double_dot, {'\u0000'}, {(int) stack_tape});
     move(replace_double_dot, {(int) stack_tape}, -1);
 
-    go_to_move(replace_double_dot, {stack_symbol, '{'}, stack_tape, -1, {(int) stack_tape}, 1, 1, {0,1});
+    go_to_move(replace_double_dot, {stack_symbol, '{', stack_sep}, stack_tape, -1, {(int) stack_tape}, 1, 1, {0,1});
     move(replace_double_dot, {(int) stack_tape}, 1);
     push(replace_double_dot, 'O');
     move(replace_double_dot, {(int) stack_tape}, -1);
@@ -1902,11 +1908,15 @@ void TuringTools::make_working_nesting(IncompleteSet &a, const vector<int> &tupl
     //ignores double dot between brackets coming from nemaspaces
     IncompleteSet skip_brackets{"skip_brackets_"+ to_string(counter), "skip_brackets_"+ to_string(counter)};
     counter++;
-    go_to_move(skip_brackets, {stack_symbol, '{'}, stack_tape, -1, {(int) stack_tape}, 1, 1, {0,1});
+    go_to_move(skip_brackets, {stack_symbol, '{', stack_sep}, stack_tape, -1, {(int) stack_tape}, 1, 1, {0,1});
     link_on(working_nesting, skip_brackets, {'('}, {(int) stack_tape});
 
 
     move(working_nesting, {(int) stack_tape}, 1);
+
+    go_to(working_nesting, {stack_symbol, stack_sep}, stack_tape, -1, {(int) stack_tape});
+    write_on(working_nesting, {stack_sep}, {(int) stack_tape}, {'N'}, {(int) stack_tape});
+    go_to(working_nesting, {'\u0000'}, stack_tape, 1, {(int) stack_tape});
 
     link_put(working_nesting, {'S'}, {0});
 
@@ -1945,7 +1955,6 @@ void TuringTools::add_nesting_working(IncompleteSet &a) {
 
     push(create_key, 'N');
     push(create_key, '{');
-
 
     move(create_key, {(int) stack_tape}, -2);
     go_to(create_key, {stack_symbol, '{', 'O'}, stack_tape, -1, {(int) stack_tape});
