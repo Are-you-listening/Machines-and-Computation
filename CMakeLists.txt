@@ -117,15 +117,7 @@ add_executable(Tog
 
 #for ImGUI
 target_link_libraries(Tog PUBLIC imgui)
-
 target_link_libraries(Tog PUBLIC glfw OpenGL::GL ${CMAKE_DL_LIBS})
-target_include_directories(Tog PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>
-        $<INSTALL_INTERFACE:include>)
-target_link_libraries(Tog PUBLIC glfw OpenGL::GL ${CMAKE_DL_LIBS})
-
-target_include_directories( Tog PUBLIC imgui)
-
 target_include_directories(Tog PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>
         $<INSTALL_INTERFACE:include>)

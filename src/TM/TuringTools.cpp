@@ -1496,6 +1496,8 @@ void TuringTools::find_match_heap_traverse(IncompleteSet &a, char start_marker, 
 
     go_to(traverse_loop, {'A'}, 0, -1, {marker_tape, data_tape});
     set_heap_mode(traverse_loop, true);
+
+
     find_match_heap(traverse_loop, start_marker, end_marker, marker_tape, data_tape, false, full);
     //still need to move last key
 
