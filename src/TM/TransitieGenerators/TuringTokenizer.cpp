@@ -64,6 +64,14 @@ IncompleteSet TuringTokenizer::tokenize() {
     //need to loop this, and repeat if ::
     tools->go_to(find_seperator, seperators, 1, 1, {0, 1});
 
+    string on_comma = tools->branch_on(find_seperator, {','}, {1});
+    string old_to = find_seperator.to_state;
+    find_seperator.to_state = on_comma;
+    tools->move(find_seperator, {0, 1}, 1);
+    tools->make_loop(find_seperator);
+
+    find_seperator.to_state = old_to;
+
     IncompleteSet onAmpercent{"tokenize_onAmpercent", "tokenize_onAmpercent"};
     tools->move(onAmpercent, {0,1}, 1);
 
