@@ -20,6 +20,7 @@ IncompleteSet TuringDenestify::deNestify() {
     tools->nesting_marker(result, get_tuple_index(), split_nesting, max_nesting);
     tools->check_for_loop_continue_split(result, get_tuple_index());
 
+
     string end_denesting = tools->branch_on(result, {'\u0000'}, {get_tuple_index()[1]});
 
     tools->go_to(result, {'N', 'A', 'V'}, get_tuple_index()[0], -1, get_tuple_index());
