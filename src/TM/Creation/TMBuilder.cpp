@@ -47,9 +47,6 @@ TMBuilder_output TMBuilder::generateTM() {
 
     tools->link(program, tokenize_program);
 
-    IncompleteSet breaker{"breaker", "breaker2"};
-    //tools->link(program, breaker);
-
     if (if_else_anti){
         TuringIfElseAntiNesting ifElse{(int) tapes-5, split_nesting, max_nesting};
         IncompleteSet if_else_program = ifElse.getTransitions();
@@ -61,8 +58,8 @@ TMBuilder_output TMBuilder::generateTM() {
     IncompleteSet vardict_set = vardict.getTransitions();
     tools->link(program, vardict_set);
 
-
-
+    IncompleteSet breaker{"breaker", "breaker2"};
+    //tools->link(program, breaker);
 
     TuringDenestify denest{(int) tapes-5, split_nesting, max_nesting};
 

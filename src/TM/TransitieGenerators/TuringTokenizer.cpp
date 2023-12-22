@@ -236,6 +236,7 @@ IncompleteSet TuringTokenizer::tokenize() {
     tools->stack_replace(result, {'\n'}, {'I'});
     tools->stack_replace(result, {':',':','P'}, {'A'});
     tools->stack_replace(result, {stack_symbol, 'P','('}, {'P'});
+    tools->stack_replace(result, {'A', 'P', 'A', 'S', 'A', 'P', 'A', 'D'}, {'A'});
 
     tools->go_to(result, {stack_symbol}, tapes-1, -1, {(int) tapes-1});
     tools->move(result, {(int) tapes-1}, 1);
@@ -244,7 +245,6 @@ IncompleteSet TuringTokenizer::tokenize() {
     tools->push(onIgnore, 'I');
 
     tools->link_on(result, onIgnore, {'I'}, {(int) tapes-1});
-
     tools->go_to(result, {'\u0000'}, tapes-1, 1, {(int) tapes-1});
 
 
@@ -429,4 +429,3 @@ IncompleteSet TuringTokenizer::tokenize_runner_productions() {
 IncompleteSet TuringTokenizer::getTransitions() {
     return tokenize();
 }
-
