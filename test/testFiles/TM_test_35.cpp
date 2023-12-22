@@ -1,12 +1,12 @@
 int main(){
-    bool a= true;
+    bool c= true;
     bool b= false;
-    if(a==b){
+    if(c==b){
         int a=0;
     } else{
         string a="test";
     }
-    std::cout << a << std::endl;
+    std::cout << c << std::endl;
     return 0;
 
 }
