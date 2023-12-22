@@ -126,6 +126,11 @@ target_link_libraries(Tog PUBLIC glfw OpenGL::GL ${CMAKE_DL_LIBS})
 
 target_include_directories( Tog PUBLIC imgui)
 
+target_include_directories(Tog PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>
+        $<INSTALL_INTERFACE:include>)
+target_link_libraries(Tog PUBLIC glfw OpenGL::GL ${CMAKE_DL_LIBS})
+
 set(CMAKE_INSTALL_PREFIX testing)
 install(TARGETS TESTS
         DESTINATION ${CMAKE_INSTALL_PREFIX}

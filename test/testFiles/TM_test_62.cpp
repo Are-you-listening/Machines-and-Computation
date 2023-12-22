@@ -45,6 +45,7 @@ pair<int, int> getPosition(const Pion*s) { //Pion moet in spel zitten
             }
         }
     }
+    return {0, 0};
 }
 
 

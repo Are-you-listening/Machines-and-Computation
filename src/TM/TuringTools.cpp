@@ -3803,14 +3803,25 @@ void TuringTools::check_split_nesting(IncompleteSet &a, const vector<int>&tuple_
 
     std::vector<string> branches;
 
-    for (int i=0; i<split_nesting+2; i++){
+    for (int i=0; i<split_nesting+1; i++){
+        string start_process = check_split_nesting.to_state;
         go_to(check_split_nesting, {'}', '{', stack_symbol}, stack_tape, 1, {(int) stack_tape});
 
         IncompleteSet skip_nesting_set{"skip_nesting_"+ to_string(counter), "skip_nesting_"+ to_string(counter)};
         counter++;
         skip_nesting(skip_nesting_set, 1, 1, stack_tape, 1, {(int) stack_tape});
+        move(skip_nesting_set, {(int) stack_tape}, 1);
+
+        IncompleteTransition toStart;
+        toStart.state = skip_nesting_set.to_state;
+        toStart.to_state = start_process;
+        toStart.def_move = 0;
+        skip_nesting_set.transitions.push_back(toStart);
+
+        skip_nesting_set.to_state = "unreached";
 
         link_on(check_split_nesting, skip_nesting_set, {'{'}, {(int) stack_tape});
+
 
         string branch_fine = branch_on(check_split_nesting, {stack_symbol}, {(int) stack_tape});
         branches.push_back(branch_fine);
