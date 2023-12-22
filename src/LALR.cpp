@@ -501,7 +501,6 @@ void LALR::generate() {
 
     _root->matchBrackets(_cfg.getT()); //Format first
     _root->findViolation(max,split,count,index,violator,_cfg.getT(),found,lastFunction); //Check for violations
-    //this->generateParseTreeImage("test.dot");
     lastFunction = _root->findRoot(lastFunction,_cfg.getT()); //We need to insert it in the root
 
     while(violator!=nullptr){
@@ -1082,6 +1081,9 @@ void LALR::generateParseTreeImage(const string filename) {
         dotFile.close();
 
         std::string dotCommand = "dot -Tpng " + filename + " -o " + filename.substr(0, filename.length()-4) + ".png";
+        std::cout << dotCommand << std::endl; //Cout command for validation
         system(dotCommand.c_str());
+    }else{
+        std::cout << "couldn't open file to generate parseTree image!" << std::endl;
     }
 }
