@@ -900,8 +900,8 @@ void LALR::saveTable() {
             }
             outFile << "rowend" << std::endl;
         }
-        outFile.close();
     }
+    outFile.close();
 }
 
 bool LALR::loadTable() {
@@ -950,6 +950,7 @@ bool LALR::loadTable() {
         return true;
     } else {
         std::cout << "couldn't open parseTable file" << std::endl;
+        inFile.close();
         return false;
     }
 }
