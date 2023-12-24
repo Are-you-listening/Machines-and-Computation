@@ -156,7 +156,7 @@ TEST(TuringMachineTest, TM_tools){
 }
 
 TEST(TuringMachineTest, TM_tokenazation) {
-    int index = 72;
+    int index = 75;
     ifstream test_file("../test/testFiles/TM_test_"+ to_string(index)+".cpp");
     string test_string;
     cout << test_file.is_open() << endl;
@@ -189,14 +189,17 @@ TEST(TuringMachineTest, TM_tokenazation) {
             break;
         }
         tm.move();
-        if (tm.getCurrentState() == "failure_4945"){
-
+        if (tm.getCurrentState() == "go_to_1989"){
+            for (int i = 0; i < tm.getTapeAmount(); i++){
+                cout << tm.getTapeData(i) << endl;
+            }
+            cout << endl;
 
             int j=0;
 
         }
 
-        if (i >= 961060000){
+        if (i >= 411940000){
             int j = 0;
 
             for (int i = 0; i < tm.getTapeAmount(); i++){
@@ -219,27 +222,30 @@ TEST(TuringMachineTest, TM_tokenazation) {
 
     cout << "halted time " << halted_time << endl;
 
-    string b = tm.exportTapeData(3);
-    int a1 = 0;
-    int a2 = 0;
-    int a3 = 0;
-    int a4 = 0;
-    for (char c: b){
-        if (c == '('){
-            a1 += 1;
+    for (auto p: {3, (int) tm.getTapeAmount()-1}){
+        string b = tm.exportTapeData(p);
+        int a1 = 0;
+        int a2 = 0;
+        int a3 = 0;
+        int a4 = 0;
+        for (char c: b){
+            if (c == '('){
+                a1 += 1;
+            }
+            if (c == ')'){
+                a2 += 1;
+            }
+            if (c == '{'){
+                a3 += 1;
+            }
+            if (c == '}'){
+                a4 += 1;
+            }
         }
-        if (c == ')'){
-            a2 += 1;
-        }
-        if (c == '{'){
-            a3 += 1;
-        }
-        if (c == '}'){
-            a4 += 1;
-        }
+        std::cout << "(): " << a1 << " " << a2 << std::endl;
+        std::cout << "{}: " << a3 << " " << a4 << std::endl;
     }
-    std::cout << "(): " << a1 << " " << a2 << std::endl;
-    std::cout << "{}: " << a3 << " " << a4 << std::endl;
+
     ofstream out{"../test/results/TM_test_"+ to_string(index)+".cpp"};
     out << tm.exportTapeData(1);
     out.close();

@@ -64,11 +64,31 @@ IncompleteSet TuringTokenizer::tokenize() {
     //need to loop this, and repeat if ::
     tools->go_to(find_seperator, seperators, 1, 1, {0, 1});
 
-    string on_comma = tools->branch_on(find_seperator, {','}, {1});
+    IncompleteSet onCommaCheck{"onCommaCheck", "onCommaCheck"};
+    tools->move(onCommaCheck, {0,1}, -1);
+    auto tempo = seperators;
+    tempo.push_back('<');
+    tools->go_to(onCommaCheck, tempo, 1, -1, {0, 1});
+    string on_comma = tools->branch_on(onCommaCheck, {'<'}, {1});
+    tools->move(onCommaCheck, {0,1}, 1);
+    tools->go_to(onCommaCheck, seperators, 1, 1, {0, 1});
+    tools->link_on(find_seperator, onCommaCheck, {','}, {1});
+
+
     string old_to = find_seperator.to_state;
     find_seperator.to_state = on_comma;
-    tools->move(find_seperator, {0, 1}, 1);
-    tools->make_loop(find_seperator);
+    IncompleteSet onCommaLoop{"onCommaLoop", "onCommaLoop"};
+    tools->move(onCommaLoop, {0, 1}, 1);
+    tools->go_to(onCommaLoop, seperators, 1, 1, {0, 1});
+    tools->make_loop_on(onCommaLoop, ',', 1);
+    tools->link(find_seperator, onCommaLoop);
+
+    IncompleteTransition toOld;
+    toOld.state = find_seperator.to_state;
+    toOld.to_state = old_to;
+    toOld.def_move = 0;
+
+    find_seperator.transitions.push_back(toOld);
 
     find_seperator.to_state = old_to;
 
@@ -236,6 +256,7 @@ IncompleteSet TuringTokenizer::tokenize() {
     tools->stack_replace(result, {'\n'}, {'I'});
     tools->stack_replace(result, {':',':','P'}, {'A'});
     tools->stack_replace(result, {stack_symbol, 'P','('}, {'P'});
+    tools->stack_replace(result, {'A', 'P', 'A', 'S', 'A', 'P', 'A', 'D'}, {'A'});
 
     tools->go_to(result, {stack_symbol}, tapes-1, -1, {(int) tapes-1});
     tools->move(result, {(int) tapes-1}, 1);
@@ -244,7 +265,6 @@ IncompleteSet TuringTokenizer::tokenize() {
     tools->push(onIgnore, 'I');
 
     tools->link_on(result, onIgnore, {'I'}, {(int) tapes-1});
-
     tools->go_to(result, {'\u0000'}, tapes-1, 1, {(int) tapes-1});
 
 
@@ -429,4 +449,3 @@ IncompleteSet TuringTokenizer::tokenize_runner_productions() {
 IncompleteSet TuringTokenizer::getTransitions() {
     return tokenize();
 }
-
