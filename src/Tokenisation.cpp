@@ -159,7 +159,7 @@ void Tokenisation::Tokenize(const std::string &FileLocation) {
     temp.clear();
     temp2.clear();
     for(auto & line : lines){
-        if(line.find("\n")!=std::string::npos){
+        while(line.find("\n")!=std::string::npos){
             line.replace(line.find("\n"),1,"");
         }
     }
@@ -178,8 +178,38 @@ void Tokenisation::Tokenize(const std::string &FileLocation) {
             //tokenVector.emplace_back("C",line);
             continue;
         }
+        std::vector<std::tuple<std::string, std::string, std::set<std::string>>> tokenTupleVectorTEMP;
+        std::set<std::string> S={};
+        tokenTupleVectorTEMP.emplace_back("V",line,S);
+        vindVn(tokenTupleVectorTEMP,line,0,VariableChar,VariableCharSecond);
         if(line.substr(0,3)=="for"){
-            tokenVector.emplace_back("F",line);
+            if(line.find(';')==std::string::npos){
+                std::string prepoint;
+                std::string afterpoint;
+                bool found= false;
+                bool foundpoint= false;
+                for(const auto & i: line){
+                    if(found){
+                        afterpoint+=i;
+                    } else {
+                        if(i==':'&&!foundpoint){
+                            foundpoint=true;
+                            prepoint+=i;
+                        } else if(i!=':'&&foundpoint){
+                            found= true;
+                            afterpoint+=i;
+                        } else{
+                            foundpoint= false;
+                            prepoint+=i;
+                        }
+                    }
+                }
+                tokenVector.emplace_back("F",prepoint);
+                tokenVector.emplace_back("V",afterpoint);
+                tokenVector.emplace_back("V","");
+            } else {
+                tokenVector.emplace_back("F",line);
+            }
         } else if(line.substr(0,2)=="if"){
             tokenVector.emplace_back("I",line);
         } else if(line.find("else if")!=std::string::npos){
@@ -188,18 +218,7 @@ void Tokenisation::Tokenize(const std::string &FileLocation) {
             tokenVector.emplace_back("E",line);
         } else if(line.find("while")!=std::string::npos){
             tokenVector.emplace_back("F",line);
-        } else if((line.find('+')!=std::string::npos||line.find('-')!=std::string::npos||line.find('*')!=std::string::npos // this just gives on when a variable is used, not which or even which scope the variable is from
-                   ||line.find('/')!=std::string::npos||line.find('%')!=std::string::npos||line.find("++")!=std::string::npos // so use in combination of (D,line) to deter the scopes.
-                   ||line.find("--")!=std::string::npos||line.find("++")!=std::string::npos||line.find('=')!=std::string::npos
-                   ||line.find("+=")!=std::string::npos||line.find("-=")!=std::string::npos||line.find("*=")!=std::string::npos
-                   ||line.find("/=")!=std::string::npos||line.find("%=")!=std::string::npos||line.find("==")!=std::string::npos
-                   ||line.find("!=")!=std::string::npos||line.find('>')!=std::string::npos||line.find('<')!=std::string::npos
-                   ||line.find(">=")!=std::string::npos||line.find("<=")!=std::string::npos||line.find("&&")!=std::string::npos
-                   ||line.find("||")!=std::string::npos||line.find('!')!=std::string::npos||line.find('&')!=std::string::npos
-                   ||line.find("<<")!=std::string::npos||line.find(">>")!=std::string::npos||line.find("->")!=std::string::npos
-                   ||line.find('.')!=std::string::npos||line.find('[')!=std::string::npos||(line.find('(')!=std::string::npos&&
-                                                                                            line.find(')')!=std::string::npos&&line.find("()")==std::string::npos)||line.find('|')!=std::string::npos)&&
-                  line.find('#')==std::string::npos&&line.find("){")==std::string::npos){
+        } else if(!std::get<2>(tokenTupleVectorTEMP[0]).empty()){
             tokenVector.emplace_back("V",line);
         }
         if(line=="{"){

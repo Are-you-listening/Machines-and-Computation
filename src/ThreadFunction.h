@@ -13,6 +13,7 @@
 #include <mutex>
 #include <thread>
 #include <filesystem>
+#include <set>
 
 class ThreadFunction {
 public:

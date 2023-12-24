@@ -8,6 +8,9 @@ static unsigned long int ThreadNameFunction=0xA0000000;
 static std::mutex thread_name_lock;
 
 void ThreadFunction::ThreadFunctionCall(const std::string& FileLocation, const std::string& Function){
+    std::set<char> VariableCharSecond= {'_','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z',
+                                        'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z',
+                                        '0','1','2','3','4','5','6','7','8','9'};
     std::vector<std::string> ChangedVariables;
     unsigned long int left=0;
     unsigned long int right=0;
@@ -38,11 +41,20 @@ void ThreadFunction::ThreadFunctionCall(const std::string& FileLocation, const s
     std::string line3;
     std::vector<std::vector<std::string>> VusedVariables;
     while(getline(File5,line3)){
-        if(line3.find(FunctionName + "(") != std::string::npos){
+        if(line3.find(FunctionName + "(") != std::string::npos&&VariableCharSecond.find(line3[line3.find(FunctionName + "(")-1])==VariableCharSecond.end()){
             std::vector<std::string> usedVariables;
             std::string temp2;
             bool appending2=false;
+            bool skipping=false;
             for(const auto& i: line3){
+                if(i=='<') {
+                    skipping= true;
+                } else if(i=='>'){
+                    skipping= false;
+                }
+                if(skipping){
+                    continue;
+                }
                 if(i=='(') {
                     appending2= true;
                 }
@@ -99,7 +111,9 @@ void ThreadFunction::ThreadFunctionCall(const std::string& FileLocation, const s
         }
     }
     for(unsigned long int i=0; i<copy.size(); i++){
-        FunctionCall+="std::ref("+VusedVariables[0][i]+")"+", ";
+        if(VusedVariables[0][i]!="a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3") {
+            FunctionCall += "std::ref(" + VusedVariables[0][i] + ")" + ", ";
+        }
     }
     FunctionCall[FunctionCall.size()-2]=')';
     FunctionCall[FunctionCall.size()-1]=';';
@@ -131,8 +145,10 @@ void ThreadFunction::ThreadFunctionCall(const std::string& FileLocation, const s
             thread_name_lock.unlock();
             count++;
             if(count<VusedVariables.size()-1){
-                for(unsigned long int i=0; i<copy.size()-1; i++){
-                    FunctionCall+="std::ref("+VusedVariables[count][i]+")"+", ";
+                for(unsigned long int i=0; i<copy.size(); i++){
+                    if(VusedVariables[count][i]!="a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3"){
+                        FunctionCall+="std::ref("+VusedVariables[count][i]+")"+", ";
+                    }
                 }
             }
             FunctionCall[FunctionCall.size()-2]=')';
@@ -221,11 +237,16 @@ void ThreadFunction::threadFILE(const std::string& ResultFileLocation){
     std::ifstream File(ResultFileLocation);
     std::vector<std::string> FunctionCalls;
     while(getline(File,line)){
-        if(line[0]!='#'&&line[0]!=' '&&line.substr(0,6)!="static"&&line.substr(0,6)!="struct"&&!line.empty()&&line!="}"&&line!="{"&&line.substr(0,7)!="typedef"&&line.substr(0,8)!="namespace"&&line.substr(0,6)=="void A"&&line.substr(0,2)!="//"){ // I assume in the code
+        if(line.find('#')==std::string::npos&&line.find("static")==std::string::npos&&line.find("struct")==std::string::npos&&!line.empty()&&line!="}"&&line!="{"&&line.find("typedef")==std::string::npos&&line.find("namespace")==std::string::npos&&line.find("void A")!=std::string::npos&&line.find("//")==std::string::npos){ // I assume in the code
             // we check
             // that people don't write variables or classes above a function,
             // also needs debugging
             FunctionCalls.push_back(line);
+        }
+    }
+    for(auto & i : FunctionCalls){
+        while(i.substr(0,1)==" "){
+            i=i.substr(1,std::string::npos);
         }
     }
     std::vector<std::thread> Threads; // still doesn't work, remember void functions and their returns, etc.
@@ -281,6 +302,7 @@ void ThreadFunction::threadFILE(const std::string& ResultFileLocation){
         }
         File7.close();
         File8.close();
+        File4.close();
         File2=std::ofstream(ResultFileLocation+"result.cc");
         File1=std::ifstream(ResultFileLocation+"tempresult.cc0");
     }
@@ -312,6 +334,7 @@ void ThreadFunction::threadFILE(const std::string& ResultFileLocation){
         }
         File7.close();
         File8.close();
+        File3.close();
         File5=std::ofstream(ResultFileLocation+"result.cc");
         File6=std::ifstream(ResultFileLocation+"tempresult.cc0");
     }
@@ -339,10 +362,13 @@ void ThreadFunction::threadFILE(const std::string& ResultFileLocation){
     while(getline(File9,C)){
         V.push_back(C);
     }
-
+    File9.close();
     std::ofstream File10(ResultFileLocation+"result.cc");
     File10<<"#include <thread>"<<std::endl;
     for(const auto& it:V){
         File10 << it <<std::endl;
     }
+    File10.close();
+    //std::string c1=ResultFileLocation +"result.cc";
+    //std::filesystem::remove(c1.c_str());
 }
