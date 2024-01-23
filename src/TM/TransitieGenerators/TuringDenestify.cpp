@@ -85,7 +85,6 @@ void TuringDenestify::createNewFunction(IncompleteSet &a) {
 
     tools->write_function_header(create_function, get_tuple_index());
 
-
     //checks if function is part of a class
     //if part of class go to H marker tuple tapes
     //call own store function

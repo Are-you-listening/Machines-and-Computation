@@ -450,8 +450,9 @@ void GUI::fixTabs() {
 
     output_text = output;
     output.clear();
+    output = "";
     start = true;
-    string tab;
+    string tab = "";
     for(char c: output_text){
         bool add = c == '{';
         bool remove = c == '}';
@@ -461,13 +462,21 @@ void GUI::fixTabs() {
         }
 
         if (remove){
-            for (int j =0; j<4; j++){
-                tab.pop_back();
+            if (tab.size() > 4){
+                for (int j =0; j<4; j++){
+                    tab.pop_back();
+                }
+            }else{
+                tab.clear();
             }
+
         }
 
         if (start){
-            output += tab;
+            if (tab.size() != 0){
+                output += tab;
+            }
+
         }
 
         if ('\n' == c){
@@ -496,6 +505,11 @@ void GUI::save() {
 void GUI::loadDemo(const string &name) {
 
     ifstream o{name};
+
+    for (int i = 0; i<max_char; i++){
+        input_text[i] = '\u0000';
+    }
+
     int counter = 0;
     while (!o.eof() && o.good()){
         input_text[counter] = (char) o.get();

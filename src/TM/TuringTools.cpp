@@ -2492,7 +2492,6 @@ void TuringTools::write_function_header(IncompleteSet &a, const vector<int>&tupl
     go_to(write_function_header, {'S'}, 0, -1, {0,1});
 
 
-
     //we dont store spaces as token for arguments
     IncompleteSet if_definer{"if_definer_"+ to_string(counter), "if_definer_"+ to_string(counter)};
     counter++;
@@ -2507,8 +2506,25 @@ void TuringTools::write_function_header(IncompleteSet &a, const vector<int>&tupl
     push(stack_loop, stack_sep);
 
 
+    string loop_point = stack_loop.to_state;
     //go to space seperating type with var
-    go_to_multiple(stack_loop, {{'E'},{','}}, {0, 1}, 1, {0,1});
+    go_to_multiple(stack_loop, {{'E'},{',', '<'}}, {0, 1}, 1, {0,1});
+
+    //in case of '<' go to '>' ignoring the commas in between
+    IncompleteSet onTemplateType{"onTemplateType_"+to_string(counter), "onTemplateType_"+to_string(counter)};
+    counter++;
+    skip_nesting(onTemplateType, stack_tape, 1, 1, 1, {0,1}, '<', '>');
+    IncompleteTransition toStartStackLoop;
+    toStartStackLoop.state = onTemplateType.to_state;
+    toStartStackLoop.to_state = loop_point;
+    toStartStackLoop.def_move = 0;
+
+    onTemplateType.to_state = "unreached";
+
+    onTemplateType.transitions.push_back(toStartStackLoop);
+
+    link_on(stack_loop, onTemplateType, {'<'}, {1});
+
     go_to(stack_loop, {' '}, 1, -1, {0,1});
 
     move(stack_loop, {0,1}, 1);
