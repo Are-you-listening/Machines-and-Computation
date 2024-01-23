@@ -512,7 +512,11 @@ void GUI::loadDemo(const string &name) {
 
     int counter = 0;
     while (!o.eof() && o.good()){
-        input_text[counter] = (char) o.get();
+        char c = (char) o.get();
+        if (c == '\377'){
+            break;
+        }
+        input_text[counter] = c;
         counter++;
     }
 

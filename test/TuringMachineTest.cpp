@@ -156,7 +156,7 @@ TEST(TuringMachineTest, TM_tools){
 }
 
 TEST(TuringMachineTest, TM_tokenazation) {
-    int index = 77;
+    int index = 80;
     ifstream test_file("../test/testFiles/TM_test_"+ to_string(index)+".cpp");
     string test_string;
     cout << test_file.is_open() << endl;
@@ -170,7 +170,7 @@ TEST(TuringMachineTest, TM_tokenazation) {
     //test_string = "class base{}; class derived{int test(){};int taco(){};}";
     // not in real use yet
     TuringTools::reset();
-    auto t = new TMBuilder(4, true, 2, 4);
+    auto t = new TMBuilder(4, true, 2, 3);
     TMBuilder_output data = t->generateTM();
     //ofstream o("output/TM_test.json");
     //o << data;
@@ -179,7 +179,7 @@ TEST(TuringMachineTest, TM_tokenazation) {
     tm.load_input(test_string, 1);
 
     int halted_time = -1;
-    for (int i = 0; i<400000; i++){
+    for (int i = 0; i<800000; i++){
 
         if (tm.isHalted()){
             if (halted_time == -1){

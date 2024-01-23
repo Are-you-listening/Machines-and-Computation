@@ -22,6 +22,9 @@ IncompleteSet TuringDenestify::deNestify() {
 
     string end_denesting = tools->branch_on(result, {'\u0000'}, {get_tuple_index()[1]});
 
+    IncompleteSet b{"br", "br2"};
+    //tools->link(result, b);
+
     tools->go_to(result, {'N', 'A', 'V'}, get_tuple_index()[0], -1, get_tuple_index());
 
 
