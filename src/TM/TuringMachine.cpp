@@ -8,6 +8,7 @@
 
 std::mutex mutex_x;
 std::mutex mutex_counter;
+std::mutex mutex_debug;
 
 TuringMachine::TuringMachine(const string &path) {
     storage_in_state_size = 0;
@@ -426,7 +427,7 @@ void TuringMachine::singleTapeProd(IncompleteSet &new_transitions, const string 
             store.input_index = {i*2+new_control, i*2+new_control+1};
 
             char new_token = 'X';
-            if (usefull.find(i) != usefull.end()){
+            if (usefullUpper.find(i) != usefullUpper.end()){
                 new_token = 'P';
             }
 
@@ -483,6 +484,7 @@ void TuringMachine::singleTapeProd(IncompleteSet &new_transitions, const string 
 
 
         //soon_merging = {};
+
         for (int i =0; i<tapes.size(); i++){
             auto self = usefull.find(i);
             if (self == usefull.end()){
@@ -587,18 +589,54 @@ void TuringMachine::singleTapeProd(IncompleteSet &new_transitions, const string 
             loop_state2.def_move = -1;
             //new_transitions.transitions.push_back(loop_state2);
 
-            IncompleteTransition move_marker_back;
-            move_marker_back.state = k+"_mark"+ to_string(local_count)+"_"+ to_string(i);
-            move_marker_back.to_state = to;
-            move_marker_back.def_move = -1*prod.production.movement[i];
 
-            move_marker_back.output = {'\u0004', 'X'};
-            move_marker_back.output_index = {i+1, i*2+new_control};
-            move_marker_back.move = {-1*prod.production.movement[i], -1*prod.production.movement[i]};
+            if (prod.production.movement[i] < 0){
 
-            trans_incomp.push_back(move_marker_back);
+
+                for (int w=0; w<-1*prod.production.movement[i]; w++){
+                    IncompleteTransition move_marker_back;
+                    string temp_from = "";
+                    if (w > 0){
+                        temp_from += "_"+ to_string(w);
+                    }
+                    move_marker_back.state = k+"_mark"+ to_string(local_count)+"_"+ to_string(i)+temp_from;
+                    string temp_to = to;
+                    if (w+1 < -1*prod.production.movement[i]){
+                        temp_to = k+"_mark"+ to_string(local_count)+"_"+ to_string(i)+"_"+to_string(w+1);
+                    }
+                    move_marker_back.to_state = temp_to;
+                    move_marker_back.def_move = 1;
+
+                    if (w == 0){
+                        move_marker_back.output = {'\u0004', 'X', 'N'};
+                        move_marker_back.output_index = {i+1, i*2+new_control, mark_track};
+                        move_marker_back.move = {1, 1, 1};
+                    } else{
+                        move_marker_back.output = {'N'};
+                        move_marker_back.output_index = {mark_track};
+                        move_marker_back.move = {1};
+                    }
+
+
+                    trans_incomp.push_back(move_marker_back);
+                }
+            }else{
+                IncompleteTransition move_marker_back;
+                move_marker_back.state = k+"_mark"+ to_string(local_count)+"_"+ to_string(i);
+                move_marker_back.to_state = to;
+                move_marker_back.def_move = -1*prod.production.movement[i];
+
+                move_marker_back.output = {'\u0004', 'X'};
+                move_marker_back.output_index = {i+1, i*2+new_control};
+                move_marker_back.move = {-1*prod.production.movement[i], -1*prod.production.movement[i]};
+
+                trans_incomp.push_back(move_marker_back);
+            }
+
+
 
         }
+
 
 
         //all_store_options = tools->mergeToSingle(soon_merging);
@@ -618,11 +656,11 @@ void TuringMachine::singleTapeProd(IncompleteSet &new_transitions, const string 
         for (int c = 0; c <new_control; c++){
             toNextMode.output.push_back('\u0002');
             toNextMode.output_index.push_back(c);
-            toNextMode.move.push_back(0);
+            toNextMode.move.push_back(1);
         }
 
         toNextMode.to_state = prod.production.new_state;
-        toNextMode.def_move = 0;
+        toNextMode.def_move = 1;
 
         trans_incomp.push_back(toNextMode);
     }

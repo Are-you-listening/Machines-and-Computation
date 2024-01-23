@@ -50,7 +50,7 @@ TMBuilder_output TMBuilder::generateTM() {
     IncompleteSet breaker{"breaker", "breaker2"};
     //tools->link(program, breaker);
 
-
+    /*
     if (if_else_anti){
         TuringIfElseAntiNesting ifElse{(int) tapes-5, split_nesting, max_nesting};
         IncompleteSet if_else_program = ifElse.getTransitions();
@@ -75,7 +75,7 @@ TMBuilder_output TMBuilder::generateTM() {
     re_heap.def_move = 0;
 
     program.transitions.push_back(re_heap);
-
+    */
     for (auto incomp: program.transitions){
         Transition t = tools->make_transition(incomp, tapes);
 

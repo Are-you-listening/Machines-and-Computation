@@ -156,7 +156,7 @@ TEST(TuringMachineTest, TM_tools){
 }
 
 TEST(TuringMachineTest, TM_tokenazation) {
-    int index = 80;
+    int index = 81;
     ifstream test_file("../test/testFiles/TM_test_"+ to_string(index)+".cpp");
     string test_string;
     cout << test_file.is_open() << endl;
@@ -179,7 +179,7 @@ TEST(TuringMachineTest, TM_tokenazation) {
     tm.load_input(test_string, 1);
 
     int halted_time = -1;
-    for (int i = 0; i<800000; i++){
+    for (int i = 0; i<330; i++){
 
         if (tm.isHalted()){
             if (halted_time == -1){
@@ -193,7 +193,7 @@ TEST(TuringMachineTest, TM_tokenazation) {
 
         }
 
-        if (i >= 411940000){
+        if (i >= 320000000){
             int j = 0;
 
             for (int i = 0; i < tm.getTapeAmount(); i++){
@@ -337,8 +337,8 @@ TEST(TuringMachineTest, TM_single_tape) {
 }
 
 TEST(TuringMachineTest, TM_single_tape_2){
-    /*
-    int index = 9;
+
+    int index = 81;
     ifstream test_file("../test/testFiles/TM_test_"+ to_string(index)+".cpp");
     string test_string;
     cout << test_file.is_open() << endl;
@@ -349,7 +349,7 @@ TEST(TuringMachineTest, TM_single_tape_2){
     }
 
     TuringTools::reset();
-    auto t = new TMBuilder(4, 2, 4, true);
+    auto t = new TMBuilder(4, 2, 3, true);
     TMBuilder_output data = t->generateTM();
     //ofstream o("output/TM_test.json");
     //o << data;
@@ -369,7 +369,7 @@ TEST(TuringMachineTest, TM_single_tape_2){
     cout << tm.getProductions().size() << endl;
 
     int halted_time = -1;
-    for (int i = 0; i<50000; i++){
+    for (int i = 0; i<1000000; i++){
 
 
         if (tm.isHalted()){
@@ -381,15 +381,10 @@ TEST(TuringMachineTest, TM_single_tape_2){
         }
         tm.move();
 
-
-        if (i >= 246800000){
-            int j = 0;
-
-            for (int i = 0; i < tm.getTapeAmount(); i++){
-                cout << tm.getTapeData(i) << endl;
-            }
-            cout << endl;
-        }
+        /*
+        if (i >= 5400){
+            cout << "i "<<i<<" state " << tm.getCurrentState() << endl;
+        }*/
     }
 
     cout << endl;
@@ -429,7 +424,7 @@ TEST(TuringMachineTest, TM_single_tape_2){
     ofstream out{"../test/results/TM_test_"+ to_string(index)+".cpp"};
     out << tm.exportTapeData(1);
     out.close();
-    */
+
 }
 
 TEST(TuringMachineTest, TM_builder_2){
