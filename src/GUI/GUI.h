@@ -59,6 +59,8 @@ private:
     void threading_check();
 
     void save();
+
+    void loadDemo(const string& name);
 };
 
 #endif //TOG_GUI_H
