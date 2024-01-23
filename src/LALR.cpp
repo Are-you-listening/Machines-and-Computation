@@ -474,6 +474,7 @@ void LALR::parse(std::vector<std::tuple<std::string, std::string, std::set<std::
     auto inputcopy = input;
     _root->addTokens(inputcopy);
     std::cout << "done parsing" << endl;
+    generateParseTreeImage("parseTree.dot");
 }
 
 void LALR::printTable() {
@@ -1056,12 +1057,12 @@ ParseTree::ParseTree(const vector<ParseTree *> &children, const string &symbol,
                      const tuple<string, string, set<string>> &token): children(children),symbol(symbol),token(token) {}
 
 void ParseTree::generateDot(ostream &out) {
-    if (children.empty()) {
-        out << "  " << '"' << this << '"' << " [label=\"" << get<1>(token) << "\"";
-    } else {
-        out << "  " << '"' << this << '"' << " [label=\"" << symbol << "\"";
-    }
-    // out << "  " << '"' << this << '"' << " [label=\"" << symbol << "\"";
+    //if (children.empty()) {
+    //    out << "  " << '"' << this << '"' << " [label=\"" << get<1>(token) << "\"";
+    //} else {
+    //    out << "  " << '"' << this << '"' << " [label=\"" << symbol << "\"";
+    //}
+     out << "  " << '"' << this << '"' << " [label=\"" << symbol << "\"";
     if (children.empty()){
         out << ", color=\"red\", style=\"filled\", fillcolor=\"coral\"";
     }
@@ -1082,7 +1083,7 @@ void LALR::generateParseTreeImage(const string filename) {
         dotFile.close();
 
         std::string dotCommand = "dot -Tpng " + filename + " -o " + filename.substr(0, filename.length()-4) + ".png";
-        std::cout << dotCommand << std::endl; //Cout command for validation
+        //std::cout << dotCommand << std::endl; //Cout command for validation
         system(dotCommand.c_str());
     }else{
         std::cout << "couldn't open file to generate parseTree image!" << std::endl;
