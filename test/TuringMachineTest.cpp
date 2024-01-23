@@ -179,7 +179,7 @@ TEST(TuringMachineTest, TM_tokenazation) {
     tm.load_input(test_string, 1);
 
     int halted_time = -1;
-    for (int i = 0; i<330; i++){
+    for (int i = 0; i<100000; i++){
 
         if (tm.isHalted()){
             if (halted_time == -1){
@@ -349,7 +349,7 @@ TEST(TuringMachineTest, TM_single_tape_2){
     }
 
     TuringTools::reset();
-    auto t = new TMBuilder(4, 2, 3, true);
+    auto t = new TMBuilder(4, true, 2, 3);
     TMBuilder_output data = t->generateTM();
     //ofstream o("output/TM_test.json");
     //o << data;
@@ -366,10 +366,9 @@ TEST(TuringMachineTest, TM_single_tape_2){
     tm = *tw;
 
     cout << "created" << endl;
-    cout << tm.getProductions().size() << endl;
 
     int halted_time = -1;
-    for (int i = 0; i<1000000; i++){
+    for (int i = 0; i<10000000; i++){
 
 
         if (tm.isHalted()){

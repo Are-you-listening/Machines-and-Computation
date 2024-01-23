@@ -256,6 +256,8 @@ TuringMachine* TuringMachine::toSingleTape() {
     start.def_move = -1;
     new_transitions.transitions.push_back(start);
 
+    vector<vector<IncompleteTransition>> add_list;
+
     vector<thread> t_list;
     for (auto [k, v]: trans_map){
 
@@ -268,10 +270,10 @@ TuringMachine* TuringMachine::toSingleTape() {
             }
 
             //here stuff
-            auto t = thread{[this, &new_transitions, k, v, &counter, &mark_track, &new_control, &storage_in_state_indexes, &none_moving] (){ singleTapeProd(new_transitions, k, v, counter, mark_track, new_control, storage_in_state_indexes, none_moving);}};
+            auto t = thread{[this, &add_list, k, v, &counter, &mark_track, &new_control, &storage_in_state_indexes, &none_moving] (){ singleTapeProd(add_list, k, v, counter, mark_track, new_control, storage_in_state_indexes, none_moving);}};
             t_list.push_back(std::move(t));
         }else{
-            singleTapeProd(new_transitions, k, v, counter, mark_track, new_control, storage_in_state_indexes, none_moving);
+            singleTapeProd(add_list, k, v, counter, mark_track, new_control, storage_in_state_indexes, none_moving);
         }
 
 
@@ -285,8 +287,8 @@ TuringMachine* TuringMachine::toSingleTape() {
     cout << "done" << endl;
 
     vector<Transition> real_transitions;
-    real_transitions.reserve(new_transitions.transitions.size()+1);
-    for (auto incomp: new_transitions.transitions){
+    real_transitions.reserve(new_transitions.transitions.size()+1+add_list.size());
+    for (auto& incomp: new_transitions.transitions){
         Transition t = tools->make_transition(incomp, new_control+tapes.size()*2+1);
 
         real_transitions.push_back(t);
@@ -294,6 +296,18 @@ TuringMachine* TuringMachine::toSingleTape() {
         //json production = add_transition(t);
         //TM_data["Productions"].push_back(production);
     }
+    for (auto& a:add_list){
+        for (auto& incomp: a){
+            Transition t = tools->make_transition(incomp, new_control+tapes.size()*2+1);
+
+            real_transitions.push_back(t);
+
+            //json production = add_transition(t);
+            //TM_data["Productions"].push_back(production);
+        }
+    }
+
+
 
     output_tm->load({}, start.state, "", tapes.size()*2+1, real_transitions);
 
@@ -384,7 +398,7 @@ bool TuringMachine::isSingleTape() const {
     return single_tape;
 }
 
-void TuringMachine::singleTapeProd(IncompleteSet &new_transitions, const string& k, const vector<Transition>& v, int& counter, const int& mark_track,
+void TuringMachine::singleTapeProd(vector<vector<IncompleteTransition>>& new_transitions, const string& k, const vector<Transition>& v, int& counter, const int& mark_track,
                                    const int& new_control, const vector<int>& storage_in_state_indexes, const vector<int>& none_moving){
     vector<IncompleteTransition> trans_incomp;
     if (v.size() <= 3){
@@ -681,6 +695,6 @@ void TuringMachine::singleTapeProd(IncompleteSet &new_transitions, const string&
     }
 
     mutex_x.lock();
-    new_transitions.transitions.insert(new_transitions.transitions.begin(), make_move_iterator(trans_incomp.begin()), make_move_iterator(trans_incomp.end()));
+    new_transitions.push_back(std::move(trans_incomp));
     mutex_x.unlock();
 }

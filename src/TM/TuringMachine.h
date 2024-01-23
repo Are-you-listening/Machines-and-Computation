@@ -62,7 +62,7 @@ private:
 
     bool single_tape = false;
 
-    void singleTapeProd(IncompleteSet& new_transitions, const string& k, const vector<Transition>& v, int& counter, const int& mark_track, const int& new_control, const vector<int>& storage_in_state_indexes, const vector<int>& none_moving);
+    void singleTapeProd(vector<vector<IncompleteTransition>>& new_transitions, const string& k, const vector<Transition>& v, int& counter, const int& mark_track, const int& new_control, const vector<int>& storage_in_state_indexes, const vector<int>& none_moving);
 
 };
 
