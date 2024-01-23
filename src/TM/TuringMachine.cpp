@@ -259,15 +259,23 @@ TuringMachine* TuringMachine::toSingleTape() {
     vector<thread> t_list;
     for (auto [k, v]: trans_map){
 
-        if (t_list.size() == 10){
-            auto d = std::move(t_list[0]);
-            d.join();
-            t_list.erase(t_list.begin());
+
+        if (v.size() > 4){
+            if (t_list.size() == 10){
+                auto d = std::move(t_list[0]);
+                d.join();
+                t_list.erase(t_list.begin());
+            }
+
+            //here stuff
+            auto t = thread{[this, &new_transitions, k, v, &counter, &mark_track, &new_control, &storage_in_state_indexes, &none_moving] (){ singleTapeProd(new_transitions, k, v, counter, mark_track, new_control, storage_in_state_indexes, none_moving);}};
+            t_list.push_back(std::move(t));
+        }else{
+            singleTapeProd(new_transitions, k, v, counter, mark_track, new_control, storage_in_state_indexes, none_moving);
         }
 
-        //here stuff
-        auto t = thread{[this, &new_transitions, k, v, &counter, mark_track, &new_control, &storage_in_state_indexes, &none_moving] (){ singleTapeProd(new_transitions, k, v, counter, mark_track, new_control, storage_in_state_indexes, none_moving);}};
-        t_list.push_back(std::move(t));
+
+
 
     }
     for (auto& t: t_list){
@@ -277,6 +285,7 @@ TuringMachine* TuringMachine::toSingleTape() {
     cout << "done" << endl;
 
     vector<Transition> real_transitions;
+    real_transitions.reserve(new_transitions.transitions.size()+1);
     for (auto incomp: new_transitions.transitions){
         Transition t = tools->make_transition(incomp, new_control+tapes.size()*2+1);
 
@@ -375,9 +384,15 @@ bool TuringMachine::isSingleTape() const {
     return single_tape;
 }
 
-void TuringMachine::singleTapeProd(IncompleteSet &new_transitions, const string k, const vector<Transition> v, int& counter, const int& mark_track,
+void TuringMachine::singleTapeProd(IncompleteSet &new_transitions, const string& k, const vector<Transition>& v, int& counter, const int& mark_track,
                                    const int& new_control, const vector<int>& storage_in_state_indexes, const vector<int>& none_moving){
     vector<IncompleteTransition> trans_incomp;
+    if (v.size() <= 3){
+        trans_incomp.reserve(10);
+    }else{
+        trans_incomp.reserve(50);
+    }
+
 
     //later skip store part for same state
     IncompleteTransition loop_state;
@@ -389,7 +404,7 @@ void TuringMachine::singleTapeProd(IncompleteSet &new_transitions, const string 
     loop_state.output_index = {mark_track};
     loop_state.move = {1};
 
-    trans_incomp.push_back(loop_state);
+    trans_incomp.push_back(std::move(loop_state));
 
     set<int> usefullUpper = getUsefullIndexesParent(v);
 
@@ -407,7 +422,7 @@ void TuringMachine::singleTapeProd(IncompleteSet &new_transitions, const string 
             epsilon.state = k;
             epsilon.to_state = prod.production.new_state;
             epsilon.def_move = 0;
-            trans_incomp.push_back(epsilon);
+            trans_incomp.push_back(std::move(epsilon));
 
             continue;
         }
@@ -442,7 +457,7 @@ void TuringMachine::singleTapeProd(IncompleteSet &new_transitions, const string 
         }
 
         auto all_store_options = TuringTools::mergeToSingle(soon_merging);
-        trans_incomp.insert(trans_incomp.begin(), all_store_options.begin(), all_store_options.end());
+        trans_incomp.insert(trans_incomp.begin(), make_move_iterator(all_store_options.begin()), make_move_iterator(all_store_options.end()));
 
         string write_state = k+"_write"+ to_string(local_count);
         IncompleteTransition toWriteMode;
@@ -469,7 +484,7 @@ void TuringMachine::singleTapeProd(IncompleteSet &new_transitions, const string 
         toWriteMode.to_state = write_state;
         toWriteMode.def_move = 0;
 
-        trans_incomp.push_back(toWriteMode);
+        trans_incomp.push_back(std::move(toWriteMode));
 
         IncompleteTransition loop_state3;
         loop_state3.state = write_state;
@@ -480,7 +495,7 @@ void TuringMachine::singleTapeProd(IncompleteSet &new_transitions, const string 
         loop_state3.output_index = {mark_track};
         loop_state3.move = {-1};
 
-        trans_incomp.push_back(loop_state3);
+        trans_incomp.push_back(std::move(loop_state3));
 
 
         //soon_merging = {};
@@ -499,7 +514,7 @@ void TuringMachine::singleTapeProd(IncompleteSet &new_transitions, const string 
                     cleanup.output = {'X'};
                     cleanup.output_index = {i*2+new_control};
                     cleanup.move = {0};
-                    trans_incomp.push_back(cleanup);
+                    trans_incomp.push_back(std::move(cleanup));
                 }
                 continue;
             }
@@ -548,7 +563,7 @@ void TuringMachine::singleTapeProd(IncompleteSet &new_transitions, const string 
             write.control_increase = {0};
             write.increase_amount = {-1};
             //soon_merging.insert(write);
-            trans_incomp.push_back(write);
+            trans_incomp.push_back(std::move(write));
 
             IncompleteTransition toCheckMode;
             toCheckMode.state = write_state;
@@ -556,7 +571,7 @@ void TuringMachine::singleTapeProd(IncompleteSet &new_transitions, const string 
             toCheckMode.def_move = 0;
             toCheckMode.input = {'P'};
             toCheckMode.input_index = {i*2+new_control};
-            trans_incomp.push_back(toCheckMode);
+            trans_incomp.push_back(std::move(toCheckMode));
 
             if (from != write_state){
                 IncompleteTransition write_skip;
@@ -618,7 +633,7 @@ void TuringMachine::singleTapeProd(IncompleteSet &new_transitions, const string 
                     }
 
 
-                    trans_incomp.push_back(move_marker_back);
+                    trans_incomp.push_back(std::move(move_marker_back));
                 }
             }else{
                 IncompleteTransition move_marker_back;
@@ -666,6 +681,6 @@ void TuringMachine::singleTapeProd(IncompleteSet &new_transitions, const string 
     }
 
     mutex_x.lock();
-    new_transitions.transitions.insert(new_transitions.transitions.begin(), trans_incomp.begin(), trans_incomp.end());
+    new_transitions.transitions.insert(new_transitions.transitions.begin(), make_move_iterator(trans_incomp.begin()), make_move_iterator(trans_incomp.end()));
     mutex_x.unlock();
 }
