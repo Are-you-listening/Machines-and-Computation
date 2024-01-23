@@ -57,6 +57,8 @@ private:
     int move_counter = 0;
 
     void threading_check();
+
+    void save();
 };
 
 #endif //TOG_GUI_H

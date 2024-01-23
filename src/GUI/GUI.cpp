@@ -228,7 +228,7 @@ void GUI::Config() {
 
                 if (threading){
                     threading_check();
-                    ifstream readThread{"result.cc"};
+                    ifstream readThread{"output/result.cppresult.cc"};
                     string text;
                     while (!readThread.eof()){
                         text += (char) readThread.get();
@@ -236,7 +236,7 @@ void GUI::Config() {
 
                     output_text = text;
                 }
-
+                save();
             }else{
                 if (single_tape){
                     if (!tm_machine.isSingleTape()){
@@ -258,6 +258,8 @@ void GUI::Config() {
                 tm_machine.load_input(text_string, 1);
             }
         }
+
+
 
     }
 
@@ -310,6 +312,7 @@ void GUI::Config() {
             tm_busy = false;
             output_text = tm_machine.exportTapeData(1);
             fixTabs();
+            save();
         }
     }
 
@@ -403,8 +406,7 @@ GUI::~GUI() {
 void GUI::threading_check() {
     Orchestrator::tabber(); //Cleanup output file; match tabs & spaces
     if(Config::getConfig()->isThreading()){
-        ThreadFunction::threadFILE("result.cpp");
-        Orchestrator::threadingTest(); //Perform a speed test
+        ThreadFunction::threadFILE("output/result.cpp");
     }
 
 
@@ -461,4 +463,15 @@ void GUI::fixTabs() {
         output.push_back(c);
     }
     output_text = output;
+}
+
+void GUI::save() {
+    ofstream before{"GUI_before.cpp"};
+    before << input_text;
+    before.close();
+
+    ofstream after{"GUI_after.cpp"};
+    after << output_text;
+    after.close();
+
 }
