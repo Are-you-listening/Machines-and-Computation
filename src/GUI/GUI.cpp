@@ -323,6 +323,23 @@ void GUI::Config() {
         tm_b = new TMBuilder(tuple_size, if_else_antinesting, split_nesting, max_nesting);
     }
 
+    if (ImGui::Button("load F1 (class)")){
+        loadDemo("demo/class.cpp");
+    }
+
+    if (ImGui::Button("load F2 (combination)")){
+        loadDemo("demo/combination.cpp");
+    }
+    if (ImGui::Button("load F3 (forif)")){
+        loadDemo("demo/forif.cpp");
+    }
+    if (ImGui::Button("load F4 (main)")){
+        loadDemo("demo/main.cpp");
+    }
+    if (ImGui::Button("load F5 (variables)")){
+        loadDemo("demo/variables.cpp");
+    }
+
 
     ImGui::End();
 
@@ -473,5 +490,16 @@ void GUI::save() {
     ofstream after{"GUI_after.cpp"};
     after << output_text;
     after.close();
+
+}
+
+void GUI::loadDemo(const string &name) {
+
+    ifstream o{name};
+    int counter = 0;
+    while (!o.eof() && o.good()){
+        input_text[counter] = (char) o.get();
+        counter++;
+    }
 
 }
