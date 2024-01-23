@@ -487,6 +487,9 @@ void LALR::printTable() {
 }
 
 void LALR::generate() {
+
+    generateParseTreeImage("debug");
+
     const unsigned long split = Config::getConfig()->getSplitNesting()+1;
     const unsigned long max = Config::getConfig()->getMaxNesting()+1;
     unsigned long count = 0;
@@ -501,6 +504,7 @@ void LALR::generate() {
     _root->cleanIncludeTypedefs(new_rootKids); //Collect includes
 
     _root->matchBrackets(_cfg.getT()); //Format first
+    generateParseTreeImage("d2ebug");
     _root->findViolation(max,split,count,index,violator,_cfg.getT(),found,lastFunction); //Check for violations
     lastFunction = _root->findRoot(lastFunction,_cfg.getT()); //We need to insert it in the root
 
@@ -522,10 +526,13 @@ void LALR::generate() {
 
         vector<ParseTree *> newKids;
 
-        for (long unsigned int i = 0; i<=index; ++i) { //Pushback firsthalf of kids
-            ParseTree *child = violator->children[i];
-            newKids.push_back(child);
-        }
+        //if(index!=0){
+            for (long unsigned int i = 0; i<=index; ++i) { //Pushback firsthalf of kids
+                ParseTree *child = violator->children[i];
+                newKids.push_back(child);
+            }
+        //}
+
         //if(newKids!= empty())
         //get<1>(newKids[newKids.size()-1]->token)+="{";
 
@@ -559,6 +566,7 @@ void LALR::generate() {
         }
 
         newKids.push_back(functionCall(function(createFrom,result2,functionName,lastFunction))); //Create the new function in the root and add its functionCall()
+
         functionName+="A";
         newKids.push_back(violator->children[index]);
 
@@ -569,12 +577,23 @@ void LALR::generate() {
         violator->children = newKids; //Set children (now with functionCall)
 
         //Recheck everything
+
+        if(functionName=="AAA"){
+            generateParseTreeImage("d4ebug");
+            //break;
+        }
+
         recheck:
         violator= nullptr;
         lastFunction = nullptr;
         count = 0;
+        index = NULL;
         found = false;
         _root->findViolation(max,split,count,index,violator,_cfg.getT(), found,lastFunction); //Check for more violations
+        if(count<split){
+            violator= nullptr;
+            break;
+        }
         lastFunction = _root->findRoot(lastFunction,_cfg.getT()); //We need to insert it in the root
     }
 
@@ -782,6 +801,8 @@ void ParseTree::findViolation(const unsigned long &max,const unsigned long &spli
 
         if(get<0>(child->token)=="{") { //Found nesting
             ++count;
+            std::cout << count << std::endl;
+
             if (count == split) {
                 Rviolator = this;
                 index = i;
@@ -805,14 +826,17 @@ void ParseTree::findViolation(const unsigned long &max,const unsigned long &spli
             
         }else if(get<0>(child->token)=="}"){ //Didn't reach max but did found matching; should now decrease?
             --count; //Is this right?
-            if(!found){
+            std::cout << count << std::endl;
+            /*if(!found){
                 if(Rviolator!= nullptr && count<split){
                     Rviolator = nullptr;
                     found = true;
                 }
-            }
+            }*/
         }
     }
+
+
     //--count;
     // Reset the count how?
     //Nothing more to handle
@@ -1083,7 +1107,7 @@ void LALR::generateParseTreeImage(const string filename) {
         dotFile.close();
 
         std::string dotCommand = "dot -Tpng " + filename + " -o " + filename.substr(0, filename.length()-4) + ".png";
-        //std::cout << dotCommand << std::endl; //Cout command for validation
+        std::cout << dotCommand << std::endl; //Cout command for validation
         system(dotCommand.c_str());
     }else{
         std::cout << "couldn't open file to generate parseTree image!" << std::endl;

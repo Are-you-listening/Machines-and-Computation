@@ -18,6 +18,7 @@ void Orchestrator::tabber() {
         }
         V10.push_back(C10);
     }
+    File910.close();
 
 
     std::ofstream File1010("output/result.cpp");
@@ -38,7 +39,6 @@ void Orchestrator::tabber() {
             }
         }
     }
-    File910.close();
     File1010.close();
 }
 
