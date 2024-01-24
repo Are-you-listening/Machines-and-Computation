@@ -238,11 +238,6 @@ void GUI::Config() {
                 }
                 save();
             }else{
-                if (single_tape){
-                    if (!tm_machine.isSingleTape()){
-                        tm_machine = *tm_machine.toSingleTape();
-                    }
-                }
 
                 tm_busy = true;
                 move_counter = 0;
@@ -253,9 +248,22 @@ void GUI::Config() {
 
                 auto data = tm_b->generateTM();
 
-                tm_machine.clear(true);
-                tm_machine.load(data.states, data.start_state, data.input, data.tape_size, data.productions);
-                tm_machine.load_input(text_string, 1);
+                if (single_tape){
+                    tm_machine.clear(true);
+                    tm_machine.load(data.states, data.start_state, data.input, data.tape_size, data.productions);
+                    tm_machine.setSingleTape(false);
+                    tm_machine.load_input(text_string, 1);
+                    if (!tm_machine.isSingleTape()){
+                        tm_machine = *tm_machine.toSingleTape();
+                    }
+                }
+
+                if (!single_tape){
+                    tm_machine.clear(true);
+                    tm_machine.load(data.states, data.start_state, data.input, data.tape_size, data.productions);
+                    tm_machine.load_input(text_string, 1);
+                }
+
             }
         }
 
@@ -310,7 +318,11 @@ void GUI::Config() {
 
         if (tm_machine.isHalted()){
             tm_busy = false;
-            output_text = tm_machine.exportTapeData(1);
+            int index = 1;
+            if (tm_machine.isSingleTape()){
+                index = 3;
+            }
+            output_text = tm_machine.exportTapeData(index);
             fixTabs();
             save();
         }
@@ -338,6 +350,16 @@ void GUI::Config() {
     }
     if (ImGui::Button("load F5 (variables)")){
         loadDemo("demo/variables.cpp");
+    }
+
+    if (tm){
+        if (ImGui::Button("load F6 (singletape)")){
+            loadDemo("demo/singletape.cpp");
+        }
+
+        if (ImGui::Button("load F7 (ifElseAntinesting)")){
+            loadDemo("demo/ifElseAntinestingTM.cpp");
+        }
     }
 
 
@@ -379,14 +401,19 @@ void GUI::TMEmulator() {
 
     draw_list->AddText(ImVec2{widget_pos.x+ (int)(default_offset_x*1.1), widget_pos.y+(int)(default_offset_y*0.5)},ImColor(1.0f, 1.0f, 1.00f, 1.00f), moves_string.c_str());
 
+
+    float size_y = size.y/5.0*9.0/(double)tapes_amount;
+    float size_x = size.y/5.0*9.0/(double)tapes_amount;
+
     for (int j= 0; j<tapes_amount; j++){
-        float size_y = size.y/5.0;
-        float offset_y = j*0.07*size.y*4+ default_offset_y;
+
+
+        float offset_y = j*0.07*size.y*4*(9.0/(float)tapes_amount)+ default_offset_y;
 
         string tape_data = tm_machine.exportTapeData(j, true);
         int i_x = 0;
         for (int i= tm_machine.getTuringIndex(j)-10; i<blocks_per_tape+tm_machine.getTuringIndex(j)-10; i++, i_x++){
-            float size_x = size.y/5.0;
+
             float offset_x = i_x*size_x+ default_offset_x;
 
 
