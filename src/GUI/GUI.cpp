@@ -223,6 +223,7 @@ void GUI::Config() {
                 lalry.generate();
 
                 string out = lalry.getYield();
+
                 output_text = out;
                 fixTabs();
 
@@ -231,7 +232,11 @@ void GUI::Config() {
                     ifstream readThread{"output/result.cppresult.cc"};
                     string text;
                     while (!readThread.eof()){
-                        text += (char) readThread.get();
+                        char c = (char) readThread.get();
+                        if (c == '\377'){
+                            break;
+                        }
+                        text += c;
                     }
 
                     output_text = text;
