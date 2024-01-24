@@ -3668,7 +3668,7 @@ set<IncompleteTransition> TuringTools::mergeToSingle(const set<IncompleteTransit
     return out;
 }
 
-Transition TuringTools::make_transition(IncompleteTransition &incomp, int tapes) {
+Transition TuringTools::make_transition(IncompleteTransition &incomp, const int& tapes) {
     Transition transition;
     transition.state = incomp.state;
     vector<char> inputs;

@@ -5,7 +5,7 @@
 #include "TuringMachine.h"
 #include <thread>
 #include <mutex>
-
+#include <chrono>
 std::mutex mutex_x;
 std::mutex mutex_counter;
 std::mutex mutex_debug;
@@ -296,6 +296,8 @@ TuringMachine* TuringMachine::toSingleTape() {
         //json production = add_transition(t);
         //TM_data["Productions"].push_back(production);
     }
+    auto t0 = std::chrono::high_resolution_clock::now();
+
     for (auto& a:add_list){
         for (auto& incomp: a){
             Transition t = tools->make_transition(incomp, new_control+tapes.size()*2+1);
@@ -306,8 +308,10 @@ TuringMachine* TuringMachine::toSingleTape() {
             //TM_data["Productions"].push_back(production);
         }
     }
+    auto t1 = std::chrono::high_resolution_clock::now();
 
-
+    auto d = std::chrono::duration_cast<std::chrono::milliseconds>(t1-t0);
+    std::cout << d.count() << "ms" << endl;
 
     output_tm->load({}, start.state, "", tapes.size()*2+1, real_transitions);
 
@@ -425,7 +429,7 @@ void TuringMachine::singleTapeProd(vector<vector<IncompleteTransition>>& new_tra
     //later skip store part for same state
     for (const auto& prod: v){
         mutex_counter.lock();
-        cout << counter << endl;
+        cout << counter << '\n';
         counter++;
         int local_count = counter;
         mutex_counter.unlock();
