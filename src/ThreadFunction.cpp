@@ -83,7 +83,7 @@ void ThreadFunction::ThreadFunctionCall(const std::string& FileLocation, const s
     std::stringstream tempName;
     thread_name_lock.lock();
     tempName << std::hex << ThreadNameFunction;
-    std::string FunctionCall= "std::thread " + tempName.str() + "(" + FunctionName + ", ";
+    std::string FunctionCall= "std::thread " + tempName.str() +"([&](){" + FunctionName + "(  ";
     joins.push_back(tempName.str());
     ThreadNameFunction++;
     thread_name_lock.unlock();
@@ -112,11 +112,12 @@ void ThreadFunction::ThreadFunctionCall(const std::string& FileLocation, const s
     }
     for(unsigned long int i=0; i<copy.size(); i++){
         if(VusedVariables[0][i]!="a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3") {
-            FunctionCall += "std::ref(" + VusedVariables[0][i] + ")" + ", ";
+            FunctionCall += VusedVariables[0][i] + ", ";
         }
     }
     FunctionCall[FunctionCall.size()-2]=')';
     FunctionCall[FunctionCall.size()-1]=';';
+    FunctionCall+="});";
     std::fstream File(FileLocation);
     std::ofstream File2(FileLocation+"thread");
     std::string line2;
@@ -139,7 +140,7 @@ void ThreadFunction::ThreadFunctionCall(const std::string& FileLocation, const s
             tempName.str("");
             thread_name_lock.lock();
             tempName << std::hex << ThreadNameFunction;
-            FunctionCall= "std::thread " + tempName.str() + "(" + FunctionName + ", ";
+            FunctionCall= "std::thread " + tempName.str() +"([&](){" + FunctionName + "(  ";
             joins.push_back(tempName.str());
             ThreadNameFunction++;
             thread_name_lock.unlock();
@@ -147,12 +148,13 @@ void ThreadFunction::ThreadFunctionCall(const std::string& FileLocation, const s
             if(count<VusedVariables.size()-1){
                 for(unsigned long int i=0; i<copy.size(); i++){
                     if(VusedVariables[count][i]!="a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3"){
-                        FunctionCall+="std::ref("+VusedVariables[count][i]+")"+", ";
+                        FunctionCall+=VusedVariables[count][i]+", ";
                     }
                 }
             }
             FunctionCall[FunctionCall.size()-2]=')';
             FunctionCall[FunctionCall.size()-1]=';';
+            FunctionCall+="});";
         } else {
             File2 <<line2<< std::endl;
         }
@@ -249,9 +251,9 @@ void ThreadFunction::threadFILE(const std::string& ResultFileLocation){
             i=i.substr(1,std::string::npos);
         }
     }
-    std::vector<std::thread> Threads; // still doesn't work, remember void functions and their returns, etc.
+    std::vector<std::thread> Threads; 
     ThreadFunction threading; // maybe create a function that turns every function into a void one.
-    unsigned long int count=0; // I also assume calling join() on a thread that's already joined is not harmful.
+    unsigned long int count=0;
     for(const auto & i : FunctionCalls){
         if(core_amount!=0){
             std::filesystem::copy(ResultFileLocation,ResultFileLocation + std::to_string(count));
