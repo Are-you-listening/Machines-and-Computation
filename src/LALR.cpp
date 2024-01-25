@@ -508,7 +508,7 @@ void LALR::generate() {
         //Find difference: vSet - dSet = result
         std::set<std::string> vSet; //Contains V,I,e
         std::set<std::string> dSet;
-        violator->getTokenSet(vSet,dSet);
+        violator->children[index+1]->getTokenSet(vSet,dSet); //Don't use violator here, since violator might have children who don't have anything to do in the scope ( violator[index+1] is first child after "{"-child)
         std::set<std::string> result;
         std::set_difference(vSet.begin(), vSet.end(), dSet.begin(), dSet.end(), std::inserter(result, result.end()));
         std::set<string> result2;
