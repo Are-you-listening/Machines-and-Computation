@@ -73,7 +73,8 @@ int main() {
             text_string += c;
         }
 
-        auto tm_b = new TMBuilder(4, true, 2, 4);
+
+        auto tm_b = new TMBuilder(4, Config::getConfig()->getIfElseNesting(), Config::getConfig()->getSplitNesting(), Config::getConfig()->getMaxNesting());
         auto data = tm_b->generateTM();
         delete tm_b;
 
