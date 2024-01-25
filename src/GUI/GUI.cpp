@@ -358,6 +358,10 @@ void GUI::Config() {
         loadDemo("demo/variables.cpp");
     }
 
+    if (ImGui::Button("load F6 (knapsack)")){
+        loadDemo("demo/knapsack.cpp");
+    }
+
     if (tm){
         if (ImGui::Button("load F6 (singletape)")){
             loadDemo("demo/singletape.cpp");

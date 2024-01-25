@@ -31,28 +31,89 @@ int main() {
     //std::string Filelocation="demo/singletape.cpp";
     //std::string Filelocation="demo/variables.cpp";
 
-    std::thread Tokenizer(&Tokenisation::Tokenize, &tokenVector, Filelocation); // i ignore rvalues in function calls
-    core_amount--;
+    bool parse_tree = true;
+    if (parse_tree){
+        std::thread Tokenizer(&Tokenisation::Tokenize, &tokenVector, Filelocation); // i ignore rvalues in function calls
+        core_amount--;
 
-    //Construct GNF in parallel
-    Orchestrator("");
-    auto cfg = createCFG();
-    cfg->toGNF();
-    const CFG a = *cfg;
-    LALR lalr(a);
+        //Construct GNF in parallel
+        Orchestrator("");
+        auto cfg = createCFG();
+        cfg->toGNF();
+        const CFG a = *cfg;
+        LALR lalr(a);
 
-    Tokenizer.join(); core_amount++; //Join both operations
+        Tokenizer.join(); core_amount++; //Join both operations
 
-    //create LARL parser with tokenvector
-    auto vec = tokenVector.getTokenVector();
-    lalr.createTable();
-    lalr.parse(vec);
-    lalr.generate();
-    lalr.generateParseTreeImage("tree");
-    Orchestrator::tabber(); //Cleanup output file; match tabs & spaces
-    if(Config::getConfig()->isThreading()){
-        ThreadFunction::threadFILE("result.cpp");
-        Orchestrator::threadingTest(); //Perform a speed test
+        //create LARL parser with tokenvector
+        auto vec = tokenVector.getTokenVector();
+        lalr.createTable();
+        lalr.parse(vec);
+        lalr.generate();
+        lalr.generateParseTreeImage("tree");
+        Orchestrator::tabber(); //Cleanup output file; match tabs & spaces
+        if(Config::getConfig()->isThreading()){
+            ThreadFunction::threadFILE("result.cpp");
+            Orchestrator::threadingTest(); //Perform a speed test
+        }
     }
+
+
+    bool tm = false;
+    if (tm){
+        bool single_tape = false;
+
+        ifstream in{Filelocation};
+        string text_string;
+        while (!in.eof()){
+            char c = (char) in.get();
+            if (c == '\377'){
+                break;
+            }
+            text_string += c;
+        }
+
+        auto tm_b = new TMBuilder(4, true, 2, 4);
+        auto data = tm_b->generateTM();
+        delete tm_b;
+
+        auto tm_machine = TuringMachine{};
+        tm_machine.clear(true);
+        tm_machine.load(data.states, data.start_state, data.input, data.tape_size, data.productions);
+        tm_machine.load_input(text_string, 1);
+
+        if (single_tape){
+            tm_machine.clear(true);
+            tm_machine.load(data.states, data.start_state, data.input, data.tape_size, data.productions);
+            tm_machine.setSingleTape(false);
+            tm_machine.load_input(text_string, 1);
+            if (!tm_machine.isSingleTape()){
+                tm_machine = *tm_machine.toSingleTape();
+            }
+        }
+
+        for (int m=0; m<500000; m++){
+            if (tm_machine.isHalted()){
+                break;
+            }
+
+            tm_machine.move();
+        }
+
+        cout << endl;
+        for (int i = 0; i < tm_machine.getTapeAmount(); i++){
+            cout << tm_machine.getTapeData(i) << endl;
+        }
+
+        ofstream out{"output/result_TM.cpp"};
+        out << tm_machine.exportTapeData(1);
+        out.close();
+
+        return 0;
+
+
+    }
+
+
     return 0;
 }
