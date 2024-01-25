@@ -17,8 +17,8 @@ static unsigned int core_amount = std::thread::hardware_concurrency(); // Gets "
 // So please care about this.
 
 int main() {
-    //GUI g;
-    //return 0;
+    GUI g;
+    return 0;
 
     bool tm = true;
     bool parse_tree = true;
@@ -49,6 +49,17 @@ int main() {
 
         //create LARL parser with tokenvector
         auto vec = tokenVector.getTokenVector();
+
+        auto cfg_cyk = createCFG();
+        cfg_cyk->toCNF();
+
+        string check_str;
+        for (auto& v: vec){
+            check_str += std::get<0>(v);
+        }
+        bool b = cfg_cyk->accepts(check_str);
+        cout << "valid file " << b << endl;
+
         lalr.createTable();
         lalr.parse(vec);
         lalr.generate();
@@ -71,7 +82,6 @@ int main() {
             }
             text_string += c;
         }
-
 
         auto tm_b = new TMBuilder(4, Config::getConfig()->getIfElseNesting(), Config::getConfig()->getSplitNesting(), Config::getConfig()->getMaxNesting());
         auto data = tm_b->generateTM();

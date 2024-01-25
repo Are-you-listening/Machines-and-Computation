@@ -219,6 +219,20 @@ void GUI::Config() {
                 //create LARL parser with tokenvector
                 auto vec = tokenVector.getTokenVector();
 
+                bool check_valid = false;
+                if (check_valid){
+                    auto cfg_cyk = createCFG();
+                    cfg_cyk->toCNF();
+
+                    string check_str;
+                    for (auto& v: vec){
+                        check_str += std::get<0>(v);
+                    }
+                    bool b = cfg_cyk->accepts(check_str);
+                    cout << "valid file " << b << endl;
+                }
+
+
                 lalry.parse(vec);
                 lalry.generate();
 
@@ -344,7 +358,6 @@ void GUI::Config() {
     if (ImGui::Button("load F1 (class)")){
         loadDemo("demo/class.cpp");
     }
-
     if (ImGui::Button("load F2 (combination)")){
         loadDemo("demo/combination.cpp");
     }
