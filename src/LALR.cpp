@@ -792,7 +792,7 @@ void ParseTree::findViolation(const unsigned long &max,const unsigned long &spli
 
         if(get<0>(child->token)=="{") { //Found nesting
             ++count;
-            std::cout << count << std::endl;
+            //std::cout << count << std::endl;
 
             if (count == split) {
                 Rviolator = this;
@@ -817,7 +817,7 @@ void ParseTree::findViolation(const unsigned long &max,const unsigned long &spli
             
         }else if(get<0>(child->token)=="}"){ //Didn't reach max but did found matching; should now decrease?
             --count; //Is this right?
-            std::cout << count << std::endl;
+            //std::cout << count << std::endl;
             /*if(!found){
                 if(Rviolator!= nullptr && count<split){
                     Rviolator = nullptr;
@@ -1098,7 +1098,7 @@ void LALR::generateParseTreeImage(const string filename) {
         dotFile.close();
 
         std::string dotCommand = "dot -Tpng " + filename + " -o " + filename.substr(0, filename.length()-4) + ".png";
-        std::cout << dotCommand << std::endl; //Cout command for validation
+        //std::cout << dotCommand << std::endl;
         system(dotCommand.c_str());
     }else{
         std::cout << "couldn't open file to generate parseTree image!" << std::endl;
