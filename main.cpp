@@ -20,6 +20,9 @@ int main() {
     //GUI g;
     //return 0;
 
+    bool tm = true;
+    bool parse_tree = true;
+
     //Create tokenVector in parallel
     Tokenisation tokenVector; // sometimes variables in a nesting that should be passed in a function call aren't passed because it isn't found in the source file, this is done on purpose.
     //std::string Filelocation="demo/class.cpp";
@@ -31,7 +34,6 @@ int main() {
     //std::string Filelocation="demo/singletape.cpp";
     //std::string Filelocation="demo/variables.cpp";
 
-    bool parse_tree = true;
     if (parse_tree){
         std::thread Tokenizer(&Tokenisation::Tokenize, &tokenVector, Filelocation); // i ignore rvalues in function calls
         core_amount--;
@@ -58,8 +60,6 @@ int main() {
         }
     }
 
-
-    bool tm = true;
     if (tm){
         bool single_tape = false;
 
