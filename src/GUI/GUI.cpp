@@ -363,11 +363,11 @@ void GUI::Config() {
     }
 
     if (tm){
-        if (ImGui::Button("load F6 (singletape)")){
+        if (ImGui::Button("load F7 (singletape)")){
             loadDemo("demo/singletape.cpp");
         }
 
-        if (ImGui::Button("load F7 (ifElseAntinesting)")){
+        if (ImGui::Button("load F8 (ifElseAntinesting)")){
             loadDemo("demo/ifElseAntinestingTM.cpp");
         }
     }
