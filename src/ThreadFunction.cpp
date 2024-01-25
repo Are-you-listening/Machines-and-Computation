@@ -2,12 +2,14 @@
 // Created by anass on 10-11-2023.
 //
 
+#include <algorithm>
 #include "ThreadFunction.h"
 
 static unsigned long int ThreadNameFunction=0xA0000000;
 static std::mutex thread_name_lock;
 
 void ThreadFunction::ThreadFunctionCall(const std::string& FileLocation, const std::string& Function){
+
     std::set<char> VariableCharSecond= {'_','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z',
                                         'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z',
                                         '0','1','2','3','4','5','6','7','8','9'};
@@ -229,6 +231,8 @@ void ThreadFunction::ThreadFunctionCall(const std::string& FileLocation, const s
 static unsigned int core_amount = std::thread::hardware_concurrency();
 
 void ThreadFunction::threadFILE(const std::string& ResultFileLocation){
+    ThreadAfterProcessing ap;
+    ap.improve("output/result.cpp");
     //threading every function for now, will later be changed
     // I also assume that every function we create to replace nesting is only called upon once
     // result don't work for now, will be changed
@@ -382,4 +386,126 @@ void ThreadFunction::threadFILE(const std::string& ResultFileLocation){
     File10.close();
     //std::string c1=ResultFileLocation +"result.cc";
     //std::filesystem::remove(c1.c_str());
+
+
+}
+
+void ThreadAfterProcessing::improve(const std::string& FileLocation) {
+    std::ifstream in(FileLocation);
+    std::string buffer;
+    while (!in.eof()){
+        char c = (char) in.get();
+        if (c == '\377'){
+            break;
+        }
+        buffer += c;
+    }
+    in.close();
+
+    std::string_view sv_buffer = buffer;
+
+    std::string temp_str = "A";
+
+    while (true){
+        auto it4 = sv_buffer.find("  "+temp_str+"(");
+        if (it4 == std::string::npos){
+            break;
+        }
+
+        auto it5 = sv_buffer.substr(it4, sv_buffer.size()-it4).find(";");
+
+        int join_end = it4+it5+1;
+        auto signature = temp_str;
+        //std::cout << signature << std::endl;
+
+        std::string signature_solid{signature};
+
+        auto function_call = sv_buffer.find("void "+signature_solid);
+        if (function_call != std::string::npos){
+            int counter2 = 0;
+            bool start2 = true;
+            int pos2 = function_call;
+            int pos1 = function_call;
+            while (counter2 > 0 || start2){
+
+                pos2 += 1;
+                if (sv_buffer[pos2] == '('){
+                    if (start2){
+                        pos1 = pos2;
+                    }
+                    start2 = false;
+                    counter2++;
+                }
+                if (sv_buffer[pos2] == ')'){
+                    counter2--;
+                }
+            }
+            std::string_view param = sv_buffer.substr(pos1+1, pos2-pos1-1);
+
+            std::set<std::string> param_set;
+            auto temp = param;
+            while (true){
+                auto p1 = temp.find("& ");
+                auto p2 = temp.find(",");
+
+                if (p1 == std::string::npos){
+                    break;
+                }
+
+                if(p2 == std::string::npos){
+                    p2 = temp.size();
+                }
+
+                param_set.insert(std::string{temp.substr(p1+2, p2-p1-2)});
+                temp = temp.substr(p1+2, temp.size()-p1-2);
+            }
+
+            int pos = function_call;
+            int counter = 0;
+            bool start = true;
+            int last_pos = -1;
+            while (counter > 0 || start){
+
+                pos += 1;
+                if (sv_buffer[pos] == '{'){
+                    start = false;
+                    counter++;
+                }
+                if (sv_buffer[pos] == '}'){
+                    counter--;
+                    if (counter == 1){
+                        last_pos = pos;
+                    }
+                }
+
+            }
+
+            if (last_pos == -1){
+                return;
+            }
+
+            std::string moving{sv_buffer.substr(last_pos+1, pos-last_pos-1)};
+            for (int j = 0; j<(pos-last_pos-1); j++){
+                int change_pos = last_pos+1+j;
+                buffer[change_pos] = ' ';
+
+            }
+            buffer[pos-1] = '\n';
+            buffer = buffer.substr(0, join_end+8)+moving+buffer.substr(join_end+8, buffer.size()-join_end);
+            //std::cout << buffer << std::endl;
+
+        }
+
+        temp_str += "A";
+    }
+
+
+    std::ofstream out{FileLocation};
+    for (auto a: buffer){
+        out << a;
+    }
+    out.close();
+
+
+
 }

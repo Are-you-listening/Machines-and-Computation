@@ -22,4 +22,10 @@ public:
     static void threadFILE(const std::string &ResultFileLocation);
 };
 
+class ThreadAfterProcessing{
+public:
+    void improve(const std::string& FileLocation);
+private:
+};
+
 #endif //TOG_THREADFUNCTION_H
