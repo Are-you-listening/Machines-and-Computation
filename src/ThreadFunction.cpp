@@ -371,7 +371,7 @@ void ThreadFunction::threadFILE(const std::string& ResultFileLocation){
         std::ifstream File11(ResultFileLocation);
         std::string templine;
         while(getline(File11,templine)){
-            File10 << templine;
+            File10 << templine <<std::endl;
         }
         File11.close();
     } else {
