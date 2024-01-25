@@ -474,7 +474,6 @@ void LALR::parse(std::vector<std::tuple<std::string, std::string, std::set<std::
     auto inputcopy = input;
     _root->addTokens(inputcopy);
     std::cout << "done parsing" << endl;
-    generateParseTreeImage("parseTree.dot");
 }
 
 void LALR::printTable() {
@@ -487,9 +486,7 @@ void LALR::printTable() {
 }
 
 void LALR::generate() {
-
-    generateParseTreeImage("debug");
-
+    generateParseTreeImage("parseTreeBefore.dot");
     const unsigned long split = Config::getConfig()->getSplitNesting()+1;
     const unsigned long max = Config::getConfig()->getMaxNesting()+1;
     unsigned long count = 0;
@@ -504,11 +501,10 @@ void LALR::generate() {
     _root->cleanIncludeTypedefs(new_rootKids); //Collect includes
 
     _root->matchBrackets(_cfg.getT()); //Format first
-    generateParseTreeImage("d2ebug");
     _root->findViolation(max,split,count,index,violator,_cfg.getT(),found,lastFunction); //Check for violations
     lastFunction = _root->findRoot(lastFunction,_cfg.getT()); //We need to insert it in the root
 
-    while(violator!=nullptr){
+    while(violator!=nullptr && found){
         //Find difference: vSet - dSet = result
         std::set<std::string> vSet; //Contains V,I,e
         std::set<std::string> dSet;
@@ -577,12 +573,6 @@ void LALR::generate() {
         violator->children = newKids; //Set children (now with functionCall)
 
         //Recheck everything
-
-        if(functionName=="AAA"){
-            generateParseTreeImage("d4ebug");
-            //break;
-        }
-
         recheck:
         violator= nullptr;
         lastFunction = nullptr;
@@ -603,6 +593,7 @@ void LALR::generate() {
     _root->children = new_rootKids;
 
     saveYield();
+    generateParseTreeImage("parseTreeAfter.dot");
 }
 
 void LALR::saveYield() {
@@ -1086,7 +1077,7 @@ void ParseTree::generateDot(ostream &out) {
     //} else {
     //    out << "  " << '"' << this << '"' << " [label=\"" << symbol << "\"";
     //}
-     out << "  " << '"' << this << '"' << " [label=\"" << symbol << "\"";
+    out << "  " << '"' << this << '"' << " [label=\"" << symbol << "\"";
     if (children.empty()){
         out << ", color=\"red\", style=\"filled\", fillcolor=\"coral\"";
     }

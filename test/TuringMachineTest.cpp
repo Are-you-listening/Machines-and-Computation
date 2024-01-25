@@ -156,7 +156,7 @@ TEST(TuringMachineTest, TM_tools){
 }
 
 TEST(TuringMachineTest, TM_tokenazation) {
-    int index = 83;
+    int index = 84;
     ifstream test_file("../test/testFiles/TM_test_"+ to_string(index)+".cpp");
     string test_string;
     cout << test_file.is_open() << endl;

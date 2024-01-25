@@ -223,6 +223,7 @@ void GUI::Config() {
                 lalry.generate();
 
                 string out = lalry.getYield();
+
                 output_text = out;
                 fixTabs();
 
@@ -231,7 +232,11 @@ void GUI::Config() {
                     ifstream readThread{"output/result.cppresult.cc"};
                     string text;
                     while (!readThread.eof()){
-                        text += (char) readThread.get();
+                        char c = (char) readThread.get();
+                        if (c == '\377'){
+                            break;
+                        }
+                        text += c;
                     }
 
                     output_text = text;
@@ -259,6 +264,7 @@ void GUI::Config() {
                 }
 
                 if (!single_tape){
+                    tm_machine = TuringMachine{};
                     tm_machine.clear(true);
                     tm_machine.load(data.states, data.start_state, data.input, data.tape_size, data.productions);
                     tm_machine.load_input(text_string, 1);
