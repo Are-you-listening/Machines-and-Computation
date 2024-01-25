@@ -22,11 +22,11 @@ int main() {
 
     //Create tokenVector in parallel
     Tokenisation tokenVector; // sometimes variables in a nesting that should be passed in a function call aren't passed because it isn't found in the source file, this is done on purpose.
-    std::string Filelocation="demo/class.cpp";
+    //std::string Filelocation="demo/class.cpp";
     //std::string Filelocation="demo/combination.cpp";
     //std::string Filelocation="demo/forif.cpp";
     //std::string Filelocation="demo/ifElseAntinestingTM.cpp";
-    //std::string Filelocation="demo/knapsack.cpp";
+    std::string Filelocation="demo/knapsack.cpp";
     //std::string Filelocation="demo/main.cpp";
     //std::string Filelocation="demo/singletape.cpp";
     //std::string Filelocation="demo/variables.cpp";
@@ -59,7 +59,7 @@ int main() {
     }
 
 
-    bool tm = false;
+    bool tm = true;
     if (tm){
         bool single_tape = false;
 
@@ -109,12 +109,7 @@ int main() {
         ofstream out{"output/result_TM.cpp"};
         out << tm_machine.exportTapeData(1);
         out.close();
-
-        return 0;
-
-
     }
-
 
     return 0;
 }
