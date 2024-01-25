@@ -22,7 +22,15 @@ int main() {
 
     //Create tokenVector in parallel
     Tokenisation tokenVector; // sometimes variables in a nesting that should be passed in a function call aren't passed because it isn't found in the source file, this is done on purpose.
-    std::string Filelocation="../demo/main.cpp";
+    std::string Filelocation="demo/class.cpp";
+    //std::string Filelocation="demo/combination.cpp";
+    //std::string Filelocation="demo/forif.cpp";
+    //std::string Filelocation="demo/ifElseAntinestingTM.cpp";
+    //std::string Filelocation="demo/knapsack.cpp";
+    //std::string Filelocation="demo/main.cpp";
+    //std::string Filelocation="demo/singletape.cpp";
+    //std::string Filelocation="demo/variables.cpp";
+
     std::thread Tokenizer(&Tokenisation::Tokenize, &tokenVector, Filelocation); // i ignore rvalues in function calls
     core_amount--;
 
@@ -32,7 +40,6 @@ int main() {
     cfg->toGNF();
     const CFG a = *cfg;
     LALR lalr(a);
-    lalr.createTable();
 
     Tokenizer.join(); core_amount++; //Join both operations
 
