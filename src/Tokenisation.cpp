@@ -238,8 +238,13 @@ void Tokenisation::Tokenize(const std::string &FileLocation) {
     }
     unsigned long int count=0;
     for(auto it=tokenTupleVector.end()-1; it!=tokenTupleVector.begin(); it--,count++){
+        /*
         if(std::get<1>(*it).find("return")!=std::string::npos){
             continue;
+        }
+         */
+        if(std::get<1>(*it).find("nullptr")!=std::string::npos||std::get<1>(*it).find("NULL")!=std::string::npos){
+            std::get<0>(*it)="C";
         }
         if(std::get<0>(*it)=="V"||std::get<0>(*it)=="I"||std::get<0>(*it)=="e"){
             unsigned long int scopeNreverse=0;
