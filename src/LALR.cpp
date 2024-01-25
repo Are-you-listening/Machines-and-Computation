@@ -487,9 +487,6 @@ void LALR::printTable() {
 }
 
 void LALR::generate() {
-
-    generateParseTreeImage("debug");
-
     const unsigned long split = Config::getConfig()->getSplitNesting()+1;
     const unsigned long max = Config::getConfig()->getMaxNesting()+1;
     unsigned long count = 0;
@@ -504,7 +501,6 @@ void LALR::generate() {
     _root->cleanIncludeTypedefs(new_rootKids); //Collect includes
 
     _root->matchBrackets(_cfg.getT()); //Format first
-    generateParseTreeImage("d2ebug");
     _root->findViolation(max,split,count,index,violator,_cfg.getT(),found,lastFunction); //Check for violations
     lastFunction = _root->findRoot(lastFunction,_cfg.getT()); //We need to insert it in the root
 
@@ -577,12 +573,6 @@ void LALR::generate() {
         violator->children = newKids; //Set children (now with functionCall)
 
         //Recheck everything
-
-        if(functionName=="AAA"){
-            generateParseTreeImage("d4ebug");
-            //break;
-        }
-
         recheck:
         violator= nullptr;
         lastFunction = nullptr;
