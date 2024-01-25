@@ -264,6 +264,7 @@ void GUI::Config() {
                 }
 
                 if (!single_tape){
+                    tm_machine = TuringMachine{};
                     tm_machine.clear(true);
                     tm_machine.load(data.states, data.start_state, data.input, data.tape_size, data.productions);
                     tm_machine.load_input(text_string, 1);
