@@ -368,16 +368,16 @@ void ThreadFunction::threadFILE(const std::string& ResultFileLocation){
     std::ofstream File10(ResultFileLocation+"result.cc");
     File10<<"#include <thread>"<<std::endl;
     if(V.empty()){
-        for(const auto& it:V){
-            File10 << it <<std::endl;
-        }
-    } else {
         std::ifstream File11(ResultFileLocation);
         std::string templine;
         while(getline(File11,templine)){
             File10 << templine;
         }
         File11.close();
+    } else {
+        for(const auto& it:V){
+            File10 << it <<std::endl;
+        }
     }
     File10.close();
     //std::string c1=ResultFileLocation +"result.cc";
