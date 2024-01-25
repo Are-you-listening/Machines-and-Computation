@@ -25,6 +25,7 @@
 - [ ] Declarations in IF/ELSE statements (ex: if(int a = 0))
 - [ ] Initializer lists
 - [ ] Const functions and other keywords
+- [ ] Short forloops
 
 #### Key Notes
 - Turing Machine & LALR Output can differ but should act roughly the same
