@@ -17,8 +17,8 @@ static unsigned int core_amount = std::thread::hardware_concurrency(); // Gets "
 // So please care about this.
 
 int main() {
-    GUI g;
-    return 0;
+    //GUI g;
+    //return 0;
 
     //Create tokenVector in parallel
     Tokenisation tokenVector; // sometimes variables in a nesting that should be passed in a function call aren't passed because it isn't found in the source file, this is done on purpose.
@@ -45,6 +45,7 @@ int main() {
 
     //create LARL parser with tokenvector
     auto vec = tokenVector.getTokenVector();
+    lalr.createTable();
     lalr.parse(vec);
     lalr.generate();
     lalr.generateParseTreeImage("tree");
