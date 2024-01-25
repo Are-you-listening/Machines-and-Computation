@@ -508,7 +508,7 @@ void LALR::generate() {
     _root->findViolation(max,split,count,index,violator,_cfg.getT(),found,lastFunction); //Check for violations
     lastFunction = _root->findRoot(lastFunction,_cfg.getT()); //We need to insert it in the root
 
-    while(violator!=nullptr){
+    while(violator!=nullptr && found){
         //Find difference: vSet - dSet = result
         std::set<std::string> vSet; //Contains V,I,e
         std::set<std::string> dSet;
