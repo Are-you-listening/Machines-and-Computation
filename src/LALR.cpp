@@ -474,7 +474,6 @@ void LALR::parse(std::vector<std::tuple<std::string, std::string, std::set<std::
     auto inputcopy = input;
     _root->addTokens(inputcopy);
     std::cout << "done parsing" << endl;
-    generateParseTreeImage("parseTree.dot");
 }
 
 void LALR::printTable() {
@@ -487,6 +486,7 @@ void LALR::printTable() {
 }
 
 void LALR::generate() {
+    generateParseTreeImage("parseTreeBefore.dot");
     const unsigned long split = Config::getConfig()->getSplitNesting()+1;
     const unsigned long max = Config::getConfig()->getMaxNesting()+1;
     unsigned long count = 0;
@@ -593,6 +593,7 @@ void LALR::generate() {
     _root->children = new_rootKids;
 
     saveYield();
+    generateParseTreeImage("parseTreeAfter.dot");
 }
 
 void LALR::saveYield() {
@@ -1076,7 +1077,7 @@ void ParseTree::generateDot(ostream &out) {
     //} else {
     //    out << "  " << '"' << this << '"' << " [label=\"" << symbol << "\"";
     //}
-     out << "  " << '"' << this << '"' << " [label=\"" << symbol << "\"";
+    out << "  " << '"' << this << '"' << " [label=\"" << symbol << "\"";
     if (children.empty()){
         out << ", color=\"red\", style=\"filled\", fillcolor=\"coral\"";
     }
