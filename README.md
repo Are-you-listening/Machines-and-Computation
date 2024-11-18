@@ -1,5 +1,5 @@
 # The never{ Nestifier }
-> Group project for the course "Machines en berekenbaarheid" (INFORMAT 1001WETMAB)
+> Group project for the course Automata and Computation ("Machines en berekenbaarheid") (INFORMAT 1001WETMAB)
 > > By Anas Stitou, Tibo Vereycken, Emil Lambert & Kars van Velzen
 
 ### How to start?
