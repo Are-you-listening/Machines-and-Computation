@@ -18,7 +18,7 @@ By creating the software students should develope a deeper understanding of the 
 
 We developed a program to analyse code and clean up unnecesary nesting while keeping the original code functionality. This makes a codebase easier to read, understand and to extend upon in the future. A speed up is also made, since different code blocks can be rewritten with threading. A flag can turn this behaviour off. We do this by using grammars, tokens& parsers. The same functionality is also implemented on (a set of) turing machines. A test system is supplied just like a graphical user interface is provided for demo purposes.
 
-### How to run?
+# How to run?
     Run main.cpp    Enjoy =)
 
 #### Supported Included List:
