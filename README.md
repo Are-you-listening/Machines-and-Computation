@@ -2,7 +2,23 @@
 > Group project for the course Machines and Computation ("Machines en berekenbaarheid") (INFORMAT 1001WETMAB)
 > > By Anas Stitou, Tibo Vereycken, Emil Lambert & Kars van Velzen
 
-### How to start?
+# Course Info
+
+[Fall, 2024 | Machines en berekenbaarheid, 1001WETMAB] 
+
+The goals off this project for this course consists of (but not limited to): Show expertise in the course material theory, Implementing a software product, Developing an analytical mindset, 
+
+You can find detailed information about the course using this [link](https://www.uantwerpen.be/nl/studeren/aanbod/alle-opleidingen/informatica-studeren/bachelor/studieprogramma/) (Dutch)
+
+# Product Requirements
+
+By creating the software students should develope a deeper understanding of the theory by implementing and extending upon various theoretical concepts seen in class for a functional usecase in the computer science field.
+
+# Final Product
+
+We developed a program to analyse code and clean up unnecesary nesting while keeping the original code functionality. This makes a codebase easier to read, understand and to extend upon in the future. A speed up is also made, since different code blocks can be rewritten with threading. A flag can turn this behaviour off. We do this by using grammars, tokens& parsers. The same functionality is also implemented on (a set of) turing machines. A test system is supplied just like a graphical user interface is provided for demo purposes.
+
+### How to run?
     Run main.cpp    Enjoy =)
 
 #### Supported Included List:
