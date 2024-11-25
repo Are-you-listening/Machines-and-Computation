@@ -1,5 +1,5 @@
 # The never{ Nestifier }
-> Group project for the course Machines and Computation ("Machines en berekenbaarheid") (INFORMAT 1001WETMAB)
+> Automaticly cleans up your codes by removing unnecessary layers of nesting by using grammars, automata & turing machines!
 > > By Anas Stitou, Tibo Vereycken, Emil Lambert & Kars van Velzen
 
 # Course Info
